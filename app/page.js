@@ -233,7 +233,7 @@ export default function Home() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
           --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb;
-          --grey-200: #e2dfda; --grey-400: #aaa89f; --grey-600: #6b6960; --grey-800: #2a2926;
+          --grey-200: #e2dfda; --grey-400: #888580; --grey-600: #4a4845; --grey-800: #2a2926;
           --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif;
         }
         html { scroll-behavior: smooth; }
@@ -244,7 +244,7 @@ export default function Home() {
         .logo-name { font-family:var(--serif); font-size:1.35rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; line-height:1; }
         .logo-tagline { font-size:0.5rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--grey-400); margin-top:0.2rem; font-weight:300; }
         .nav-links { display:flex; align-items:center; gap:2.5rem; list-style:none; }
-        .nav-links a { font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-600); text-decoration:none; font-weight:300; transition:color 0.2s; }
+        .nav-links a { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-600); text-decoration:none; font-weight:400; transition:color 0.2s; }
         .nav-links a:hover { color:var(--black); }
         .nav-right { display:flex; align-items:center; gap:1.5rem; }
         .nav-lang { display:flex; align-items:center; gap:0.4rem; }
@@ -263,7 +263,7 @@ export default function Home() {
         .hero-title { font-family:var(--serif); font-size:clamp(3.5rem,5.5vw,6rem); font-weight:300; line-height:1.02; margin-bottom:2.5rem; }
         .hero-title em { font-style:italic; color:var(--grey-600); display:block; }
         .hero-divider { width:40px; height:1px; background:var(--grey-400); margin-bottom:2rem; }
-        .hero-sub { font-size:0.88rem; color:var(--grey-600); max-width:42ch; line-height:2; margin-bottom:3.5rem; font-weight:300; }
+        .hero-sub { font-size:1rem; color:var(--grey-700); max-width:42ch; line-height:1.9; margin-bottom:3.5rem; font-weight:400; }
         .hero-actions { display:flex; align-items:center; gap:2.5rem; }
         .btn-primary { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; background:var(--black); color:var(--white); padding:1rem 2.5rem; text-decoration:none; font-weight:300; transition:background 0.3s; font-family:var(--sans); display:inline-block; }
         .btn-primary:hover { background:var(--grey-800); }
@@ -288,7 +288,7 @@ export default function Home() {
 
         .onde-section { padding:8rem 6rem; }
         .onde-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:3rem; }
-        .onde-sub { font-size:0.85rem; color:var(--grey-600); max-width:32ch; text-align:right; line-height:2; font-weight:300; }
+        .onde-sub { font-size:0.92rem; color:var(--grey-700); max-width:32ch; text-align:right; line-height:1.9; font-weight:400; }
         .occasions-grid { display:grid; grid-template-columns:repeat(8,1fr); border:1px solid var(--grey-200); }
         .occasion-btn { padding:2.5rem 1rem; text-align:center; cursor:pointer; border:none; border-right:1px solid var(--grey-200); background:var(--white); font-family:var(--serif); font-size:1.15rem; font-weight:300; color:var(--grey-600); transition:all 0.25s; }
         .occasion-btn:last-child { border-right:none; }
@@ -305,7 +305,7 @@ export default function Home() {
         .process-step:not(:first-child) { padding-left:2.5rem; }
         .process-num { font-family:var(--serif); font-size:4rem; font-weight:300; color:var(--grey-200); line-height:1; margin-bottom:1.5rem; }
         .process-title { font-family:var(--serif); font-size:1.3rem; font-weight:400; margin-bottom:1rem; }
-        .process-desc { font-size:0.82rem; color:var(--grey-600); line-height:2; font-weight:300; }
+        .process-desc { font-size:0.95rem; color:var(--grey-800); line-height:1.9; font-weight:400; }
 
         .catalog-section { padding:8rem 6rem; }
         .catalog-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4rem; }
@@ -318,7 +318,7 @@ export default function Home() {
 
         .plans-section { background:var(--grey-100); padding:8rem 6rem; }
         .plans-intro { display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:end; margin-bottom:4rem; }
-        .plans-intro-sub { font-size:0.85rem; color:var(--grey-600); line-height:2; font-weight:300; }
+        .plans-intro-sub { font-size:0.95rem; color:var(--grey-800); line-height:1.9; font-weight:400; }
         .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--grey-200); }
         .plan-card { background:var(--white); padding:2.5rem; position:relative; }
         .plan-card.featured { background:var(--black); color:var(--white); }
@@ -331,7 +331,7 @@ export default function Home() {
         .plan-line { height:1px; background:var(--grey-200); margin-bottom:1.5rem; }
         .plan-card.featured .plan-line { background:#2a2926; }
         .plan-features { list-style:none; display:flex; flex-direction:column; gap:0.6rem; margin-bottom:2rem; }
-        .plan-features li { font-size:0.78rem; color:var(--grey-600); display:flex; align-items:center; gap:1rem; font-weight:300; }
+        .plan-features li { font-size:0.88rem; color:var(--grey-700); display:flex; align-items:center; gap:1rem; font-weight:400; }
         .plan-card.featured .plan-features li { color:var(--grey-400); }
         .plan-features li::before { content:''; width:20px; height:1px; background:var(--grey-400); flex-shrink:0; }
         .plan-btn { display:block; text-align:center; font-size:0.58rem; letter-spacing:0.2em; text-transform:uppercase; padding:0.85rem; text-decoration:none; border:1px solid var(--grey-800); color:var(--grey-800); transition:all 0.25s; font-weight:300; font-family:var(--sans); }
@@ -341,17 +341,17 @@ export default function Home() {
 
         .deposit-section { padding:8rem 6rem; display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:start; border-top:1px solid var(--grey-200); }
         .deposit-title { font-family:var(--serif); font-size:clamp(1.8rem,2.5vw,3rem); font-weight:300; line-height:1.2; margin-bottom:1.5rem; }
-        .deposit-text { font-size:0.85rem; color:var(--grey-600); line-height:2; font-weight:300; }
+        .deposit-text { font-size:0.95rem; color:var(--grey-800); line-height:1.9; font-weight:400; }
         .deposit-methods { display:flex; flex-direction:column; border:1px solid var(--grey-200); }
         .deposit-method { padding:1.25rem 1.5rem; border-bottom:1px solid var(--grey-200); display:flex; align-items:center; justify-content:space-between; gap:1rem; }
         .deposit-method:last-child { border-bottom:none; }
-        .deposit-method-name { font-size:0.82rem; font-weight:300; }
+        .deposit-method-name { font-size:0.92rem; font-weight:400; }
         .deposit-method-desc { font-size:0.68rem; color:var(--grey-400); text-align:right; font-weight:300; }
 
         .cta-section { background:var(--black); color:var(--white); padding:10rem 6rem; text-align:center; display:flex; flex-direction:column; align-items:center; }
         .cta-title { font-family:var(--serif); font-size:clamp(3rem,6vw,6rem); font-weight:300; line-height:1.05; max-width:16ch; margin-bottom:2.5rem; }
         .cta-title em { font-style:italic; color:var(--grey-600); }
-        .cta-sub { font-size:0.82rem; color:var(--grey-600); margin-bottom:3.5rem; max-width:50ch; line-height:2; font-weight:300; }
+        .cta-sub { font-size:0.95rem; color:var(--grey-400); margin-bottom:3.5rem; max-width:50ch; line-height:1.9; font-weight:400; }
         .btn-inv { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; border:1px solid rgba(255,255,255,0.3); color:var(--white); padding:1rem 3rem; text-decoration:none; font-weight:300; transition:all 0.3s; font-family:var(--sans); }
         .btn-inv:hover { background:var(--white); color:var(--black); border-color:var(--white); }
 
