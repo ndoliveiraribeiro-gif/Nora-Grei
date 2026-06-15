@@ -113,7 +113,7 @@ export default function Catalogo() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --grey-400: #3a3835; --grey-600: #1a1a18; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
+        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --grey-400: #080808; --grey-600: #080808; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
         body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
 
         .cat-nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
@@ -140,8 +140,14 @@ export default function Catalogo() {
         @media (max-width:900px) {
           .cat-nav { padding:1rem 1.5rem; }
           .cat-header { padding:6rem 1.5rem 2rem; }
+          .cat-header-label { font-size:0.88rem; color:#080808; font-weight:500; }
+          .cat-header-title { font-size:clamp(1.8rem,7vw,2.5rem); color:#080808; }
+          .cat-header-sub { font-size:1.05rem; color:#080808; }
           .cat-filters { padding:0 1.5rem 1.5rem; }
+          .filter-btn { font-size:0.82rem; color:#080808; }
+          .filter-select { font-size:0.82rem; color:#080808; }
           .cat-grid { padding:0 1.5rem 4rem; grid-template-columns:repeat(2,1fr); gap:1rem; }
+          body { font-size:17px; color:#080808; }
         }
 
         @media (max-width:480px) {
