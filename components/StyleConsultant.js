@@ -81,8 +81,8 @@ export default function StyleConsultant({ lang = "pt", nomeCliente = null }) {
         .consultant {
           position: fixed;
           bottom: calc(80px + env(safe-area-inset-bottom));
-          left: 1rem; right: 1rem;
-          z-index: 150;
+          left: 1rem; right: 4rem;
+          z-index: 149;
           background: #f8f7f5;
           border: 1px solid #e2dfda;
           box-shadow: 0 8px 40px rgba(0,0,0,0.12);
@@ -198,7 +198,7 @@ export default function StyleConsultant({ lang = "pt", nomeCliente = null }) {
           white-space: nowrap;
         }
         @media (min-width: 769px) {
-          .consultant { left: auto; right: 2rem; bottom: 2rem; width: 380px; }
+          .consultant { left: 2rem; right: auto; bottom: 2rem; width: 380px; }
         }
       `}</style>
 

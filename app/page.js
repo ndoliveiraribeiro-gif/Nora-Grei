@@ -340,9 +340,9 @@ export default function Home() {
           body { font-size:17px; padding-bottom:140px; }
 
           /* NAV MOBILE */
-          .nav { padding:1rem 1.25rem; }
+          .nav { padding:0.85rem 1.25rem; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; }
           .nav-links { display:none; }
-          .nav-right .nav-btn-outline { display:none; }
+          .nav-right .nav-btn-outline { display:none; } .nav-right .nav-btn-fill { display:none; }
           .nav-right .nav-btn-fill { display:none; }
           .nav-right { gap:1rem; }
           .lang-btn { font-size:0.65rem; }
@@ -425,7 +425,7 @@ export default function Home() {
 
           /* BOTTOM NAV */
           .bottom-nav { display:block; }
-          .mobile-cta-bar { display:block; }
+          .mobile-cta-bar { display:none; }
         }
       `}</style>
 

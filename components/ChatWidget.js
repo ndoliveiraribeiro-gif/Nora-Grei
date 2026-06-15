@@ -130,17 +130,17 @@ export default function ChatWidget({ lang = "pt" }) {
       <style>{`
         .chat-fab {
           position: fixed;
-          bottom: calc(90px + env(safe-area-inset-bottom));
-          right: 1.25rem;
+          bottom: calc(80px + env(safe-area-inset-bottom));
+          right: 1rem;
           z-index: 300;
           width: 56px; height: 56px;
           border-radius: 50%;
-          background: #080808;
+          background: #c8a4a5;
           color: #f8f7f5;
           border: none;
           cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+          box-shadow: 0 4px 20px rgba(200,164,165,0.4);
           transition: transform 0.2s, box-shadow 0.2s;
           font-size: 1.3rem;
         }
@@ -167,7 +167,7 @@ export default function ChatWidget({ lang = "pt" }) {
         }
 
         .chat-header {
-          background: #080808;
+          background: #c8a4a5;
           color: #f8f7f5;
           padding: 1rem 1.25rem;
           display: flex;
@@ -312,8 +312,8 @@ export default function ChatWidget({ lang = "pt" }) {
         .chat-send:disabled { background: #e2dfda; cursor: not-allowed; }
 
         @media (max-width: 768px) {
-          .chat-window { right: 0; left: 0; bottom: calc(140px + env(safe-area-inset-bottom)); width: 100%; max-height: 60vh; border-left: none; border-right: none; }
-          .chat-fab { bottom: calc(145px + env(safe-area-inset-bottom)); right: 1rem; }
+          .chat-window { right: 0; left: 0; bottom: calc(130px + env(safe-area-inset-bottom)); width: 100%; max-height: 55vh; border-left: none; border-right: none; }
+          .chat-fab { bottom: calc(80px + env(safe-area-inset-bottom)); right: 1rem; }
         }
       `}</style>
 
