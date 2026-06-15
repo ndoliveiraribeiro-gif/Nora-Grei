@@ -337,6 +337,7 @@ export default function Home() {
 
         /* ── MOBILE ── */
         @media (max-width: 768px) {
+          nav { display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
           body { font-size:17px; padding-bottom:140px; }
 
           /* NAV MOBILE */
