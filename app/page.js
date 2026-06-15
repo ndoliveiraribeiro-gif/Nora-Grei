@@ -627,7 +627,7 @@ export default function Home() {
             <span className="bottom-nav-label">{t.bottomNav.pedidos}</span>
             {activeTab==="pedidos" && <div className="bottom-nav-dot"></div>}
           </a>
-          <a href="/entrar" className={`bottom-nav-item${activeTab==="perfil"?" active":""}`} onClick={() => setActiveTab("perfil")}>
+          <a href={userLogado ? "/perfil" : "/entrar"} className={`bottom-nav-item${activeTab==="perfil"?" active":""}`} onClick={() => setActiveTab("perfil")}>
             <div className="bottom-nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <span className="bottom-nav-label">{t.bottomNav.perfil}</span>
             {activeTab==="perfil" && <div className="bottom-nav-dot"></div>}
