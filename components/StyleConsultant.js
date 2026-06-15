@@ -98,7 +98,7 @@ export default function StyleConsultant({ lang = "pt" }) {
 
   return (
     <>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         .sc-wrap {
           position: fixed;
           bottom: calc(80px + env(safe-area-inset-bottom));
@@ -134,7 +134,7 @@ export default function StyleConsultant({ lang = "pt" }) {
         @media (min-width: 769px) {
           .sc-wrap { left: auto; right: 2rem; bottom: 2rem; }
         }
-      `}</style>
+      `}} />
 
       <div className="sc-wrap">
         <div className="sc-header">
