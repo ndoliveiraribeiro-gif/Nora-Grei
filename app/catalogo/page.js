@@ -82,12 +82,16 @@ export default function Catalogo() {
 
   const carregarPecas = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("pecas").select(`*, stock_tamanhos(tamanho, quantidade_disponivel), categorias(nome)`);
+    const { data, error } = await supabase
+      .from("pecas")
+      .select(`*, stock_tamanhos(tamanho, quantidade_disponivel), categorias(nome), alugueres(data_fim, estado)`)
+      .order("created_at", { ascending: false });
     if (data && data.length > 0) {
       const formatadas = data.map(p => ({
         ...p,
         categoria: p.categorias?.nome || "",
         tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
+        data_fim: p.alugueres?.find(a => a.estado === "ativo")?.data_fim || null,
       }));
       setPecas(formatadas);
     }
