@@ -340,7 +340,7 @@ export default function Home() {
           body { font-size:17px; padding-bottom:140px; }
 
           /* NAV MOBILE */
-          .nav { padding:0.85rem 1.25rem; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; }
+          .nav { padding:0.85rem 1.25rem; display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
           .nav-links { display:none; }
           .nav-right .nav-btn-outline { display:none; } .nav-right .nav-btn-fill { display:none; }
           .nav-right .nav-btn-fill { display:none; }
