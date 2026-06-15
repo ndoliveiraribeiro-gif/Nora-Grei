@@ -69,20 +69,20 @@ export default function Catalogo() {
         body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
         .cat-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
         .cat-nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .cat-nav-back { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-400); text-decoration:none; font-weight:400; transition:color 0.2s; }
+        .cat-nav-back { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:#1a1a18; text-decoration:none; font-weight:400; transition:color 0.2s; }
         .cat-nav-back:hover { color:var(--black); }
         .cat-header { padding:8rem 4rem 3rem; }
-        .cat-header-label { font-size:0.58rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--grey-400); margin-bottom:0.75rem; font-weight:400; }
+        .cat-header-label { font-size:0.58rem; letter-spacing:0.3em; text-transform:uppercase; color:#1a1a18; margin-bottom:0.75rem; font-weight:400; }
         .cat-header-title { font-family:var(--serif); font-size:clamp(2.5rem,4vw,4rem); font-weight:300; line-height:1.05; }
         .cat-filters { padding:0 4rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:3rem; }
-        .filter-btn { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.6rem 1.25rem; border:1px solid var(--grey-200); background:var(--white); color:var(--grey-600); cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
+        .filter-btn { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.6rem 1.25rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
         .filter-btn:hover { border-color:var(--black); color:var(--black); }
         .filter-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .filter-sep { width:1px; height:20px; background:var(--grey-200); }
-        .filter-select { font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.6rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:var(--grey-600); cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; }
+        .filter-select { font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.6rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; }
         .cat-grid { padding:0 4rem 6rem; display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
-        .cat-empty { padding:4rem; text-align:center; font-family:var(--serif); font-size:1.5rem; font-weight:300; color:var(--grey-400); font-style:italic; }
-        .cat-loading { padding:4rem; text-align:center; font-size:0.82rem; color:var(--grey-400); letter-spacing:0.2em; text-transform:uppercase; }
+        .cat-empty { padding:4rem; text-align:center; font-family:var(--serif); font-size:1.5rem; font-weight:300; color:#1a1a18; font-style:italic; }
+        .cat-loading { padding:4rem; text-align:center; font-size:0.82rem; color:#1a1a18; letter-spacing:0.2em; text-transform:uppercase; }
         @media (max-width:900px) { .cat-nav{padding:1rem 1.5rem;} .cat-header{padding:6rem 1.5rem 2rem;} .cat-filters{padding:0 1.5rem 1.5rem;} .cat-grid{padding:0 1.5rem 4rem;grid-template-columns:repeat(2,1fr);gap:1rem;} }
         @media (max-width:480px) { .cat-grid{grid-template-columns:1fr;} }
       `}</style>
