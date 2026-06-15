@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PontosWidget from "@/components/PontosWidget";
+import CodigoDesconto from "@/components/CodigoDesconto";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -421,8 +422,13 @@ export default function Perfil() {
                       <div className="pf-aluguer-nome">{peca?.nome || "Peça"}</div>
                       <div className="pf-aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer || 0}€</div>
                     </div>
-                    <div className={`pf-estado pf-estado-${a.estado === 'ativo' ? 'ativo' : a.estado === 'devolvido' ? 'devolvido' : 'pendente'}`}>
-                      {i[a.estado] || a.estado}
+                    <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'0.5rem'}}>
+                      <div className={`pf-estado pf-estado-${a.estado === 'ativo' ? 'ativo' : a.estado === 'devolvido' ? 'devolvido' : 'pendente'}`}>
+                        {i[a.estado] || a.estado}
+                      </div>
+                      {a.estado === 'devolvido' && (
+                        <CodigoDesconto aluguer={a} clienteId={user?.id} lang={lang} />
+                      )}
                     </div>
                   </div>
                 );
