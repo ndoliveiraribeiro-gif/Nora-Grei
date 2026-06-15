@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 const translations = {
   pt: {
@@ -158,8 +159,11 @@ export default function Home() {
   const [selected, setSelected] = useState(null);
   const [lang, setLang] = useState("pt");
   const [activeTab, setActiveTab] = useState("home");
+  const [userLogado, setUserLogado] = useState(false);
 
   useEffect(() => {
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    sb.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     const saved = localStorage.getItem("ng_lang");
     if (saved && translations[saved]) setLang(saved);
     else {
@@ -186,7 +190,7 @@ export default function Home() {
         body { background: var(--white); color: var(--black); font-family: var(--sans); font-weight: 400; font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
 
         /* NAV */
-        .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
+        .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); flex-wrap:nowrap; }
         .logo { display:flex; flex-direction:column; text-decoration:none; color:var(--black); }
         .logo-name { font-family:var(--serif); font-size:1.35rem; font-weight:400; letter-spacing:0.25em; text-transform:uppercase; line-height:1; }
         .logo-tagline { font-size:0.55rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--grey-400); margin-top:0.2rem; font-weight:400; }
@@ -447,7 +451,7 @@ export default function Home() {
             <span className="lang-sep">/</span>
             <button className={`lang-btn${lang==="lt"?" active":""}`} onClick={() => changeLang("lt")}>LT</button>
           </div>
-          <a href="/entrar" className="nav-btn nav-btn-outline">{t.nav.entrar}</a>
+          <a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? "O meu perfil" : t.nav.entrar}</a>
           <a href="#onde-vas" className="nav-btn nav-btn-fill">{t.hero.ctaPrincipal}</a>
         </div>
       </nav>
