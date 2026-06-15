@@ -183,11 +183,11 @@ export default function Home() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
           --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb;
-          --grey-200: #e2dfda; --grey-400: #888580; --grey-600: #4a4845; --grey-800: #2a2926;
+          --grey-200: #e2dfda; --grey-400: #5a5855; --grey-600: #1a1a18; --grey-800: #2a2926;
           --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif;
         }
         html { scroll-behavior: smooth; }
-        body { background: var(--white); color: var(--black); font-family: var(--sans); font-weight: 400; font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        body { background: var(--white); color: var(--black); font-family: var(--sans); font-weight: 400; font-size: 17px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
 
         /* NAV */
         .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); flex-wrap:nowrap; }
@@ -261,7 +261,7 @@ export default function Home() {
         .process-step:not(:first-child) { padding-left:2.5rem; }
         .process-num { font-family:var(--serif); font-size:4rem; font-weight:300; color:var(--grey-200); line-height:1; margin-bottom:1.5rem; }
         .process-title { font-family:var(--serif); font-size:1.4rem; font-weight:400; margin-bottom:0.75rem; }
-        .process-desc { font-size:0.95rem; color:var(--grey-600); line-height:1.9; font-weight:400; }
+        .process-desc { font-size:1.05rem; color:var(--grey-600); line-height:1.9; font-weight:400; }
 
         /* CATÁLOGO */
         .catalog-section { padding:8rem 6rem; }
@@ -288,7 +288,7 @@ export default function Home() {
         .plan-line { height:1px; background:var(--grey-200); margin-bottom:1.5rem; }
         .plan-card.featured .plan-line { background:#2a2926; }
         .plan-features { list-style:none; display:flex; flex-direction:column; gap:0.6rem; margin-bottom:2rem; }
-        .plan-features li { font-size:0.9rem; color:var(--grey-600); display:flex; align-items:center; gap:1rem; font-weight:400; }
+        .plan-features li { font-size:1rem; color:var(--grey-600); display:flex; align-items:center; gap:1rem; font-weight:400; }
         .plan-card.featured .plan-features li { color:var(--grey-400); }
         .plan-features li::before { content:''; width:20px; height:1px; background:var(--grey-400); flex-shrink:0; }
         .plan-btn { display:block; text-align:center; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; padding:0.9rem; text-decoration:none; border:1px solid var(--grey-800); color:var(--grey-800); transition:all 0.25s; font-weight:400; font-family:var(--sans); }
@@ -340,9 +340,9 @@ export default function Home() {
           body { font-size:17px; padding-bottom:140px; }
 
           /* NAV MOBILE */
-          .nav { padding:0.85rem 1.25rem; display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
+          .nav { padding:0.9rem 1.25rem; display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
           .nav-links { display:none; }
-          .nav-right .nav-btn-outline { display:none; } .nav-right .nav-btn-fill { display:none; }
+          .nav-right .nav-btn-outline { display:none; }
           .nav-right .nav-btn-fill { display:none; }
           .nav-right { gap:1rem; }
           .lang-btn { font-size:0.65rem; }
@@ -357,7 +357,7 @@ export default function Home() {
           .hero-divider { margin-bottom:1.25rem; }
           .hero-sub { font-size:1.05rem; margin-bottom:2rem; max-width:100%; }
           .hero-actions { gap:1rem; }
-          .btn-primary { font-size:0.82rem; padding:1.1rem 2rem; width:100%; text-align:center; }
+          .btn-primary { font-size:1rem; padding:1.1rem 2rem; width:100%; text-align:center; }
           .btn-text { font-size:0.78rem; }
 
           /* STRIP MOBILE */
@@ -410,13 +410,13 @@ export default function Home() {
           .deposit-text { font-size:1rem; }
           .deposit-method { flex-direction:column; align-items:flex-start; gap:0.3rem; padding:1rem 1.25rem; }
           .deposit-method-name { font-size:1rem; }
-          .deposit-method-desc { text-align:left; font-size:0.85rem; }
+          .deposit-method-desc { text-align:left; font-size:1rem; }
 
           /* CTA MOBILE */
           .cta-section { padding:5rem 1.25rem; }
           .cta-title { font-size:clamp(2.5rem,9vw,3.5rem); }
           .cta-sub { font-size:1rem; }
-          .btn-inv { font-size:0.82rem; padding:1.1rem 2.5rem; }
+          .btn-inv { font-size:1rem; padding:1.1rem 2.5rem; }
 
           /* FOOTER MOBILE */
           footer { grid-template-columns:1fr; padding:2rem 1.25rem; gap:1.5rem; }

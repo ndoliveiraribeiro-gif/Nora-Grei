@@ -135,12 +135,12 @@ export default function ChatWidget({ lang = "pt" }) {
           z-index: 300;
           width: 56px; height: 56px;
           border-radius: 50%;
-          background: #c8a4a5;
+          background: #c4748a;
           color: #f8f7f5;
           border: none;
           cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 20px rgba(200,164,165,0.4);
+          box-shadow: 0 4px 20px rgba(196,116,138,0.3);
           transition: transform 0.2s, box-shadow 0.2s;
           font-size: 1.3rem;
         }
@@ -167,7 +167,7 @@ export default function ChatWidget({ lang = "pt" }) {
         }
 
         .chat-header {
-          background: #c8a4a5;
+          background: #c4748a;
           color: #f8f7f5;
           padding: 1rem 1.25rem;
           display: flex;

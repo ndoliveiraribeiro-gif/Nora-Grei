@@ -1,242 +1,189 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const ocasioesData = {
+const ROSA = "#c4748a";
+const ROSA_DARK = "#a85c72";
+const ROSA_LIGHT = "#f9eef1";
+
+const t = {
   pt: {
-    ocasioes: ["Férias", "Concerto", "Gala", "Festa", "Casamento", "Trabalho", "Jantar", "Teatro"],
-    generos: ["Mulher", "Homem", "Indefinido"],
-    saudacao: (nome) => nome ? `Olá, ${nome}!` : "Olá!",
-    pergunta: "Onde vais hoje?",
-    perguntaGenero: (ocasiao) => `${ocasiao}! Que elegante. És mulher, homem ou preferes não especificar?`,
-    sugestao: (ocasiao, genero) => `A tua seleção para ${ocasiao} está pronta — escolhida especialmente para ${genero === "Mulher" ? "ti" : genero === "Homem" ? "ti" : "si"}.`,
-    verSugestoes: "Ver sugestões",
-    mudar: "Mudar ocasião",
+    ajuda: "Posso ajudar-te a escolher?",
+    sim: "Sim, quero ajuda!",
+    nao: "Não, obrigada",
+    evento: "Que evento é este?",
+    eventos: ["Férias","Concerto","Gala","Festa","Casamento","Trabalho","Jantar","Teatro"],
+    sexo: "Como te identificas?",
+    sexos: ["Mulher","Homem","Não especifico"],
+    idade: "Qual a tua faixa etária?",
+    idades: ["18-25","26-35","36-45","46+"],
+    ver: "Ver sugestões para mim",
+    mudar: "Recomeçar",
+    pronto: (evento, sexo) => `Perfeito! Selecionei looks de ${evento} para ${sexo === "Mulher" ? "ti" : sexo === "Homem" ? "ti" : "si"}.`,
+    titulo: "✦ Stylist Nora Grei",
   },
   fr: {
-    ocasioes: ["Vacances", "Concert", "Gala", "Fête", "Mariage", "Travail", "Dîner", "Théâtre"],
-    generos: ["Femme", "Homme", "Non précisé"],
-    saudacao: (nome) => nome ? `Bonjour, ${nome}!` : "Bonjour!",
-    pergunta: "Où allez-vous aujourd'hui ?",
-    perguntaGenero: (ocasiao) => `${ocasiao} ! Élégant. Vous êtes femme, homme ou préférez ne pas préciser ?`,
-    sugestao: (ocasiao, genero) => `Votre sélection pour ${ocasiao} est prête — choisie spécialement pour vous.`,
-    verSugestoes: "Voir les suggestions",
-    mudar: "Changer l'occasion",
+    ajuda: "Puis-je vous aider à choisir ?",
+    sim: "Oui, j'aide-moi !",
+    nao: "Non, merci",
+    evento: "Quel est cet événement ?",
+    eventos: ["Vacances","Concert","Gala","Fête","Mariage","Travail","Dîner","Théâtre"],
+    sexo: "Comment vous identifiez-vous ?",
+    sexos: ["Femme","Homme","Non précisé"],
+    idade: "Quelle est votre tranche d'âge ?",
+    idades: ["18-25","26-35","36-45","46+"],
+    ver: "Voir mes suggestions",
+    mudar: "Recommencer",
+    pronto: (evento, sexo) => `Parfait ! J'ai sélectionné des looks ${evento} pour vous.`,
+    titulo: "✦ Stylist Nora Grei",
   },
   lt: {
-    ocasioes: ["Atostogos", "Koncertas", "Gala", "Vakarėlis", "Vestuvės", "Darbas", "Vakarienė", "Teatras"],
-    generos: ["Moteris", "Vyras", "Nenurodyta"],
-    saudacao: (nome) => nome ? `Sveiki, ${nome}!` : "Sveiki!",
-    pergunta: "Kur šiandien einate?",
-    perguntaGenero: (ocasiao) => `${ocasiao}! Elegantiškai. Esate moteris, vyras ar pageidaujate nenurodyti?`,
-    sugestao: (ocasiao, genero) => `Jūsų atranka ${ocasiao} paruošta — parinkta specialiai jums.`,
-    verSugestoes: "Žiūrėti pasiūlymus",
-    mudar: "Keisti progą",
+    ajuda: "Ar galiu padėti pasirinkti?",
+    sim: "Taip, padėk man!",
+    nao: "Ne, ačiū",
+    evento: "Kokia tai proga?",
+    eventos: ["Atostogos","Koncertas","Gala","Vakarėlis","Vestuvės","Darbas","Vakarienė","Teatras"],
+    sexo: "Kaip save identifikuojate?",
+    sexos: ["Moteris","Vyras","Nenurodyti"],
+    idade: "Koks jūsų amžiaus grupė?",
+    idades: ["18-25","26-35","36-45","46+"],
+    ver: "Žiūrėti pasiūlymus",
+    mudar: "Pradėti iš naujo",
+    pronto: (evento, sexo) => `Puiku! Parinkau looks ${evento} jums.`,
+    titulo: "✦ Stylist Nora Grei",
   },
 };
 
-export default function StyleConsultant({ lang = "pt", nomeCliente = null }) {
-  const [step, setStep] = useState("ocasiao"); // ocasiao | genero | pronto
-  const [ocasiao, setOcasiao] = useState(null);
-  const [genero, setGenero] = useState(null);
-  const [minimizado, setMinimizado] = useState(false);
+export default function StyleConsultant({ lang = "pt" }) {
+  const [step, setStep] = useState(null); // null=escondido, ask=pergunta, evento, sexo, idade, pronto
+  const [evento, setEvento] = useState(null);
+  const [sexo, setSexo] = useState(null);
+  const [idade, setIdade] = useState(null);
 
-  const d = ocasioesData[lang] || ocasioesData.pt;
+  const i = t[lang] || t.pt;
 
   useEffect(() => {
-    const saved = localStorage.getItem("ng_consultant");
+    // Só aparece no catálogo
+    if (typeof window === "undefined") return;
+    if (!window.location.pathname.startsWith("/catalogo")) return;
+    
+    const saved = localStorage.getItem("ng_consultant_v2");
     if (saved) {
-      const { ocasiao, genero } = JSON.parse(saved);
-      if (ocasiao && genero) { setOcasiao(ocasiao); setGenero(genero); setStep("pronto"); }
-      else if (ocasiao) { setOcasiao(ocasiao); setStep("genero"); }
+      const data = JSON.parse(saved);
+      if (data.done) return; // já preencheu, não mostrar
+      setStep("ask");
+    } else {
+      // Primeira visita ao catálogo - mostrar após 2 segundos
+      setTimeout(() => setStep("ask"), 2000);
     }
   }, []);
 
-  const escolherOcasiao = (o) => {
-    setOcasiao(o);
-    setStep("genero");
-    localStorage.setItem("ng_consultant", JSON.stringify({ ocasiao: o }));
+  const recusar = () => {
+    localStorage.setItem("ng_consultant_v2", JSON.stringify({ done: true }));
+    setStep(null);
   };
 
-  const escolherGenero = (g) => {
-    setGenero(g);
+  const escolherEvento = (e) => { setEvento(e); setStep("sexo"); };
+  const escolherSexo = (s) => { setSexo(s); setStep("idade"); };
+  const escolherIdade = (i) => {
+    setIdade(i);
     setStep("pronto");
-    localStorage.setItem("ng_consultant", JSON.stringify({ ocasiao, genero: g }));
+    localStorage.setItem("ng_consultant_v2", JSON.stringify({ evento, sexo, idade: i, done: false }));
   };
 
   const resetar = () => {
-    setStep("ocasiao"); setOcasiao(null); setGenero(null);
-    localStorage.removeItem("ng_consultant");
-    localStorage.removeItem("ng_ai_comment");
+    localStorage.removeItem("ng_consultant_v2");
+    setEvento(null); setSexo(null); setIdade(null);
+    setStep("ask");
   };
 
-  if (minimizado) return (
-    <button onClick={() => setMinimizado(false)} style={{position:'fixed',bottom:'calc(80px + env(safe-area-inset-bottom))',right:'1rem',zIndex:150,background:'#080808',color:'#f8f7f5',border:'none',borderRadius:'50%',width:'52px',height:'52px',cursor:'pointer',fontSize:'1.2rem',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 20px rgba(0,0,0,0.2)'}}>
-      ✦
-    </button>
-  );
+  const verSugestoes = () => {
+    localStorage.setItem("ng_consultant_v2", JSON.stringify({ evento, sexo, idade, done: true }));
+    window.location.href = `/catalogo?evento=${encodeURIComponent(evento)}&sexo=${encodeURIComponent(sexo)}&idade=${encodeURIComponent(idade)}`;
+  };
+
+  if (!step) return null;
 
   return (
     <>
-      <style>{`
-        .consultant {
+      <style>{\`
+        .sc-wrap {
           position: fixed;
           bottom: calc(80px + env(safe-area-inset-bottom));
-          left: 1rem; right: 4rem;
+          left: 1rem; right: 1rem;
           z-index: 149;
-          background: #f8f7f5;
-          border: 1px solid #e2dfda;
-          box-shadow: 0 8px 40px rgba(0,0,0,0.12);
-          max-width: 480px;
-          margin: 0 auto;
+          background: #fff;
+          border: 1.5px solid \${ROSA};
+          box-shadow: 0 8px 32px rgba(196,116,138,0.15);
+          max-width: 420px;
+          animation: scUp 0.3s ease;
         }
-        .consultant-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem 1.25rem;
-          border-bottom: 1px solid #e2dfda;
-          background: #080808;
-          color: #f8f7f5;
+        @keyframes scUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .sc-header {
+          background: \${ROSA};
+          color: #fff;
+          padding: 0.85rem 1.25rem;
+          display: flex; align-items: center; justify-content: space-between;
+          font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500;
         }
-        .consultant-marca {
-          font-family: 'Cormorant', serif;
-          font-size: 0.9rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          font-weight: 300;
-        }
-        .consultant-close {
-          background: none;
-          border: none;
-          color: rgba(255,255,255,0.6);
-          cursor: pointer;
-          font-size: 1rem;
-          padding: 0;
-          transition: color 0.2s;
-        }
-        .consultant-close:hover { color: #f8f7f5; }
-        .consultant-body { padding: 1.25rem; }
-        .consultant-saudacao {
-          font-family: 'Cormorant', serif;
-          font-size: 1.4rem;
-          font-weight: 400;
-          color: #080808;
-          margin-bottom: 0.4rem;
-        }
-        .consultant-pergunta {
-          font-size: 0.92rem;
-          color: #2e2d2b;
-          font-weight: 400;
-          margin-bottom: 1.25rem;
-          line-height: 1.6;
-        }
-        .consultant-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 0.5rem;
-        }
-        .consultant-btn {
-          padding: 0.75rem 0.5rem;
-          border: 1px solid #e2dfda;
-          background: #f8f7f5;
-          font-family: 'Cormorant', serif;
-          font-size: 1rem;
-          font-weight: 300;
-          color: #4a4845;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: center;
-        }
-        .consultant-btn:hover { background: #080808; color: #f8f7f5; border-color: #080808; }
-        .consultant-genero-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.5rem;
-        }
-        .consultant-sugestao {
-          font-family: 'Cormorant', serif;
-          font-size: 1.1rem;
-          font-style: italic;
-          font-weight: 300;
-          color: #2e2d2b;
-          line-height: 1.6;
-          margin-bottom: 1rem;
-        }
-        .consultant-actions {
-          display: flex;
-          gap: 0.75rem;
-          align-items: center;
-        }
-        .consultant-btn-ver {
-          flex: 1;
-          padding: 0.85rem;
-          background: #080808;
-          color: #f8f7f5;
-          border: none;
-          font-size: 0.72rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          font-family: 'Jost', sans-serif;
-          font-weight: 500;
-          cursor: pointer;
-          text-decoration: none;
-          text-align: center;
-          display: block;
-          transition: background 0.2s;
-        }
-        .consultant-btn-ver:hover { background: #2a2926; }
-        .consultant-btn-reset {
-          font-size: 0.72rem;
-          color: #888580;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: 'Jost', sans-serif;
-          font-weight: 400;
-          padding: 0;
-          text-decoration: underline;
-          white-space: nowrap;
-        }
+        .sc-close { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; font-size: 1rem; padding: 0; }
+        .sc-body { padding: 1.25rem; font-family: 'Jost', sans-serif; }
+        .sc-question { font-family: 'Cormorant', serif; font-size: 1.25rem; font-weight: 400; color: #1a1a18; margin-bottom: 1rem; line-height: 1.4; }
+        .sc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 0.5rem; }
+        .sc-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        .sc-btn { padding: 0.65rem 0.5rem; border: 1.5px solid #e2dfda; background: #fff; color: #1a1a18; font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 400; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .sc-btn:hover { border-color: \${ROSA}; color: \${ROSA}; }
+        .sc-btn-sim { background: \${ROSA}; color: #fff; border-color: \${ROSA}; width: 100%; padding: 0.85rem; font-size: 0.82rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+        .sc-btn-nao { background: none; border: none; color: #aaa89f; font-family: 'Jost', sans-serif; font-size: 0.78rem; cursor: pointer; width: 100%; text-align: center; padding: 0.3rem; text-decoration: underline; }
+        .sc-btn-ver { background: \${ROSA}; color: #fff; border: none; width: 100%; padding: 0.9rem; font-family: 'Jost', sans-serif; font-size: 0.82rem; letter-spacing: 0.1em; font-weight: 500; cursor: pointer; margin-bottom: 0.5rem; }
+        .sc-pronto { font-family: 'Cormorant', serif; font-size: 1.15rem; font-style: italic; color: #1a1a18; margin-bottom: 1rem; line-height: 1.5; }
+        .sc-btn-reset { background: none; border: none; color: #aaa89f; font-family: 'Jost', sans-serif; font-size: 0.75rem; cursor: pointer; width: 100%; text-align: center; text-decoration: underline; }
         @media (min-width: 769px) {
-          .consultant { left: 2rem; right: auto; bottom: 2rem; width: 380px; }
+          .sc-wrap { left: auto; right: 2rem; bottom: 2rem; }
         }
-      `}</style>
+      \`}</style>
 
-      <div className="consultant">
-        <div className="consultant-header">
-          <span className="consultant-marca">✦ Nora Grei Stylist</span>
-          <button className="consultant-close" onClick={() => setMinimizado(true)}>✕</button>
+      <div className="sc-wrap">
+        <div className="sc-header">
+          <span>{i.titulo}</span>
+          <button className="sc-close" onClick={recusar}>✕</button>
         </div>
-        <div className="consultant-body">
-          {step === "ocasiao" && (
+        <div className="sc-body">
+          {step === "ask" && (
             <>
-              <div className="consultant-saudacao">{d.saudacao(nomeCliente)}</div>
-              <p className="consultant-pergunta">{d.pergunta}</p>
-              <div className="consultant-grid">
-                {d.ocasioes.map(o => (
-                  <button key={o} className="consultant-btn" onClick={() => escolherOcasiao(o)}>{o}</button>
-                ))}
+              <p className="sc-question">{i.ajuda}</p>
+              <button className="sc-btn sc-btn-sim" onClick={() => setStep("evento")}>{i.sim}</button>
+              <button className="sc-btn-nao" onClick={recusar}>{i.nao}</button>
+            </>
+          )}
+          {step === "evento" && (
+            <>
+              <p className="sc-question">{i.evento}</p>
+              <div className="sc-grid">
+                {i.eventos.map(e => <button key={e} className="sc-btn" onClick={() => escolherEvento(e)}>{e}</button>)}
               </div>
             </>
           )}
-          {step === "genero" && (
+          {step === "sexo" && (
             <>
-              <div className="consultant-saudacao">{d.saudacao(nomeCliente)}</div>
-              <p className="consultant-pergunta">{d.perguntaGenero(ocasiao)}</p>
-              <div className="consultant-genero-grid">
-                {d.generos.map(g => (
-                  <button key={g} className="consultant-btn" onClick={() => escolherGenero(g)}>{g}</button>
-                ))}
+              <p className="sc-question">{i.sexo}</p>
+              <div className="sc-grid">
+                {i.sexos.map(s => <button key={s} className="sc-btn" onClick={() => escolherSexo(s)}>{s}</button>)}
+              </div>
+            </>
+          )}
+          {step === "idade" && (
+            <>
+              <p className="sc-question">{i.idade}</p>
+              <div className="sc-grid-4">
+                {i.idades.map(id => <button key={id} className="sc-btn" onClick={() => escolherIdade(id)}>{id}</button>)}
               </div>
             </>
           )}
           {step === "pronto" && (
             <>
-              <p className="consultant-sugestao">{d.sugestao(ocasiao, genero)}</p>
-              <div className="consultant-actions">
-                <a href={`/catalogo?ocasiao=${encodeURIComponent(ocasiao)}&genero=${encodeURIComponent(genero)}`} className="consultant-btn-ver">{d.verSugestoes}</a>
-                <button className="consultant-btn-reset" onClick={resetar}>{d.mudar}</button>
-              </div>
+              <p className="sc-pronto">{i.pronto(evento, sexo)}</p>
+              <button className="sc-btn-ver" onClick={verSugestoes}>{i.ver}</button>
+              <button className="sc-btn-reset" onClick={resetar}>{i.mudar}</button>
             </>
           )}
         </div>
