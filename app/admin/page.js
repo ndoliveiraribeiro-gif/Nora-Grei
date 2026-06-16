@@ -193,7 +193,7 @@ export default function Admin() {
         .ad-sair:hover { color:var(--white); }
         
         /* MAIN */
-        .ad-main { margin-left:220px; padding:2.5rem; min-width:0; overflow-x:auto; }
+           .ad-main { margin-left:220px; padding:2.5rem; }             
         .ad-header { margin-bottom:2rem; }
         .ad-titulo { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; }
         .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; white-space:nowrap; }
