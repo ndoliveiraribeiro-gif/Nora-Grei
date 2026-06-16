@@ -109,7 +109,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
             </a>
           </>
         ) : (
-          <a href={`/catalogo/${peca.id}?reservar=true`}
+          <a href={`/reserva?peca=${peca.id}`}
             style={{flex:1,padding:'0.65rem',fontSize:'0.55rem',letterSpacing:'0.1em',textTransform:'uppercase',background:'#f0eeeb',color:'#4a4845',border:'1px solid #e2dfda',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400}}>
             {l.reservar}
           </a>
