@@ -261,7 +261,7 @@ export default function Admin() {
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 
-      <div className="ad-layout">
+      <div className="ad-layout" style={{display:'grid',gridTemplateColumns:'220px 1fr',minHeight:'100vh',width:'100%'}}>
         {/* SIDEBAR */}
         <aside className="ad-sidebar">
           <div className="ad-logo">
