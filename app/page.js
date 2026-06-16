@@ -337,7 +337,6 @@ export default function Home() {
 
         /* ── MOBILE ── */
         @media (max-width: 768px) {
-          nav { display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
           body { font-size:17px; padding-bottom:140px; }
 
           /* NAV MOBILE */
@@ -453,7 +452,7 @@ export default function Home() {
             <button className={`lang-btn${lang==="lt"?" active":""}`} onClick={() => changeLang("lt")}>LT</button>
           </div>
           {userLogado && <a href="/pedidos" className="nav-btn nav-btn-outline">Pedidos</a>}
-<a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? "Perfil" : t.nav.entrar}</a>
+          <a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? "Perfil" : t.nav.entrar}</a>
           <a href="#onde-vas" className="nav-btn nav-btn-fill">{t.hero.ctaPrincipal}</a>
         </div>
       </nav>
@@ -628,7 +627,7 @@ export default function Home() {
             <span className="bottom-nav-label">{t.bottomNav.pedidos}</span>
             {activeTab==="pedidos" && <div className="bottom-nav-dot"></div>}
           </a>
-          <a href={userLogado ? "/perfil" : "/entrar"} className={`bottom-nav-item${activeTab==="perfil"?" active":""}`} onClick={() => setActiveTab("perfil")}>
+          <a href="/entrar" className={`bottom-nav-item${activeTab==="perfil"?" active":""}`} onClick={() => setActiveTab("perfil")}>
             <div className="bottom-nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <span className="bottom-nav-label">{t.bottomNav.perfil}</span>
             {activeTab==="perfil" && <div className="bottom-nav-dot"></div>}
