@@ -175,7 +175,7 @@ function CheckoutContent() {
     if (pecaId) {
       const { data } = await supabase
         .from("pecas")
-        .select("*, categorias(nome)")
+        .select("*, categorias(nome), fotos")
         .eq("id", pecaId)
         .single();
       if (data) setPeca({ ...data, categoria: data.categorias?.nome || "" });
