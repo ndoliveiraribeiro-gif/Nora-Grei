@@ -452,7 +452,8 @@ export default function Home() {
             <span className="lang-sep">/</span>
             <button className={`lang-btn${lang==="lt"?" active":""}`} onClick={() => changeLang("lt")}>LT</button>
           </div>
-          <a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? "O meu perfil" : t.nav.entrar}</a>
+          {userLogado && <a href="/pedidos" className="nav-btn nav-btn-outline">Pedidos</a>}
+<a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? "Perfil" : t.nav.entrar}</a>
           <a href="#onde-vas" className="nav-btn nav-btn-fill">{t.hero.ctaPrincipal}</a>
         </div>
       </nav>
