@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -9,45 +9,206 @@ const supabase = createClient(
 
 const T = {
   pt: {
-    nav: { catalogo: "Catálogo", planos: "Planos", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { linha1: "A peça certa,", linha2: "para o momento", linha3: "certo.", pergunta: "Onde vais hoje?", cta: "Ver catálogo" },
-    ocasioes: ["Férias","Concerto","Gala","Festa","Casamento","Trabalho","Jantar","Teatro"],
-    strip: ["Envio gratuito","Depósito devolvido","Peças inspecionadas","Cancele quando quiser","Alugar ou Comprar"],
-    como: { label: "O processo", titulo: "Simples assim.", passos: ["Escolhe","Recebe","Usa","Devolve"] },
-    numeros: [{ val: "200+", label: "Peças disponíveis" },{ val: "48h", label: "Entrega rápida" },{ val: "100%", label: "Depósito devolvido" },{ val: "4.9★", label: "Avaliação média" }],
-    cta: { titulo: "O teu próximo look.", sub: "Está aqui.", btn: "Explorar catálogo" },
-    footer: { copy: "© 2025 Nora Grei", links: ["Catálogo","Planos","Contacto","Termos"] },
-    bottomNav: { inicio: "Início", catalogo: "Catálogo", pedidos: "Pedidos", perfil: "Perfil" },
+    nav: { catalogo: "Colecção", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
+    hero: {
+      eyebrow: "Nova colecção — Primavera 2026",
+      titulo: "Veste o extraordinário.",
+      sub: "Sem comprar.",
+      desc: "Descobre uma nova forma de viver a moda. Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.",
+      cta1: "Explorar colecção",
+      cta2: "Como funciona",
+      peca: "Vestido Seda Noite",
+      preco: "35€ / dia",
+    },
+    como: {
+      label: "O processo",
+      titulo: "Moda sem compromisso.",
+      passos: [
+        { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos." },
+        { num: "02", titulo: "Recebe", desc: "Entregamos em casa, limpa e pronta a usar." },
+        { num: "03", titulo: "Usa", desc: "Vive cada momento com estilo único." },
+        { num: "04", titulo: "Devolve ou troca", desc: "Renova o teu guarda-roupa sem acumular." },
+      ],
+    },
+    porque: {
+      label: "A nossa missão",
+      titulo: "Porque a moda deve acompanhar a tua vida,",
+      tituloSub: "não ocupar o teu armário.",
+      pontos: ["Menos desperdício.", "Mais exclusividade.", "Mais liberdade.", "Moda consciente."],
+    },
+    categorias: {
+      label: "Para cada momento",
+      titulo: "O look certo,",
+      tituloSub: "para cada ocasião.",
+      lista: [
+        { nome: "Eventos", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" },
+        { nome: "Trabalho", img: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&q=80" },
+        { nome: "Férias", img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
+        { nome: "Jantares", img: "https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?w=600&q=80" },
+      ],
+    },
+    numeros: [
+      { val: "1.000+", label: "Alugueres realizados" },
+      { val: "200+", label: "Peças exclusivas" },
+      { val: "4.9★", label: "Avaliação média" },
+      { val: "48h", label: "Entrega rápida" },
+    ],
+    sustentabilidade: {
+      label: "Moda consciente",
+      titulo: "Cada peça vive várias histórias.",
+      stats: [
+        { val: "70%", label: "Água poupada vs comprar" },
+        { val: "5×", label: "Reutilizações por peça" },
+        { val: "60%", label: "Emissões reduzidas" },
+      ],
+    },
+    cta: {
+      titulo: "O teu guarda-roupa infinito",
+      sub: "começa aqui.",
+      btn: "Explorar colecção",
+      tag: "Moda exclusiva. Sem excessos.",
+    },
+    strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspecionadas", "Cancele quando quiser", "Moda consciente"],
+    footer: { copy: "© 2026 Nora Grei. Todos os direitos reservados.", links: ["Colecção", "Como funciona", "Contacto", "Termos", "Privacidade"] },
+    bottomNav: { inicio: "Início", catalogo: "Colecção", pedidos: "Pedidos", perfil: "Perfil" },
   },
   fr: {
-    nav: { catalogo: "Catalogue", planos: "Abonnements", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { linha1: "La pièce parfaite,", linha2: "pour le moment", linha3: "parfait.", pergunta: "Où allez-vous ?", cta: "Voir le catalogue" },
-    ocasioes: ["Vacances","Concert","Gala","Fête","Mariage","Travail","Dîner","Théâtre"],
-    strip: ["Livraison gratuite","Dépôt remboursé","Pièces inspectées","Annulez quand vous voulez","Louer ou Acheter"],
-    como: { label: "Le processus", titulo: "Aussi simple que ça.", passos: ["Choisissez","Recevez","Portez","Retournez"] },
-    numeros: [{ val: "200+", label: "Pièces disponibles" },{ val: "48h", label: "Livraison rapide" },{ val: "100%", label: "Dépôt remboursé" },{ val: "4.9★", label: "Note moyenne" }],
-    cta: { titulo: "Votre prochain look.", sub: "Est ici.", btn: "Explorer le catalogue" },
-    footer: { copy: "© 2025 Nora Grei", links: ["Catalogue","Abonnements","Contact","CGU"] },
-    bottomNav: { inicio: "Accueil", catalogo: "Catalogue", pedidos: "Commandes", perfil: "Profil" },
+    nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
+    hero: {
+      eyebrow: "Nouvelle collection — Printemps 2026",
+      titulo: "Portez l'extraordinaire.",
+      sub: "Sans acheter.",
+      desc: "Découvrez une nouvelle façon de vivre la mode. Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe quand vous voulez.",
+      cta1: "Explorer la collection",
+      cta2: "Comment ça marche",
+      peca: "Robe Soie Nuit",
+      preco: "35€ / jour",
+    },
+    como: {
+      label: "Le processus",
+      titulo: "La mode sans engagement.",
+      passos: [
+        { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves." },
+        { num: "02", titulo: "Recevez", desc: "Livraison à domicile, propre et prête à porter." },
+        { num: "03", titulo: "Portez", desc: "Vivez chaque moment avec un style unique." },
+        { num: "04", titulo: "Retournez ou échangez", desc: "Renouvelez votre garde-robe sans accumuler." },
+      ],
+    },
+    porque: {
+      label: "Notre mission",
+      titulo: "Parce que la mode doit accompagner votre vie,",
+      tituloSub: "pas occuper votre armoire.",
+      pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode consciente."],
+    },
+    categorias: {
+      label: "Pour chaque moment",
+      titulo: "Le look parfait,",
+      tituloSub: "pour chaque occasion.",
+      lista: [
+        { nome: "Événements", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" },
+        { nome: "Travail", img: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&q=80" },
+        { nome: "Vacances", img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
+        { nome: "Dîners", img: "https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?w=600&q=80" },
+      ],
+    },
+    numeros: [
+      { val: "1.000+", label: "Locations réalisées" },
+      { val: "200+", label: "Pièces exclusives" },
+      { val: "4.9★", label: "Note moyenne" },
+      { val: "48h", label: "Livraison rapide" },
+    ],
+    sustentabilidade: {
+      label: "Mode consciente",
+      titulo: "Chaque pièce vit plusieurs histoires.",
+      stats: [
+        { val: "70%", label: "Eau économisée vs achat" },
+        { val: "5×", label: "Réutilisations par pièce" },
+        { val: "60%", label: "Émissions réduites" },
+      ],
+    },
+    cta: {
+      titulo: "Votre garde-robe infinie",
+      sub: "commence ici.",
+      btn: "Explorer la collection",
+      tag: "Mode exclusive. Sans excès.",
+    },
+    strip: ["Livraison gratuite", "Dépôt 100% remboursé", "Pièces inspectées", "Annulez quand vous voulez", "Mode consciente"],
+    footer: { copy: "© 2026 Nora Grei. Tous droits réservés.", links: ["Collection", "Comment ça marche", "Contact", "CGU", "Confidentialité"] },
+    bottomNav: { inicio: "Accueil", catalogo: "Collection", pedidos: "Commandes", perfil: "Profil" },
   },
   lt: {
-    nav: { catalogo: "Katalogas", planos: "Planai", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { linha1: "Tinkamas drabužis,", linha2: "tinkamu", linha3: "momentu.", pergunta: "Kur šiandien einate?", cta: "Žiūrėti katalogą" },
-    ocasioes: ["Atostogos","Koncertas","Gala","Vakarėlis","Vestuvės","Darbas","Vakarienė","Teatras"],
-    strip: ["Nemokamas pristatymas","Užstatas grąžinamas","Drabužiai patikrinti","Atšaukite kada norite","Nuomoti ar Pirkti"],
-    como: { label: "Procesas", titulo: "Taip paprasta.", passos: ["Pasirinkite","Gaukite","Dėvėkite","Grąžinkite"] },
-    numeros: [{ val: "200+", label: "Drabužių" },{ val: "48h", label: "Greitas pristatymas" },{ val: "100%", label: "Užstatas grąžinamas" },{ val: "4.9★", label: "Įvertinimas" }],
-    cta: { titulo: "Jūsų kitas įvaizdis.", sub: "Čia.", btn: "Naršyti katalogą" },
-    footer: { copy: "© 2025 Nora Grei", links: ["Katalogas","Planai","Kontaktai","Sąlygos"] },
-    bottomNav: { inicio: "Pradžia", catalogo: "Katalogas", pedidos: "Užsakymai", perfil: "Profilis" },
+    nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
+    hero: {
+      eyebrow: "Nauja kolekcija — Pavasaris 2026",
+      titulo: "Dėvėkite nepaprastą.",
+      sub: "Nepirkdami.",
+      desc: "Atraskite naują būdą gyventi madą. Išsinuomokite išskirtines Nora Grei drabužius ir atnaujinkite savo garderobą kada norite.",
+      cta1: "Naršyti kolekciją",
+      cta2: "Kaip tai veikia",
+      peca: "Šilkinė vakarinė suknelė",
+      preco: "35€ / dieną",
+    },
+    como: {
+      label: "Procesas",
+      titulo: "Mada be įsipareigojimų.",
+      passos: [
+        { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite savo svajonių drabužį." },
+        { num: "02", titulo: "Gaukite", desc: "Pristatome į namus, švarų ir paruoštą dėvėti." },
+        { num: "03", titulo: "Dėvėkite", desc: "Gyvenkit kiekvieną akimirką su unikaliu stiliumi." },
+        { num: "04", titulo: "Grąžinkite ar keiskite", desc: "Atnaujinkite garderobą nekaupdami." },
+      ],
+    },
+    porque: {
+      label: "Mūsų misija",
+      titulo: "Nes mada turi lydėti jūsų gyvenimą,",
+      tituloSub: "o ne užimti jūsų spintą.",
+      pontos: ["Mažiau atliekų.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."],
+    },
+    categorias: {
+      label: "Kiekvienai progai",
+      titulo: "Tinkamas įvaizdis,",
+      tituloSub: "kiekvienai progai.",
+      lista: [
+        { nome: "Renginiai", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" },
+        { nome: "Darbas", img: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&q=80" },
+        { nome: "Atostogos", img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
+        { nome: "Vakarienės", img: "https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?w=600&q=80" },
+      ],
+    },
+    numeros: [
+      { val: "1.000+", label: "Įvykdytų nuomų" },
+      { val: "200+", label: "Išskirtinių drabužių" },
+      { val: "4.9★", label: "Vidutinis įvertinimas" },
+      { val: "48h", label: "Greitas pristatymas" },
+    ],
+    sustentabilidade: {
+      label: "Sąmoninga mada",
+      titulo: "Kiekvienas drabužis gyvena kelias istorijas.",
+      stats: [
+        { val: "70%", label: "Sutaupytas vanduo" },
+        { val: "5×", label: "Pakartotinis naudojimas" },
+        { val: "60%", label: "Sumažintos emisijos" },
+      ],
+    },
+    cta: {
+      titulo: "Jūsų begalinis garderobas",
+      sub: "prasideda čia.",
+      btn: "Naršyti kolekciją",
+      tag: "Išskirtinė mada. Be pertekliaus.",
+    },
+    strip: ["Nemokamas pristatymas", "Užstatas grąžinamas 100%", "Drabužiai patikrinti", "Atšaukite kada norite", "Sąmoninga mada"],
+    footer: { copy: "© 2026 Nora Grei. Visos teisės saugomos.", links: ["Kolekcija", "Kaip tai veikia", "Kontaktai", "Sąlygos", "Privatumas"] },
+    bottomNav: { inicio: "Pradžia", catalogo: "Kolekcija", pedidos: "Užsakymai", perfil: "Profilis" },
   },
 };
 
 export default function Home() {
   const [lang, setLang] = useState("pt");
-  const [ocasiaoSel, setOcasiaoSel] = useState(null);
   const [userLogado, setUserLogado] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
+  const [catHover, setCatHover] = useState(null);
+  const [banner, setBanner] = useState(false);
+  const [cupaoCopiado, setCupaoCopiado] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -57,27 +218,34 @@ export default function Home() {
       if (b === "fr") setLang("fr");
       else if (b === "lt") setLang("lt");
     }
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-    sb.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
+    supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
+    const visto = localStorage.getItem("ng_banner_cupao");
+    if (!visto) { setTimeout(() => setBanner(true), 1500); }
   }, []);
 
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
-  const t = T[lang];
-
-  const escolherOcasiao = (o) => {
-    setOcasiaoSel(o);
-    localStorage.setItem("ng_consultant_v2", JSON.stringify({ evento: o, done: false }));
-    setTimeout(() => { window.location.href = `/catalogo?evento=${encodeURIComponent(o)}`; }, 400);
+  const fecharBanner = () => { setBanner(false); localStorage.setItem("ng_banner_cupao", "1"); };
+  const copiarCupao = () => {
+    navigator.clipboard.writeText("NORA15");
+    setCupaoCopiado(true);
+    setTimeout(() => setCupaoCopiado(false), 3000);
   };
+  const t = T[lang];
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-        :root { --black:#080808; --white:#f8f7f5; --grey-100:#f0eeeb; --grey-200:#e2dfda; --grey-400:#5a5855; --rosa:#c4748a; --serif:'Cormorant',Georgia,serif; --sans:'Jost',Arial,sans-serif; }
-        html { scroll-behavior:smooth; }
-        body { background:var(--white); color:var(--black); font-family:var(--sans); font-size:17px; font-weight:400; -webkit-font-smoothing:antialiased; }
+        :root {
+          --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb;
+          --grey-200: #e2dfda; --grey-400: #5a5855; --grey-600: #1a1a18;
+          --rosa: #c4748a;
+          --serif: 'Cormorant', Georgia, serif;
+          --sans: 'Jost', Arial, sans-serif;
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--white); color: var(--black); font-family: var(--sans); font-size: 17px; font-weight: 400; line-height: 1.7; -webkit-font-smoothing: antialiased; }
 
         /* NAV */
         .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
@@ -99,59 +267,88 @@ export default function Home() {
         .nav-btn-fill:hover { background:#2a2926; }
 
         /* HERO */
-        .hero { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; padding-top:80px; }
+        .hero { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; padding-top:80px; position:relative; }
         .hero-left { display:flex; flex-direction:column; justify-content:center; padding:6rem 4rem 6rem 6rem; }
-        .hero-title { font-family:var(--serif); font-size:clamp(3.5rem,5.5vw,6.5rem); font-weight:300; line-height:1.02; margin-bottom:3rem; }
-        .hero-title em { font-style:italic; color:var(--grey-400); }
-        .hero-pergunta { font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--grey-400); margin-bottom:1.25rem; font-weight:500; }
-        .hero-ocasioes { display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-bottom:2rem; }
-        .hero-ocasiao { padding:0.85rem 0.5rem; border:1px solid var(--grey-200); background:var(--white); font-family:var(--serif); font-size:1rem; font-weight:300; color:var(--grey-400); cursor:pointer; text-align:center; transition:all 0.2s; }
-        .hero-ocasiao:hover { border-color:var(--black); color:var(--black); }
-        .hero-ocasiao.selected { background:var(--black); color:var(--white); border-color:var(--black); }
-        .hero-cta { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-400); text-decoration:none; border-bottom:1px solid var(--grey-200); padding-bottom:2px; transition:all 0.2s; font-weight:400; }
-        .hero-cta:hover { color:var(--black); border-color:var(--black); }
+        .hero-eyebrow { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--grey-400); margin-bottom:2rem; font-weight:400; }
+        .hero-titulo { font-family:var(--serif); font-size:clamp(3.5rem,5.5vw,6rem); font-weight:300; line-height:1.02; color:var(--black); }
+        .hero-sub { font-family:var(--serif); font-size:clamp(3.5rem,5.5vw,6rem); font-weight:300; font-style:italic; color:var(--grey-400); line-height:1.02; margin-bottom:2.5rem; }
+        .hero-desc { font-size:1rem; color:var(--grey-600); max-width:42ch; line-height:1.9; margin-bottom:3rem; font-weight:400; }
+        .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; }
+        .btn-primary { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--black); color:var(--white); padding:1.1rem 2.5rem; text-decoration:none; font-weight:400; transition:background 0.3s; font-family:var(--sans); display:inline-block; }
+        .btn-primary:hover { background:#2a2926; }
+        .btn-ghost { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-600); text-decoration:none; font-weight:400; border-bottom:1px solid var(--grey-200); padding-bottom:2px; display:inline-flex; align-items:center; transition:all 0.2s; }
+        .btn-ghost:hover { color:var(--black); border-color:var(--black); }
         .hero-right { position:relative; overflow:hidden; }
-        .hero-right img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; }
-        .hero-caption { position:absolute; bottom:0; left:0; right:0; background:rgba(248,247,245,0.92); padding:1.25rem 2rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--grey-200); z-index:2; }
-        .hero-caption-nome { font-family:var(--serif); font-size:1rem; font-style:italic; font-weight:300; }
-        .hero-caption-preco { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-400); }
+        .hero-right img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform 6s ease; }
+        .hero-right:hover img { transform:scale(1.03); }
+        .hero-caption { position:absolute; bottom:0; left:0; right:0; z-index:2; padding:1.5rem 2rem; background:linear-gradient(to top, rgba(8,8,8,0.6), transparent); color:white; display:flex; justify-content:space-between; align-items:flex-end; }
+        .hero-caption-nome { font-family:var(--serif); font-size:1.1rem; font-style:italic; font-weight:300; }
+        .hero-caption-preco { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; opacity:0.8; }
 
         /* STRIP */
         .strip { background:var(--black); padding:0.9rem 0; overflow:hidden; }
-        .strip-track { display:flex; white-space:nowrap; animation:marquee 25s linear infinite; }
+        .strip-track { display:flex; white-space:nowrap; animation:marquee 30s linear infinite; }
         .strip-item { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.5); padding:0 3rem; flex-shrink:0; }
-        .strip-item::after { content:'—'; margin-left:3rem; color:rgba(255,255,255,0.15); }
+        .strip-item::after { content:'✦'; margin-left:3rem; color:rgba(255,255,255,0.2); }
         @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
         /* NÚMEROS */
-        .numeros { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200); }
-        .numero { padding:3rem 2rem; text-align:center; border-right:1px solid var(--grey-200); }
+        .numeros { display:grid; grid-template-columns:repeat(4,1fr); }
+        .numero { padding:4rem 2rem; text-align:center; border-right:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200); }
         .numero:last-child { border-right:none; }
-        .numero-val { font-family:var(--serif); font-size:3rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.5rem; }
+        .numero-val { font-family:var(--serif); font-size:3.5rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.5rem; }
         .numero-label { font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--grey-400); font-weight:400; }
 
         /* COMO FUNCIONA */
-        .como { padding:8rem 6rem; background:var(--grey-100); }
-        .como-label { font-size:0.68rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--grey-400); margin-bottom:1rem; font-weight:400; }
-        .como-titulo { font-family:var(--serif); font-size:clamp(3rem,5vw,5rem); font-weight:300; margin-bottom:5rem; }
-        .como-passos { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
-        .como-passo { padding:2.5rem; border-right:1px solid var(--grey-200); position:relative; }
-        .como-passo:last-child { border-right:none; }
-        .como-num { font-family:var(--serif); font-size:5rem; font-weight:300; color:var(--grey-200); line-height:1; margin-bottom:1.5rem; }
-        .como-passo-nome { font-family:var(--serif); font-size:2rem; font-weight:300; color:var(--black); }
+        .como { padding:10rem 6rem; }
+        .section-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--grey-400); margin-bottom:1rem; font-weight:400; }
+        .section-titulo { font-family:var(--serif); font-size:clamp(2.5rem,4vw,4.5rem); font-weight:300; line-height:1.08; margin-bottom:5rem; }
+        .section-titulo em { font-style:italic; color:var(--grey-400); }
+        .como-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--grey-200); }
+        .como-passo { background:var(--white); padding:3rem 2.5rem; }
+        .como-num { font-family:var(--serif); font-size:4rem; font-weight:300; color:var(--grey-200); line-height:1; margin-bottom:2rem; }
+        .como-titulo { font-family:var(--serif); font-size:1.6rem; font-weight:400; color:var(--black); margin-bottom:0.75rem; }
+        .como-desc { font-size:0.95rem; color:var(--grey-600); line-height:1.8; font-weight:400; }
+
+        /* PORQUE */
+        .porque { background:var(--black); color:var(--white); padding:10rem 6rem; display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; }
+        .porque-titulo { font-family:var(--serif); font-size:clamp(2rem,3.5vw,3.5rem); font-weight:300; line-height:1.2; color:var(--white); }
+        .porque-titulo em { font-style:italic; color:rgba(255,255,255,0.4); display:block; margin-top:0.25rem; }
+        .porque-pontos { display:flex; flex-direction:column; gap:1.5rem; }
+        .porque-ponto { display:flex; align-items:center; gap:1.5rem; font-family:var(--serif); font-size:1.4rem; font-weight:300; color:rgba(255,255,255,0.8); }
+        .porque-ponto::before { content:''; width:32px; height:1px; background:rgba(255,255,255,0.3); flex-shrink:0; }
+
+        /* CATEGORIAS */
+        .categorias { padding:10rem 6rem; }
+        .cat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--grey-200); margin-top:4rem; }
+        .cat-card { background:var(--white); position:relative; overflow:hidden; aspect-ratio:3/4; cursor:pointer; }
+        .cat-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s ease; }
+        .cat-card:hover img { transform:scale(1.05); }
+        .cat-card-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 50%); display:flex; align-items:flex-end; padding:2rem; }
+        .cat-card-nome { font-family:var(--serif); font-size:1.6rem; font-weight:300; color:var(--white); font-style:italic; }
+
+        /* SUSTENTABILIDADE */
+        .sustent { background:var(--grey-100); padding:8rem 6rem; }
+        .sustent-grid { display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; margin-top:4rem; }
+        .sustent-titulo { font-family:var(--serif); font-size:clamp(2rem,3vw,3rem); font-weight:300; line-height:1.3; color:var(--black); }
+        .sustent-stats { display:flex; flex-direction:column; gap:1px; background:var(--grey-200); }
+        .sustent-stat { background:var(--grey-100); padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .sustent-stat-val { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); }
+        .sustent-stat-label { font-size:0.82rem; color:var(--grey-600); text-align:right; max-width:20ch; font-weight:400; }
 
         /* CTA FINAL */
-        .cta-final { background:var(--black); color:var(--white); padding:12rem 6rem; display:flex; flex-direction:column; align-items:center; text-align:center; }
-        .cta-final-titulo { font-family:var(--serif); font-size:clamp(4rem,7vw,8rem); font-weight:300; line-height:1; margin-bottom:0.5rem; }
-        .cta-final-sub { font-family:var(--serif); font-size:clamp(4rem,7vw,8rem); font-weight:300; font-style:italic; color:var(--grey-400); line-height:1; margin-bottom:4rem; }
-        .cta-final-btn { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; border:1px solid rgba(255,255,255,0.3); color:var(--white); padding:1.1rem 3rem; text-decoration:none; font-weight:400; transition:all 0.3s; font-family:var(--sans); }
-        .cta-final-btn:hover { background:var(--white); color:var(--black); border-color:var(--white); }
+        .cta-final { padding:14rem 6rem; text-align:center; display:flex; flex-direction:column; align-items:center; border-top:1px solid var(--grey-200); }
+        .cta-final-titulo { font-family:var(--serif); font-size:clamp(3.5rem,7vw,8rem); font-weight:300; line-height:1; color:var(--black); }
+        .cta-final-sub { font-family:var(--serif); font-size:clamp(3.5rem,7vw,8rem); font-weight:300; font-style:italic; color:var(--grey-400); line-height:1; margin-bottom:1rem; }
+        .cta-final-tag { font-size:0.68rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--grey-400); margin-bottom:4rem; font-weight:400; }
+        .cta-final-btn { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; background:var(--black); color:var(--white); padding:1.25rem 4rem; text-decoration:none; font-weight:400; font-family:var(--sans); transition:background 0.3s; }
+        .cta-final-btn:hover { background:#2a2926; }
 
         /* FOOTER */
-        footer { padding:2rem 6rem; border-top:1px solid var(--grey-200); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-        .footer-copy { font-size:0.65rem; color:var(--grey-400); font-weight:400; }
-        .footer-links { display:flex; gap:2rem; list-style:none; }
-        .footer-links a { font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--grey-400); text-decoration:none; transition:color 0.2s; }
+        footer { padding:2.5rem 6rem; border-top:1px solid var(--grey-200); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+        .footer-copy { font-size:0.65rem; color:var(--grey-400); }
+        .footer-links { display:flex; gap:2rem; list-style:none; flex-wrap:wrap; }
+        .footer-links a { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--grey-400); text-decoration:none; transition:color 0.2s; font-weight:400; }
         .footer-links a:hover { color:var(--black); }
 
         /* BOTTOM NAV */
@@ -163,33 +360,74 @@ export default function Home() {
         .bottom-nav-label { font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
         .bottom-nav-dot { width:4px; height:4px; border-radius:50%; background:var(--black); margin-top:2px; }
 
+        /* BANNER CUPÃO */
+        .cupao-banner { position:fixed; top:80px; left:0; right:0; z-index:99; background:var(--black); color:var(--white); padding:0.9rem 4rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.1); animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
+        .cupao-texto { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.8); font-weight:400; }
+        .cupao-codigo { font-family:var(--serif); font-size:1.1rem; font-weight:400; color:var(--white); letter-spacing:0.2em; margin:0 1rem; }
+        .cupao-btn { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--rosa); color:var(--white); border:none; padding:0.5rem 1rem; cursor:pointer; font-family:var(--sans); font-weight:500; transition:background 0.2s; white-space:nowrap; }
+        .cupao-btn:hover { background:#a85c72; }
+        .cupao-btn.copied { background:#27ae60; }
+        .cupao-link { font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; transition:color 0.2s; white-space:nowrap; }
+        .cupao-link:hover { color:var(--white); }
+        .cupao-fechar { background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:1rem; padding:0; transition:color 0.2s; flex-shrink:0; }
+        .cupao-fechar:hover { color:var(--white); }
+
         /* MOBILE */
-        @media (max-width:768px) {
-          body { font-size:17px; padding-bottom:80px; }
-          .nav { padding:0.9rem 1.25rem; display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:center !important; width:100% !important; }
+        @media (max-width: 768px) {
+          body { padding-bottom: 80px; }
+          .nav { padding:0.9rem 1.25rem; display:flex !important; flex-direction:row !important; align-items:center !important; justify-content:space-between !important; width:100% !important; }
           .nav-links { display:none; }
           .nav-right .nav-btn-outline { display:none; }
           .nav-right .nav-btn-fill { display:none; }
           .hero { grid-template-columns:1fr; min-height:auto; padding-top:70px; }
-          .hero-right { height:75vw; order:-1; }
+          .hero-right { height:80vw; order:-1; }
           .hero-left { padding:2rem 1.25rem 3rem; }
-          .hero-title { font-size:clamp(2.5rem,10vw,3.5rem); margin-bottom:2rem; }
-          .hero-ocasioes { grid-template-columns:repeat(2,1fr); }
-          .hero-ocasiao { font-size:1.05rem; padding:0.9rem 0.5rem; }
+          .hero-titulo, .hero-sub { font-size:clamp(2.5rem,9vw,3.5rem); }
+          .hero-desc { font-size:1rem; max-width:100%; }
+          .hero-btns { flex-direction:column; }
+          .btn-primary { text-align:center; }
           .numeros { grid-template-columns:repeat(2,1fr); }
-          .numero { padding:2rem 1rem; border-bottom:1px solid var(--grey-200); }
-          .como { padding:3.5rem 1.25rem; }
-          .como-titulo { font-size:2.5rem; margin-bottom:2.5rem; }
-          .como-passos { grid-template-columns:1fr 1fr; }
-          .como-passo { padding:1.5rem; border-bottom:1px solid var(--grey-200); }
+          .numero { padding:2.5rem 1rem; }
+          .numero-val { font-size:2.5rem; }
+          .como { padding:4rem 1.25rem; }
+          .section-titulo { font-size:2rem; margin-bottom:2.5rem; }
+          .como-grid { grid-template-columns:1fr; }
+          .como-passo { padding:2rem 1.25rem; }
+          .porque { grid-template-columns:1fr; gap:3rem; padding:5rem 1.25rem; }
+          .porque-titulo { font-size:1.8rem; }
+          .porque-ponto { font-size:1.2rem; }
+          .categorias { padding:4rem 1.25rem; }
+          .cat-grid { grid-template-columns:1fr 1fr; }
+          .sustent { padding:4rem 1.25rem; }
+          .sustent-grid { grid-template-columns:1fr; gap:2rem; }
+          .sustent-titulo { font-size:1.6rem; }
           .cta-final { padding:6rem 1.25rem; }
-          .cta-final-titulo, .cta-final-sub { font-size:clamp(3rem,10vw,5rem); }
-          footer { padding:1.5rem 1.25rem; flex-direction:column; align-items:flex-start; gap:1rem; }
+          .cta-final-titulo, .cta-final-sub { font-size:clamp(2.5rem,9vw,4rem); }
+          footer { padding:1.5rem 1.25rem; flex-direction:column; align-items:flex-start; }
           .bottom-nav { display:block; }
         }
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+      {/* BANNER CUPÃO */}
+      {banner && (
+        <div className="cupao-banner">
+          <div style={{display:'flex',alignItems:'center',gap:'0.5rem',flexWrap:'wrap'}}>
+            <span className="cupao-texto">✦ Oferta de boas-vindas —</span>
+            <span className="cupao-codigo">NORA15</span>
+            <span className="cupao-texto">— 15% de desconto em</span>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:'1rem',flexShrink:0}}>
+            <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="cupao-link">www.noragrei.com ↗</a>
+            <button className={`cupao-btn${cupaoCopiado?" copied":""}`} onClick={copiarCupao}>
+              {cupaoCopiado ? "Copiado ✓" : "Copiar código"}
+            </button>
+            <button className="cupao-fechar" onClick={fecharBanner}>✕</button>
+          </div>
+        </div>
+      )}
 
       {/* NAV */}
       <nav className="nav">
@@ -203,38 +441,36 @@ export default function Home() {
         </ul>
         <div className="nav-right">
           <div className="nav-lang">
-            {["pt","fr","lt"].map((l,i) => (
-              <>
-                {i > 0 && <span key={`sep-${l}`} className="lang-sep">/</span>}
-                <button key={l} className={`lang-btn${lang===l?" active":""}`} onClick={() => changeLang(l)}>{l.toUpperCase()}</button>
-              </>
+            {["pt","fr","lt"].map((l, i) => (
+              <span key={l} style={{display:'flex',alignItems:'center',gap:'0.4rem'}}>
+                {i > 0 && <span className="lang-sep">/</span>}
+                <button className={`lang-btn${lang===l?" active":""}`} onClick={() => changeLang(l)}>{l.toUpperCase()}</button>
+              </span>
             ))}
           </div>
           {userLogado && <a href="/pedidos" className="nav-btn nav-btn-outline">{t.nav.pedidos}</a>}
           <a href={userLogado ? "/perfil" : "/entrar"} className="nav-btn nav-btn-outline">{userLogado ? t.nav.perfil : t.nav.entrar}</a>
-          <a href="/catalogo" className="nav-btn nav-btn-fill">{t.hero.cta}</a>
+          <a href="/catalogo" className="nav-btn nav-btn-fill">{t.hero.cta1}</a>
         </div>
       </nav>
 
       {/* HERO */}
       <section className="hero">
         <div className="hero-left">
-          <h1 className="hero-title">
-            {t.hero.linha1}<br />{t.hero.linha2}<br /><em>{t.hero.linha3}</em>
-          </h1>
-          <p className="hero-pergunta">{t.hero.pergunta}</p>
-          <div className="hero-ocasioes">
-            {t.ocasioes.map(o => (
-              <button key={o} className={`hero-ocasiao${ocasiaoSel===o?" selected":""}`} onClick={() => escolherOcasiao(o)}>{o}</button>
-            ))}
+          <p className="hero-eyebrow">{t.hero.eyebrow}</p>
+          <h1 className="hero-titulo">{t.hero.titulo}</h1>
+          <p className="hero-sub">{t.hero.sub}</p>
+          <p className="hero-desc">{t.hero.desc}</p>
+          <div className="hero-btns">
+            <a href="/catalogo" className="btn-primary">{t.hero.cta1}</a>
+            <a href="#como" className="btn-ghost">{t.hero.cta2} →</a>
           </div>
-          <a href="/catalogo" className="hero-cta">{t.hero.cta} →</a>
         </div>
         <div className="hero-right">
-          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80" alt="Nora Grei" />
+          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=85" alt="Nora Grei" />
           <div className="hero-caption">
-            <span className="hero-caption-nome">Vestido Seda Noite</span>
-            <span className="hero-caption-preco">35€ / dia</span>
+            <span className="hero-caption-nome">{t.hero.peca}</span>
+            <span className="hero-caption-preco">{t.hero.preco}</span>
           </div>
         </div>
       </section>
@@ -260,15 +496,64 @@ export default function Home() {
 
       {/* COMO FUNCIONA */}
       <section className="como" id="como">
-        <p className="como-label">{t.como.label}</p>
-        <h2 className="como-titulo">{t.como.titulo}</h2>
-        <div className="como-passos">
+        <p className="section-label">{t.como.label}</p>
+        <h2 className="section-titulo">{t.como.titulo}</h2>
+        <div className="como-grid">
           {t.como.passos.map((p,i) => (
             <div key={i} className="como-passo">
-              <div className="como-num">0{i+1}</div>
-              <div className="como-passo-nome">{p}</div>
+              <div className="como-num">{p.num}</div>
+              <h3 className="como-titulo">{p.titulo}</h3>
+              <p className="como-desc">{p.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* PORQUE */}
+      <section className="porque">
+        <div>
+          <p className="section-label" style={{color:'rgba(255,255,255,0.4)'}}>{t.porque.label}</p>
+          <h2 className="porque-titulo">
+            {t.porque.titulo}
+            <em>{t.porque.tituloSub}</em>
+          </h2>
+        </div>
+        <div className="porque-pontos">
+          {t.porque.pontos.map((p,i) => (
+            <div key={i} className="porque-ponto">{p}</div>
+          ))}
+        </div>
+      </section>
+
+      {/* CATEGORIAS */}
+      <section className="categorias">
+        <p className="section-label">{t.categorias.label}</p>
+        <h2 className="section-titulo">{t.categorias.titulo}<br /><em>{t.categorias.tituloSub}</em></h2>
+        <div className="cat-grid">
+          {t.categorias.lista.map((c,i) => (
+            <a key={i} href="/catalogo" className="cat-card">
+              <img src={c.img} alt={c.nome} />
+              <div className="cat-card-overlay">
+                <span className="cat-card-nome">{c.nome}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* SUSTENTABILIDADE */}
+      <section className="sustent">
+        <p className="section-label">{t.sustentabilidade.label}</p>
+        <div className="sustent-grid">
+          <h2 className="sustent-titulo">{t.sustentabilidade.titulo}</h2>
+          <div className="sustent-stats">
+            {t.sustentabilidade.stats.map((s,i) => (
+              <div key={i} className="sustent-stat">
+                <div className="sustent-stat-val">{s.val}</div>
+                <div className="sustent-stat-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -276,6 +561,7 @@ export default function Home() {
       <section className="cta-final">
         <div className="cta-final-titulo">{t.cta.titulo}</div>
         <div className="cta-final-sub">{t.cta.sub}</div>
+        <p className="cta-final-tag">{t.cta.tag}</p>
         <a href="/catalogo" className="cta-final-btn">{t.cta.btn}</a>
       </section>
 
