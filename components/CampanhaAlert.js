@@ -19,6 +19,15 @@ export default function CampanhaAlert({ lang = "pt" }) {
   const [copiado, setCopiado] = useState(false);
   const i = t[lang] || t.pt;
 
+  const registarEvento = async (tipo) => {
+    if (!campanha) return;
+    await supabase.from("campanha_eventos").insert({
+      campanha_id: campanha.id,
+      tipo: tipo,
+      sessao_id: localStorage.getItem("ng_sessao") || Math.random().toString(36).slice(2),
+    });
+  };
+
   useEffect(() => {
     verificarCampanha();
   }, []);
@@ -49,16 +58,23 @@ export default function CampanhaAlert({ lang = "pt" }) {
         setCampanha(campanhaAleatoria);
         setVisivel(true);
         localStorage.setItem("ng_campanha_ultima", Date.now().toString());
+        // Registar impressão
+        await supabase.from("campanha_eventos").insert({
+          campanha_id: campanhaAleatoria.id,
+          tipo: "impressao",
+          sessao_id: localStorage.getItem("ng_sessao") || Math.random().toString(36).slice(2),
+        });
       }, 2000);
     }
   };
 
-  const fechar = () => setVisivel(false);
+  const fechar = () => { registarEvento("fechar"); setVisivel(false); };
 
   const copiar = () => {
     if (campanha?.codigo) {
       navigator.clipboard.writeText(campanha.codigo);
       setCopiado(true);
+      registarEvento("copia");
       setTimeout(() => setCopiado(false), 3000);
     }
   };
@@ -121,7 +137,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
                   {copiado ? i.copiado : i.copiar}
                 </button>
               )}
-              <a href={campanha.url_destino || "https://www.noragrei.com"} target="_blank" rel="noopener noreferrer" className="ca-btn-ver">
+              <a href={campanha.url_destino || "https://www.noragrei.com"} target="_blank" rel="noopener noreferrer" className="ca-btn-ver" onClick={() => registarEvento("clique")}>
                 {i.ver} ↗
               </a>
             </div>
