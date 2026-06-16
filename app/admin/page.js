@@ -261,7 +261,7 @@ export default function Admin() {
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 
-      <div className="ad-layout" style={{display:'grid',gridTemplateColumns:'220px 1fr',minHeight:'100vh',width:'100%'}}>
+      <div className="ad-layout" style={{display:"grid",gridTemplateColumns:"220px 1fr",minHeight:"100vh",width:"100%"}}>
         {/* SIDEBAR */}
         <aside className="ad-sidebar">
           <div className="ad-logo">
@@ -316,6 +316,7 @@ export default function Admin() {
                   <button className="ad-btn ad-btn-black" onClick={() => setTab("catalogo")}>+ Adicionar peça</button>
                   <button className="ad-btn ad-btn-rosa" onClick={() => setTab("alugueres")}>Ver alugueres</button>
                   <button className="ad-btn ad-btn-outline" onClick={() => setTab("reservas")}>Ver reservas</button>
+                  <a href="/analytics" className="ad-btn ad-btn-outline" style={{textDecoration:'none',display:'inline-flex',alignItems:'center'}}>📊 Analytics & AI</a>
                 </div>
               </div>
             </>
