@@ -59,6 +59,8 @@ export default function Registar() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [dataNasc, setDataNasc] = useState("");
+  const [genero, setGenero] = useState("");
   const [password, setPassword] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [erro, setErro] = useState("");
@@ -76,9 +78,23 @@ export default function Registar() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nome, telefone } }
+      options: { data: { nome, telefone, data_nascimento: dataNasc, genero } }
     });
     if (error) { setErro(error.message); setLoading(false); return; }
+    // Criar registo na tabela clientes
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("clientes").upsert({
+          id: user.id,
+          email,
+          nome,
+          telefone,
+          data_nascimento: dataNasc || null,
+          genero: genero || null,
+        });
+      }
+    } catch(e) {}
     setSucesso(true);
     setLoading(false);
   };
@@ -174,6 +190,19 @@ export default function Registar() {
                 <div className="form-group">
                   <label className="form-label">{i.telefone}</label>
                   <input className="form-input" type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="+351 912 345 678" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Data de nascimento</label>
+                  <input className="form-input" type="date" value={dataNasc} onChange={e => setDataNasc(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Género</label>
+                  <select className="form-input" value={genero} onChange={e => setGenero(e.target.value)} style={{cursor:'pointer'}}>
+                    <option value="">Prefiro não especificar</option>
+                    <option value="Mulher">Mulher</option>
+                    <option value="Homem">Homem</option>
+                    <option value="Não-binário">Não-binário</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.password}</label>

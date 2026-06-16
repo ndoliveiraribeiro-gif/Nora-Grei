@@ -193,10 +193,10 @@ export default function Admin() {
         .ad-sair:hover { color:var(--white); }
         
         /* MAIN */
-        .ad-main { margin-left:220px; padding:2.5rem; }
+        .ad-main { margin-left:220px; padding:2.5rem; min-width:0; overflow-x:auto; }
         .ad-header { margin-bottom:2rem; }
         .ad-titulo { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; }
-        .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; }
+        .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; white-space:nowrap; }
         
         /* CARDS STATS */
         .ad-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
@@ -290,7 +290,7 @@ export default function Admin() {
             <>
               <div className="ad-header">
                 <h1 className="ad-titulo">Dashboard</h1>
-                <p className="ad-subtitulo">Resumo do negócio em tempo real</p>
+                <p className="ad-subtitulo" style={{whiteSpace:"nowrap"}}>Resumo do negócio em tempo real</p>
               </div>
               <div className="ad-stats">
                 <div className="ad-stat destaque">
@@ -316,7 +316,6 @@ export default function Admin() {
                   <button className="ad-btn ad-btn-black" onClick={() => setTab("catalogo")}>+ Adicionar peça</button>
                   <button className="ad-btn ad-btn-rosa" onClick={() => setTab("alugueres")}>Ver alugueres</button>
                   <button className="ad-btn ad-btn-outline" onClick={() => setTab("reservas")}>Ver reservas</button>
-                  <a href="/analytics" className="ad-btn ad-btn-outline" style={{textDecoration:'none',display:'inline-block'}}>📊 Analytics & AI</a>
                 </div>
               </div>
             </>
