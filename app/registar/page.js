@@ -61,6 +61,8 @@ export default function Registar() {
   const [telefone, setTelefone] = useState("");
   const [dataNasc, setDataNasc] = useState("");
   const [genero, setGenero] = useState("");
+  const [pais, setPais] = useState("");
+  const [cidade, setCidade] = useState("");
   const [password, setPassword] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [erro, setErro] = useState("");
@@ -92,6 +94,8 @@ export default function Registar() {
           telefone,
           data_nascimento: dataNasc || null,
           genero: genero || null,
+          pais: pais || null,
+          cidade: cidade || null,
         });
       }
     } catch(e) {}
@@ -203,6 +207,22 @@ export default function Registar() {
                     <option value="Homem">Homem</option>
                     <option value="Não-binário">Não-binário</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">País</label>
+                  <select className="form-input" value={pais} onChange={e => setPais(e.target.value)} style={{cursor:'pointer'}}>
+                    <option value="">Selecionar país</option>
+                    <option value="Portugal">🇵🇹 Portugal</option>
+                    <option value="França">🇫🇷 França</option>
+                    <option value="Lituânia">🇱🇹 Lituânia</option>
+                    <option value="Espanha">🇪🇸 Espanha</option>
+                    <option value="Brasil">🇧🇷 Brasil</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Cidade</label>
+                  <input className="form-input" type="text" value={cidade} onChange={e => setCidade(e.target.value)} placeholder="Lisboa, Porto, Paris..." />
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.password}</label>
