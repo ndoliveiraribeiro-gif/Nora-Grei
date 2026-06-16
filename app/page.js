@@ -220,15 +220,7 @@ export default function Home() {
     }
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     const visto = localStorage.getItem("ng_banner_cupao");
-    if (!visto) { 
-      setTimeout(() => {
-        setBanner(true);
-        setTimeout(() => {
-          setBanner(false);
-          localStorage.setItem("ng_banner_cupao", "1");
-        }, 7000);
-      }, 1500); 
-    }
+    if (!visto) { setTimeout(() => { setBanner(true); setTimeout(() => { setBanner(false); localStorage.setItem("ng_banner_cupao", "1"); }, 7000); }, 1500); }
   }, []);
 
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
@@ -378,7 +370,7 @@ export default function Home() {
         .cupao-btn.copied { background:#27ae60; }
         .cupao-link { font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; transition:color 0.2s; white-space:nowrap; }
         .cupao-link:hover { color:var(--white); }
-        .cupao-fechar { background:rgba(255,255,255,0.15); border:none; color:#fff; cursor:pointer; font-size:1.1rem; padding:0.4rem 0.7rem; transition:all 0.2s; flex-shrink:0; font-weight:500; border-radius:2px; }
+        .cupao-fechar { background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:1rem; padding:0; transition:color 0.2s; flex-shrink:0; }
         .cupao-fechar:hover { color:var(--white); }
 
         /* MOBILE */
@@ -388,11 +380,6 @@ export default function Home() {
           .nav-links { display:none; }
           .nav-right .nav-btn-outline { display:none; }
           .nav-right .nav-btn-fill { display:none; }
-          .cupao-banner { padding:0.75rem 1rem; top:70px; flex-wrap:nowrap; gap:0.5rem; }
-          .cupao-texto { font-size:0.6rem; }
-          .cupao-codigo { font-size:0.9rem; margin:0 0.25rem; }
-          .cupao-btn { font-size:0.58rem; padding:0.4rem 0.6rem; }
-          .cupao-link { display:none; }
           .hero { grid-template-columns:1fr; min-height:auto; padding-top:70px; }
           .hero-right { height:80vw; order:-1; }
           .hero-left { padding:2rem 1.25rem 3rem; }
