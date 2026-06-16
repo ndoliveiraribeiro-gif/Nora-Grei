@@ -173,9 +173,9 @@ export default function Admin() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Jost:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root { --black:#080808; --white:#f8f7f5; --grey-100:#f0eeeb; --grey-200:#e2dfda; --grey-600:#1a1a18; --rosa:#c4748a; --sans:'Jost',Arial,sans-serif; --serif:'Cormorant',Georgia,serif; }
-        body { background:var(--grey-100); font-family:var(--sans); font-weight:400; font-size:15px; -webkit-font-smoothing:antialiased; color:var(--black); }
+        body { background:var(--grey-100); font-family:var(--sans); font-weight:400; font-size:15px; -webkit-font-smoothing:antialiased; color:var(--black); display:block !important; flex-direction:unset !important; }
         
-        .ad-layout { display:grid; grid-template-columns:220px 1fr; min-height:100vh; }
+        .ad-layout { display:grid !important; grid-template-columns:220px 1fr; min-height:100vh; width:100%; }
         
         /* SIDEBAR */
         .ad-sidebar { background:var(--black); color:var(--white); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:220px; z-index:100; }
@@ -193,10 +193,10 @@ export default function Admin() {
         .ad-sair:hover { color:var(--white); }
         
         /* MAIN */
-           .ad-main { margin-left:220px; padding:2.5rem; }             
+        .ad-main { margin-left:220px; padding:2.5rem; }
         .ad-header { margin-bottom:2rem; }
         .ad-titulo { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; }
-        .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; white-space:nowrap; }
+        .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; }
         
         /* CARDS STATS */
         .ad-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
@@ -290,7 +290,7 @@ export default function Admin() {
             <>
               <div className="ad-header">
                 <h1 className="ad-titulo">Dashboard</h1>
-                <p className="ad-subtitulo" style={{whiteSpace:"nowrap"}}>Resumo do negócio em tempo real</p>
+                <p className="ad-subtitulo">Resumo do negócio em tempo real</p>
               </div>
               <div className="ad-stats">
                 <div className="ad-stat destaque">
