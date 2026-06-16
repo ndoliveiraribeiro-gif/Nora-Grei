@@ -54,11 +54,10 @@ export default function CampanhaAlert({ lang = "pt" }) {
     const campanhaAleatoria = data[Math.floor(Math.random() * data.length)];
     
     if (sorteio <= campanhaAleatoria.probabilidade) {
-      setTimeout(() => {
+      setTimeout(async () => {
         setCampanha(campanhaAleatoria);
         setVisivel(true);
         localStorage.setItem("ng_campanha_ultima", Date.now().toString());
-        // Registar impressão
         await supabase.from("campanha_eventos").insert({
           campanha_id: campanhaAleatoria.id,
           tipo: "impressao",
