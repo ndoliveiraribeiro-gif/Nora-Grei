@@ -220,7 +220,15 @@ export default function Home() {
     }
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     const visto = localStorage.getItem("ng_banner_cupao");
-    if (!visto) { setTimeout(() => setBanner(true), 1500); }
+    if (!visto) { 
+      setTimeout(() => {
+        setBanner(true);
+        setTimeout(() => {
+          setBanner(false);
+          localStorage.setItem("ng_banner_cupao", "1");
+        }, 7000);
+      }, 1500); 
+    }
   }, []);
 
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
