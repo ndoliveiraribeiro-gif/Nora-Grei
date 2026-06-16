@@ -154,6 +154,32 @@ export default function Admin() {
     }
   };
 
+  // FLUXO DEVOLUÇÃO
+  const confirmarRecepcao = async (id) => {
+    await supabase.from("alugueres").update({ 
+      estado: "em_verificacao",
+      data_recepcao: new Date().toISOString()
+    }).eq("id", id);
+    carregarDados();
+  };
+
+  const confirmarVerificacao = async (id, danificado = false) => {
+    const estado = danificado ? "devolvido_danificado" : "devolvido";
+    await supabase.from("alugueres").update({ 
+      estado,
+      data_verificacao: new Date().toISOString(),
+    }).eq("id", id);
+    carregarDados();
+  };
+
+  const libertarCaucao = async (id) => {
+    await supabase.from("alugueres").update({ 
+      deposito_estado: "libertado",
+      caucao_libertada_em: new Date().toISOString()
+    }).eq("id", id);
+    carregarDados();
+  };
+
   const notificarReserva = async (reservaId, clienteId) => {
     await supabase.from("reservas_espera").update({ estado: "notificado", notificado_em: new Date().toISOString(), expira_confirmacao_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }).eq("id", reservaId);
     carregarDados();
@@ -474,6 +500,7 @@ export default function Admin() {
                             <option value="confirmado">Confirmado</option>
                             <option value="enviado">Enviado</option>
                             <option value="ativo">Ativo</option>
+                            <option value="em_verificacao">Em verificação</option>
                             <option value="devolvido">Devolvido</option>
                             <option value="devolvido_danificado">Danificado</option>
                             <option value="nao_devolvido">Não devolvido</option>
@@ -481,7 +508,33 @@ export default function Admin() {
                           </select>
                         </td>
                         <td>
-                          <div style={{fontSize:'0.75rem',color:'#5a5855'}}>{a.metodo_entrega}</div>
+                          <div style={{display:'flex',flexDirection:'column',gap:'0.3rem'}}>
+                            {a.estado === 'ativo' && (
+                              <button className="ad-btn ad-btn-sm ad-btn-rosa" onClick={() => confirmarRecepcao(a.id)}>
+                                📦 Recebi a peça
+                              </button>
+                            )}
+                            {a.estado === 'em_verificacao' && (
+                              <>
+                                <div style={{fontSize:'0.72rem',color:'#f39c12',fontWeight:500,marginBottom:'0.25rem'}}>⏳ Em verificação</div>
+                                <button className="ad-btn ad-btn-sm ad-btn-black" onClick={() => confirmarVerificacao(a.id, false)}>
+                                  ✓ Aprovada
+                                </button>
+                                <button className="ad-btn ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb',fontSize:'0.6rem',padding:'0.35rem 0.65rem'}} onClick={() => confirmarVerificacao(a.id, true)}>
+                                  ✗ Danificada
+                                </button>
+                              </>
+                            )}
+                            {(a.estado === 'devolvido') && a.deposito_estado !== 'libertado' && (
+                              <button className="ad-btn ad-btn-sm ad-btn-outline" onClick={() => libertarCaucao(a.id)}>
+                                💰 Libertar caução
+                              </button>
+                            )}
+                            {a.caucao_libertada_em && (
+                              <div style={{fontSize:'0.65rem',color:'#27ae60',fontWeight:500}}>✓ Caução libertada</div>
+                            )}
+                            <div style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.25rem'}}>{a.metodo_entrega}</div>
+                          </div>
                         </td>
                       </tr>
                     ))}
