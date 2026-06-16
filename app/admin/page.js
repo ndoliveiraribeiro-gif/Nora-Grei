@@ -316,6 +316,7 @@ export default function Admin() {
                   <button className="ad-btn ad-btn-black" onClick={() => setTab("catalogo")}>+ Adicionar peça</button>
                   <button className="ad-btn ad-btn-rosa" onClick={() => setTab("alugueres")}>Ver alugueres</button>
                   <button className="ad-btn ad-btn-outline" onClick={() => setTab("reservas")}>Ver reservas</button>
+                  <a href="/analytics" className="ad-btn ad-btn-outline" style={{textDecoration:'none',display:'inline-block'}}>📊 Analytics & AI</a>
                 </div>
               </div>
             </>
