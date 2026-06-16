@@ -7,9 +7,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", config: "Configurações" };
-const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", clientes: "◉", reservas: "◌", config: "⚙" };
+const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };
+const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", clientes: "◉", reservas: "◌", campanhas: "✉", config: "⚙" };
 
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
@@ -37,6 +37,10 @@ export default function Admin() {
 
   // CONFIG
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
+
+  // CAMPANHAS
+  const [campanhas, setCampanhas] = useState([]);
+  const [novaCampanha, setNovaCampanha] = useState({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
 
   useEffect(() => { verificarAcesso(); }, []);
   useEffect(() => { if (acesso) carregarDados(); }, [acesso, tab]);
@@ -85,6 +89,10 @@ export default function Admin() {
       const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))").order("created_at", { ascending: false });
       if (data) setReservas(data);
     }
+    if (tab === "campanhas") {
+      const { data } = await supabase.from("campanhas").select("*, pecas(nome)").order("created_at", { ascending: false });
+      if (data) setCampanhas(data);
+    }
   };
 
   const criarPeca = async () => {
@@ -113,6 +121,37 @@ export default function Admin() {
   const confirmarDeposito = async (id) => {
     await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id);
     carregarDados();
+  };
+
+  const criarCampanha = async () => {
+    if (!novaCampanha.titulo || !novaCampanha.mensagem) return;
+    const { error } = await supabase.from("campanhas").insert({
+      titulo: novaCampanha.titulo,
+      mensagem: novaCampanha.mensagem,
+      tipo: novaCampanha.tipo,
+      codigo: novaCampanha.codigo || null,
+      desconto: novaCampanha.desconto || null,
+      probabilidade: parseInt(novaCampanha.probabilidade),
+      url_destino: novaCampanha.url_destino,
+      validade: novaCampanha.validade || null,
+      ativa: true,
+    });
+    if (!error) {
+      setNovaCampanha({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
+      carregarDados();
+    }
+  };
+
+  const toggleCampanha = async (id, ativa) => {
+    await supabase.from("campanhas").update({ ativa: !ativa }).eq("id", id);
+    carregarDados();
+  };
+
+  const apagarCampanha = async (id) => {
+    if (confirm("Apagar esta campanha?")) {
+      await supabase.from("campanhas").delete().eq("id", id);
+      carregarDados();
+    }
   };
 
   const notificarReserva = async (reservaId, clienteId) => {
@@ -541,6 +580,111 @@ export default function Admin() {
                               Notificar cliente
                             </button>
                           )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {/* ── CAMPANHAS ── */}
+          {tab === "campanhas" && (
+            <>
+              <div className="ad-header">
+                <h1 className="ad-titulo">Campanhas</h1>
+                <p className="ad-subtitulo">Alertas, cupões e novidades para os clientes</p>
+              </div>
+
+              {/* NOVA CAMPANHA */}
+              <div className="ad-card">
+                <p className="ad-card-title">Nova campanha</p>
+                <div className="ad-form-grid">
+                  <div>
+                    <label className="ad-label">Título</label>
+                    <input className="ad-input" value={novaCampanha.titulo} onChange={e => setNovaCampanha(p => ({...p, titulo: e.target.value}))} placeholder="É o teu dia de sorte!" />
+                  </div>
+                  <div>
+                    <label className="ad-label">Tipo</label>
+                    <select className="ad-select" value={novaCampanha.tipo} onChange={e => setNovaCampanha(p => ({...p, tipo: e.target.value}))}>
+                      <option value="cupao">Cupão de desconto</option>
+                      <option value="novidade">Novidade de produto</option>
+                      <option value="oferta">Oferta especial</option>
+                    </select>
+                  </div>
+                  <div className="ad-form-full">
+                    <label className="ad-label">Mensagem</label>
+                    <textarea className="ad-textarea" value={novaCampanha.mensagem} onChange={e => setNovaCampanha(p => ({...p, mensagem: e.target.value}))} placeholder="Compra a nova camisola e leva uma t-shirt grátis..." />
+                  </div>
+                  <div>
+                    <label className="ad-label">Código de desconto (opcional)</label>
+                    <input className="ad-input" value={novaCampanha.codigo} onChange={e => setNovaCampanha(p => ({...p, codigo: e.target.value}))} placeholder="NORA15" />
+                  </div>
+                  <div>
+                    <label className="ad-label">Descrição do desconto</label>
+                    <input className="ad-input" value={novaCampanha.desconto} onChange={e => setNovaCampanha(p => ({...p, desconto: e.target.value}))} placeholder="15% em toda a loja" />
+                  </div>
+                  <div>
+                    <label className="ad-label">Probabilidade de aparecer (%)</label>
+                    <input className="ad-input" type="number" min="1" max="100" value={novaCampanha.probabilidade} onChange={e => setNovaCampanha(p => ({...p, probabilidade: e.target.value}))} />
+                  </div>
+                  <div>
+                    <label className="ad-label">Validade (opcional)</label>
+                    <input className="ad-input" type="datetime-local" value={novaCampanha.validade} onChange={e => setNovaCampanha(p => ({...p, validade: e.target.value}))} />
+                  </div>
+                  <div className="ad-form-full">
+                    <label className="ad-label">URL destino</label>
+                    <input className="ad-input" value={novaCampanha.url_destino} onChange={e => setNovaCampanha(p => ({...p, url_destino: e.target.value}))} placeholder="https://www.noragrei.com" />
+                  </div>
+                </div>
+                <button className="ad-btn ad-btn-rosa" onClick={criarCampanha}>✉ Criar campanha</button>
+              </div>
+
+              {/* LISTA CAMPANHAS */}
+              <div className="ad-card">
+                <p className="ad-card-title">{campanhas.length} campanhas criadas</p>
+                <table className="ad-table">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Tipo</th>
+                      <th>Código</th>
+                      <th>Probabilidade</th>
+                      <th>Validade</th>
+                      <th>Estado</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {campanhas.length === 0 ? (
+                      <tr><td colSpan={7} style={{textAlign:'center',color:'#5a5855',padding:'2rem'}}>Sem campanhas criadas</td></tr>
+                    ) : campanhas.map(c => (
+                      <tr key={c.id}>
+                        <td>
+                          <div style={{fontWeight:500}}>{c.titulo}</div>
+                          <div style={{fontSize:'0.78rem',color:'#5a5855',maxWidth:'200px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.mensagem}</div>
+                        </td>
+                        <td>
+                          <span className={`ad-badge ${c.tipo === 'cupao' ? 'ad-badge-rosa' : c.tipo === 'novidade' ? 'ad-badge-verde' : 'ad-badge-laranja'}`}>
+                            {c.tipo}
+                          </span>
+                        </td>
+                        <td style={{fontWeight:600,letterSpacing:'0.1em'}}>{c.codigo || "—"}</td>
+                        <td>{c.probabilidade}%</td>
+                        <td style={{fontSize:'0.82rem'}}>{c.validade ? new Date(c.validade).toLocaleDateString('pt-PT') : "Sem limite"}</td>
+                        <td>
+                          <span className={`ad-badge ${c.ativa ? 'ad-badge-verde' : 'ad-badge-cinza'}`}>
+                            {c.ativa ? "Ativa" : "Inativa"}
+                          </span>
+                        </td>
+                        <td style={{display:'flex',gap:'0.4rem'}}>
+                          <button className={`ad-btn ad-btn-sm ${c.ativa ? 'ad-btn-outline' : 'ad-btn-rosa'}`} onClick={() => toggleCampanha(c.id, c.ativa)}>
+                            {c.ativa ? "Pausar" : "Ativar"}
+                          </button>
+                          <button className="ad-btn ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb'}} onClick={() => apagarCampanha(c.id)}>
+                            Apagar
+                          </button>
                         </td>
                       </tr>
                     ))}
