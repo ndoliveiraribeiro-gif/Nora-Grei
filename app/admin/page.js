@@ -78,7 +78,12 @@ export default function Admin() {
       if (c) setCategorias(c);
     }
     if (tab === "alugueres") {
-      const { data } = await supabase.from("alugueres").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))").order("created_at", { ascending: false }).limit(50);
+      const { data, error } = await supabase
+        .from("alugueres")
+        .select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))")
+        .order("data_fim", { ascending: true })
+        .limit(100);
+      console.log("Alugueres:", data?.length, error);
       if (data) setAlugueres(data);
     }
     if (tab === "clientes") {
@@ -152,6 +157,15 @@ export default function Admin() {
       await supabase.from("campanhas").delete().eq("id", id);
       carregarDados();
     }
+  };
+
+  // CALCULAR ATRASO
+  const calcularAtraso = (dataFim) => {
+    if (!dataFim) return 0;
+    const hoje = new Date();
+    const fim = new Date(dataFim);
+    const diff = Math.floor((hoje - fim) / 86400000);
+    return diff > 0 ? diff : 0;
   };
 
   // FLUXO DEVOLUÇÃO
@@ -462,6 +476,7 @@ export default function Admin() {
                       <th>Cliente</th>
                       <th>Peça</th>
                       <th>Datas</th>
+                      <th>Atraso</th>
                       <th>Valor</th>
                       <th>Depósito</th>
                       <th>Estado</th>
@@ -481,6 +496,18 @@ export default function Admin() {
                         </td>
                         <td style={{fontSize:'0.82rem'}}>
                           {a.data_inicio} → {a.data_fim}
+                        </td>
+                        <td>
+                          {calcularAtraso(a.data_fim) > 0 ? (
+                            <div>
+                              <span style={{color:'#e74c3c',fontWeight:600,fontSize:'0.9rem'}}>+{calcularAtraso(a.data_fim)} dias</span>
+                              <div style={{fontSize:'0.72rem',color:'#e74c3c'}}>
+                                -{(calcularAtraso(a.data_fim) * (a.valor_aluguer / Math.max(1, Math.ceil((new Date(a.data_fim) - new Date(a.data_inicio)) / 86400000)))).toFixed(0)}€ caução
+                              </div>
+                            </div>
+                          ) : (
+                            <span style={{color:'#27ae60',fontSize:'0.82rem'}}>✓ No prazo</span>
+                          )}
                         </td>
                         <td>{a.valor_aluguer}€</td>
                         <td>
