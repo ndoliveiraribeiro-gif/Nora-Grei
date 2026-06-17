@@ -77,7 +77,8 @@ export default function Admin() {
       }
 
       if (!data?.is_admin) {
-        window.location.href = "/";
+        setErroAuth("❌ Sem acesso. Email: " + u.email + " | UUID: " + u.id + " | is_admin: " + JSON.stringify(data));
+        setLoading(false);
         return;
       }
 
