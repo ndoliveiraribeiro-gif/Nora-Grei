@@ -1,11 +1,6 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/lib/supabase";
 
 const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "config"];
 const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };

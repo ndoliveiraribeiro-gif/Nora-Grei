@@ -1,11 +1,6 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/lib/supabase";
 
 const t = {
   pt: { copiar: "Copiar código", copiado: "Copiado! ✓", ver: "Ver agora", fechar: "Fechar", sorte: "É o teu dia de sorte!", novidade: "Novidade na Nora Grei" },

@@ -1,11 +1,6 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/lib/supabase";
 
 const t = {
   pt: { titulo: "Entrar", email: "Email", password: "Password", btn: "Entrar", registar: "Ainda não tem conta?", link: "Criar conta", erro: "Email ou password incorretos.", esquecer: "Esqueceu a password?" },
