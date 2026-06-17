@@ -23,6 +23,8 @@ export default function Admin() {
   // CATÁLOGO
   const [pecas, setPecas] = useState([]);
   const [novaPeca, setNovaPeca] = useState({ nome: "", categoria_id: "", preco_aluguer_dia: "", valor_peca: "", descricao: "", material: "", origem: "Portugal" });
+  const [fotosUpload, setFotosUpload] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [editPeca, setEditPeca] = useState(null);
 
@@ -89,7 +91,7 @@ export default function Admin() {
     if (tab === "alugueres") {
       const { data, error } = await supabase
         .from("alugueres")
-        .select("*, clientes!alugueres_cliente_id_fkey(nome, email), stock_tamanhos(tamanho, pecas(nome))")
+        .select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))")
         .order("data_fim", { ascending: true })
         .limit(100);
       console.log("Alugueres:", data?.length, error);
@@ -107,6 +109,25 @@ export default function Admin() {
       const { data } = await supabase.from("campanhas").select("*, pecas(nome)").order("created_at", { ascending: false });
       if (data) setCampanhas(data);
     }
+  };
+
+  const handleFotos = (e) => {
+    setFotosUpload(Array.from(e.target.files));
+  };
+
+  const uploadFotos = async (pecaId) => {
+    const urls = [];
+    for (const foto of fotosUpload) {
+      const ext = foto.name.split(".").pop();
+      const path = `${pecaId}/${Date.now()}.${ext}`;
+      setUploadProgress(`A fazer upload de ${foto.name}...`);
+      const { error } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true });
+      if (!error) {
+        const { data } = supabase.storage.from("pecas").getPublicUrl(path);
+        urls.push(data.publicUrl);
+      }
+    }
+    return urls;
   };
 
   const criarPeca = async () => {
@@ -415,7 +436,13 @@ export default function Admin() {
                     <textarea className="ad-textarea" value={novaPeca.descricao} onChange={e => setNovaPeca(p => ({...p, descricao: e.target.value}))} placeholder="Descrição da peça..." />
                   </div>
                 </div>
-                <button className="ad-btn ad-btn-black" onClick={criarPeca}>+ Adicionar peça</button>
+                <div style={{marginBottom:'1rem'}}>
+                <label className="ad-label">Fotos da peça</label>
+                <input type="file" accept="image/*" multiple onChange={handleFotos} style={{width:'100%',padding:'0.75rem',border:'1.5px solid #e2dfda',background:'#f8f7f5',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',cursor:'pointer'}} />
+                {fotosUpload.length > 0 && <p style={{fontSize:'0.75rem',color:'#27ae60',marginTop:'0.4rem'}}>{fotosUpload.length} foto(s) selecionada(s)</p>}
+                {uploadProgress && <p style={{fontSize:'0.75rem',color:'#c4748a',marginTop:'0.4rem'}}>{uploadProgress}</p>}
+              </div>
+              <button className="ad-btn ad-btn-black" onClick={criarPeca}>+ Adicionar peça</button>
               </div>
 
               {/* LISTA PEÇAS */}
@@ -424,6 +451,7 @@ export default function Admin() {
                 <table className="ad-table">
                   <thead>
                     <tr>
+                      <th>Foto</th>
                       <th>Peça</th>
                       <th>Categoria</th>
                       <th>Preço/dia</th>
