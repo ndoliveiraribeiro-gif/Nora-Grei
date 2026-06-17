@@ -358,7 +358,7 @@ Responde APENAS com o comentário.`;
 
           {/* BOTÕES */}
           <a
-            href={peca.estado === 'disponivel' && tamanhoSelecionado ? `/checkout?peca=${peca.id}&tamanho=${tamanhoSelecionado}` : '#'}
+            href={peca.estado === 'disponivel' && tamanhoSelecionado ? `/checkout?peca=${peca.id}&tamanho=${tamanhoSelecionado}&stock_id=${peca.stock_tamanhos?.find(s => s.tamanho === tamanhoSelecionado)?.id || ''}` : '#'}
             className={`pd-btn-alugar${!tamanhoSelecionado || peca.estado !== 'disponivel' ? ' disabled' : ''}`}
             onClick={e => { if (!tamanhoSelecionado) { e.preventDefault(); alert(t.selecioneTamanho); } }}
           >

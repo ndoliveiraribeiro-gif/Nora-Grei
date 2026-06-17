@@ -146,6 +146,7 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const pecaId = searchParams.get("peca");
   const tamanhoParam = searchParams.get("tamanho");
+  const stockId = searchParams.get("stock_id");
 
   const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
@@ -175,7 +176,7 @@ function CheckoutContent() {
     if (pecaId) {
       const { data } = await supabase
         .from("pecas")
-        .select("*, categorias(nome), fotos")
+        .select("*, categorias(nome)")
         .eq("id", pecaId)
         .single();
       if (data) setPeca({ ...data, categoria: data.categorias?.nome || "" });
@@ -211,7 +212,7 @@ function CheckoutContent() {
     try {
       const { error } = await supabase.from("alugueres").insert({
         cliente_id: user.id,
-        stock_tamanho_id: tamanhoParam,
+        stock_tamanho_id: stockId || tamanhoParam,
         data_inicio: dataInicio,
         data_fim: dataFim,
         tipo: temGratis ? "subscricao" : "avulso",
