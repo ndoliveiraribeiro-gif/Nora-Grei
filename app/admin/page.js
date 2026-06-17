@@ -89,7 +89,7 @@ export default function Admin() {
     if (tab === "alugueres") {
       const { data, error } = await supabase
         .from("alugueres")
-        .select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))")
+        .select("*, clientes!alugueres_cliente_id_fkey(nome, email), stock_tamanhos(tamanho, pecas(nome))")
         .order("data_fim", { ascending: true })
         .limit(100);
       console.log("Alugueres:", data?.length, error);
