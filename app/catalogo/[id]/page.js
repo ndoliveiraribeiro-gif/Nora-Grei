@@ -106,7 +106,7 @@ export default function PecaDetalhe({ params }) {
   const carregarPeca = async () => {
     const { data } = await supabase
       .from("pecas")
-      .select(`*, stock_tamanhos(tamanho, quantidade_disponivel), categorias(nome)`)
+      .select(`*, stock_tamanhos(id, tamanho, quantidade_disponivel), categorias(nome)`)
       .eq("id", params.id)
       .single();
     if (data) {
