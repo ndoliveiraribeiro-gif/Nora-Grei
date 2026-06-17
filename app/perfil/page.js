@@ -225,7 +225,7 @@ export default function Perfil() {
         .pf-hero-nome { font-family:var(--serif); font-size:2rem; font-weight:400; color:var(--black); line-height:1.1; margin-bottom:0.3rem; }
         .pf-hero-email { font-size:0.92rem; color:var(--grey-500); }
         .pf-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--grey-200); }
-        .pf-stat { background:var(--white); padding:1.5rem 1rem; text-align:center; }
+        .pf-stat { background:var(--white); padding:1.5rem 1rem; text-align:center; cursor:pointer; transition:background 0.2s; }
         .pf-stat-val { font-family:var(--serif); font-size:2rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.4rem; }
         .pf-stat-label { font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-500); font-weight:400; }
         .pf-stat.reservas .pf-stat-val { color: #e67e22; }
