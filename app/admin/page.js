@@ -16,6 +16,7 @@ export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [acesso, setAcesso] = useState(false);
+  const [erroAuth, setErroAuth] = useState("");
 
   // DASHBOARD
   const [stats, setStats] = useState({ alugueres_ativos: 0, devolucoes_hoje: 0, receita_mes: 0, clientes_total: 0 });
@@ -26,7 +27,7 @@ export default function Admin() {
   const [fotosUpload, setFotosUpload] = useState([]);
   const [uploadProgress, setUploadProgress] = useState("");
   const [categorias, setCategorias] = useState([]);
-  const [editPeca, setEditPeca] = useState(null);
+  const [criandoPeca, setCriandoPeca] = useState(false);
 
   // ALUGUERES
   const [alugueres, setAlugueres] = useState([]);
@@ -48,22 +49,44 @@ export default function Admin() {
   useEffect(() => { if (acesso) carregarDados(); }, [acesso, tab]);
 
   const verificarAcesso = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = "/entrar"; return; }
-    setUser(user);
-    // Tentar buscar is_admin - se falhar por RLS, tentar de outra forma
-    const { data, error } = await supabase.from("clientes").select("is_admin").eq("id", user.id).single();
-    if (error) {
-      console.error("Erro RLS:", error);
-      // Se der erro de RLS mas o utilizador está autenticado, deixar entrar
-      // (protegido pelo Supabase de qualquer forma)
+    try {
+      // FIX CHROME: esperar que a sessão esteja pronta
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        window.location.href = "/entrar";
+        return;
+      }
+
+      const u = session.user;
+      setUser(u);
+
+      // Verificar se é admin
+      const { data, error } = await supabase
+        .from("clientes")
+        .select("is_admin")
+        .eq("id", u.id)
+        .single();
+
+      if (error) {
+        // RLS pode bloquear — se sessão válida, deixar entrar (protegido pelo Supabase)
+        console.warn("RLS warning:", error.message);
+        setAcesso(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!data?.is_admin) {
+        window.location.href = "/";
+        return;
+      }
+
       setAcesso(true);
+    } catch (e) {
+      setErroAuth("Erro ao verificar acesso: " + e.message);
+    } finally {
       setLoading(false);
-      return;
     }
-    if (!data?.is_admin) { window.location.href = "/"; return; }
-    setAcesso(true);
-    setLoading(false);
   };
 
   const carregarDados = async () => {
@@ -89,12 +112,11 @@ export default function Admin() {
       if (c) setCategorias(c);
     }
     if (tab === "alugueres") {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("alugueres")
         .select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))")
         .order("data_fim", { ascending: true })
         .limit(100);
-      console.log("Alugueres:", data?.length, error);
       if (data) setAlugueres(data);
     }
     if (tab === "clientes") {
@@ -119,12 +141,14 @@ export default function Admin() {
     const urls = [];
     for (const foto of fotosUpload) {
       const ext = foto.name.split(".").pop();
-      const path = `${pecaId}/${Date.now()}.${ext}`;
+      const path = `${pecaId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       setUploadProgress(`A fazer upload de ${foto.name}...`);
       const { error } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true });
       if (!error) {
         const { data } = supabase.storage.from("pecas").getPublicUrl(path);
         urls.push(data.publicUrl);
+      } else {
+        console.error("Erro upload:", error.message);
       }
     }
     return urls;
@@ -132,7 +156,11 @@ export default function Admin() {
 
   const criarPeca = async () => {
     if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) return;
-    const { error } = await supabase.from("pecas").insert({
+    setCriandoPeca(true);
+    setUploadProgress("");
+
+    // 1. Criar a peça primeiro para obter o ID
+    const { data: pecaCriada, error } = await supabase.from("pecas").insert({
       nome: novaPeca.nome,
       categoria_id: novaPeca.categoria_id || null,
       preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia),
@@ -141,11 +169,31 @@ export default function Admin() {
       material: novaPeca.material,
       origem: novaPeca.origem,
       estado: "disponivel",
-    });
-    if (!error) {
-      setNovaPeca({ nome: "", categoria_id: "", preco_aluguer_dia: "", valor_peca: "", descricao: "", material: "", origem: "Portugal" });
-      carregarDados();
+    }).select().single();
+
+    if (error) {
+      setUploadProgress("Erro ao criar peça: " + error.message);
+      setCriandoPeca(false);
+      return;
     }
+
+    // 2. Upload das fotos com o ID real da peça
+    if (fotosUpload.length > 0) {
+      const urls = await uploadFotos(pecaCriada.id);
+      if (urls.length > 0) {
+        // 3. Guardar as URLs na peça
+        await supabase.from("pecas").update({ fotos: urls }).eq("id", pecaCriada.id);
+        setUploadProgress(`✓ ${urls.length} foto(s) guardada(s)!`);
+      }
+    } else {
+      setUploadProgress("✓ Peça criada com sucesso!");
+    }
+
+    setNovaPeca({ nome: "", categoria_id: "", preco_aluguer_dia: "", valor_peca: "", descricao: "", material: "", origem: "Portugal" });
+    setFotosUpload([]);
+    setCriandoPeca(false);
+    setTimeout(() => setUploadProgress(""), 3000);
+    carregarDados();
   };
 
   const atualizarEstadoAluguer = async (id, estado) => {
@@ -189,7 +237,6 @@ export default function Admin() {
     }
   };
 
-  // CALCULAR ATRASO
   const calcularAtraso = (dataFim) => {
     if (!dataFim) return 0;
     const hoje = new Date();
@@ -198,7 +245,6 @@ export default function Admin() {
     return diff > 0 ? diff : 0;
   };
 
-  // FLUXO DEVOLUÇÃO
   const confirmarRecepcao = async (id) => {
     await supabase.from("alugueres").update({ 
       estado: "em_verificacao",
@@ -235,6 +281,17 @@ export default function Admin() {
     </div>
   );
 
+  if (erroAuth) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.85rem',color:'#e74c3c',padding:'2rem',textAlign:'center'}}>
+      <div>
+        <p>{erroAuth}</p>
+        <button onClick={() => window.location.href = "/entrar"} style={{marginTop:'1rem',padding:'0.75rem 1.5rem',background:'#080808',color:'#fff',border:'none',cursor:'pointer',fontFamily:"'Jost',sans-serif",fontSize:'0.75rem',letterSpacing:'0.15em',textTransform:'uppercase'}}>
+          Ir para login
+        </button>
+      </div>
+    </div>
+  );
+
   const ROSA = "#c4748a";
 
   return (
@@ -247,7 +304,6 @@ export default function Admin() {
         
         .ad-layout { display:grid !important; grid-template-columns:220px 1fr; min-height:100vh; width:100%; }
         
-        /* SIDEBAR */
         .ad-sidebar { background:var(--black); color:var(--white); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:220px; z-index:100; }
         .ad-logo { padding:2rem 1.5rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.08); }
         .ad-logo-name { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.2em; text-transform:uppercase; }
@@ -262,20 +318,17 @@ export default function Admin() {
         .ad-sair { font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.4); background:none; border:none; cursor:pointer; font-family:var(--sans); padding:0; transition:color 0.2s; }
         .ad-sair:hover { color:var(--white); }
         
-        /* MAIN */
         .ad-main { margin-left:220px; padding:2.5rem; }
         .ad-header { margin-bottom:2rem; }
         .ad-titulo { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; }
         .ad-subtitulo { font-size:0.82rem; color:#5a5855; margin-top:0.4rem; }
         
-        /* CARDS STATS */
         .ad-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
         .ad-stat { background:var(--white); padding:1.5rem; }
         .ad-stat-val { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.4rem; }
         .ad-stat-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
         .ad-stat.destaque .ad-stat-val { color:var(--rosa); }
         
-        /* TABELA */
         .ad-card { background:var(--white); padding:1.5rem; margin-bottom:1.5rem; }
         .ad-card-title { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--grey-100); }
         .ad-table { width:100%; border-collapse:collapse; }
@@ -284,7 +337,6 @@ export default function Admin() {
         .ad-table tr:last-child td { border-bottom:none; }
         .ad-table tr:hover td { background:var(--grey-100); }
         
-        /* BADGES */
         .ad-badge { display:inline-block; font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.25rem 0.6rem; font-weight:500; }
         .ad-badge-verde { background:#e8f5e9; color:#27ae60; }
         .ad-badge-laranja { background:#fff8e1; color:#f39c12; }
@@ -292,7 +344,6 @@ export default function Admin() {
         .ad-badge-rosa { background:#fff0f3; color:var(--rosa); }
         .ad-badge-vermelho { background:#fff5f5; color:#e74c3c; }
         
-        /* BOTÕES */
         .ad-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.85rem; border:none; cursor:pointer; font-family:var(--sans); font-weight:500; transition:all 0.2s; }
         .ad-btn-black { background:var(--black); color:var(--white); }
         .ad-btn-black:hover { background:#2a2926; }
@@ -301,8 +352,8 @@ export default function Admin() {
         .ad-btn-outline { background:var(--white); color:var(--black); border:1px solid var(--grey-200); }
         .ad-btn-outline:hover { border-color:var(--black); }
         .ad-btn-sm { padding:0.35rem 0.65rem; font-size:0.6rem; }
+        .ad-btn:disabled { opacity:0.5; cursor:not-allowed; }
         
-        /* FORM */
         .ad-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
         .ad-form-grid-3 { grid-template-columns:1fr 1fr 1fr; }
         .ad-form-full { grid-column:1/-1; }
@@ -312,8 +363,15 @@ export default function Admin() {
         .ad-select { width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.92rem; font-family:var(--sans); color:var(--black); outline:none; border-radius:0; cursor:pointer; }
         .ad-textarea { width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.92rem; font-family:var(--sans); color:var(--black); outline:none; border-radius:0; resize:vertical; min-height:80px; }
         
-        /* SELECT ESTADO */
         .ad-select-estado { font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.35rem 0.5rem; border:1px solid var(--grey-200); background:var(--white); font-family:var(--sans); cursor:pointer; color:var(--black); border-radius:0; }
+
+        /* UPLOAD AREA */
+        .ad-upload-area { width:100%; padding:1.5rem; border:2px dashed var(--grey-200); background:var(--grey-100); cursor:pointer; text-align:center; transition:border-color 0.2s; font-family:var(--sans); font-size:0.85rem; color:#5a5855; }
+        .ad-upload-area:hover { border-color:var(--rosa); }
+
+        /* FOTOS PREVIEW */
+        .ad-fotos-preview { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+        .ad-foto-thumb { width:60px; height:60px; object-fit:cover; border:1px solid var(--grey-200); }
 
         @media (max-width:768px) {
           .ad-layout { grid-template-columns:1fr; }
@@ -436,13 +494,53 @@ export default function Admin() {
                     <textarea className="ad-textarea" value={novaPeca.descricao} onChange={e => setNovaPeca(p => ({...p, descricao: e.target.value}))} placeholder="Descrição da peça..." />
                   </div>
                 </div>
+
+                {/* UPLOAD FOTOS — CORRIGIDO */}
                 <div style={{marginBottom:'1rem'}}>
-                <label className="ad-label">Fotos da peça</label>
-                <input type="file" accept="image/*" multiple onChange={handleFotos} style={{width:'100%',padding:'0.75rem',border:'1.5px solid #e2dfda',background:'#f8f7f5',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',cursor:'pointer'}} />
-                {fotosUpload.length > 0 && <p style={{fontSize:'0.75rem',color:'#27ae60',marginTop:'0.4rem'}}>{fotosUpload.length} foto(s) selecionada(s)</p>}
-                {uploadProgress && <p style={{fontSize:'0.75rem',color:'#c4748a',marginTop:'0.4rem'}}>{uploadProgress}</p>}
-              </div>
-              <button className="ad-btn ad-btn-black" onClick={criarPeca}>+ Adicionar peça</button>
+                  <label className="ad-label">Fotos da peça</label>
+                  <label className="ad-upload-area" style={{display:'block',cursor:'pointer'}}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFotos}
+                      style={{display:'none'}}
+                    />
+                    {fotosUpload.length === 0 ? (
+                      <div>
+                        <div style={{fontSize:'1.5rem',marginBottom:'0.4rem'}}>📷</div>
+                        <div style={{fontSize:'0.82rem',color:'#5a5855'}}>Clica para selecionar fotos</div>
+                        <div style={{fontSize:'0.72rem',color:'#999',marginTop:'0.2rem'}}>JPG, PNG, WEBP — múltiplas fotos</div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{fontSize:'0.82rem',color:'#27ae60',fontWeight:500}}>{fotosUpload.length} foto(s) selecionada(s)</div>
+                        <div style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{fotosUpload.map(f => f.name).join(", ")}</div>
+                      </div>
+                    )}
+                  </label>
+                  {/* Preview das fotos selecionadas */}
+                  {fotosUpload.length > 0 && (
+                    <div className="ad-fotos-preview">
+                      {fotosUpload.map((f, i) => (
+                        <img key={i} src={URL.createObjectURL(f)} alt="" className="ad-foto-thumb" />
+                      ))}
+                    </div>
+                  )}
+                  {uploadProgress && (
+                    <p style={{fontSize:'0.75rem',color: uploadProgress.startsWith('✓') ? '#27ae60' : uploadProgress.startsWith('Erro') ? '#e74c3c' : '#c4748a',marginTop:'0.5rem',fontWeight:500}}>
+                      {uploadProgress}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  className="ad-btn ad-btn-black"
+                  onClick={criarPeca}
+                  disabled={criandoPeca}
+                >
+                  {criandoPeca ? "A criar peça..." : "+ Adicionar peça"}
+                </button>
               </div>
 
               {/* LISTA PEÇAS */}
@@ -464,6 +562,13 @@ export default function Admin() {
                   <tbody>
                     {pecas.map(p => (
                       <tr key={p.id}>
+                        <td>
+                          {p.fotos && p.fotos.length > 0 ? (
+                            <img src={p.fotos[0]} alt={p.nome} style={{width:'48px',height:'48px',objectFit:'cover',border:'1px solid #e2dfda'}} />
+                          ) : (
+                            <div style={{width:'48px',height:'48px',background:'#f0eeeb',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.2rem',color:'#ccc'}}>📷</div>
+                          )}
+                        </td>
                         <td><strong>{p.nome}</strong></td>
                         <td>{p.categorias?.nome || "—"}</td>
                         <td>{p.preco_aluguer_dia}€</td>
@@ -482,7 +587,7 @@ export default function Admin() {
                           }}>
                             {p.estado === 'disponivel' ? 'Desativar' : 'Ativar'}
                           </button>
-                          <button className="ad-btn ad-btn-vermelho ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb'}} onClick={async () => {
+                          <button className="ad-btn ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb'}} onClick={async () => {
                             if (confirm("Apagar esta peça?")) {
                               await supabase.from("pecas").delete().eq("id", p.id);
                               carregarDados();
@@ -635,9 +740,7 @@ export default function Admin() {
                         <td style={{fontSize:'0.82rem'}}>{c.email}</td>
                         <td style={{fontSize:'0.82rem'}}>{c.telefone || "—"}</td>
                         <td style={{fontSize:'0.82rem'}}>{c.cidade || "—"}</td>
-                        <td>
-                          <span className="ad-badge ad-badge-rosa">{c.pontos || 0} pts</span>
-                        </td>
+                        <td><span className="ad-badge ad-badge-rosa">{c.pontos || 0} pts</span></td>
                         <td style={{fontSize:'0.82rem'}}>{c.nif || "—"}</td>
                         <td>
                           <button className={`ad-btn ad-btn-sm ${c.is_admin ? 'ad-btn-rosa' : 'ad-btn-outline'}`} onClick={async () => {
@@ -714,8 +817,6 @@ export default function Admin() {
                 <h1 className="ad-titulo">Campanhas</h1>
                 <p className="ad-subtitulo">Alertas, cupões e novidades para os clientes</p>
               </div>
-
-              {/* NOVA CAMPANHA */}
               <div className="ad-card">
                 <p className="ad-card-title">Nova campanha</p>
                 <div className="ad-form-grid">
@@ -758,8 +859,6 @@ export default function Admin() {
                 </div>
                 <button className="ad-btn ad-btn-rosa" onClick={criarCampanha}>✉ Criar campanha</button>
               </div>
-
-              {/* LISTA CAMPANHAS */}
               <div className="ad-card">
                 <p className="ad-card-title">{campanhas.length} campanhas criadas</p>
                 <table className="ad-table">
