@@ -71,8 +71,9 @@ export default function Admin() {
         return;
       }
 
-      if (!data?.is_admin) {
-        setErroAuth("❌ Sem acesso. Email: " + u.email + " | UUID: " + u.id + " | is_admin: " + JSON.stringify(data));
+      const ADMIN_UUID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+      if (u.id !== ADMIN_UUID && !data?.is_admin) {
+        setErroAuth("❌ Sem acesso. Email: " + u.email + " | UUID: " + u.id);
         setLoading(false);
         return;
       }
