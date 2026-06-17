@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import PontosWidget from "@/components/PontosWidget";
-import CodigoDesconto from "@/components/CodigoDesconto";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -225,7 +224,7 @@ export default function Perfil() {
         .pf-avatar-btn { position:absolute; bottom:0; right:0; width:28px; height:28px; border-radius:50%; background:var(--black); color:var(--white); border:2px solid var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; font-weight:500; }
         .pf-hero-nome { font-family:var(--serif); font-size:2rem; font-weight:400; color:var(--black); line-height:1.1; margin-bottom:0.3rem; }
         .pf-hero-email { font-size:0.92rem; color:var(--grey-500); }
-        .pf-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--grey-200); }
+        .pf-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--grey-200); }
         .pf-stat { background:var(--white); padding:1.5rem 1rem; text-align:center; }
         .pf-stat-val { font-family:var(--serif); font-size:2rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.4rem; }
         .pf-stat-label { font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-500); font-weight:400; }
@@ -422,13 +421,8 @@ export default function Perfil() {
                       <div className="pf-aluguer-nome">{peca?.nome || "Peça"}</div>
                       <div className="pf-aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer || 0}€</div>
                     </div>
-                    <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'0.5rem'}}>
-                      <div className={`pf-estado pf-estado-${a.estado === 'ativo' ? 'ativo' : a.estado === 'devolvido' ? 'devolvido' : 'pendente'}`}>
-                        {i[a.estado] || a.estado}
-                      </div>
-                      {a.estado === 'devolvido' && (
-                        <CodigoDesconto aluguer={a} clienteId={user?.id} lang={lang} />
-                      )}
+                    <div className={`pf-estado pf-estado-${a.estado === 'ativo' ? 'ativo' : a.estado === 'devolvido' ? 'devolvido' : 'pendente'}`}>
+                      {i[a.estado] || a.estado}
                     </div>
                   </div>
                 );
