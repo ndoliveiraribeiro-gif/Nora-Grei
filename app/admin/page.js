@@ -40,7 +40,20 @@ export default function Admin() {
   const [campanhas, setCampanhas] = useState([]);
   const [novaCampanha, setNovaCampanha] = useState({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
 
-  useEffect(() => { verificarAcesso(); }, []);
+  useEffect(() => {
+    const pwd = new URLSearchParams(window.location.search).get('k');
+    if (pwd === 'noragrei2024admin') {
+      setAcesso(true);
+    } else {
+      const input = prompt('Password:');
+      if (input === 'noragrei2024admin') {
+        setAcesso(true);
+      } else {
+        window.location.href = '/';
+      }
+    }
+    setLoading(false);
+  }, []);
   useEffect(() => { if (acesso) carregarDados(); }, [acesso, tab]);
 
   const verificarAcesso = async () => {
