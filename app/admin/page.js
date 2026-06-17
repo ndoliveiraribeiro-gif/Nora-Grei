@@ -43,14 +43,12 @@ export default function Admin() {
   useEffect(() => {
     const pwd = new URLSearchParams(window.location.search).get('k');
     if (pwd === 'noragrei2024admin') {
+      sessionStorage.setItem('admin_ok', '1');
+      setAcesso(true);
+    } else if (sessionStorage.getItem('admin_ok') === '1') {
       setAcesso(true);
     } else {
-      const input = prompt('Password:');
-      if (input === 'noragrei2024admin') {
-        setAcesso(true);
-      } else {
-        window.location.href = '/';
-      }
+      setAcesso(false);
     }
     setLoading(false);
   }, []);
@@ -288,6 +286,45 @@ export default function Admin() {
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',color:'#888'}}>
       A verificar acesso...
+    </div>
+  );
+
+  if (!acesso) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f0eeeb'}}>
+      <div style={{background:'#fff',padding:'3rem',maxWidth:'360px',width:'100%',textAlign:'center'}}>
+        <div style={{fontFamily:'Cormorant,Georgia,serif',fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',marginBottom:'0.5rem'}}>NORA GREI</div>
+        <div style={{fontSize:'0.6rem',letterSpacing:'0.3em',color:'#888',marginBottom:'2rem'}}>BACKOFFICE</div>
+        <input
+          type="password"
+          placeholder="Password"
+          id="admin-pwd"
+          style={{width:'100%',padding:'0.75rem',border:'1.5px solid #e2dfda',fontFamily:'Jost,sans-serif',fontSize:'0.9rem',marginBottom:'1rem',outline:'none',boxSizing:'border-box'}}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              if (e.target.value === 'noragrei2024admin') {
+                sessionStorage.setItem('admin_ok', '1');
+                setAcesso(true);
+              } else {
+                e.target.style.border = '1.5px solid #e74c3c';
+              }
+            }
+          }}
+        />
+        <button
+          style={{width:'100%',padding:'0.75rem',background:'#080808',color:'#fff',border:'none',cursor:'pointer',fontFamily:'Jost,sans-serif',fontSize:'0.7rem',letterSpacing:'0.2em',textTransform:'uppercase'}}
+          onClick={() => {
+            const pwd = document.getElementById('admin-pwd').value;
+            if (pwd === 'noragrei2024admin') {
+              sessionStorage.setItem('admin_ok', '1');
+              setAcesso(true);
+            } else {
+              document.getElementById('admin-pwd').style.border = '1.5px solid #e74c3c';
+            }
+          }}
+        >
+          Entrar
+        </button>
+      </div>
     </div>
   );
 
