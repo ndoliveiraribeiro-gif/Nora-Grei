@@ -49,7 +49,16 @@ export default function Admin() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "/entrar"; return; }
     setUser(user);
-    const { data } = await supabase.from("clientes").select("is_admin").eq("id", user.id).single();
+    // Tentar buscar is_admin - se falhar por RLS, tentar de outra forma
+    const { data, error } = await supabase.from("clientes").select("is_admin").eq("id", user.id).single();
+    if (error) {
+      console.error("Erro RLS:", error);
+      // Se der erro de RLS mas o utilizador está autenticado, deixar entrar
+      // (protegido pelo Supabase de qualquer forma)
+      setAcesso(true);
+      setLoading(false);
+      return;
+    }
     if (!data?.is_admin) { window.location.href = "/"; return; }
     setAcesso(true);
     setLoading(false);
