@@ -384,7 +384,7 @@ ${Object.entries(estatisticas.pecasEspera).map(([k,v]) => `- ${k}: ${v} em esper
     </div>
   );
 
-  const s = `
+  const s = String.raw`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Jost:wght@400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--rosa:#c4748a;--sans:'Jost',Arial,sans-serif;--serif:'Cormorant',Georgia,serif}
