@@ -12,6 +12,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [acesso, setAcesso] = useState(false);
   const [erroAuth, setErroAuth] = useState("");
+  const [pwdInput, setPwdInput] = useState("");
 
   // DASHBOARD
   const [stats, setStats] = useState({ alugueres_ativos: 0, devolucoes_hoje: 0, receita_mes: 0, clientes_total: 0 });
@@ -297,15 +298,14 @@ export default function Admin() {
         <input
           type="password"
           placeholder="Password"
-          id="admin-pwd"
+          value={pwdInput}
+          onChange={e => setPwdInput(e.target.value)}
           style={{width:'100%',padding:'0.75rem',border:'1.5px solid #e2dfda',fontFamily:'Jost,sans-serif',fontSize:'0.9rem',marginBottom:'1rem',outline:'none',boxSizing:'border-box'}}
           onKeyDown={e => {
             if (e.key === 'Enter') {
-              if (e.target.value === 'noragrei2024admin') {
+              if (pwdInput === 'noragrei2024admin') {
                 sessionStorage.setItem('admin_ok', '1');
                 setAcesso(true);
-              } else {
-                e.target.style.border = '1.5px solid #e74c3c';
               }
             }
           }}
@@ -313,12 +313,9 @@ export default function Admin() {
         <button
           style={{width:'100%',padding:'0.75rem',background:'#080808',color:'#fff',border:'none',cursor:'pointer',fontFamily:'Jost,sans-serif',fontSize:'0.7rem',letterSpacing:'0.2em',textTransform:'uppercase'}}
           onClick={() => {
-            const pwd = document.getElementById('admin-pwd').value;
-            if (pwd === 'noragrei2024admin') {
+            if (pwdInput === 'noragrei2024admin') {
               sessionStorage.setItem('admin_ok', '1');
               setAcesso(true);
-            } else {
-              document.getElementById('admin-pwd').style.border = '1.5px solid #e74c3c';
             }
           }}
         >
