@@ -1,4 +1,5 @@
 ﻿"use client";
+export const dynamic = 'force-dynamic';
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -43,17 +44,14 @@ export default function Admin() {
 
   useEffect(() => {
     const pwd = new URLSearchParams(window.location.search).get('k');
-    if (pwd === 'noragrei2024admin') {
-      sessionStorage.setItem('admin_ok', '1');
-      setAcesso(true);
-    } else if (sessionStorage.getItem('admin_ok') === '1') {
-      setAcesso(true);
-    } else {
-      setAcesso(false);
-    }
+    const ok = pwd === 'noragrei2024admin' || sessionStorage.getItem('admin_ok') === '1';
+    if (pwd === 'noragrei2024admin') sessionStorage.setItem('admin_ok', '1');
+    setAcesso(ok);
     setLoading(false);
+    if (ok) carregarDados();
   }, []);
-  useEffect(() => { if (acesso) carregarDados(); }, [acesso, tab]);
+
+  useEffect(() => { if (acesso) carregarDados(); }, [tab]);
 
   const verificarAcesso = async () => {
     try {
