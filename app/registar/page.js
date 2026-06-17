@@ -191,11 +191,7 @@ export default function Registar() {
                   <label className="form-label">{i.email}</label>
                   <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="maria@email.com" />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">{i.telefone}</label>
-                  <input className="form-input" type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="+351 912 345 678" />
-                </div>
-                <div className="form-group">
+                  <div className="form-group">
                   <label className="form-label">Data de nascimento</label>
                   <input className="form-input" type="date" value={dataNasc} onChange={e => setDataNasc(e.target.value)} />
                 </div>
