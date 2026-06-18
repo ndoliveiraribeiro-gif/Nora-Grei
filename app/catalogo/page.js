@@ -5,50 +5,28 @@ import PecaCard from "@/components/PecaCard";
 
 const translations = {
   pt: {
-    titulo: "Catálogo",
-    subtitulo: "Roupa e acessórios para cada momento.",
-    todas: "Todas",
-    semResultados: "Nenhuma peça encontrada.",
-    loading: "A carregar...",
+    titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas",
+    semResultados: "Nenhuma peça encontrada.", loading: "A carregar...",
     categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Calçado", "Novidades"],
-    ordenar: "Ordenar",
-    precoAsc: "Preço: menor primeiro",
-    precoDesc: "Preço: maior primeiro",
-    recentes: "Mais recentes",
+    ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
   },
   fr: {
-    titulo: "Catalogue",
-    subtitulo: "Vêtements et accessoires pour chaque moment.",
-    todas: "Tout",
-    semResultados: "Aucune pièce trouvée.",
-    loading: "Chargement...",
+    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout",
+    semResultados: "Aucune pièce trouvée.", loading: "Chargement...",
     categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Chaussures", "Nouveautés"],
-    ordenar: "Trier",
-    precoAsc: "Prix: croissant",
-    precoDesc: "Prix: décroissant",
-    recentes: "Plus récents",
+    ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
   },
   lt: {
-    titulo: "Katalogas",
-    subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.",
-    todas: "Visi",
-    semResultados: "Drabužių nerasta.",
-    loading: "Kraunama...",
+    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi",
+    semResultados: "Drabužių nerasta.", loading: "Kraunama...",
     categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Avalynė", "Naujienos"],
-    ordenar: "Rūšiuoti",
-    precoAsc: "Kaina: mažiausia pirma",
-    precoDesc: "Kaina: didžiausia pirma",
-    recentes: "Naujausi",
+    ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
   },
 };
 
 const pecasExemplo = [
   { id: "1", nome: "Vestido Seda Noite", categoria: "Vestidos", preco_aluguer_dia: 35, estado: "disponivel", tamanhos: ["XS", "S", "M"], fotos: ["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80"] },
   { id: "2", nome: "Casaco Tweed Dourado", categoria: "Casacos", preco_aluguer_dia: 28, estado: "disponivel", tamanhos: ["S", "M", "L"], fotos: ["https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"] },
-  { id: "3", nome: "Conjunto Linho Branco", categoria: "Conjuntos", preco_aluguer_dia: 42, estado: "disponivel", tamanhos: ["XS", "S"], fotos: ["https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80"] },
-  { id: "4", nome: "Vestido Midi Floral", categoria: "Vestidos", preco_aluguer_dia: 25, estado: "disponivel", tamanhos: ["M", "L", "XL"], fotos: ["https://images.unsplash.com/photo-1495385794356-15371f348c31?w=400&q=80"] },
-  { id: "5", nome: "Blazer Alfaiataria Preta", categoria: "Conjuntos", preco_aluguer_dia: 30, estado: "indisponivel", tamanhos: ["S", "M"], fotos: ["https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&q=80"], data_fim: new Date(Date.now() + 2 * 86400000).toISOString() },
-  { id: "6", nome: "Vestido Cetim Champagne", categoria: "Vestidos", preco_aluguer_dia: 55, estado: "disponivel", tamanhos: ["XS", "S", "M", "L"], fotos: ["https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?w=400&q=80"] },
 ];
 
 export default function Catalogo() {
@@ -60,14 +38,13 @@ export default function Catalogo() {
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
-    if (saved) setLang(saved);
+    if (saved && translations[saved]) setLang(saved);
     carregarPecas();
   }, []);
 
   const carregarPecas = async () => {
     setLoading(true);
     try {
-      // Query separada para evitar limitações do Supabase com joins profundos
       const { data, error } = await supabase
         .from("pecas")
         .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
@@ -75,11 +52,11 @@ export default function Catalogo() {
 
       if (error) throw error;
 
-      // Buscar alugueres ativos separadamente para o timer
+      // Buscar TODOS os alugueres não finalizados (qualquer estado ativo no processo)
       const { data: alugueresAtivos } = await supabase
         .from("alugueres")
-        .select("stock_tamanho_id, data_fim, estado")
-        .eq("estado", "ativo");
+        .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
+        .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
 
       if (data && data.length > 0) {
         const agora = new Date();
@@ -87,21 +64,23 @@ export default function Catalogo() {
           const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
           const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
 
-          // Encontrar aluguer ativo para esta peça
-          const aluguerAtivo = (alugueresAtivos || [])
+          // Encontrar o aluguer mais recente desta peça que ainda está em curso
+          const aluguerEmCurso = (alugueresAtivos || [])
             .filter(a => stockIds.includes(a.stock_tamanho_id))
-            .sort((a, b) => new Date(a.data_fim) - new Date(b.data_fim))[0];
+            .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
 
           let dataFimFinal = null;
-          let estadoFinal = p.estado;
+          let indisponivel = false;
 
-          if (aluguerAtivo) {
-            const dataFimComHigienizacao = new Date(new Date(aluguerAtivo.data_fim).getTime() + 24 * 60 * 60 * 1000);
-            if (dataFimComHigienizacao > agora) {
-              dataFimFinal = dataFimComHigienizacao.toISOString();
-              estadoFinal = "indisponivel";
-            } else {
-              estadoFinal = "disponivel";
+          if (aluguerEmCurso) {
+            // Usar data_disponivel_novamente se existir, senão calcular: data_fim + 3 dias
+            const dataDisp = aluguerEmCurso.data_disponivel_novamente
+              ? new Date(aluguerEmCurso.data_disponivel_novamente)
+              : new Date(new Date(aluguerEmCurso.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+
+            if (dataDisp > agora) {
+              dataFimFinal = dataDisp.toISOString();
+              indisponivel = true;
             }
           }
 
@@ -110,7 +89,7 @@ export default function Catalogo() {
             categoria: p.categorias?.nome || "",
             tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
             data_fim: dataFimFinal,
-            estado: temStock && estadoFinal === "disponivel" ? "disponivel" : (dataFimFinal ? "indisponivel" : p.estado),
+            estado: (temStock && !indisponivel) ? "disponivel" : "indisponivel",
           };
         });
         setPecas(formatadas);
@@ -145,7 +124,6 @@ export default function Catalogo() {
         .cat-header { padding: 8rem 4rem 3rem; }
         .cat-header-label { font-size:0.75rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.75rem; font-weight:400; }
         .cat-header-title { font-family:var(--serif); font-size:clamp(2.5rem,4vw,4rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; }
-        .cat-header-sub { font-size:0.92rem; color:#1a1a18; font-weight:400; }
         .cat-filters { padding:0 4rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:3rem; }
         .filter-btn { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.6rem 1.25rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
         .filter-btn:hover { border-color:var(--black); color:var(--black); }
@@ -160,16 +138,13 @@ export default function Catalogo() {
           .cat-header { padding:6rem 1.5rem 2rem; }
           .cat-header-label { font-size:0.88rem; color:#080808; font-weight:500; }
           .cat-header-title { font-size:clamp(1.8rem,7vw,2.5rem); color:#080808; }
-          .cat-header-sub { font-size:1.05rem; color:#080808; }
           .cat-filters { padding:0 1.5rem 1.5rem; }
           .filter-btn { font-size:0.82rem; color:#080808; }
           .filter-select { font-size:0.82rem; color:#080808; }
           .cat-grid { padding:0 1.5rem 4rem; grid-template-columns:repeat(2,1fr); gap:1rem; }
           body { font-size:17px; color:#080808; }
         }
-        @media (max-width:480px) {
-          .cat-grid { grid-template-columns:1fr; }
-        }
+        @media (max-width:480px) { .cat-grid { grid-template-columns:1fr; } }
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
