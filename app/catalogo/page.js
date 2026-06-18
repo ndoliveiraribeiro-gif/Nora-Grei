@@ -79,14 +79,18 @@ export default function Catalogo() {
       // Buscar peças com stock e alugueres ativos para o timer
       const { data, error } = await supabase
         .from("pecas")
-        .select(`*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)`)
+        .select(`
+          *,
+          categorias(nome),
+          stock_tamanhos(
+            id,
+            tamanho,
+            quantidade_disponivel,
+            quantidade_total,
+            alugueres(data_fim, estado)
+          )
+        `)
         .order("created_at", { ascending: false });
-
-      // Buscar alugueres ativos separadamente
-      const { data: alugueresAtivos } = await supabase
-        .from("alugueres")
-        .select("stock_tamanho_id, data_fim, estado")
-        .eq("estado", "ativo");
 
       if (error) throw error;
 
@@ -97,9 +101,9 @@ export default function Catalogo() {
           const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
           
           // Buscar data_fim do aluguer ativo mais próximo (para o timer)
-          const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
-          const aluguerAtivo = (alugueresAtivos || [])
-            .filter(a => stockIds.includes(a.stock_tamanho_id))
+          const aluguerAtivo = p.stock_tamanhos
+            ?.flatMap(s => s.alugueres || [])
+            .filter(a => a.estado === "ativo")
             .sort((a, b) => new Date(a.data_fim) - new Date(b.data_fim))[0];
 
           // Se tem aluguer ativo mas a data já passou + 24h, considerar disponível
