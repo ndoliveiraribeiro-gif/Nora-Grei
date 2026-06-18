@@ -273,7 +273,7 @@ function ReservaContent() {
                   <button
                     key={s.id}
                     className={`tam${tamanho === s.tamanho ? " on" : ""}${esgotado ? " esgotado" : ""}`}
-                    onClick={() => !esgotado || setTamanho(s.tamanho)}
+                    onClick={() => setTamanho(s.tamanho)}
                     disabled={false}
                     title={esgotado ? i.esgotado : ""}
                   >
