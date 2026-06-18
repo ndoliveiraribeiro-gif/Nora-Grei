@@ -160,8 +160,11 @@ function BotaoCodigoDesconto({ aluguer, i }) {
   );
 }
 
+import { useSearchParams } from "next/navigation";
+
 export default function Pedidos() {
-  const [tab, setTab] = useState("ativos");
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState(searchParams.get("tab") || "ativos");
   const [ativos, setAtivos] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [historico, setHistorico] = useState([]);
