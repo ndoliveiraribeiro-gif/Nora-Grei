@@ -1,12 +1,7 @@
 ﻿"use client";
 import { useState, useEffect, Suspense } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 import { useSearchParams } from "next/navigation";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
 
 const t = {
   pt: {
@@ -38,60 +33,26 @@ const t = {
     nota: "Receberás uma notificação quando a peça ficar disponível. Tens 24h para confirmar.",
   },
   fr: {
-    titulo: "Réserver une pièce",
-    subtitulo: "Quand cette pièce sera disponible, vous serez le premier à le savoir.",
-    peca: "La pièce que vous souhaitez réserver",
-    tamanho: "Taille souhaitée",
-    datas: "Quand avez-vous besoin de la pièce ?",
-    dataInicio: "Date de début souhaitée",
-    dataFim: "Date de fin souhaitée",
-    entrega: "Comment souhaitez-vous recevoir ?",
-    entregaOpcoes: [
-      { id: "envio", label: "Livraison par courrier", desc: "Recevez chez vous en 2-3 jours ouvrés après confirmation" },
-      { id: "presencial", label: "Retrait en boutique", desc: "Retirez en boutique quand la pièce sera disponible" },
-    ],
-    obs: "Observations (optionnel)",
-    obsPlaceholder: "Ex: J'en ai besoin pour un mariage le 20...",
-    confirmar: "Confirmer la réservation",
-    sucesso: "Réservation confirmée !",
-    sucessoDesc: "Vous recevrez une notification quand la pièce sera disponible. Vous aurez 24h pour confirmer.",
-    verPedidos: "Voir mes commandes",
-    login: "Vous devez vous connecter pour réserver",
-    fazerLogin: "Se connecter",
-    timer: "Disponible dans",
-    semStock: "Aucune taille disponible",
-    selTamanho: "Sélectionnez une taille",
-    voltar: "← Catalogue",
-    esgotado: "Épuisé",
-    nota: "Vous recevrez une notification quand la pièce sera disponible. Vous avez 24h pour confirmer.",
+    titulo: "Réserver une pièce", subtitulo: "Quand cette pièce sera disponible, vous serez le premier à le savoir.",
+    peca: "La pièce que vous souhaitez réserver", tamanho: "Taille souhaitée", datas: "Quand avez-vous besoin de la pièce ?",
+    dataInicio: "Date de début souhaitée", dataFim: "Date de fin souhaitée", entrega: "Comment souhaitez-vous recevoir ?",
+    entregaOpcoes: [{ id:"envio",label:"Livraison par courrier",desc:"Recevez chez vous en 2-3 jours ouvrés" },{ id:"presencial",label:"Retrait en boutique",desc:"Retirez en boutique" }],
+    obs: "Observations (optionnel)", obsPlaceholder: "Ex: J'en ai besoin pour un mariage le 20...",
+    confirmar: "Confirmer la réservation", sucesso: "Réservation confirmée !", sucessoDesc: "Vous recevrez une notification. Vous aurez 24h pour confirmer.",
+    verPedidos: "Voir mes commandes", login: "Vous devez vous connecter", fazerLogin: "Se connecter",
+    timer: "Disponible dans", semStock: "Aucune taille disponible", selTamanho: "Sélectionnez une taille",
+    voltar: "← Catalogue", esgotado: "Épuisé", nota: "Vous recevrez une notification. Vous avez 24h pour confirmer.",
   },
   lt: {
-    titulo: "Rezervuoti drabužį",
-    subtitulo: "Kai šis drabužis bus prieinamas, būsite pirmasis tai sužinojęs.",
-    peca: "Drabužis, kurį norite rezervuoti",
-    tamanho: "Pageidaujamas dydis",
-    datas: "Kada jums reikia drabužio?",
-    dataInicio: "Pageidaujama pradžios data",
-    dataFim: "Pageidaujama pabaigos data",
-    entrega: "Kaip norite gauti?",
-    entregaOpcoes: [
-      { id: "envio", label: "Pristatymas paštu", desc: "Gaukite namuose per 2-3 darbo dienas po patvirtinimo" },
-      { id: "presencial", label: "Atsiėmimas asmeniškai", desc: "Atsiimkite parduotuvėje kai drabužis bus prieinamas" },
-    ],
-    obs: "Pastabos (neprivaloma)",
-    obsPlaceholder: "Pvz: Reikia vestuvėms...",
-    confirmar: "Patvirtinti rezervaciją",
-    sucesso: "Rezervacija patvirtinta!",
-    sucessoDesc: "Gausite pranešimą kai drabužis bus prieinamas. Turėsite 24h patvirtinti.",
-    verPedidos: "Žiūrėti užsakymus",
-    login: "Turite prisijungti rezervuoti",
-    fazerLogin: "Prisijungti",
-    timer: "Prieinama po",
-    semStock: "Nėra dydžių",
-    selTamanho: "Pasirinkite dydį",
-    voltar: "← Katalogas",
-    esgotado: "Išparduota",
-    nota: "Gausite pranešimą kai drabužis bus prieinamas. Turėsite 24h patvirtinti.",
+    titulo: "Rezervuoti drabužį", subtitulo: "Kai šis drabužis bus prieinamas, būsite pirmasis sužinojęs.",
+    peca: "Drabužis, kurį norite rezervuoti", tamanho: "Pageidaujamas dydis", datas: "Kada jums reikia drabužio?",
+    dataInicio: "Pageidaujama pradžios data", dataFim: "Pageidaujama pabaigos data", entrega: "Kaip norite gauti?",
+    entregaOpcoes: [{ id:"envio",label:"Pristatymas paštu",desc:"Gaukite namuose per 2-3 darbo dienas" },{ id:"presencial",label:"Atsiėmimas asmeniškai",desc:"Atsiimkite parduotuvėje" }],
+    obs: "Pastabos (neprivaloma)", obsPlaceholder: "Pvz: Reikia vestuvėms...",
+    confirmar: "Patvirtinti rezervaciją", sucesso: "Rezervacija patvirtinta!", sucessoDesc: "Gausite pranešimą. Turėsite 24h patvirtinti.",
+    verPedidos: "Žiūrėti užsakymus", login: "Turite prisijungti", fazerLogin: "Prisijungti",
+    timer: "Prieinama po", semStock: "Nėra dydžių", selTamanho: "Pasirinkite dydį",
+    voltar: "← Katalogas", esgotado: "Išparduota", nota: "Gausite pranešimą. Turėsite 24h patvirtinti.",
   },
 };
 
@@ -109,15 +70,13 @@ function Timer({ dataFim, label }) {
       else setTempo(`${mins}m`);
     };
     calc();
-    const i = setInterval(calc, 60000);
-    return () => clearInterval(i);
+    const iv = setInterval(calc, 60000);
+    return () => clearInterval(iv);
   }, [dataFim]);
   return (
     <div style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'1rem 1.25rem',background:'#fff8e1',border:'1px solid #f39c12',marginBottom:'1.5rem'}}>
-      <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#e67e22',animation:'pulse 2s infinite',flexShrink:0}}></div>
-      <span style={{fontSize:'0.9rem',color:'#1a1a18',fontFamily:"'Jost',sans-serif",fontWeight:400}}>
-        {label}: <strong>{tempo}</strong>
-      </span>
+      <div style={{width:8,height:8,borderRadius:'50%',background:'#e67e22',animation:'pulse 2s infinite',flexShrink:0}} />
+      <span style={{fontSize:'0.9rem',color:'#1a1a18',fontFamily:"'Jost',sans-serif"}}>{label}: <strong>{tempo}</strong></span>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
     </div>
   );
@@ -146,7 +105,7 @@ function ReservaContent() {
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
-    if (saved) setLang(saved);
+    if (saved && t[saved]) setLang(saved);
     carregarDados();
   }, []);
 
@@ -157,17 +116,29 @@ function ReservaContent() {
     if (pecaId) {
       const { data: p } = await supabase
         .from("pecas")
-        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, alugueres(data_fim, estado))")
+        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
         .eq("id", pecaId)
         .single();
 
       if (p) {
         setPeca({ ...p, categoria: p.categorias?.nome || "" });
         setStockTamanhos(p.stock_tamanhos || []);
-        const aluguerAtivo = p.stock_tamanhos
-          ?.flatMap(s => s.alugueres || [])
-          .find(a => a.estado === "ativo");
-        if (aluguerAtivo) setDataFimAluguer(aluguerAtivo.data_fim);
+
+        // Buscar aluguer ativo para timer
+        const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
+        if (stockIds.length > 0) {
+          const { data: al } = await supabase
+            .from("alugueres")
+            .select("data_fim, data_disponivel_novamente")
+            .in("stock_tamanho_id", stockIds)
+            .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"])
+            .order("data_fim", { ascending: false })
+            .limit(1);
+          if (al?.[0]) {
+            const dataDisp = al[0].data_disponivel_novamente || al[0].data_fim;
+            setDataFimAluguer(dataDisp);
+          }
+        }
       }
     }
     setLoading(false);
@@ -187,7 +158,6 @@ function ReservaContent() {
       stock_tamanho_id: stockItem.id,
       data_inicio_desejada: dataInicio,
       data_fim_desejada: dataFim,
-      tamanho: tamanho,
       tipo_entrega: entrega,
       observacoes: obs || null,
       estado: "aguarda",
@@ -201,7 +171,7 @@ function ReservaContent() {
   const i = t[lang] || t.pt;
 
   if (loading) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',color:'#888580'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',color:'#888'}}>
       A carregar...
     </div>
   );
@@ -224,170 +194,161 @@ function ReservaContent() {
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root { --black:#080808; --white:#f8f7f5; --grey-100:#f0eeeb; --grey-200:#e2dfda; --grey-600:#1a1a18; --rosa:#c4748a; --serif:'Cormorant',Georgia,serif; --sans:'Jost',Arial,sans-serif; }
         body { background:var(--grey-100); font-family:var(--sans); font-size:17px; -webkit-font-smoothing:antialiased; }
-        .rv-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
-        .rv-nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:400; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .rv-nav-back { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; font-weight:400; }
-        .rv-page { padding:6rem 4rem 4rem; max-width:900px; margin:0 auto; display:grid; grid-template-columns:1fr 360px; gap:2rem; align-items:start; }
-        .rv-section { background:var(--white); padding:2rem; margin-bottom:1.5rem; }
-        .rv-title { font-size:0.68rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--grey-100); }
-        .rv-peca { display:flex; gap:1.25rem; align-items:center; }
-        .rv-peca-img { width:72px; height:90px; object-fit:cover; background:var(--grey-100); flex-shrink:0; }
-        .rv-peca-nome { font-family:var(--serif); font-size:1.4rem; font-weight:300; color:var(--black); margin-bottom:0.25rem; }
-        .rv-peca-cat { font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; }
-        .rv-tamanhos { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
-        .rv-tam { width:52px; height:52px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.85rem; cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; color:var(--black); }
-        .rv-tam:hover { border-color:var(--black); }
-        .rv-tam.selected { background:var(--black); color:var(--white); border-color:var(--black); }
-        .rv-tam.esgotado { color:var(--grey-200); cursor:not-allowed; text-decoration:line-through; }
-        .rv-dates { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        .rv-label { display:block; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-600); margin-bottom:0.5rem; font-weight:500; }
-        .rv-input { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; transition:border-color 0.2s; border-radius:0; }
-        .rv-input:focus { border-color:var(--black); }
-        .rv-textarea { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; border-radius:0; resize:vertical; min-height:80px; }
-        .rv-opcoes { display:flex; flex-direction:column; gap:0.75rem; }
-        .rv-opcao { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border:1.5px solid var(--grey-200); cursor:pointer; transition:all 0.2s; }
-        .rv-opcao.selected { border-color:var(--black); background:var(--grey-100); }
-        .rv-opcao-radio { width:18px; height:18px; border-radius:50%; border:2px solid var(--grey-200); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .rv-opcao.selected .rv-opcao-radio { border-color:var(--black); background:var(--black); }
-        .rv-opcao.selected .rv-opcao-radio::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
-        .rv-opcao-label { font-size:0.95rem; font-weight:500; color:var(--black); }
-        .rv-opcao-desc { font-size:0.8rem; color:#5a5855; }
-        .rv-resumo { background:var(--white); padding:2rem; position:sticky; top:6rem; }
-        .rv-nota { background:#f0eeeb; padding:1rem 1.25rem; border-left:3px solid var(--rosa); font-size:0.88rem; color:var(--grey-600); line-height:1.7; margin-bottom:1.25rem; }
-        .rv-btn { width:100%; padding:1.15rem; background:var(--rosa); color:var(--white); border:none; font-size:0.78rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; transition:background 0.2s; }
-        .rv-btn:hover { background:#a85c72; }
-        .rv-btn:disabled { opacity:0.6; cursor:not-allowed; }
-        .rv-erro { color:#c0392b; font-size:0.9rem; margin-top:0.75rem; padding:0.75rem; background:#fff5f5; border:1px solid #f5c6cb; }
-        .rv-login { text-align:center; padding:2rem; }
-        .rv-login p { font-size:1rem; color:#5a5855; margin-bottom:1.25rem; }
-        .rv-login a { display:inline-block; padding:1rem 2rem; background:var(--black); color:var(--white); text-decoration:none; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; font-family:var(--sans); font-weight:500; }
+        .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
+        .nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:400; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
+        .nav-back { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; }
+        .page { padding:6rem 4rem 4rem; max-width:900px; margin:0 auto; display:grid; grid-template-columns:1fr 360px; gap:2rem; align-items:start; }
+        .sec { background:var(--white); padding:2rem; margin-bottom:1.5rem; }
+        .sec-t { font-size:0.68rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--grey-100); }
+        .peca-row { display:flex; gap:1.25rem; align-items:center; }
+        .peca-img { width:72px; height:90px; object-fit:cover; background:var(--grey-100); flex-shrink:0; }
+        .peca-nome { font-family:var(--serif); font-size:1.4rem; font-weight:300; color:var(--black); margin-bottom:0.25rem; }
+        .peca-cat { font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; }
+        .tamanhos { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+        .tam { width:52px; height:52px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.85rem; cursor:pointer; font-family:var(--sans); transition:all 0.2s; color:var(--black); }
+        .tam:hover { border-color:var(--black); }
+        .tam.on { background:var(--black); color:var(--white); border-color:var(--black); }
+        .tam.esgotado { color:var(--grey-200); cursor:not-allowed; text-decoration:line-through; background:var(--grey-100); }
+        .dates { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .lbl { display:block; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-600); margin-bottom:0.5rem; font-weight:500; }
+        .inp { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; transition:border-color 0.2s; }
+        .inp:focus { border-color:var(--black); }
+        .textarea { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; resize:vertical; min-height:80px; }
+        .opts { display:flex; flex-direction:column; gap:0.75rem; }
+        .opt { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border:1.5px solid var(--grey-200); cursor:pointer; transition:all 0.2s; }
+        .opt.on { border-color:var(--black); background:var(--grey-100); }
+        .opt-radio { width:18px; height:18px; border-radius:50%; border:2px solid var(--grey-200); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .opt.on .opt-radio { border-color:var(--black); background:var(--black); }
+        .opt.on .opt-radio::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
+        .opt-label { font-size:0.95rem; font-weight:500; color:var(--black); }
+        .opt-desc { font-size:0.8rem; color:#5a5855; }
+        .resumo { background:var(--white); padding:2rem; position:sticky; top:6rem; }
+        .nota { background:#f0eeeb; padding:1rem 1.25rem; border-left:3px solid var(--rosa); font-size:0.88rem; color:var(--grey-600); line-height:1.7; margin-bottom:1.25rem; }
+        .btn { width:100%; padding:1.15rem; background:var(--rosa); color:var(--white); border:none; font-size:0.78rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; transition:background 0.2s; }
+        .btn:hover { background:#a85c72; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .erro { color:#c0392b; font-size:0.9rem; margin-top:0.75rem; padding:0.75rem; background:#fff5f5; border:1px solid #f5c6cb; }
+        .login-box { text-align:center; padding:2rem; }
+        .login-box p { font-size:1rem; color:#5a5855; margin-bottom:1.25rem; }
+        .login-box a { display:inline-block; padding:1rem 2rem; background:var(--black); color:var(--white); text-decoration:none; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; font-family:var(--sans); font-weight:500; }
         @media (max-width:768px) {
-          .rv-nav { padding:1rem 1.25rem; }
-          .rv-page { grid-template-columns:1fr; padding:5rem 1.25rem 6rem; }
-          .rv-resumo { position:static; }
-          .rv-dates { grid-template-columns:1fr; }
-          .rv-section { padding:1.5rem 1.25rem; }
+          .nav { padding:1rem 1.25rem; }
+          .page { grid-template-columns:1fr; padding:5rem 1.25rem 6rem; }
+          .resumo { position:static; }
+          .dates { grid-template-columns:1fr; }
+          .sec { padding:1.5rem 1.25rem; }
         }
       `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 
-      <nav className="rv-nav">
-        <a href="/" className="rv-nav-logo">Nora Grei</a>
-        <a href="/catalogo" className="rv-nav-back">{i.voltar}</a>
+      <nav className="nav">
+        <a href="/" className="nav-logo">Nora Grei</a>
+        <a href="/catalogo" className="nav-back">{i.voltar}</a>
       </nav>
 
-      <div className="rv-page">
+      <div className="page">
         <div>
-          {/* TIMER */}
           {dataFimAluguer && <Timer dataFim={dataFimAluguer} label={i.timer} />}
 
-          {/* PEÇA */}
-          <div className="rv-section">
-            <p className="rv-title">{i.peca}</p>
+          <div className="sec">
+            <p className="sec-t">{i.peca}</p>
             {peca && (
-              <div className="rv-peca">
-                {peca.fotos?.[0] && <img src={peca.fotos[0]} alt={peca.nome} className="rv-peca-img" />}
+              <div className="peca-row">
+                {peca.fotos?.[0] && <img src={peca.fotos[0]} alt={peca.nome} className="peca-img" />}
                 <div>
-                  {peca.categoria && <p className="rv-peca-cat">{peca.categoria}</p>}
-                  <p className="rv-peca-nome">{peca.nome}</p>
+                  {peca.categoria && <p className="peca-cat">{peca.categoria}</p>}
+                  <p className="peca-nome">{peca.nome}</p>
                   <p style={{fontSize:'1rem',color:'var(--black)',fontWeight:500,marginTop:'0.25rem'}}>{peca.preco_aluguer_dia}€/dia</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* TAMANHOS */}
-          <div className="rv-section">
-            <p className="rv-title">{i.tamanho}</p>
-            <div className="rv-tamanhos">
-              {stockTamanhos.map(s => (
-                <button
-                  key={s.tamanho}
-                  className={`rv-tam${tamanho === s.tamanho ? " selected" : ""}${s.quantidade_disponivel > 0 ? " esgotado" : ""}`}
-                  onClick={() => s.quantidade_disponivel === 0 && setTamanho(s.tamanho)}
-                  title={s.quantidade_disponivel > 0 ? i.esgotado : ""}
-                >
-                  {s.tamanho}
-                </button>
-              ))}
+          <div className="sec">
+            <p className="sec-t">{i.tamanho}</p>
+            <div className="tamanhos">
+              {stockTamanhos.map(s => {
+                const esgotado = s.quantidade_disponivel === 0;
+                return (
+                  <button
+                    key={s.id}
+                    className={`tam${tamanho === s.tamanho ? " on" : ""}${esgotado ? " esgotado" : ""}`}
+                    onClick={() => !esgotado || setTamanho(s.tamanho)}
+                    disabled={false}
+                    title={esgotado ? i.esgotado : ""}
+                  >
+                    {s.tamanho}
+                  </button>
+                );
+              })}
+            </div>
+            {stockTamanhos.length === 0 && <p style={{fontSize:'0.85rem',color:'#5a5855'}}>{i.semStock}</p>}
+          </div>
+
+          <div className="sec">
+            <p className="sec-t">{i.datas}</p>
+            <div className="dates">
+              <div>
+                <label className="lbl">{i.dataInicio}</label>
+                <input className="inp" type="date" min={hoje} value={dataInicio} onChange={e => setDataInicio(e.target.value)} />
+              </div>
+              <div>
+                <label className="lbl">{i.dataFim}</label>
+                <input className="inp" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => setDataFim(e.target.value)} />
+              </div>
             </div>
           </div>
 
-          {/* DATAS */}
-          <div className="rv-section">
-            <p className="rv-title">{i.datas}</p>
-            <div className="rv-dates">
-              <div>
-                <label className="rv-label">{i.dataInicio}</label>
-                <input className="rv-input" type="date" min={hoje} value={dataInicio} onChange={e => setDataInicio(e.target.value)} />
-              </div>
-              <div>
-                <label className="rv-label">{i.dataFim}</label>
-                <input className="rv-input" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => setDataFim(e.target.value)} />
-              </div>
-            </div>
-          </div>
-
-          {/* ENTREGA */}
-          <div className="rv-section">
-            <p className="rv-title">{i.entrega}</p>
-            <div className="rv-opcoes">
+          <div className="sec">
+            <p className="sec-t">{i.entrega}</p>
+            <div className="opts">
               {i.entregaOpcoes.map(op => (
-                <div key={op.id} className={`rv-opcao${entrega === op.id ? " selected" : ""}`} onClick={() => setEntrega(op.id)}>
-                  <div className="rv-opcao-radio"></div>
-                  <div>
-                    <div className="rv-opcao-label">{op.label}</div>
-                    <div className="rv-opcao-desc">{op.desc}</div>
-                  </div>
+                <div key={op.id} className={`opt${entrega === op.id ? " on" : ""}`} onClick={() => setEntrega(op.id)}>
+                  <div className="opt-radio"></div>
+                  <div><div className="opt-label">{op.label}</div><div className="opt-desc">{op.desc}</div></div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* OBSERVAÇÕES */}
-          <div className="rv-section">
-            <p className="rv-title">{i.obs}</p>
-            <textarea className="rv-textarea" value={obs} onChange={e => setObs(e.target.value)} placeholder={i.obsPlaceholder} />
+          <div className="sec">
+            <p className="sec-t">{i.obs}</p>
+            <textarea className="textarea" value={obs} onChange={e => setObs(e.target.value)} placeholder={i.obsPlaceholder} />
           </div>
         </div>
 
-        {/* RESUMO */}
-        <div className="rv-resumo">
-          <p className="rv-title">Resumo da reserva</p>
+        <div className="resumo">
+          <p className="sec-t">Resumo da reserva</p>
           {!user ? (
-            <div className="rv-login">
+            <div className="login-box">
               <p>{i.login}</p>
-              <a href="/entrar">{i.fazerLogin}</a>
+              <a href={`/entrar?redirect=/reserva?peca=${pecaId}`}>{i.fazerLogin}</a>
             </div>
           ) : (
             <>
-              <div className="rv-nota">{i.nota}</div>
+              <div className="nota">{i.nota}</div>
               {peca && (
                 <div style={{marginBottom:'1.25rem'}}>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                    <span>Peça</span>
-                    <span style={{color:'var(--black)',fontWeight:500}}>{peca.nome}</span>
+                    <span>Peça</span><span style={{color:'var(--black)',fontWeight:500}}>{peca.nome}</span>
                   </div>
                   {tamanho && (
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                      <span>Tamanho</span>
-                      <span style={{color:'var(--black)',fontWeight:500}}>{tamanho}</span>
+                      <span>Tamanho</span><span style={{color:'var(--black)',fontWeight:500}}>{tamanho}</span>
                     </div>
                   )}
                   {dataInicio && dataFim && (
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                      <span>Datas</span>
-                      <span style={{color:'var(--black)',fontWeight:500}}>{dataInicio} → {dataFim}</span>
+                      <span>Datas</span><span style={{color:'var(--black)',fontWeight:500}}>{dataInicio} → {dataFim}</span>
                     </div>
                   )}
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',color:'#5a5855'}}>
-                    <span>Entrega</span>
-                    <span style={{color:'var(--black)',fontWeight:500}}>{entrega === 'envio' ? 'Envio postal' : 'Presencial'}</span>
+                    <span>Entrega</span><span style={{color:'var(--black)',fontWeight:500}}>{entrega === 'envio' ? 'Envio postal' : 'Presencial'}</span>
                   </div>
                 </div>
               )}
-              {erro && <div className="rv-erro">{erro}</div>}
-              <button className="rv-btn" onClick={confirmarReserva} disabled={loading || !tamanho || !dataInicio || !dataFim}>
+              {erro && <div className="erro">{erro}</div>}
+              <button className="btn" onClick={confirmarReserva} disabled={loading || !tamanho || !dataInicio || !dataFim}>
                 {loading ? "..." : i.confirmar}
               </button>
             </>
