@@ -81,8 +81,16 @@ export default function Backoffice() {
       if (data) setAlugueres(data);
     }
     if (tab === "clientes") {
-      const { data } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });
-      if (data) setClientes(data);
+      const { data, error } = await supabase.from("clientes").select("*").order("created_at", { ascending: false });
+      console.log("Clientes:", data, error);
+      if (data) {
+        // Buscar alugueres separadamente
+        const clientesComAl = await Promise.all(data.map(async (c) => {
+          const { data: al } = await supabase.from("alugueres").select("id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos))").eq("cliente_id", c.id);
+          return { ...c, alugueres: al || [] };
+        }));
+        setClientes(clientesComAl);
+      }
     }
     if (tab === "reservas") {
       const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))").order("created_at", { ascending: false });
