@@ -364,7 +364,7 @@ export default function Perfil() {
             { val: stats.totalAlugueres, label: "Alugueres", href: "/pedidos" },
             { val: Number(stats.totalGasto).toFixed(0)+"€", label: "Total gasto" },
             { val: stats.pecasAtivas, label: "Em curso" },
-            { val: stats.reservas, label: "Reservas", cor: stats.reservas>0?"#e67e22":undefined },
+            { val: stats.reservas, label: "Reservas", cor: stats.reservas>0?"#e67e22":undefined, href: "/pedidos?tab=reservas" },
             { val: stats.pontos||stats.totalPecas, label: "Pontos" },
           ].map((s,i) => (
             <div key={i} className="stat" onClick={() => s.href && (window.location.href = s.href)}>
