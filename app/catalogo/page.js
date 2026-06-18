@@ -8,12 +8,9 @@ const translations = {
     titulo: "Catálogo",
     subtitulo: "Roupa e acessórios para cada momento.",
     todas: "Todas",
-    ocasiao: "Ocasião",
     semResultados: "Nenhuma peça encontrada.",
     loading: "A carregar...",
-    ocasioes: ["Férias", "Concerto", "Gala", "Festa", "Casamento", "Trabalho", "Jantar", "Teatro"],
     categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Calçado", "Novidades"],
-    filtros: "Filtros",
     ordenar: "Ordenar",
     precoAsc: "Preço: menor primeiro",
     precoDesc: "Preço: maior primeiro",
@@ -23,12 +20,9 @@ const translations = {
     titulo: "Catalogue",
     subtitulo: "Vêtements et accessoires pour chaque moment.",
     todas: "Tout",
-    ocasiao: "Occasion",
     semResultados: "Aucune pièce trouvée.",
     loading: "Chargement...",
-    ocasioes: ["Vacances", "Concert", "Gala", "Fête", "Mariage", "Travail", "Dîner", "Théâtre"],
     categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Chaussures", "Nouveautés"],
-    filtros: "Filtres",
     ordenar: "Trier",
     precoAsc: "Prix: croissant",
     precoDesc: "Prix: décroissant",
@@ -38,12 +32,9 @@ const translations = {
     titulo: "Katalogas",
     subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.",
     todas: "Visi",
-    ocasiao: "Proga",
     semResultados: "Drabužių nerasta.",
     loading: "Kraunama...",
-    ocasioes: ["Atostogos", "Koncertas", "Gala", "Vakarėlis", "Vestuvės", "Darbas", "Vakarienė", "Teatras"],
     categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Avalynė", "Naujienos"],
-    filtros: "Filtrai",
     ordenar: "Rūšiuoti",
     precoAsc: "Kaina: mažiausia pirma",
     precoDesc: "Kaina: didžiausia pirma",
@@ -76,48 +67,40 @@ export default function Catalogo() {
   const carregarPecas = async () => {
     setLoading(true);
     try {
-      // Buscar peças com stock e alugueres ativos para o timer
+      // Query separada para evitar limitações do Supabase com joins profundos
       const { data, error } = await supabase
         .from("pecas")
-        .select(`
-          *,
-          categorias(nome),
-          stock_tamanhos(
-            id,
-            tamanho,
-            quantidade_disponivel,
-            quantidade_total,
-            alugueres(data_fim, estado)
-          )
-        `)
+        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
+      // Buscar alugueres ativos separadamente para o timer
+      const { data: alugueresAtivos } = await supabase
+        .from("alugueres")
+        .select("stock_tamanho_id, data_fim, estado")
+        .eq("estado", "ativo");
+
       if (data && data.length > 0) {
         const agora = new Date();
         const formatadas = data.map(p => {
-          // Verificar disponibilidade real: estado + stock disponível
           const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
-          
-          // Buscar data_fim do aluguer ativo mais próximo (para o timer)
-          const aluguerAtivo = p.stock_tamanhos
-            ?.flatMap(s => s.alugueres || [])
-            .filter(a => a.estado === "ativo")
+          const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
+
+          // Encontrar aluguer ativo para esta peça
+          const aluguerAtivo = (alugueresAtivos || [])
+            .filter(a => stockIds.includes(a.stock_tamanho_id))
             .sort((a, b) => new Date(a.data_fim) - new Date(b.data_fim))[0];
 
-          // Se tem aluguer ativo mas a data já passou + 24h, considerar disponível
           let dataFimFinal = null;
           let estadoFinal = p.estado;
 
           if (aluguerAtivo) {
             const dataFimComHigienizacao = new Date(new Date(aluguerAtivo.data_fim).getTime() + 24 * 60 * 60 * 1000);
             if (dataFimComHigienizacao > agora) {
-              // Ainda indisponível — mostrar timer
               dataFimFinal = dataFimComHigienizacao.toISOString();
               estadoFinal = "indisponivel";
             } else {
-              // Já passou + 24h de higienização — disponível
               estadoFinal = "disponivel";
             }
           }
@@ -153,7 +136,7 @@ export default function Catalogo() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --grey-400: #080808; --grey-600: #080808; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
+        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
         body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
         .cat-nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
         .cat-nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
