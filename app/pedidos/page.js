@@ -191,13 +191,14 @@ export default function Pedidos() {
       setHistorico(alugueres.filter(a => ["devolvido","cancelado","devolvido_danificado"].includes(a.estado)));
     }
 
-    const { data: res } = await supabase
+    const { data: res, error: errRes } = await supabase
       .from("reservas_espera")
-      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos)), alugueres(data_fim, estado)")
+      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos))")
       .eq("cliente_id", user.id)
       .eq("estado", "aguarda")
       .order("created_at", { ascending: false });
 
+    console.log("Reservas:", res, errRes);
     if (res) setReservas(res);
     setLoading(false);
   };
@@ -242,8 +243,7 @@ export default function Pedidos() {
   const CardReserva = ({ r }) => {
     const peca = r.stock_tamanhos?.pecas;
     // Calcular timer — data_fim do aluguer ativo + 24h
-    const aluguerAtivo = Array.isArray(r.alugueres) ? r.alugueres.find(a => a.estado === "ativo") : null;
-    const dataFimTimer = aluguerAtivo ? new Date(new Date(aluguerAtivo.data_fim).getTime() + 24*60*60*1000).toISOString() : null;
+    const dataFimTimer = null; // calculado separadamente se necessário
 
     return (
       <div style={{background:'#fff',padding:'1.25rem',borderBottom:'1px solid #f0eeeb'}}>
