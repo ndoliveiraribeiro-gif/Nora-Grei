@@ -18,18 +18,16 @@ const t = {
     ],
     pagamento: "Método de pagamento",
     pagamentoOpcoes: [
-      { id: "cartao", label: "Cartão crédito/débito", desc: "Via Stripe — seguro e rápido" },
-      { id: "mbway", label: "MB Way", desc: "Pagamento instantâneo" },
-      { id: "transferencia", label: "Transferência imediata", desc: "Envie comprovativo" },
-      { id: "dinheiro", label: "Dinheiro", desc: "Apenas presencial" },
-      { id: "cheque", label: "Cheque visado", desc: "Apenas presencial" },
+      { id: "cartao", label: "Cartão crédito/débito", desc: "Via Stripe — confirmação imediata", automatico: true },
+      { id: "mbway", label: "MB Way", desc: "Pagamento instantâneo", automatico: true },
+      { id: "transferencia", label: "Transferência bancária", desc: "Envia comprovativo — confirmamos em até 1 dia útil", automatico: false },
+      { id: "dinheiro", label: "Dinheiro (presencial)", desc: "Pago no levantamento da peça", automatico: false },
     ],
     deposito: "Depósito de caução",
     depositoOpcoes: [
-      { id: "cartao", label: "Cartão crédito/débito", desc: "Reservado via Stripe, devolvido automaticamente" },
-      { id: "transferencia", label: "Transferência bancária", desc: "Envie comprovativo, devolvemos em 2 dias úteis" },
-      { id: "cheque", label: "Cheque visado", desc: "Entregue presencialmente na recolha" },
-      { id: "dinheiro", label: "Dinheiro", desc: "Pago e devolvido em mãos — presencial" },
+      { id: "cartao", label: "Cartão crédito/débito", desc: "Reservado via Stripe, devolvido automaticamente", automatico: true },
+      { id: "transferencia", label: "Transferência bancária", desc: "Envia comprovativo, devolvemos em 2 dias úteis", automatico: false },
+      { id: "dinheiro", label: "Dinheiro (presencial)", desc: "Pago e devolvido em mãos", automatico: false },
     ],
     resumo: "Resumo",
     aluguer: "Aluguer",
@@ -37,104 +35,23 @@ const t = {
     depositoVal: "Depósito (devolvido)",
     total: "Total a pagar agora",
     totalSemDeposito: "* O depósito será devolvido após inspeção da peça",
-    confirmar: "Confirmar aluguer",
+    confirmar: "Confirmar e pagar",
+    confirmarPendente: "Confirmar pedido",
     login: "Precisa de fazer login para continuar",
     fazerLogin: "Fazer login",
     tamanho: "Tamanho",
     pontos: (n) => `Tens ${n} pontos — a ${10 - (n % 10)} de um aluguer gratuito!`,
     gratis: "🎉 Tens um aluguer gratuito disponível! Aplicado automaticamente.",
     obrigatorio: "Por favor preencha todos os campos",
-    sucesso: "Aluguer confirmado! Receberás um email com os detalhes.",
+    sucesso: "Pagamento confirmado!",
+    sucessoPendente: "Pedido registado!",
+    sucessoDesc: "O teu aluguer está confirmado. Vamos preparar a tua peça.",
+    sucessoPendenteDesc: "Falta confirmar o pagamento. Envia o comprovativo ou paga presencialmente para avançarmos.",
     nivel: "Nível",
     caucaoDesconto: "Desconto de caução",
-  },
-  fr: {
-    titulo: "Finaliser la location",
-    peca: "Votre pièce",
-    datas: "Dates de location",
-    dataInicio: "Date de début",
-    dataFim: "Date de fin",
-    dias: (n) => `${n} jour${n !== 1 ? "s" : ""}`,
-    entrega: "Mode de livraison",
-    entregaOpcoes: [
-      { id: "envio", label: "Livraison à domicile", desc: "Livraison en 1-2 jours ouvrés" },
-      { id: "presencial", label: "Retrait en boutique", desc: "Dans notre boutique" },
-    ],
-    pagamento: "Mode de paiement",
-    pagamentoOpcoes: [
-      { id: "cartao", label: "Carte crédit/débit", desc: "Via Stripe — sécurisé et rapide" },
-      { id: "mbway", label: "MB Way", desc: "Paiement instantané" },
-      { id: "transferencia", label: "Virement immédiat", desc: "Envoyez le justificatif" },
-      { id: "dinheiro", label: "Espèces", desc: "En personne uniquement" },
-      { id: "cheque", label: "Chèque certifié", desc: "En personne uniquement" },
-    ],
-    deposito: "Dépôt de garantie",
-    depositoOpcoes: [
-      { id: "cartao", label: "Carte crédit/débit", desc: "Réservé via Stripe, remboursé automatiquement" },
-      { id: "transferencia", label: "Virement bancaire", desc: "Envoyez le justificatif, remboursé sous 2 jours" },
-      { id: "cheque", label: "Chèque certifié", desc: "Remis en personne à la récupération" },
-      { id: "dinheiro", label: "Espèces", desc: "Payé et remboursé en mains propres" },
-    ],
-    resumo: "Récapitulatif",
-    aluguer: "Location",
-    higienizacao: "Frais de nettoyage",
-    depositoVal: "Dépôt (remboursé)",
-    total: "Total à payer maintenant",
-    totalSemDeposito: "* Le dépôt sera remboursé après inspection",
-    confirmar: "Confirmer la location",
-    login: "Vous devez vous connecter pour continuer",
-    fazerLogin: "Se connecter",
-    tamanho: "Taille",
-    pontos: (n) => `Vous avez ${n} points — encore ${10 - (n % 10)} pour une location gratuite!`,
-    gratis: "🎉 Vous avez une location gratuite! Appliquée automatiquement.",
-    obrigatorio: "Veuillez remplir tous les champs",
-    sucesso: "Location confirmée! Vous recevrez un email avec les détails.",
-    nivel: "Niveau",
-    caucaoDesconto: "Réduction de dépôt",
-  },
-  lt: {
-    titulo: "Užbaigti nuomą",
-    peca: "Jūsų drabužis",
-    datas: "Nuomos datos",
-    dataInicio: "Pradžios data",
-    dataFim: "Pabaigos data",
-    dias: (n) => `${n} diena${n !== 1 ? "s" : ""}`,
-    entrega: "Pristatymo būdas",
-    entregaOpcoes: [
-      { id: "envio", label: "Pristatymas į namus", desc: "Pristatymas per 1-2 darbo dienas" },
-      { id: "presencial", label: "Atsiėmimas asmeniškai", desc: "Mūsų parduotuvėje" },
-    ],
-    pagamento: "Mokėjimo būdas",
-    pagamentoOpcoes: [
-      { id: "cartao", label: "Kredito/debeto kortelė", desc: "Per Stripe — saugu ir greita" },
-      { id: "mbway", label: "MB Way", desc: "Momentinis mokėjimas" },
-      { id: "transferencia", label: "Skubus pavedimas", desc: "Išsiųskite patvirtinimą" },
-      { id: "dinheiro", label: "Grynieji pinigai", desc: "Tik asmeniškai" },
-      { id: "cheque", label: "Banko čekis", desc: "Tik asmeniškai" },
-    ],
-    deposito: "Užstatas",
-    depositoOpcoes: [
-      { id: "cartao", label: "Kredito/debeto kortelė", desc: "Per Stripe, grąžinama automatiškai" },
-      { id: "transferencia", label: "Banko pavedimas", desc: "Išsiųskite patvirtinimą, grąžiname per 2 dienas" },
-      { id: "cheque", label: "Banko čekis", desc: "Pateikiamas asmeniškai atsiimant" },
-      { id: "dinheiro", label: "Grynieji pinigai", desc: "Mokama ir grąžinama rankomis" },
-    ],
-    resumo: "Suvestinė",
-    aluguer: "Nuoma",
-    higienizacao: "Valymo mokestis",
-    depositoVal: "Užstatas (grąžinamas)",
-    total: "Iš viso mokėti dabar",
-    totalSemDeposito: "* Užstatas bus grąžintas po patikrinimo",
-    confirmar: "Patvirtinti nuomą",
-    login: "Turite prisijungti tęsti",
-    fazerLogin: "Prisijungti",
-    tamanho: "Dydis",
-    pontos: (n) => `Turite ${n} taškų — dar ${10 - (n % 10)} iki nemokamos nuomos!`,
-    gratis: "🎉 Turite nemokamą nuomą! Pritaikyta automatiškai.",
-    obrigatorio: "Prašome užpildyti visus laukus",
-    sucesso: "Nuoma patvirtinta! Gausite el. laišką su detalėmis.",
-    nivel: "Lygis",
-    caucaoDesconto: "Užstato nuolaida",
+    avisoTransferencia: "Após o pagamento, envia o comprovativo para o nosso WhatsApp ou email. O teu pedido fica reservado por 24h.",
+    avisoDinheiro: "Paga no momento do levantamento presencial na nossa loja.",
+    conflito: "Esta peça já está reservada para essas datas. Escolhe outro período.",
   },
 };
 
@@ -167,6 +84,8 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
+  const [sucessoPendente, setSucessoPendente] = useState(false);
+  const [aReservar, setAReservar] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -188,7 +107,6 @@ function CheckoutContent() {
         .single();
       if (data) {
         setPeca({ ...data, categoria: data.categorias?.nome || "" });
-        // Encontrar o nome do tamanho pelo stock_id
         if (stockId) {
           const st = data.stock_tamanhos?.find(s => s.id === stockId);
           if (st) setTamanhoNome(st.tamanho);
@@ -218,35 +136,80 @@ function CheckoutContent() {
 
   const temGratis = pontos >= 10 && pontos % 10 === 0;
   const valorAluguer = temGratis ? 0 : (peca ? peca.preco_aluguer_dia * numDias : 0);
-  
-  // Calcular caução com desconto do nível
+
   const valorDepositoBase = peca ? peca.valor_peca : 0;
   const valorDeposito = Math.round(valorDepositoBase * nv.caucao / 100);
   const descontoDeposito = valorDepositoBase - valorDeposito;
-  
+
+  const pagamentoSelecionado = t.pt.pagamentoOpcoes.find(p => p.id === pagamento);
+  const depositoSelecionado = t.pt.depositoOpcoes.find(p => p.id === deposito);
+  const tudoAutomatico = pagamentoSelecionado?.automatico && (valorDeposito === 0 || depositoSelecionado?.automatico);
+
   const totalAgora = valorAluguer + HIGIENIZACAO + (deposito === "cartao" ? valorDeposito : 0);
+
+  // Validar se há conflito de datas com alugueres já em curso para este tamanho
+  const verificarConflito = async () => {
+    if (!stockId || !dataInicio || !dataFim) return false;
+    const { data: conflitos } = await supabase
+      .from("alugueres")
+      .select("data_inicio, data_fim, data_disponivel_novamente")
+      .eq("stock_tamanho_id", stockId)
+      .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+
+    if (!conflitos || conflitos.length === 0) return false;
+
+    const inicioNovo = new Date(dataInicio);
+    const fimNovo = new Date(dataFim);
+
+    return conflitos.some(c => {
+      const fimExistente = c.data_disponivel_novamente
+        ? new Date(c.data_disponivel_novamente)
+        : new Date(new Date(c.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+      const inicioExistente = new Date(c.data_inicio);
+      // Há conflito se os períodos se sobrepõem
+      return inicioNovo < fimExistente && fimNovo > inicioExistente;
+    });
+  };
 
   const confirmar = async () => {
     if (!dataInicio || !dataFim) { setErro(i.obrigatorio); return; }
     if (!user) { window.location.href = `/entrar?redirect=/checkout?peca=${pecaId}&tamanho=${tamanhoParam}`; return; }
+
     setLoading(true); setErro("");
+
     try {
+      // Validar conflito de datas antes de criar
+      const temConflito = await verificarConflito();
+      if (temConflito) {
+        setErro(i.conflito);
+        setLoading(false);
+        return;
+      }
+
+      const pagamentoAutomatico = pagamentoSelecionado?.automatico;
+      const depositoAutomatico = valorDeposito === 0 || depositoSelecionado?.automatico;
+      const tudoConfirmado = pagamentoAutomatico && depositoAutomatico;
+
+      const estadoInicial = tudoConfirmado ? "confirmado" : "pendente";
+      const depositoEstadoInicial = depositoAutomatico ? "recebido" : "pendente";
+
       const { error } = await supabase.from("alugueres").insert({
         cliente_id: user.id,
         stock_tamanho_id: stockId,
         data_inicio: dataInicio,
         data_fim: dataFim,
         tipo: temGratis ? "subscricao" : "avulso",
-        estado: "pendente",
+        estado: estadoInicial,
         metodo_entrega: entrega,
+        metodo_pagamento: pagamento,
         valor_aluguer: valorAluguer,
         deposito_valor: valorDeposito,
         deposito_modalidade: deposito,
-        deposito_estado: "pendente",
+        deposito_estado: depositoEstadoInicial,
+        ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
       });
       if (error) throw error;
 
-      // Atualizar pontos
       if (temGratis) {
         await supabase.from("clientes").update({ pontos: pontos - 10 }).eq("id", user.id);
       } else {
@@ -255,15 +218,33 @@ function CheckoutContent() {
           total_pecas_alugadas: totalAlugueres + 1
         }).eq("id", user.id);
       }
-      setSucesso(true);
+
+      if (tudoConfirmado) {
+        setSucesso(true);
+      } else {
+        setSucessoPendente(true);
+      }
     } catch(e) { setErro(e.message); }
     setLoading(false);
   };
 
-  if (sucesso) return (
+  if (sucesso || sucessoPendente) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'1.5rem',padding:'2rem',fontFamily:"'Jost',sans-serif",textAlign:'center'}}>
-      <div style={{fontSize:'3rem'}}>🎉</div>
-      <h1 style={{fontFamily:"'Cormorant',serif",fontSize:'2.5rem',fontWeight:300,color:'#080808'}}>{i.sucesso}</h1>
+      <div style={{fontSize:'3rem'}}>{sucesso ? "🎉" : "⏳"}</div>
+      <h1 style={{fontFamily:"'Cormorant',serif",fontSize:'2.5rem',fontWeight:300,color:'#080808'}}>{sucesso ? i.sucesso : i.sucessoPendente}</h1>
+      <p style={{fontSize:'0.95rem',color:'#5a5855',maxWidth:'40ch',lineHeight:1.7}}>
+        {sucesso ? i.sucessoDesc : i.sucessoPendenteDesc}
+      </p>
+      {sucessoPendente && (pagamento === "transferencia" || deposito === "transferencia") && (
+        <div style={{background:'#fff8e1',padding:'1rem 1.5rem',maxWidth:'40ch',fontSize:'0.85rem',color:'#946200',borderLeft:'3px solid #f39c12'}}>
+          {i.avisoTransferencia}
+        </div>
+      )}
+      {sucessoPendente && (pagamento === "dinheiro" || deposito === "dinheiro") && (
+        <div style={{background:'#f0eeeb',padding:'1rem 1.5rem',maxWidth:'40ch',fontSize:'0.85rem',color:'#5a5855',borderLeft:'3px solid #888'}}>
+          {i.avisoDinheiro}
+        </div>
+      )}
       <a href="/pedidos" style={{background:'#080808',color:'#f8f7f5',padding:'1rem 2.5rem',textDecoration:'none',fontSize:'0.75rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",fontWeight:500}}>Ver os meus pedidos</a>
     </div>
   );
@@ -296,8 +277,10 @@ function CheckoutContent() {
         .opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--g2);flex-shrink:0;display:flex;align-items:center;justify-content:center}
         .opt.on .opt-radio{border-color:var(--black);background:var(--black)}
         .opt.on .opt-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--white)}
-        .opt-label{font-size:0.95rem;font-weight:500;color:var(--black);margin-bottom:0.2rem}
+        .opt-label{font-size:0.95rem;font-weight:500;color:var(--black);margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem}
         .opt-desc{font-size:0.8rem;color:#5a5855;font-weight:400}
+        .badge-auto{font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#e8f5e9;color:#27ae60;font-weight:600}
+        .badge-manual{font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#fff8e1;color:#f39c12;font-weight:600}
         .pontos-box{background:var(--g1);padding:1rem 1.25rem;border-left:3px solid var(--rosa);font-size:0.9rem;color:#1a1a18}
         .gratis-box{background:#fff0f3;padding:1rem 1.25rem;border-left:3px solid var(--rosa);font-size:0.95rem;color:#a85c72;font-weight:500}
         .nivel-box{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;background:var(--g1);margin-bottom:1rem;font-size:0.85rem}
@@ -314,6 +297,7 @@ function CheckoutContent() {
         .login-box p{font-size:1rem;color:#5a5855;margin-bottom:1.5rem}
         .login-box a{display:inline-block;padding:1rem 2.5rem;background:var(--black);color:var(--white);text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
         .desconto-caucao{font-size:0.78rem;color:#27ae60;margin-top:0.25rem}
+        .aviso-pendente{background:#fff8e1;padding:0.85rem 1rem;border-left:3px solid #f39c12;font-size:0.82rem;color:#946200;margin-bottom:1rem;line-height:1.5}
         @media(max-width:768px){
           .nav{padding:1rem 1.25rem}
           .page{grid-template-columns:1fr;padding:5rem 1.25rem 6rem;gap:1rem}
@@ -332,7 +316,6 @@ function CheckoutContent() {
 
       <div className="page">
         <div>
-          {/* PEÇA */}
           <div className="sec">
             <p className="sec-t">{i.peca}</p>
             {peca && (
@@ -348,7 +331,6 @@ function CheckoutContent() {
             )}
           </div>
 
-          {/* NÍVEL E PONTOS */}
           {user && (
             <div className="sec" style={{padding:'1rem 1.5rem'}}>
               <div className="nivel-box">
@@ -368,17 +350,16 @@ function CheckoutContent() {
             </div>
           )}
 
-          {/* DATAS */}
           <div className="sec">
             <p className="sec-t">{i.datas}</p>
             <div className="dates">
               <div>
                 <label className="lbl">{i.dataInicio}</label>
-                <input className="inp" type="date" min={hoje} value={dataInicio} onChange={e => { setDataInicio(e.target.value); if (dataFim && e.target.value > dataFim) setDataFim(""); }} />
+                <input className="inp" type="date" min={hoje} value={dataInicio} onChange={e => { setDataInicio(e.target.value); if (dataFim && e.target.value > dataFim) setDataFim(""); setErro(""); }} />
               </div>
               <div>
                 <label className="lbl">{i.dataFim}</label>
-                <input className="inp" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => setDataFim(e.target.value)} />
+                <input className="inp" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => { setDataFim(e.target.value); setErro(""); }} />
               </div>
             </div>
             {numDias > 0 && (
@@ -388,7 +369,6 @@ function CheckoutContent() {
             )}
           </div>
 
-          {/* ENTREGA */}
           <div className="sec">
             <p className="sec-t">{i.entrega}</p>
             <div className="opts">
@@ -401,20 +381,21 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* PAGAMENTO */}
           <div className="sec">
             <p className="sec-t">{i.pagamento}</p>
             <div className="opts">
               {i.pagamentoOpcoes.map(op => (
                 <div key={op.id} className={`opt${pagamento === op.id ? " on" : ""}`} onClick={() => setPagamento(op.id)}>
                   <div className="opt-radio"></div>
-                  <div><div className="opt-label">{op.label}</div><div className="opt-desc">{op.desc}</div></div>
+                  <div>
+                    <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
+                    <div className="opt-desc">{op.desc}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* DEPÓSITO */}
           <div className="sec">
             <p className="sec-t">{i.deposito}</p>
             {nv.caucao < 100 && (
@@ -431,7 +412,10 @@ function CheckoutContent() {
                 {i.depositoOpcoes.map(op => (
                   <div key={op.id} className={`opt${deposito === op.id ? " on" : ""}`} onClick={() => setDeposito(op.id)}>
                     <div className="opt-radio"></div>
-                    <div><div className="opt-label">{op.label}</div><div className="opt-desc">{op.desc}</div></div>
+                    <div>
+                      <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
+                      <div className="opt-desc">{op.desc}</div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -439,7 +423,6 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* RESUMO */}
         <div className="resumo">
           <p className="sec-t">{i.resumo}</p>
           {!user ? (
@@ -449,6 +432,11 @@ function CheckoutContent() {
             </div>
           ) : (
             <>
+              {!tudoAutomatico && (
+                <div className="aviso-pendente">
+                  ⏳ O teu pedido fica <strong>pendente</strong> até confirmarmos o pagamento {pagamento === "dinheiro" || deposito === "dinheiro" ? "presencial" : "da transferência"}.
+                </div>
+              )}
               <div className="r-linha">
                 <span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span>
                 <span>{temGratis ? <span style={{color:'#c4748a',fontWeight:500}}>Grátis</span> : `${valorAluguer.toFixed(2)}€`}</span>
@@ -471,7 +459,7 @@ function CheckoutContent() {
               <p className="r-nota">{i.totalSemDeposito}</p>
               {erro && <div className="erro">{erro}</div>}
               <button className="btn" onClick={confirmar} disabled={loading || !dataInicio || !dataFim}>
-                {loading ? "..." : i.confirmar}
+                {loading ? "..." : (tudoAutomatico ? i.confirmar : i.confirmarPendente)}
               </button>
             </>
           )}
