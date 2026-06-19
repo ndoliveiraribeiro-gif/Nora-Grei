@@ -129,8 +129,10 @@ const t = {
     dataNascimento: "Data de nascimento", genero: "Género",
     generosOpcoes: ["Mulher", "Homem", "Prefiro não especificar"],
     nif: "NIF", nifPlaceholder: "123 456 789",
+    numeroCC: "Número de Cartão de Cidadão", numeroCCPlaceholder: "12345678 9 ZZ0",
     localizacao: "Localização", cidade: "Cidade", pais: "País",
     codigoPostal: "Código postal", morada: "Morada completa",
+    numeroPorta: "Número de porta", andar: "Andar / Fração",
     detectarLocalizacao: "📍 Detectar automaticamente",
     localizacaoOk: "📍 Localização detectada ✓",
     guardar: "Guardar", guardado: "Guardado! ✓",
@@ -139,12 +141,17 @@ const t = {
     verCatalogo: "Explorar catálogo",
     sair: "Terminar sessão",
     verPedidos: "Ver os meus pedidos",
+    perfilIncompleto: "⚠️ Perfil incompleto",
+    perfilIncompletoDesc: "Para poderes alugar peças, precisamos destes dados para a entrega: morada completa, código postal, cidade, NIF, número de Cartão de Cidadão e telefone.",
+    camposObrigatorios: "* Campos obrigatórios para alugar",
   },
 };
 
+const CAMPOS_OBRIGATORIOS = ["nome", "telefone", "morada", "numero_porta", "codigo_postal", "cidade", "nif", "numero_cc"];
+
 export default function Perfil() {
   const [user, setUser] = useState(null);
-  const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", avatar_url: "", nif: "", data_nascimento: "", genero: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
+  const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -164,7 +171,7 @@ export default function Perfil() {
 
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
-      setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
+      setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
     }
 
     const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
@@ -201,7 +208,8 @@ export default function Perfil() {
 
   const guardarPerfil = async () => {
     if (!user) return;
-    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, telefone: perfil.telefone, morada: perfil.morada, nif: perfil.nif, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude });
+    const perfilCompleto = CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
+    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 3000);
   };
@@ -234,6 +242,8 @@ export default function Perfil() {
   // Histórico (finalizados) — onde mostramos botão de comprar
   const alugueresHistorico = alugueres.filter(a => ["devolvido","devolvido_danificado","cancelado"].includes(a.estado));
 
+  const perfilIncompleto = !CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
+
   return (
     <>
       <style>{`
@@ -252,6 +262,9 @@ export default function Perfil() {
         .avatar-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--black);color:var(--white);border:2px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:400;line-height:1.1;margin-bottom:0.3rem}
         .hero-email{font-size:0.92rem;color:var(--g5)}
+        .alerta-perfil{background:#fff8e1;border-left:3px solid #f39c12;padding:1.25rem 1.5rem}
+        .alerta-perfil-titulo{font-size:0.85rem;font-weight:600;color:#946200;margin-bottom:0.3rem}
+        .alerta-perfil-desc{font-size:0.78rem;color:#946200;line-height:1.5}
         .nivel-card{background:var(--white);padding:2rem 2.5rem}
         .nivel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
         .nivel-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;font-size:0.82rem;font-weight:500}
@@ -273,6 +286,7 @@ export default function Perfil() {
         .card{background:var(--white);padding:2rem 2.5rem}
         .card-t{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--g5);font-weight:500;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
         .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+        .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
         .full{grid-column:1/-1}
         .fg{display:flex;flex-direction:column;gap:0.5rem}
         .lbl{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#2e2d2b;font-weight:500}
@@ -286,6 +300,7 @@ export default function Perfil() {
         .btn-save:hover{background:#2e2d2b}
         .btn-ok{background:#27ae60}
         .divider{height:1px;background:var(--g1);margin:1.25rem 0}
+        .nota-obrigatorio{font-size:0.7rem;color:var(--g5);font-style:italic;margin-top:0.5rem}
         .aluguer-card{background:var(--white);padding:1.25rem 1.5rem;margin-bottom:1px}
         .aluguer-row{display:flex;align-items:flex-start;gap:1.5rem}
         .aluguer-img{width:56px;height:70px;flex-shrink:0;background:var(--g1);overflow:hidden}
@@ -304,6 +319,7 @@ export default function Perfil() {
           .nivel-beneficios{grid-template-columns:1fr 1fr}
           .card{padding:1.5rem}
           .grid2{grid-template-columns:1fr}
+          .grid3{grid-template-columns:1fr}
           .full{grid-column:auto}
           .aluguer-row{flex-direction:row}
         }
@@ -329,6 +345,14 @@ export default function Perfil() {
             {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g5)',marginTop:'0.3rem'}}>📍 {perfil.cidade}, {perfil.pais}</div>}
           </div>
         </div>
+
+        {/* ALERTA PERFIL INCOMPLETO */}
+        {perfilIncompleto && (
+          <div className="alerta-perfil">
+            <div className="alerta-perfil-titulo">{i.perfilIncompleto}</div>
+            <div className="alerta-perfil-desc">{i.perfilIncompletoDesc}</div>
+          </div>
+        )}
 
         {/* NÍVEL */}
         <div className="nivel-card">
@@ -417,9 +441,9 @@ export default function Perfil() {
         <div className="card">
           <p className="card-t">{i.dadosPessoais}</p>
           <div className="grid2">
-            <div className="fg"><label className="lbl">{i.nome}</label><input className="inp" value={perfil.nome} onChange={e => set("nome", e.target.value)} placeholder="Maria Silva" /></div>
+            <div className="fg"><label className="lbl">{i.nome} *</label><input className="inp" value={perfil.nome} onChange={e => set("nome", e.target.value)} placeholder="Maria Silva" /></div>
             <div className="fg"><label className="lbl">{i.email}</label><input className="inp" value={user?.email||""} disabled /></div>
-            <div className="fg"><label className="lbl">{i.telefone}</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
+            <div className="fg"><label className="lbl">{i.telefone} *</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
             <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>
             <div className="fg"><label className="lbl">{i.genero}</label>
               <select className="inp" value={perfil.genero} onChange={e => set("genero", e.target.value)}>
@@ -427,17 +451,23 @@ export default function Perfil() {
                 {i.generosOpcoes.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
-            <div className="fg"><label className="lbl">{i.nif}</label><input className="inp" value={perfil.nif} onChange={e => set("nif", e.target.value)} placeholder={i.nifPlaceholder} /></div>
+            <div className="fg"><label className="lbl">{i.nif} *</label><input className="inp" value={perfil.nif} onChange={e => set("nif", e.target.value)} placeholder={i.nifPlaceholder} /></div>
+            <div className="fg"><label className="lbl">{i.numeroCC} *</label><input className="inp" value={perfil.numero_cc} onChange={e => set("numero_cc", e.target.value)} placeholder={i.numeroCCPlaceholder} /></div>
           </div>
           <div className="divider" />
           <p className="card-t" style={{marginBottom:'1rem'}}>{i.localizacao}</p>
           <div className="grid2">
             <div className="fg full"><button className="loc-btn" onClick={detectarLocalizacao} disabled={detectandoLoc}>{detectandoLoc?"A detectar...":locDetectada?i.localizacaoOk:i.detectarLocalizacao}</button></div>
-            <div className="fg"><label className="lbl">{i.cidade}</label><input className="inp" value={perfil.cidade} onChange={e => set("cidade", e.target.value)} placeholder="Lisboa" /></div>
-            <div className="fg"><label className="lbl">{i.codigoPostal}</label><input className="inp" value={perfil.codigo_postal} onChange={e => set("codigo_postal", e.target.value)} placeholder="1000-001" /></div>
+            <div className="fg"><label className="lbl">{i.cidade} *</label><input className="inp" value={perfil.cidade} onChange={e => set("cidade", e.target.value)} placeholder="Lisboa" /></div>
+            <div className="fg"><label className="lbl">{i.codigoPostal} *</label><input className="inp" value={perfil.codigo_postal} onChange={e => set("codigo_postal", e.target.value)} placeholder="1000-001" /></div>
             <div className="fg"><label className="lbl">{i.pais}</label><input className="inp" value={perfil.pais} onChange={e => set("pais", e.target.value)} /></div>
-            <div className="fg"><label className="lbl">{i.morada}</label><input className="inp" value={perfil.morada} onChange={e => set("morada", e.target.value)} placeholder="Rua, nº, andar" /></div>
+            <div className="fg"><label className="lbl">{i.morada} *</label><input className="inp" value={perfil.morada} onChange={e => set("morada", e.target.value)} placeholder="Rua das Flores" /></div>
           </div>
+          <div className="grid3" style={{marginTop:'1.25rem'}}>
+            <div className="fg"><label className="lbl">{i.numeroPorta} *</label><input className="inp" value={perfil.numero_porta} onChange={e => set("numero_porta", e.target.value)} placeholder="123" /></div>
+            <div className="fg"><label className="lbl">{i.andar}</label><input className="inp" value={perfil.andar} onChange={e => set("andar", e.target.value)} placeholder="2º Esq." /></div>
+          </div>
+          <p className="nota-obrigatorio">{i.camposObrigatorios}</p>
           <div className="save-row"><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
         </div>
 
