@@ -5,8 +5,10 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", estatisticas: "Estatísticas & AI", config: "Config" };
+const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+
+const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
 const NIVEL = (n) => {
   if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 0, cor: "#6c5ce7" };
@@ -35,10 +37,26 @@ export default function Backoffice() {
   const [stats, setStats] = useState({ alugueres_ativos: 0, devolucoes_hoje: 0, receita_mes: 0, clientes_total: 0, reservas_espera: 0, taxa_ocupacao: 0 });
   const [pecas, setPecas] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] });
+  const [novaPeca, setNovaPeca] = useState(PECA_VAZIA);
   const [fotosUpload, setFotosUpload] = useState([]);
   const [uploadProgress, setUploadProgress] = useState("");
   const [criandoPeca, setCriandoPeca] = useState(false);
+
+  // EDIÇÃO DE PEÇA
+  const [pecaEditando, setPecaEditando] = useState(null);
+  const [editForm, setEditForm] = useState(PECA_VAZIA);
+  const [editFotosNovas, setEditFotosNovas] = useState([]);
+  const [editFotosExistentes, setEditFotosExistentes] = useState([]);
+  const [editProgress, setEditProgress] = useState("");
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+  const [editTamanhos, setEditTamanhos] = useState([]);
+
+  // LANDING PAGE
+  const [landingCfg, setLandingCfg] = useState({ video_landing_url: "", hero_peca_id: "", categoria_festa_peca_id: "", categoria_trabalho_peca_id: "", categoria_ferias_peca_id: "", categoria_jantar_peca_id: "" });
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoProgress, setVideoProgress] = useState("");
+  const [pecasComFoto, setPecasComFoto] = useState([]);
+
   const [alugueres, setAlugueres] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [clienteSel, setClienteSel] = useState(null);
@@ -78,32 +96,11 @@ export default function Backoffice() {
     }
     if (tab === "alugueres") {
       const { data } = await supabase.from("alugueres").select("*, clientes(nome, email, total_pecas_alugadas), stock_tamanhos(tamanho, pecas(nome, valor_peca))").order("created_at", { ascending: false }).limit(100);
-      if (data && data.length > 0) {
-        setAlugueres(data);
-      } else {
-        // Fallback: query separada
-        const { data: al } = await supabase.from("alugueres").select("*").order("created_at", { ascending: false }).limit(100);
-        if (al) {
-          const alComDados = await Promise.all(al.map(async (a) => {
-            const { data: cl } = await supabase.from("clientes").select("nome, email, total_pecas_alugadas").eq("id", a.cliente_id).single();
-            const { data: st } = await supabase.from("stock_tamanhos").select("tamanho, pecas(nome, valor_peca)").eq("id", a.stock_tamanho_id).single();
-            return { ...a, clientes: cl, stock_tamanhos: st };
-          }));
-          setAlugueres(alComDados);
-        }
-      }
+      if (data) setAlugueres(data);
     }
     if (tab === "clientes") {
-      const { data, error } = await supabase.from("clientes").select("*").order("created_at", { ascending: false });
-      console.log("Clientes:", data, error);
-      if (data) {
-        // Buscar alugueres separadamente
-        const clientesComAl = await Promise.all(data.map(async (c) => {
-          const { data: al } = await supabase.from("alugueres").select("id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos))").eq("cliente_id", c.id);
-          return { ...c, alugueres: al || [] };
-        }));
-        setClientes(clientesComAl);
-      }
+      const { data } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });
+      if (data) setClientes(data);
     }
     if (tab === "reservas") {
       const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))").order("created_at", { ascending: false });
@@ -112,6 +109,19 @@ export default function Backoffice() {
     if (tab === "campanhas") {
       const { data } = await supabase.from("campanhas").select("*").order("created_at", { ascending: false });
       if (data) setCampanhas(data);
+    }
+    if (tab === "landing") {
+      const { data: cfg } = await supabase.from("configuracoes").select("*").limit(1).maybeSingle();
+      if (cfg) setLandingCfg({
+        video_landing_url: cfg.video_landing_url || "",
+        hero_peca_id: cfg.hero_peca_id || "",
+        categoria_festa_peca_id: cfg.categoria_festa_peca_id || "",
+        categoria_trabalho_peca_id: cfg.categoria_trabalho_peca_id || "",
+        categoria_ferias_peca_id: cfg.categoria_ferias_peca_id || "",
+        categoria_jantar_peca_id: cfg.categoria_jantar_peca_id || "",
+      });
+      const { data: pcf } = await supabase.from("pecas").select("id, nome, fotos");
+      if (pcf) setPecasComFoto(pcf.filter(p => p.fotos?.length > 0));
     }
     if (tab === "estatisticas") await carregarEstatisticas();
   };
@@ -158,11 +168,93 @@ export default function Backoffice() {
       for (const foto of fotosUpload) { const ext = foto.name.split(".").pop(); const path = `${pc.id}/${Date.now()}.${ext}`; setUploadProgress(`A fazer upload de ${foto.name}...`); const { error: upErr } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true }); if (!upErr) { const { data } = supabase.storage.from("pecas").getPublicUrl(path); urls.push(data.publicUrl); } }
       if (urls.length > 0) { await supabase.from("pecas").update({ fotos: urls }).eq("id", pc.id); setUploadProgress(`✓ ${urls.length} foto(s) guardada(s)!`); }
     } else { setUploadProgress("✓ Peça criada!"); }
-    setNovaPeca({ nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] });
+    setNovaPeca(PECA_VAZIA);
     setFotosUpload([]); setCriandoPeca(false);
     setTimeout(() => setUploadProgress(""), 4000);
     carregarDados();
   };
+
+  // --- EDIÇÃO DE PEÇA ---
+  const abrirEdicao = (p) => {
+    setPecaEditando(p.id);
+    setEditForm({
+      nome: p.nome || "", categoria_id: p.categoria_id || "",
+      preco_aluguer_dia: p.preco_aluguer_dia || "", preco_avulso: p.preco_avulso || "",
+      valor_peca: p.valor_peca || "", descricao: p.descricao || "",
+      material: p.material || "", origem: p.origem || "Portugal",
+      destaque: !!p.destaque, ocasioes: p.ocasioes || [],
+    });
+    setEditTamanhos((p.stock_tamanhos || []).map(s => ({ id: s.id, tamanho: s.tamanho, quantidade_total: s.quantidade_total, quantidade_disponivel: s.quantidade_disponivel })));
+    setEditFotosExistentes(p.fotos || []);
+    setEditFotosNovas([]);
+    setEditProgress("");
+  };
+
+  const fecharEdicao = () => { setPecaEditando(null); setEditForm(PECA_VAZIA); setEditTamanhos([]); setEditFotosExistentes([]); setEditFotosNovas([]); };
+
+  const removerFotoExistente = (idx) => setEditFotosExistentes(prev => prev.filter((_, i) => i !== idx));
+
+  const atualizarTamanhoEdit = (idx, campo, valor) => {
+    setEditTamanhos(prev => prev.map((t, i) => i === idx ? { ...t, [campo]: valor } : t));
+  };
+
+  const adicionarTamanhoEdit = () => setEditTamanhos(prev => [...prev, { id: null, tamanho: "", quantidade_total: 1, quantidade_disponivel: 1 }]);
+  const removerTamanhoEdit = async (idx) => {
+    const t = editTamanhos[idx];
+    if (t.id) { await supabase.from("stock_tamanhos").delete().eq("id", t.id); }
+    setEditTamanhos(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const guardarEdicao = async () => {
+    if (!pecaEditando) return;
+    setSalvandoEdicao(true);
+    setEditProgress("A guardar...");
+
+    let fotosFinais = [...editFotosExistentes];
+    if (editFotosNovas.length > 0) {
+      for (const foto of editFotosNovas) {
+        const ext = foto.name.split(".").pop();
+        const path = `${pecaEditando}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        setEditProgress(`A fazer upload de ${foto.name}...`);
+        const { error: upErr } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true });
+        if (!upErr) { const { data } = supabase.storage.from("pecas").getPublicUrl(path); fotosFinais.push(data.publicUrl); }
+      }
+    }
+
+    const { error } = await supabase.from("pecas").update({
+      nome: editForm.nome, categoria_id: editForm.categoria_id || null,
+      preco_aluguer_dia: parseFloat(editForm.preco_aluguer_dia) || 0,
+      preco_avulso: parseFloat(editForm.preco_avulso) || null,
+      valor_peca: parseFloat(editForm.valor_peca) || 0,
+      descricao: editForm.descricao, material: editForm.material, origem: editForm.origem,
+      destaque: editForm.destaque, ocasioes: editForm.ocasioes,
+      fotos: fotosFinais,
+    }).eq("id", pecaEditando);
+
+    if (error) { setEditProgress("❌ " + error.message); setSalvandoEdicao(false); return; }
+
+    for (const t of editTamanhos) {
+      if (!t.tamanho) continue;
+      if (t.id) {
+        await supabase.from("stock_tamanhos").update({
+          tamanho: t.tamanho,
+          quantidade_total: parseInt(t.quantidade_total) || 0,
+          quantidade_disponivel: parseInt(t.quantidade_disponivel) || 0,
+        }).eq("id", t.id);
+      } else {
+        await supabase.from("stock_tamanhos").insert({
+          peca_id: pecaEditando, tamanho: t.tamanho,
+          quantidade_total: parseInt(t.quantidade_total) || 1,
+          quantidade_disponivel: parseInt(t.quantidade_disponivel) || 1,
+        });
+      }
+    }
+
+    setEditProgress("✓ Guardado com sucesso!");
+    setSalvandoEdicao(false);
+    setTimeout(() => { fecharEdicao(); carregarDados(); }, 1000);
+  };
+
 
   const atualizarEstado = async (id, estado) => { await supabase.from("alugueres").update({ estado }).eq("id", id); carregarDados(); };
   const confirmarDeposito = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
@@ -177,6 +269,32 @@ export default function Backoffice() {
     if (error) { alert("Erro: " + error.message); return; }
     setNovaCampanha({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
     carregarDados();
+  };
+
+  // --- LANDING PAGE ---
+  const uploadVideo = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setVideoProgress("A fazer upload do vídeo...");
+    const ext = file.name.split(".").pop();
+    const path = `landing/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("videos").upload(path, file, { upsert: true });
+    if (error) { setVideoProgress("❌ " + error.message); setUploadingVideo(false); return; }
+    const { data } = supabase.storage.from("videos").getPublicUrl(path);
+    setLandingCfg(prev => ({ ...prev, video_landing_url: data.publicUrl }));
+    setVideoProgress("✓ Vídeo carregado! Clica em Guardar para aplicar.");
+    setUploadingVideo(false);
+  };
+
+  const guardarLanding = async () => {
+    const { data: existing } = await supabase.from("configuracoes").select("id").limit(1).maybeSingle();
+    if (existing) {
+      await supabase.from("configuracoes").update(landingCfg).eq("id", existing.id);
+    } else {
+      await supabase.from("configuracoes").insert(landingCfg);
+    }
+    alert("Configurações da landing page guardadas!");
   };
 
   if (!logado) return (
@@ -327,7 +445,7 @@ export default function Backoffice() {
                     {pecas.map(p => (
                       <tr key={p.id} style={{ background:"#fff" }}>
                         <td style={TD}>{p.fotos?.length>0?<img src={p.fotos[0]} alt="" style={{ width:48,height:60,objectFit:"cover" }}/>:<div style={{ width:48,height:60,background:"#f0eeeb",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc" }}>📷</div>}</td>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.6rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}</td>
+                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.6rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}<div style={{ fontSize:"0.62rem",color:"#bbb",marginTop:"0.2rem",fontFamily:"monospace" }}>{p.id.slice(0,8)}...</div></td>
                         <td style={TD}>{p.categorias?.nome||"—"}</td>
                         <td style={TD}>{p.preco_aluguer_dia}€{p.preco_avulso?<div style={{ fontSize:"0.72rem",color:"#888" }}>{p.preco_avulso}€/oc.</div>:null}</td>
                         <td style={{ ...TD,maxWidth:120 }}><div style={{ fontSize:"0.72rem",color:"#888" }}>{(p.ocasioes||[]).slice(0,3).join(", ")||"—"}</div></td>
@@ -335,6 +453,7 @@ export default function Backoffice() {
                         <td style={TD}><span style={BADGE(p.estado==="disponivel"?"green":"gray")}>{p.estado}</span></td>
                         <td style={TD}>
                           <div style={{ display:"flex",gap:"0.4rem",flexWrap:"wrap" }}>
+                            <button style={BTN("rosa","sm")} onClick={() => abrirEdicao(p)}>✏️ Editar</button>
                             <button style={BTN("outline","sm")} onClick={async()=>{ await supabase.from("pecas").update({estado:p.estado==="disponivel"?"indisponivel":"disponivel"}).eq("id",p.id); carregarDados(); }}>{p.estado==="disponivel"?"Desativar":"Ativar"}</button>
                             <button style={BTN("red","sm")} onClick={async()=>{ if(confirm("Apagar?")){ await supabase.from("pecas").delete().eq("id",p.id); carregarDados(); } }}>Apagar</button>
                           </div>
@@ -345,6 +464,103 @@ export default function Backoffice() {
                 </table>
               </div>
             </div>
+
+            {pecaEditando && (
+              <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && fecharEdicao()}>
+                <div style={{ background:"#fff",width:"100%",maxWidth:700,maxHeight:"90vh",overflowY:"auto",padding:"2rem" }}>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.5rem" }}>
+                    <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300 }}>Editar peça</h2>
+                    <button onClick={fecharEdicao} style={{ background:"none",border:"none",fontSize:"1.5rem",cursor:"pointer",color:"#888" }}>✕</button>
+                  </div>
+
+                  <div style={COL2}>
+                    <div><label style={LBL}>Nome *</label><input style={INP} value={editForm.nome} onChange={e => setEditForm(f=>({...f,nome:e.target.value}))} /></div>
+                    <div><label style={LBL}>Categoria</label>
+                      <select style={INP} value={editForm.categoria_id} onChange={e => setEditForm(f=>({...f,categoria_id:e.target.value}))}>
+                        <option value="">Selecionar</option>
+                        {categorias.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                      </select>
+                    </div>
+                    <div><label style={LBL}>Preço aluguer/dia (€) *</label><input style={INP} type="number" value={editForm.preco_aluguer_dia} onChange={e => setEditForm(f=>({...f,preco_aluguer_dia:e.target.value}))} /></div>
+                    <div><label style={LBL}>Preço por ocasião (€)</label><input style={INP} type="number" value={editForm.preco_avulso} onChange={e => setEditForm(f=>({...f,preco_avulso:e.target.value}))} /></div>
+                    <div><label style={LBL}>Valor peça (€) — caução base</label><input style={INP} type="number" value={editForm.valor_peca} onChange={e => setEditForm(f=>({...f,valor_peca:e.target.value}))} /></div>
+                    <div><label style={LBL}>Material</label><input style={INP} value={editForm.material} onChange={e => setEditForm(f=>({...f,material:e.target.value}))} /></div>
+                    <div><label style={LBL}>Origem</label><input style={INP} value={editForm.origem} onChange={e => setEditForm(f=>({...f,origem:e.target.value}))} /></div>
+                    <div style={{ display:"flex",alignItems:"center",gap:"0.5rem",paddingTop:"1.5rem" }}>
+                      <input type="checkbox" id="editdest" checked={editForm.destaque} onChange={e => setEditForm(f=>({...f,destaque:e.target.checked}))} />
+                      <label htmlFor="editdest" style={{ ...LBL,marginBottom:0 }}>Em destaque</label>
+                    </div>
+                    <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Descrição</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={editForm.descricao} onChange={e => setEditForm(f=>({...f,descricao:e.target.value}))} /></div>
+                  </div>
+
+                  <div style={{ marginTop:"1.25rem",marginBottom:"1.25rem" }}>
+                    <label style={LBL}>Ocasiões</label>
+                    <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap",marginTop:"0.5rem" }}>
+                      {OCASIOES.map(o => (
+                        <button key={o} type="button" onClick={() => setEditForm(f=>({...f,ocasioes:f.ocasioes.includes(o)?f.ocasioes.filter(x=>x!==o):[...f.ocasioes,o]}))}
+                          style={{ fontSize:"0.68rem",padding:"0.4rem 0.75rem",border:`1.5px solid ${editForm.ocasioes.includes(o)?"#080808":"#e2dfda"}`,background:editForm.ocasioes.includes(o)?"#080808":"#fff",color:editForm.ocasioes.includes(o)?"#fff":"#080808",cursor:"pointer",fontFamily:"'Jost',sans-serif" }}>
+                          {o}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom:"1.25rem" }}>
+                    <label style={LBL}>Tamanhos & stock</label>
+                    {editTamanhos.map((t,i) => (
+                      <div key={i} style={{ display:"flex",gap:"0.75rem",alignItems:"center",marginBottom:"0.5rem" }}>
+                        <select style={{ ...INP,width:"110px" }} value={t.tamanho} onChange={e => atualizarTamanhoEdit(i, "tamanho", e.target.value)}>
+                          <option value="">Tamanho</option>
+                          {TAMANHOS.map(sz => <option key={sz} value={sz}>{sz}</option>)}
+                        </select>
+                        <div style={{ display:"flex",flexDirection:"column",gap:"0.2rem" }}>
+                          <span style={{ fontSize:"0.55rem",color:"#888" }}>Total</span>
+                          <input style={{ ...INP,width:"80px" }} type="number" min="0" value={t.quantidade_total} onChange={e => atualizarTamanhoEdit(i, "quantidade_total", e.target.value)} />
+                        </div>
+                        <div style={{ display:"flex",flexDirection:"column",gap:"0.2rem" }}>
+                          <span style={{ fontSize:"0.55rem",color:"#888" }}>Disponível</span>
+                          <input style={{ ...INP,width:"80px" }} type="number" min="0" value={t.quantidade_disponivel} onChange={e => atualizarTamanhoEdit(i, "quantidade_disponivel", e.target.value)} />
+                        </div>
+                        <button type="button" onClick={() => removerTamanhoEdit(i)} style={{ background:"none",border:"none",cursor:"pointer",color:"#e74c3c",fontSize:"1.2rem",marginTop:"1rem" }}>✕</button>
+                      </div>
+                    ))}
+                    <button type="button" style={BTN("outline","sm")} onClick={adicionarTamanhoEdit}>+ Tamanho</button>
+                  </div>
+
+                  <div style={{ marginBottom:"1.25rem" }}>
+                    <label style={LBL}>Fotos atuais</label>
+                    {editFotosExistentes.length === 0 ? (
+                      <p style={{ fontSize:"0.8rem",color:"#888",marginTop:"0.5rem" }}>Sem fotos</p>
+                    ) : (
+                      <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap",marginTop:"0.5rem" }}>
+                        {editFotosExistentes.map((f, i) => (
+                          <div key={i} style={{ position:"relative" }}>
+                            <img src={f} alt="" style={{ width:70,height:70,objectFit:"cover",border:"1px solid #e2dfda" }} />
+                            <button onClick={() => removerFotoExistente(i)} style={{ position:"absolute",top:-8,right:-8,width:22,height:22,borderRadius:"50%",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontSize:"0.7rem" }}>✕</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ marginBottom:"1.5rem" }}>
+                    <label style={LBL}>Adicionar novas fotos</label>
+                    <label style={{ display:"block",padding:"1.25rem",border:"2px dashed #e2dfda",background:"#f8f8f6",cursor:"pointer",textAlign:"center",marginTop:"0.5rem" }}>
+                      <input type="file" accept="image/*" multiple onChange={e => setEditFotosNovas(Array.from(e.target.files))} style={{ display:"none" }} />
+                      {editFotosNovas.length === 0 ? <div style={{ fontSize:"0.8rem",color:"#888" }}>📷 Clica para adicionar fotos</div>
+                        : <div style={{ color:"#27ae60",fontWeight:500,fontSize:"0.82rem" }}>{editFotosNovas.length} nova(s) foto(s) selecionada(s)</div>}
+                    </label>
+                  </div>
+
+                  {editProgress && <p style={{ fontSize:"0.8rem",color:editProgress.startsWith("✓")?"#27ae60":editProgress.startsWith("❌")?"#e74c3c":"#c4748a",fontWeight:500,marginBottom:"1rem" }}>{editProgress}</p>}
+
+                  <div style={{ display:"flex",gap:"0.75rem" }}>
+                    <button style={{ ...BTN("black"),flex:1,opacity:salvandoEdicao?0.6:1 }} onClick={guardarEdicao} disabled={salvandoEdicao}>{salvandoEdicao?"A guardar...":"Guardar alterações"}</button>
+                    <button style={BTN("outline")} onClick={fecharEdicao}>Cancelar</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -543,6 +759,60 @@ export default function Backoffice() {
                 </tbody>
               </table>
             </div>
+          </>
+        )}
+
+        {/* LANDING PAGE */}
+        {tab === "landing" && (
+          <>
+            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Landing Page</h1>
+            <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Gerir vídeo e fotos da página inicial</p>
+
+            <div style={CARD}>
+              <p style={CARD_T}>Vídeo da landing page</p>
+              <label style={{ display:"block",padding:"2rem",border:"2px dashed #e2dfda",background:"#f8f8f6",cursor:"pointer",textAlign:"center",marginBottom:"1rem" }}>
+                <input type="file" accept="video/mp4,video/webm" onChange={uploadVideo} style={{ display:"none" }} />
+                {landingCfg.video_landing_url ? (
+                  <div>
+                    <video src={landingCfg.video_landing_url} style={{ maxWidth:"100%",maxHeight:200,marginBottom:"0.5rem" }} controls />
+                    <div style={{ fontSize:"0.78rem",color:"#27ae60" }}>Vídeo atual — clica para substituir</div>
+                  </div>
+                ) : (
+                  <div><div style={{ fontSize:"2rem" }}>🎬</div><div style={{ fontSize:"0.82rem",color:"#888",marginTop:"0.4rem" }}>{uploadingVideo ? "A carregar..." : "Clica para fazer upload do vídeo (mp4)"}</div></div>
+                )}
+              </label>
+              {videoProgress && <p style={{ fontSize:"0.78rem",color:videoProgress.startsWith("✓")?"#27ae60":videoProgress.startsWith("❌")?"#e74c3c":"#c4748a",fontWeight:500 }}>{videoProgress}</p>}
+            </div>
+
+            <div style={CARD}>
+              <p style={CARD_T}>Foto do Hero (banner principal)</p>
+              <select style={INP} value={landingCfg.hero_peca_id} onChange={e => setLandingCfg(p => ({...p, hero_peca_id: e.target.value}))}>
+                <option value="">Automático (peça em destaque)</option>
+                {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+              </select>
+            </div>
+
+            <div style={CARD}>
+              <p style={CARD_T}>Fotos das categorias</p>
+              <div style={COL2}>
+                {[
+                  ["Festa", "categoria_festa_peca_id"],
+                  ["Trabalho", "categoria_trabalho_peca_id"],
+                  ["Férias", "categoria_ferias_peca_id"],
+                  ["Jantar", "categoria_jantar_peca_id"],
+                ].map(([label, key]) => (
+                  <div key={key}>
+                    <label style={LBL}>{label}</label>
+                    <select style={INP} value={landingCfg[key]} onChange={e => setLandingCfg(p => ({...p, [key]: e.target.value}))}>
+                      <option value="">Automático</option>
+                      {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button style={BTN("black")} onClick={guardarLanding}>Guardar alterações</button>
           </>
         )}
 
