@@ -32,7 +32,6 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [heroPeca, setHeroPeca] = useState(null);
   const [categoriaFotos, setCategoriaFotos] = useState({});
-  const [pecasGrid, setPecasGrid] = useState([]);
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
@@ -73,10 +72,8 @@ export default function Home() {
         if (!mapa[oc] && restantes[idx]) { mapa[oc] = restantes[idx].fotos[0]; idx++; }
       });
       setCategoriaFotos(mapa);
-      setPecasGrid(restantes.slice(0, 6));
     }
 
-    // Vídeo configurado no backoffice (config geral)
     const { data: cfg } = await supabase.from("configuracoes").select("video_landing_url").maybeSingle();
     if (cfg?.video_landing_url) setVideoUrl(cfg.video_landing_url);
   };
@@ -114,115 +111,100 @@ export default function Home() {
         .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}
         .nb-f:hover{background:#2a2926}
 
-        /* HERO — mais compacto */
-        .hero{min-height:88svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
+        .hero{min-height:90svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:brightness(0.55)}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.2) 0%,rgba(8,8,8,0.65) 60%,rgba(8,8,8,0.85) 100%);z-index:1}
-        .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2rem 1.5rem 2.25rem;color:#fff}
-        .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:0.75rem}
-        .hero-titulo{font-family:var(--serif);font-size:clamp(2.6rem,9vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
-        .hero-sub{font-family:var(--serif);font-size:clamp(2.6rem,9vw,5.5rem);font-weight:300;font-style:italic;color:rgba(255,255,255,0.65);line-height:1.02;margin-bottom:1rem}
-        .hero-desc{font-size:0.92rem;color:rgba(255,255,255,0.75);max-width:45ch;line-height:1.7;margin-bottom:1.5rem}
+        .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
+        .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
+        .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
+        .hero-sub{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;font-style:italic;color:rgba(255,255,255,0.65);line-height:1.02;margin-bottom:1.5rem}
+        .hero-desc{font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:45ch;line-height:1.8;margin-bottom:2rem}
         .hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
         .hero-cta1{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;transition:background 0.2s;flex:1;text-align:center;max-width:220px}
         .hero-cta1:hover{background:#a85c72}
         .hero-cta2{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:1rem 1.5rem;transition:all 0.2s;flex:1;text-align:center;max-width:180px}
         .hero-cta2:hover{color:#fff;border-color:#fff}
 
-        /* VÍDEO */
-        .video-sec{padding:0;background:var(--black);position:relative}
-        .video-header{padding:2.5rem 1.5rem 1.5rem;text-align:center}
-        .video-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.5rem;font-weight:500}
+        /* VÍDEO — quebra visual generosa */
+        .video-sec{padding:4rem 1.5rem;background:var(--black)}
+        .video-header{text-align:center;margin-bottom:2rem}
+        .video-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.6rem;font-weight:500}
         .video-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.5rem);font-weight:300;color:#fff}
-        .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;cursor:pointer;overflow:hidden}
+        .video-wrap{position:relative;width:100%;max-width:900px;margin:0 auto;aspect-ratio:16/9;background:#1a1a1a;cursor:pointer;overflow:hidden;border-radius:2px}
         .video-wrap video{width:100%;height:100%;object-fit:cover}
         .video-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:2}
         .video-wrap:hover .video-play-btn{transform:translate(-50%,-50%) scale(1.08)}
         .video-play-btn svg{width:26px;height:26px;fill:var(--black);margin-left:3px}
-        .video-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.7}
+        .video-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:rgba(255,255,255,0.3)}
 
-        /* STRIP */
-        .strip{background:var(--rosa);padding:0.7rem 0;overflow:hidden}
+        .strip{background:var(--rosa);padding:0.75rem 0;overflow:hidden}
         .strip-track{display:flex;white-space:nowrap;animation:marquee 25s linear infinite}
-        .strip-item{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.9);padding:0 2.5rem;flex-shrink:0}
+        .strip-item{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.9);padding:0 2.5rem;flex-shrink:0}
         .strip-item::after{content:'✦';margin-left:2.5rem;color:rgba(255,255,255,0.4)}
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-        /* ACESSO RÁPIDO */
         .quick-access{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2)}
-        .qa-item{background:var(--white);padding:1.25rem;display:flex;flex-direction:column;gap:0.3rem;text-decoration:none;color:var(--black);transition:background 0.2s;position:relative;overflow:hidden}
+        .qa-item{background:var(--white);padding:1.5rem;display:flex;flex-direction:column;gap:0.4rem;text-decoration:none;color:var(--black);transition:background 0.2s;position:relative;overflow:hidden}
         .qa-item:hover{background:var(--g1)}
         .qa-item::after{content:'→';position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--g2);transition:all 0.2s}
         .qa-item:hover::after{color:var(--rosa);right:0.75rem}
-        .qa-icon{font-size:1.35rem}
-        .qa-label{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500}
-        .qa-desc{font-size:0.74rem;color:var(--g4)}
+        .qa-icon{font-size:1.5rem;margin-bottom:0.2rem}
+        .qa-label{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500}
+        .qa-desc{font-size:0.78rem;color:var(--g4)}
 
-        /* GRID DE PEÇAS — visual denso */
-        .pecas-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--g2)}
-        .pecas-strip a{aspect-ratio:3/4;overflow:hidden;display:block;background:var(--g1)}
-        .pecas-strip img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
-        .pecas-strip a:hover img{transform:scale(1.04)}
-
-        /* SECÇÃO compacta */
-        .sec{padding:2.5rem 1.5rem}
-        .sec-tight{padding:1.5rem 1.5rem}
-        .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.5rem;font-weight:500}
-        .sec-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5.5vw,3rem);font-weight:300;line-height:1.1;margin-bottom:1.25rem}
+        /* Espaçamento generoso entre secções de imagem */
+        .sec{padding:4.5rem 1.5rem}
+        .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.75rem;font-weight:500}
+        .sec-titulo{font-family:var(--serif);font-size:clamp(2rem,6vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:2rem}
         .sec-titulo em{font-style:italic;color:var(--g4)}
 
-        /* COMO FUNCIONA */
         .como-grid{display:flex;flex-direction:column;gap:1px;background:var(--g2)}
-        .como-passo{background:var(--white);padding:1.4rem 1.5rem;display:flex;gap:1.25rem;align-items:flex-start;transition:background 0.2s}
+        .como-passo{background:var(--white);padding:1.75rem 1.5rem;display:flex;gap:1.5rem;align-items:flex-start;transition:background 0.2s}
         .como-passo:hover{background:var(--g1)}
-        .como-num-wrap{flex-shrink:0;width:40px;height:40px;background:var(--rosa);display:flex;align-items:center;justify-content:center}
-        .como-num{font-family:var(--serif);font-size:1.05rem;font-weight:300;color:#fff}
-        .como-titulo{font-family:var(--serif);font-size:1.2rem;font-weight:400;margin-bottom:0.2rem}
-        .como-desc{font-size:0.85rem;color:var(--g4);line-height:1.5}
+        .como-num-wrap{flex-shrink:0;width:48px;height:48px;background:var(--rosa);display:flex;align-items:center;justify-content:center}
+        .como-num{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:#fff}
+        .como-titulo{font-family:var(--serif);font-size:1.3rem;font-weight:400;margin-bottom:0.3rem}
+        .como-desc{font-size:0.88rem;color:var(--g4);line-height:1.6}
 
-        /* CATEGORIAS — sem espaço acima */
-        .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2)}
+        .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:4.5rem 1.5rem}
+        .porque-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:300;line-height:1.2;color:#fff;margin-bottom:2.5rem}
+        .porque-titulo em{font-style:italic;color:rgba(255,255,255,0.4);display:block}
+        .porque-ponto{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+        .porque-ponto:last-child{border-bottom:none}
+        .porque-dot{width:8px;height:8px;border-radius:50%;background:var(--rosa);flex-shrink:0}
+        .porque-text{font-family:var(--serif);font-size:1.3rem;font-weight:300;color:rgba(255,255,255,0.85)}
+
+        /* CATEGORIAS — com respiro acima */
+        .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--white)}
         .cat-card{position:relative;overflow:hidden;aspect-ratio:1/1;text-decoration:none;display:block;background:var(--g1)}
         .cat-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease}
         .cat-card:hover img{transform:scale(1.05)}
-        .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.75) 0%,transparent 50%);display:flex;align-items:flex-end;padding:1.1rem}
-        .cat-nome{font-family:var(--serif);font-size:1.3rem;font-weight:300;color:#fff;font-style:italic}
+        .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.75) 0%,transparent 50%);display:flex;align-items:flex-end;padding:1.25rem}
+        .cat-nome{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:#fff;font-style:italic}
 
-        /* PORQUE */
-        .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:2.5rem 1.5rem}
-        .porque-titulo{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.6rem);font-weight:300;line-height:1.2;color:#fff;margin-bottom:1.75rem}
-        .porque-titulo em{font-style:italic;color:rgba(255,255,255,0.4);display:block}
-        .porque-ponto{display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.08)}
-        .porque-ponto:last-child{border-bottom:none}
-        .porque-dot{width:7px;height:7px;border-radius:50%;background:var(--rosa);flex-shrink:0}
-        .porque-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:rgba(255,255,255,0.85)}
-
-        /* NÚMEROS */
         .numeros{display:grid;grid-template-columns:repeat(2,1fr);background:var(--black)}
-        .numero{padding:2rem 1.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
+        .numero{padding:2.5rem 1.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
         .numero:nth-child(even){border-right:none}
-        .numero-val{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--rosa);line-height:1;margin-bottom:0.3rem}
-        .numero-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+        .numero-val{font-family:var(--serif);font-size:3rem;font-weight:300;color:var(--rosa);line-height:1;margin-bottom:0.4rem}
+        .numero-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
 
-        /* SUSTENTABILIDADE */
-        .sustent{background:var(--g1);padding:2.5rem 1.5rem}
-        .sustent-stat{background:var(--white);padding:1.25rem;margin-bottom:1px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--rosa)}
-        .sustent-val{font-family:var(--serif);font-size:2.2rem;font-weight:300;color:var(--rosa)}
-        .sustent-label{font-size:0.8rem;color:var(--g4);text-align:right;max-width:20ch}
+        .sustent{background:var(--g1);padding:4.5rem 1.5rem}
+        .sustent-stat{background:var(--white);padding:1.5rem;margin-bottom:1px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--rosa)}
+        .sustent-val{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--rosa)}
+        .sustent-label{font-size:0.82rem;color:var(--g4);text-align:right;max-width:20ch}
 
-        /* CTA FINAL */
-        .cta-final{padding:3.5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
-        .cta-final-titulo{font-family:var(--serif);font-size:clamp(2.2rem,7vw,5rem);font-weight:300;line-height:1;color:#fff}
-        .cta-final-sub{font-family:var(--serif);font-size:clamp(2.2rem,7vw,5rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.6rem}
-        .cta-final-tag{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:1.75rem;display:block}
-        .cta-final-btn{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1.05rem 2.75rem;text-decoration:none;font-family:var(--sans);transition:background 0.2s;display:inline-block}
+        .cta-final{padding:5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
+        .cta-final-titulo{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;line-height:1;color:#fff}
+        .cta-final-sub{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.75rem}
+        .cta-final-tag{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:2.5rem;display:block}
+        .cta-final-btn{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1.1rem 3rem;text-decoration:none;font-family:var(--sans);transition:background 0.2s;display:inline-block}
         .cta-final-btn:hover{background:#a85c72}
 
-        footer{padding:1.75rem 1.5rem;border-top:1px solid var(--g2);display:flex;flex-direction:column;gap:0.85rem}
-        .footer-copy{font-size:0.62rem;color:var(--g4)}
-        .footer-links{display:flex;gap:1.25rem;flex-wrap:wrap;list-style:none}
-        .footer-links a{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+        footer{padding:2rem 1.5rem;border-top:1px solid var(--g2);display:flex;flex-direction:column;gap:1rem}
+        .footer-copy{font-size:0.65rem;color:var(--g4)}
+        .footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;list-style:none}
+        .footer-links a{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--g4);text-decoration:none}
 
         .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--g2);padding:0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom))}
         .bnav-inner{display:flex;justify-content:space-around;align-items:center}
@@ -242,10 +224,10 @@ export default function Home() {
         .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
 
         @media(min-width:769px){
-          .hero{flex-direction:row;padding-top:80px;min-height:78vh}
+          .hero{flex-direction:row;padding-top:80px;min-height:82vh}
           .hero-bg{display:none}
           .hero-overlay{display:none}
-          .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:4rem 4rem 4rem 6rem}
+          .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:5rem 4rem 5rem 6rem}
           .hero-eyebrow{color:var(--g4)}
           .hero-titulo{color:var(--black);font-size:clamp(3rem,4.5vw,5rem)}
           .hero-sub{color:var(--g4);font-size:clamp(3rem,4.5vw,5rem)}
@@ -259,22 +241,20 @@ export default function Home() {
           .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
           .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
           .hero-caption-preco{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
-          .video-wrap{max-width:1100px;margin:0 auto}
+          .video-sec{padding:6rem 6rem}
           .quick-access{grid-template-columns:repeat(4,1fr)}
-          .pecas-strip{grid-template-columns:repeat(6,1fr)}
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:3rem 2rem}
           .numero:nth-child(even){border-right:1px solid rgba(255,255,255,0.08)}
-          .sec{padding:5rem 6rem}
-          .sec-tight{padding:3rem 6rem 1rem}
+          .sec{padding:7rem 6rem}
           .como-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
-          .porque{display:grid;grid-template-columns:1fr 1fr;gap:5rem;padding:5rem 6rem;align-items:center}
-          .cat-grid{grid-template-columns:repeat(4,1fr)}
+          .porque{display:grid;grid-template-columns:1fr 1fr;gap:6rem;padding:7rem 6rem;align-items:center}
+          .cat-grid{grid-template-columns:repeat(4,1fr);gap:8px}
           .cat-card{aspect-ratio:3/4}
-          .sustent{padding:5rem 6rem}
-          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:2rem}
-          .cta-final{padding:7rem 6rem}
-          footer{flex-direction:row;justify-content:space-between;align-items:center;padding:1.75rem 6rem}
+          .sustent{padding:7rem 6rem}
+          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;margin-top:3rem}
+          .cta-final{padding:10rem 6rem}
+          footer{flex-direction:row;justify-content:space-between;align-items:center;padding:2rem 6rem}
           .bnav{display:none}
           .nav{padding:1.25rem 4rem}
           .cupao-banner{bottom:0;padding:1rem 4rem}
@@ -354,21 +334,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VÍDEO — só aparece se houver vídeo configurado */}
-      {videoUrl && (
-        <section className="video-sec">
-          <div className="video-header">
-            <p className="video-label">{t.video.label}</p>
-            <h2 className="video-titulo">{t.video.titulo}</h2>
-          </div>
+      {/* VÍDEO — quebra visual entre hero e o resto */}
+      <section className="video-sec">
+        <div className="video-header">
+          <p className="video-label">{t.video.label}</p>
+          <h2 className="video-titulo">{t.video.titulo}</h2>
+        </div>
+        {videoUrl ? (
           <div className="video-wrap" onClick={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { videoPlaying ? v.pause() : v.play(); setVideoPlaying(!videoPlaying); } }}>
-            <video src={videoUrl} loop muted={false} playsInline />
-            {!videoPlaying && (
-              <div className="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-            )}
+            <video src={videoUrl} loop playsInline />
+            {!videoPlaying && <div className="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>}
           </div>
-        </section>
-      )}
+        ) : (
+          <div className="video-wrap" style={{cursor:'default'}}>
+            <div className="video-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>
+              <span style={{fontSize:'0.7rem',letterSpacing:'0.1em',textTransform:'uppercase'}}>Vídeo em breve</span>
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* STRIP */}
       <div className="strip">
@@ -395,34 +380,23 @@ export default function Home() {
         ))}
       </div>
 
-      {/* GRID DE PEÇAS — denso, visual */}
-      {pecasGrid.length > 0 && (
-        <div className="pecas-strip">
-          {pecasGrid.map((p, i) => (
-            <a key={i} href="/catalogo"><img src={p.fotos[0]} alt={p.nome} /></a>
-          ))}
-        </div>
-      )}
-
-      {/* CATEGORIAS — logo a seguir, sem espaço vazio */}
-      <section style={{padding:0}}>
-        <div className="sec-tight">
-          <p className="sec-label">{t.categorias.label}</p>
-          <h2 className="sec-titulo">{t.categorias.titulo}<br /><em>{t.categorias.tituloSub}</em></h2>
-        </div>
-        <div className="cat-grid">
-          {t.categorias.lista.map((nomeCat,i) => (
-            <a key={i} href="/catalogo" className="cat-card">
-              {categoriaFotos[nomeCat] ? <img src={categoriaFotos[nomeCat]} alt={nomeCat} /> : (
-                <div style={{width:'100%',height:'100%',background:'linear-gradient(160deg,#e8e4e0,#d5d0c8)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                  <span style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:'rgba(0,0,0,0.08)',fontStyle:'italic'}}>NG</span>
-                </div>
-              )}
-              <div className="cat-overlay"><span className="cat-nome">{nomeCat}</span></div>
-            </a>
-          ))}
-        </div>
+      {/* CATEGORIAS — agora com respiro próprio */}
+      <section className="sec" style={{paddingBottom:0}}>
+        <p className="sec-label">{t.categorias.label}</p>
+        <h2 className="sec-titulo">{t.categorias.titulo}<br /><em>{t.categorias.tituloSub}</em></h2>
       </section>
+      <div className="cat-grid">
+        {t.categorias.lista.map((nomeCat,i) => (
+          <a key={i} href="/catalogo" className="cat-card">
+            {categoriaFotos[nomeCat] ? <img src={categoriaFotos[nomeCat]} alt={nomeCat} /> : (
+              <div style={{width:'100%',height:'100%',background:'linear-gradient(160deg,#e8e4e0,#d5d0c8)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <span style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:'rgba(0,0,0,0.08)',fontStyle:'italic'}}>NG</span>
+              </div>
+            )}
+            <div className="cat-overlay"><span className="cat-nome">{nomeCat}</span></div>
+          </a>
+        ))}
+      </div>
 
       {/* COMO FUNCIONA */}
       <section className="sec" id="como" style={{background:"var(--white)"}}>
