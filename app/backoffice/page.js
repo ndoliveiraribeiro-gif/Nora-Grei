@@ -784,7 +784,7 @@ export default function Backoffice() {
             <div style={CARD}>
               <p style={CARD_T}>Vídeo da landing page</p>
               <label style={{ display:"block",padding:"2rem",border:"2px dashed #e2dfda",background:"#f8f8f6",cursor:"pointer",textAlign:"center",marginBottom:"1rem" }}>
-                <input type="file" accept="video/mp4,video/webm" onChange={uploadVideo} style={{ display:"none" }} />
+                <input type="file" accept="video/mp4,video/webm,video/quicktime,.mov" onChange={uploadVideo} style={{ display:"none" }} />
                 {landingCfg.video_landing_url ? (
                   <div>
                     <video src={landingCfg.video_landing_url} style={{ maxWidth:"100%",maxHeight:200,marginBottom:"0.5rem" }} controls />
