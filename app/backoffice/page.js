@@ -471,7 +471,7 @@ export default function Backoffice() {
                         <td style={TD}>{p.preco_aluguer_dia}€{p.preco_avulso?<div style={{ fontSize:"0.72rem",color:"#888" }}>{p.preco_avulso}€/oc.</div>:null}</td>
                         <td style={{ ...TD,maxWidth:120 }}><div style={{ fontSize:"0.72rem",color:"#888" }}>{(p.ocasioes||[]).slice(0,3).join(", ")||"—"}</div></td>
                         <td style={TD}><div style={{ fontSize:"0.75rem" }}>{p.stock_tamanhos?.map(s=>`${s.tamanho}(${s.quantidade_disponivel}/${s.quantidade_total})`).join(", ")||"—"}</div></td>
-                        <td style={TD}><span style={BADGE(p.estado==="disponivel"?"green":"gray")}>{p.estado}</span></td>
+                        <td style={TD}><span style={BADGE(p.estado==="disponivel"?"green":"gray")}>{p.estado==="disponivel"?"Disponível":"Indisponível"}</span></td>
                         <td style={TD}>
                           <div style={{ display:"flex",gap:"0.4rem",flexWrap:"wrap" }}>
                             <button style={BTN("rosa","sm")} onClick={() => abrirEdicao(p)}>✏️ Editar</button>
@@ -610,12 +610,20 @@ export default function Backoffice() {
                           <td style={TD}>{atraso>0?<span style={{ color:"#e74c3c",fontWeight:700 }}>+{atraso}d</span>:<span style={{ color:"#27ae60" }}>✓</span>}</td>
                           <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
                           <td style={TD}>
-                            <span style={BADGE(a.deposito_estado==="recebido"||a.deposito_estado==="libertado"?"green":"orange")}>{a.deposito_estado}</span>
+                                   <span style={BADGE(a.deposito_estado==="recebido"||a.deposito_estado==="libertado"?"green":"orange")}>{{recebido:"Recebido",pendente:"A aguardar",libertado:"Devolvido ao cliente"}[a.deposito_estado]||a.deposito_estado}</span>                 
                             {a.deposito_estado==="pendente"&&<button style={{ ...BTN("rosa","sm"),display:"block",marginTop:"0.25rem" }} onClick={()=>confirmarDeposito(a.id)}>Confirmar</button>}
                           </td>
                           <td style={TD}>
                             <select value={a.estado} onChange={e=>atualizarEstado(a.id,e.target.value)} style={{ fontSize:"0.65rem",padding:"0.35rem 0.5rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",cursor:"pointer" }}>
-                              {["pendente","confirmado","enviado","ativo","em_verificacao","devolvido","devolvido_danificado","nao_devolvido","cancelado"].map(s=><option key={s} value={s}>{s}</option>)}
+                              <option value="pendente">A aguardar pagamento</option>
+                              <option value="confirmado">Pagamento confirmado — a preparar envio</option>
+                              <option value="enviado">A caminho</option>
+                              <option value="ativo">A usar</option>
+                              <option value="em_verificacao">Em inspeção</option>
+                              <option value="devolvido">Concluído</option>
+                              <option value="devolvido_danificado">Concluído — com danos</option>
+                              <option value="nao_devolvido">Não devolvido</option>
+                              <option value="cancelado">Cancelado</option>
                             </select>
                           </td>
                           <td style={TD}>
@@ -693,7 +701,7 @@ export default function Backoffice() {
                           <td style={TD}>{a.stock_tamanhos?.tamanho||"—"}</td>
                           <td style={{ ...TD,whiteSpace:"nowrap",fontSize:"0.8rem" }}>{a.data_inicio} → {a.data_fim}</td>
                           <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
-                          <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":a.estado==="ativo"?"orange":"gray")}>{a.estado}</span></td>
+                          <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":a.estado==="ativo"?"orange":"gray")}>{{pendente:"A aguardar pagamento",confirmado:"Pagamento confirmado",enviado:"A caminho",ativo:"A usar",em_verificacao:"Em inspeção",devolvido:"Concluído",devolvido_danificado:"Concluído — com danos",cancelado:"Cancelado"}[a.estado]||a.estado}</span></td>
                         </tr>
                       ))}
                     </tbody>
