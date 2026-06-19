@@ -48,6 +48,7 @@ export default function PecaDetalhe() {
   const [lang, setLang] = useState("pt");
   const [userLogado, setUserLogado] = useState(null);
   const [dataFimTimer, setDataFimTimer] = useState(null);
+  const [pecaIndisponivel, setPecaIndisponivel] = useState(false);
   const [partilhado, setPartilhado] = useState(false);
 
   useEffect(() => {
@@ -64,24 +65,35 @@ export default function PecaDetalhe() {
       .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
       .eq("id", id)
       .single();
+
     if (data) {
       setPeca(data);
       const disponivel = data.stock_tamanhos?.find(s => s.quantidade_disponivel > 0);
       if (disponivel) setTamanhoSelecionado(disponivel.id);
 
-      // Buscar aluguer ativo para o timer
       const stockIds = data.stock_tamanhos?.map(s => s.id) || [];
       if (stockIds.length > 0) {
-        const { data: al } = await supabase
+        const { data: alugueresEmCurso } = await supabase
           .from("alugueres")
-          .select("data_fim")
+          .select("data_fim, data_disponivel_novamente, estado")
           .in("stock_tamanho_id", stockIds)
-          .eq("estado", "ativo")
-          .order("data_fim", { ascending: true })
-          .limit(1);
-        if (al?.[0]) {
-          const dataFimComHigienizacao = new Date(new Date(al[0].data_fim).getTime() + 24 * 60 * 60 * 1000);
-          if (dataFimComHigienizacao > new Date()) setDataFimTimer(dataFimComHigienizacao.toISOString());
+          .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+
+        if (alugueresEmCurso && alugueresEmCurso.length > 0) {
+          const agora = new Date();
+          let dataMaisDistante = null;
+          alugueresEmCurso.forEach(a => {
+            const dataDisp = a.data_disponivel_novamente
+              ? new Date(a.data_disponivel_novamente)
+              : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+            if (dataDisp > agora && (!dataMaisDistante || dataDisp > dataMaisDistante)) {
+              dataMaisDistante = dataDisp;
+            }
+          });
+          if (dataMaisDistante) {
+            setDataFimTimer(dataMaisDistante.toISOString());
+            setPecaIndisponivel(true);
+          }
         }
       }
     }
@@ -128,9 +140,9 @@ export default function PecaDetalhe() {
   );
 
   const fotos = peca.fotos?.filter(f => f)?.length > 0 ? peca.fotos.filter(f => f) : [null];
-  const tamanhosDisponiveis = peca.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || [];
-  const tamanhosSemStock = peca.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0) || [];
-  const disponivel = peca.estado === "disponivel" && tamanhosDisponiveis.length > 0;
+  const tamanhosDisponiveis = pecaIndisponivel ? [] : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || []);
+  const tamanhosSemStock = pecaIndisponivel ? (peca.stock_tamanhos || []) : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0) || []);
+  const disponivel = !pecaIndisponivel && peca.estado === "disponivel" && tamanhosDisponiveis.length > 0;
 
   return (
     <>
@@ -206,7 +218,6 @@ export default function PecaDetalhe() {
       </nav>
 
       <div className="layout">
-        {/* FOTOS */}
         <div className="fotos">
           <div className="foto-main">
             {fotos[fotoAtiva] ? (
@@ -231,7 +242,6 @@ export default function PecaDetalhe() {
           )}
         </div>
 
-        {/* INFO */}
         <div className="info">
           {peca.categorias?.nome && <p className="badge-cat">{peca.categorias.nome}</p>}
           <h1 className="nome">{peca.nome}</h1>
@@ -250,10 +260,8 @@ export default function PecaDetalhe() {
             {disponivel ? t.disponivel : t.indisponivel}
           </span>
 
-          {/* TIMER */}
           {!disponivel && dataFimTimer && <Timer dataFim={dataFimTimer} lang={lang} />}
 
-          {/* TAMANHOS */}
           {peca.stock_tamanhos?.length > 0 && (
             <div className="secao">
               <p className="secao-label">{t.tamanho}</p>
@@ -270,7 +278,6 @@ export default function PecaDetalhe() {
             </div>
           )}
 
-          {/* OCASIÕES */}
           {peca.ocasioes?.length > 0 && (
             <div className="secao">
               <p className="secao-label">{t.ocasioes}</p>
@@ -280,14 +287,12 @@ export default function PecaDetalhe() {
             </div>
           )}
 
-          {/* DEPÓSITO */}
           <div className="deposito-box">
             <p className="secao-label">{t.deposito}</p>
             <p className="deposito-val">{peca.valor_peca}€</p>
             <p className="deposito-desc">{t.depositoDesc}</p>
           </div>
 
-          {/* BOTÕES */}
           {disponivel ? (
             <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
               {tamanhoSelecionado ? t.alugar : t.semTamanho}
@@ -302,7 +307,6 @@ export default function PecaDetalhe() {
 
           <hr className="sep" />
 
-          {/* DETALHES */}
           {peca.descricao && (
             <div className="secao">
               <p className="secao-label">{t.descricao}</p>
@@ -316,7 +320,6 @@ export default function PecaDetalhe() {
             {peca.categorias?.nome && <div className="info-row"><span className="info-key">{t.categoria}</span><span>{peca.categorias.nome}</span></div>}
           </div>
 
-          {/* PARTILHA SOCIAL */}
           <div className="partilha">
             <span className="partilha-label">{t.partilhar}</span>
             <button className="partilha-btn" onClick={() => partilhar("whatsapp")} title="WhatsApp">
