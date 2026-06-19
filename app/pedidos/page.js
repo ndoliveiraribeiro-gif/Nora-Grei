@@ -9,7 +9,7 @@ const TRADUCOES = {
     ativos: "Ativos", reservas: "Reservas", historico: "Histórico",
     semAtivos: "Não tens alugueres ativos.", semReservas: "Não tens reservas em espera.", semHistorico: "Ainda não tens alugueres.",
     verCatalogo: "Explorar catálogo", devolucao: "Devolução prevista", tamanho: "Tamanho",
-    estado: { ativo:"Ativo", enviado:"Enviado", confirmado:"Confirmado", pendente:"Pendente", devolvido:"Devolvido", cancelado:"Cancelado", em_verificacao:"Em verificação", devolvido_danificado:"Devolvido com danos" },
+    estado: { ativo:"A usar", enviado:"A caminho", confirmado:"Pagamento confirmado — a preparar envio", pendente:"A aguardar pagamento", devolvido:"Concluído", cancelado:"Cancelado", em_verificacao:"Em inspeção", devolvido_danificado:"Concluído — com danos" },
     reservaEspera: "A aguardar disponibilidade", dataDesejada: "Datas desejadas", loading: "A carregar...", voltar: "← Início",
     entregaEm: "Entrega prevista em", entregaPrazo: "3-5 dias úteis",
     comprarPeca: "Comprar esta peça",
