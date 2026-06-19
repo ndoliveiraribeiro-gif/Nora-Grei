@@ -466,7 +466,7 @@ export default function Backoffice() {
                     {pecas.map(p => (
                       <tr key={p.id} style={{ background:"#fff" }}>
                         <td style={TD}>{p.fotos?.length>0?<img src={p.fotos[0]} alt="" style={{ width:48,height:60,objectFit:"cover" }}/>:<div style={{ width:48,height:60,background:"#f0eeeb",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc" }}>📷</div>}</td>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.6rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}<div style={{ fontSize:"0.62rem",color:"#bbb",marginTop:"0.2rem",fontFamily:"monospace" }}>{p.id.slice(0,8)}...</div></td>
+                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.6rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}<div style={{ fontSize:"0.65rem",color:"#c4748a",marginTop:"0.2rem",fontFamily:"monospace",fontWeight:600 }}>{p.codigo_referencia || p.id.slice(0,8)}</div></td>
                         <td style={TD}>{p.categorias?.nome||"—"}</td>
                         <td style={TD}>{p.preco_aluguer_dia}€{p.preco_avulso?<div style={{ fontSize:"0.72rem",color:"#888" }}>{p.preco_avulso}€/oc.</div>:null}</td>
                         <td style={{ ...TD,maxWidth:120 }}><div style={{ fontSize:"0.72rem",color:"#888" }}>{(p.ocasioes||[]).slice(0,3).join(", ")||"—"}</div></td>
@@ -652,7 +652,7 @@ export default function Backoffice() {
                     const nv = NIVEL(comp);
                     return (
                       <tr key={c.id} style={{ background:"#fff" }}>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{c.nome||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.email}</div></td>
+                        <td style={TD}><div style={{ fontWeight:600 }}>{c.nome||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.email}</div><div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,marginTop:"0.15rem" }}>{c.codigo_cliente}</div></td>
                         <td style={TD}><div style={{ fontSize:"0.82rem" }}>{c.telefone||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.nif?"NIF: "+c.nif:""}</div></td>
                         <td style={TD}>{c.cidade||"—"}</td>
                         <td style={TD}>
