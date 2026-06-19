@@ -288,13 +288,26 @@ export default function Backoffice() {
   };
 
   const guardarLanding = async () => {
+    const payload = {
+      video_landing_url: landingCfg.video_landing_url || null,
+      hero_peca_id: landingCfg.hero_peca_id || null,
+      categoria_festa_peca_id: landingCfg.categoria_festa_peca_id || null,
+      categoria_trabalho_peca_id: landingCfg.categoria_trabalho_peca_id || null,
+      categoria_ferias_peca_id: landingCfg.categoria_ferias_peca_id || null,
+      categoria_jantar_peca_id: landingCfg.categoria_jantar_peca_id || null,
+    };
     const { data: existing } = await supabase.from("configuracoes").select("id").limit(1).maybeSingle();
+    let result;
     if (existing) {
-      await supabase.from("configuracoes").update(landingCfg).eq("id", existing.id);
+      result = await supabase.from("configuracoes").update(payload).eq("id", existing.id);
     } else {
-      await supabase.from("configuracoes").insert(landingCfg);
+      result = await supabase.from("configuracoes").insert(payload);
     }
-    alert("Configurações da landing page guardadas!");
+    if (result.error) {
+      alert("Erro ao guardar: " + result.error.message);
+    } else {
+      alert("Configurações da landing page guardadas!");
+    }
   };
 
   if (!logado) return (
