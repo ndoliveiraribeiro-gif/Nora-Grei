@@ -159,7 +159,7 @@ export default function PecaDetalhe() {
         .layout{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:72px}
         .fotos{position:sticky;top:72px;height:calc(100vh - 72px);display:flex;flex-direction:column;gap:0.5rem;padding:1.5rem;background:var(--g1)}
         .foto-main{flex:1;overflow:hidden;position:relative}
-        .foto-main img{width:100%;height:100%;object-fit:cover;object-position:center top}
+        .foto-main img{width:100%;height:100%;object-fit:contain;background:var(--g1)}
         .foto-counter{position:absolute;top:1rem;right:1rem;background:rgba(8,8,8,0.6);color:#fff;font-size:0.65rem;letter-spacing:0.1em;padding:0.3rem 0.6rem;font-family:var(--sans)}
         .foto-placeholder{width:100%;height:100%;background:linear-gradient(160deg,#e8e4e0,#d5d0c8);display:flex;align-items:center;justify-content:center}
         .fotos-thumb{display:flex;gap:0.5rem;height:80px;overflow-x:auto}
