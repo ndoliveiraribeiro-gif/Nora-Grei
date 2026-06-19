@@ -95,8 +95,16 @@ export default function Backoffice() {
       if (c) setCategorias(c);
     }
     if (tab === "alugueres") {
-      const { data } = await supabase.from("alugueres").select("*, clientes(nome, email, total_pecas_alugadas), stock_tamanhos(tamanho, pecas(nome, valor_peca))").order("created_at", { ascending: false }).limit(100);
-      if (data) setAlugueres(data);
+      const { data: al, error: alErr } = await supabase.from("alugueres").select("*").order("created_at", { ascending: false }).limit(100);
+      if (alErr) console.error("Erro alugueres:", alErr);
+      if (al) {
+        const alComDados = await Promise.all(al.map(async (a) => {
+          const { data: cl } = await supabase.from("clientes").select("nome, email, total_pecas_alugadas").eq("id", a.cliente_id).single();
+          const { data: st } = await supabase.from("stock_tamanhos").select("tamanho, pecas(nome, valor_peca)").eq("id", a.stock_tamanho_id).single();
+          return { ...a, clientes: cl, stock_tamanhos: st };
+        }));
+        setAlugueres(alComDados);
+      }
     }
     if (tab === "clientes") {
       const { data } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });

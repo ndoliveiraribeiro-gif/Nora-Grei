@@ -128,7 +128,7 @@ function FormularioMBWay({ telefone, setTelefone, qrAtivo, erro }) {
   );
 }
 
-function InfoTransferencia({ valor }) {
+function InfoTransferencia({ valor, comprovativo, setComprovativo, erro }) {
   return (
     <div className="form-pag">
       <div className="iban-box">
@@ -139,7 +139,19 @@ function InfoTransferencia({ valor }) {
         <p className="iban-label" style={{ marginTop: "0.75rem" }}>Referência</p>
         <p className="iban-val">Indica o teu nome completo</p>
       </div>
-      <p className="nota-aviso">Após a transferência, envia o comprovativo para suporte@noragrei.com ou pelo WhatsApp. O teu pedido fica reservado por 24h.</p>
+      <div className="fg">
+        <label className="lbl">Comprovativo de transferência *</label>
+        <label className="upload-box">
+          <input type="file" accept="image/*,.pdf" onChange={e => setComprovativo(e.target.files?.[0] || null)} style={{ display: "none" }} />
+          {comprovativo ? (
+            <span className="upload-ok">✓ {comprovativo.name}</span>
+          ) : (
+            <span className="upload-vazio">📎 Clica para anexar o comprovativo (imagem ou PDF)</span>
+          )}
+        </label>
+        {erro && <p className="erro-campo">{erro}</p>}
+      </div>
+      <p className="nota-aviso">O teu pedido fica pendente até confirmarmos o comprovativo. Reservamos a peça por 24h.</p>
     </div>
   );
 }
@@ -164,6 +176,9 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
       <div className="talao-linha"><span>Tamanho</span><span>{tamanhoNome}</span></div>
       <div className="talao-linha"><span>Período</span><span>{dataInicio} → {dataFim}</span></div>
       <div className="talao-linha"><span>Método</span><span style={{ textTransform: "capitalize" }}>{recibo.metodo_pagamento}</span></div>
+      {recibo.comprovativo_url && (
+        <div className="talao-linha"><span>Comprovativo</span><a href={recibo.comprovativo_url} target="_blank" rel="noopener noreferrer" style={{ color: "#27ae60" }}>✓ Anexado</a></div>
+      )}
       <div className="talao-sep" />
       <div className="talao-linha"><span>Aluguer</span><span>{valorAluguer.toFixed(2)}€</span></div>
       <div className="talao-linha"><span>Higienização</span><span>{HIGIENIZACAO}€</span></div>
@@ -197,6 +212,9 @@ function CheckoutContent() {
   const [dadosCartao, setDadosCartao] = useState({});
   const [telefoneMbway, setTelefoneMbway] = useState("");
   const [qrAtivo, setQrAtivo] = useState(false);
+  const [comprovativoPagamento, setComprovativoPagamento] = useState(null);
+  const [comprovativoDeposito, setComprovativoDeposito] = useState(null);
+  const [erroComprovativo, setErroComprovativo] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [erroCampo, setErroCampo] = useState("");
@@ -292,7 +310,10 @@ function CheckoutContent() {
     if (pagamento === "mbway") {
       if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("Indica um número de telefone válido"); return false; }
     }
+    if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo("Anexa o comprovativo da transferência"); return false; }
+    if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo("Anexa o comprovativo da transferência do depósito"); return false; }
     setErroCampo("");
+    setErroComprovativo("");
     return true;
   };
 
@@ -329,6 +350,23 @@ function CheckoutContent() {
       const estadoInicial = tudoConfirmado ? "confirmado" : "pendente";
       const depositoEstadoInicial = depositoAutomatico ? "recebido" : "pendente";
 
+      // Upload de comprovativos, se houver
+      let urlComprovativoPagamento = null;
+      let urlComprovativoDeposito = null;
+      if (comprovativoPagamento) {
+        const ext = comprovativoPagamento.name.split(".").pop();
+        const path = `${user.id}/${Date.now()}-pagamento.${ext}`;
+        const { error: upErr } = await supabase.storage.from("comprovativos").upload(path, comprovativoPagamento, { upsert: true });
+        if (!upErr) { const { data } = supabase.storage.from("comprovativos").getPublicUrl(path); urlComprovativoPagamento = data.publicUrl; }
+      }
+      if (comprovativoDeposito) {
+        const ext = comprovativoDeposito.name.split(".").pop();
+        const path = `${user.id}/${Date.now()}-deposito.${ext}`;
+        const { error: upErr } = await supabase.storage.from("comprovativos").upload(path, comprovativoDeposito, { upsert: true });
+        if (!upErr) { const { data } = supabase.storage.from("comprovativos").getPublicUrl(path); urlComprovativoDeposito = data.publicUrl; }
+      }
+      const urlComprovativoFinal = urlComprovativoPagamento || urlComprovativoDeposito;
+
       const { data: novoAluguer, error } = await supabase.from("alugueres").insert({
         cliente_id: user.id,
         stock_tamanho_id: stockId,
@@ -357,6 +395,7 @@ function CheckoutContent() {
         valor_deposito: valorDeposito,
         valor_total: totalAgora,
         estado: tudoConfirmado ? "pago" : "pendente",
+        comprovativo_url: urlComprovativoFinal,
         detalhes: { entrega, deposito_modalidade: deposito, peca_nome: peca?.nome, tamanho: tamanhoNome },
       }).select().single();
 
@@ -469,7 +508,7 @@ function CheckoutContent() {
             <p className="sec-t">{i.pagamento}</p>
             <div className="opts">
               {i.pagamentoOpcoes.map(op => (
-                <div key={op.id} className={`opt${pagamento === op.id ? " on" : ""}`} onClick={() => { setPagamento(op.id); setQrAtivo(false); setErroCampo(""); }}>
+                <div key={op.id} className={`opt${pagamento === op.id ? " on" : ""}`} onClick={() => { setPagamento(op.id); setQrAtivo(false); setErroCampo(""); setErroComprovativo(""); }}>
                   <div className="opt-radio" />
                   <div>
                     <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
@@ -480,7 +519,7 @@ function CheckoutContent() {
             </div>
             {pagamento === "cartao" && <FormularioCartao dados={dadosCartao} setDados={setDadosCartao} erro={erroCampo} />}
             {pagamento === "mbway" && <FormularioMBWay telefone={telefoneMbway} setTelefone={setTelefoneMbway} qrAtivo={qrAtivo} erro={erroCampo} />}
-            {pagamento === "transferencia" && <InfoTransferencia valor={totalAgora} />}
+            {pagamento === "transferencia" && <InfoTransferencia valor={totalAgora} comprovativo={comprovativoPagamento} setComprovativo={setComprovativoPagamento} erro={erroComprovativo} />}
             {pagamento === "dinheiro" && <InfoDinheiro />}
           </div>
 
@@ -494,17 +533,22 @@ function CheckoutContent() {
             {nv.caucao === 0 ? (
               <div style={{ padding: "0.75rem 1rem", background: "#f8f4ff", borderLeft: "3px solid #6c5ce7", fontSize: "0.85rem", color: "#6c5ce7" }}>💎 Platina — sem caução!</div>
             ) : (
-              <div className="opts">
-                {i.depositoOpcoes.map(op => (
-                  <div key={op.id} className={`opt${deposito === op.id ? " on" : ""}`} onClick={() => setDeposito(op.id)}>
-                    <div className="opt-radio" />
-                    <div>
-                      <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
-                      <div className="opt-desc">{op.desc}</div>
+              <>
+                <div className="opts">
+                  {i.depositoOpcoes.map(op => (
+                    <div key={op.id} className={`opt${deposito === op.id ? " on" : ""}`} onClick={() => setDeposito(op.id)}>
+                      <div className="opt-radio" />
+                      <div>
+                        <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
+                        <div className="opt-desc">{op.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+                {deposito === "transferencia" && pagamento !== "transferencia" && (
+                  <InfoTransferencia valor={valorDeposito} comprovativo={comprovativoDeposito} setComprovativo={setComprovativoDeposito} erro={erroComprovativo} />
+                )}
+              </>
             )}
           </div>
         </div>
@@ -603,6 +647,10 @@ const ESTILOS = `
   .iban-box{background:var(--g1);padding:1.25rem}
   .iban-label{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855}
   .iban-val{font-family:var(--serif);font-size:1.3rem;font-weight:400;color:var(--black);margin-top:0.2rem}
+  .upload-box{display:block;padding:1rem;border:2px dashed var(--g2);background:var(--g1);cursor:pointer;text-align:center;transition:border-color 0.2s}
+  .upload-box:hover{border-color:var(--black)}
+  .upload-vazio{font-size:0.82rem;color:#5a5855}
+  .upload-ok{font-size:0.82rem;color:#27ae60;font-weight:500}
   .pagina-sucesso{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;padding:3rem 1.5rem;font-family:var(--sans);text-align:center;background:var(--g1)}
   .sucesso-icon{font-size:3rem}
   .sucesso-titulo{font-family:var(--serif);font-size:2.2rem;font-weight:300;color:var(--black)}
