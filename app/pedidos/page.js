@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const TRADUCOES = {
@@ -56,7 +57,7 @@ const TRADUCOES = {
   },
 };
 
-function TimerEntrega({ lang, i }) {
+function TimerEntrega({ i }) {
   return (
     <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#e3f2fd',padding:'0.6rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #1976d2'}}>
       <span style={{fontSize:'1rem'}}>🚚</span>
@@ -64,32 +65,6 @@ function TimerEntrega({ lang, i }) {
         <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'#1976d2',fontWeight:600}}>{i.timerEntrega}</div>
         <div style={{fontSize:'0.72rem',color:'#1565c0'}}>{i.entregaEm} {i.entregaPrazo}</div>
       </div>
-    </div>
-  );
-}
-
-function TimerDisponivel({ dataFim, label }) {
-  const [tempo, setTempo] = useState("");
-  useEffect(() => {
-    const calc = () => {
-      const diff = new Date(dataFim) - new Date();
-      if (diff <= 0) { setTempo(""); return; }
-      const dias = Math.floor(diff / 86400000);
-      const horas = Math.floor((diff % 86400000) / 3600000);
-      const mins = Math.floor((diff % 3600000) / 60000);
-      if (dias > 0) setTempo(`${dias}d ${horas}h`);
-      else if (horas > 0) setTempo(`${horas}h ${mins}m`);
-      else setTempo(`${mins}m`);
-    };
-    calc();
-    const iv = setInterval(calc, 60000);
-    return () => clearInterval(iv);
-  }, [dataFim]);
-  if (!tempo) return null;
-  return (
-    <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.6rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #f39c12'}}>
-      <div style={{width:6,height:6,borderRadius:'50%',background:'#f39c12',animation:'pulse 2s infinite'}}/>
-      <span style={{fontSize:'0.72rem',color:'#e67e22',fontWeight:500}}>{label} <strong>{tempo}</strong></span>
     </div>
   );
 }
@@ -102,40 +77,19 @@ function BotaoCodigoDesconto({ aluguer, i }) {
 
   const gerarCodigo = async () => {
     setLoading(true);
-    // Ver se já existe código para este aluguer
-    const { data: existente } = await supabase
-      .from("codigos_desconto")
-      .select("*")
-      .eq("aluguer_id", aluguer.id)
-      .single();
-
-    if (existente) {
-      setCodigo(existente);
-      setMostrar(true);
-      setLoading(false);
-      return;
-    }
-
-    // Gerar código único
+    const { data: existente } = await supabase.from("codigos_desconto").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    if (existente) { setCodigo(existente); setMostrar(true); setLoading(false); return; }
     const cod = "NORA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     const { data: novo } = await supabase.from("codigos_desconto").insert({
-      aluguer_id: aluguer.id,
-      cliente_id: aluguer.cliente_id,
-      codigo: cod,
-      valor: aluguer.valor_aluguer || 0,
-      estado: "ativo",
+      aluguer_id: aluguer.id, cliente_id: aluguer.cliente_id, codigo: cod,
+      valor: aluguer.valor_aluguer || 0, estado: "ativo",
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     }).select().single();
-
     if (novo) { setCodigo(novo); setMostrar(true); }
     setLoading(false);
   };
 
-  const copiar = () => {
-    navigator.clipboard.writeText(codigo.codigo);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
-  };
+  const copiar = () => { navigator.clipboard.writeText(codigo.codigo); setCopiado(true); setTimeout(() => setCopiado(false), 2000); };
 
   if (mostrar && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
@@ -143,26 +97,20 @@ function BotaoCodigoDesconto({ aluguer, i }) {
       <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
       <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.5rem'}}>
-        <button onClick={copiar} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',transition:'background 0.2s'}}>
-          {copiado ? i.copiado : i.copiar}
-        </button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>
-          {i.irParaLoja}
-        </a>
+        <button onClick={copiar} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irParaLoja}</a>
       </div>
     </div>
   );
 
   return (
-    <button onClick={gerarCodigo} disabled={loading} style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500,transition:'all 0.2s'}}>
+    <button onClick={gerarCodigo} disabled={loading} style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
       {loading ? "..." : `🏷️ ${i.comprarPeca}`}
     </button>
   );
 }
 
-import { useSearchParams } from "next/navigation";
-
-export default function Pedidos() {
+function PedidosContent() {
   const searchParams = useSearchParams();
   const [tab, setTab] = useState(searchParams.get("tab") || "ativos");
   const [ativos, setAtivos] = useState([]);
@@ -170,7 +118,6 @@ export default function Pedidos() {
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("pt");
-  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -181,7 +128,6 @@ export default function Pedidos() {
   const carregarPedidos = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "/entrar"; return; }
-    setUserId(user.id);
 
     const { data: alugueres } = await supabase
       .from("alugueres")
@@ -194,14 +140,13 @@ export default function Pedidos() {
       setHistorico(alugueres.filter(a => ["devolvido","cancelado","devolvido_danificado"].includes(a.estado)));
     }
 
-    const { data: res, error: errRes } = await supabase
+    const { data: res } = await supabase
       .from("reservas_espera")
       .select("*, stock_tamanhos(tamanho, pecas(nome, fotos))")
       .eq("cliente_id", user.id)
       .eq("estado", "aguarda")
       .order("created_at", { ascending: false });
 
-    console.log("Reservas:", res, errRes);
     if (res) setReservas(res);
     setLoading(false);
   };
@@ -232,7 +177,7 @@ export default function Pedidos() {
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.35rem'}}>{i.tamanho}: {a.stock_tamanhos?.tamanho} · {a.valor_aluguer}€</p>
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem'}}>{a.data_inicio} → {a.data_fim}</p>
             {estadoBadge(a.estado)}
-            {a.estado === "enviado" && <TimerEntrega lang={lang} i={i} />}
+            {a.estado === "enviado" && <TimerEntrega i={i} />}
             {a.estado === "ativo" && a.data_fim && (
               <p style={{fontSize:'0.75rem',color:'#c4748a',marginTop:'0.5rem',fontWeight:500}}>↩ {i.devolucao}: <strong>{a.data_fim}</strong></p>
             )}
@@ -245,9 +190,6 @@ export default function Pedidos() {
 
   const CardReserva = ({ r }) => {
     const peca = r.stock_tamanhos?.pecas;
-    // Calcular timer — data_fim do aluguer ativo + 24h
-    const dataFimTimer = null; // calculado separadamente se necessário
-
     return (
       <div style={{background:'#fff',padding:'1.25rem',borderBottom:'1px solid #f0eeeb'}}>
         <div style={{display:'flex',gap:'1rem',alignItems:'flex-start'}}>
@@ -259,7 +201,6 @@ export default function Pedidos() {
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.35rem'}}>{i.tamanho}: {r.stock_tamanhos?.tamanho}</p>
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem'}}>{i.dataDesejada}: {r.data_inicio_desejada} → {r.data_fim_desejada}</p>
             <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:'#fff8e1',color:'#f39c12'}}>{i.reservaEspera}</span>
-            {dataFimTimer && <TimerDisponivel dataFim={dataFimTimer} label={i.reservaTimer} />}
           </div>
         </div>
       </div>
@@ -313,5 +254,13 @@ export default function Pedidos() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function Pedidos() {
+  return (
+    <Suspense fallback={<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#888'}}>A carregar...</div>}>
+      <PedidosContent />
+    </Suspense>
   );
 }
