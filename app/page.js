@@ -157,8 +157,8 @@ export default function Home() {
         .video-header{text-align:center;margin-bottom:2rem}
         .video-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.6rem;font-weight:500}
         .video-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.5rem);font-weight:300;color:#fff}
-        .video-wrap{position:relative;width:100%;max-width:900px;margin:0 auto;aspect-ratio:16/9;background:#1a1a1a;cursor:pointer;overflow:hidden;border-radius:2px}
-        .video-wrap video{width:100%;height:100%;object-fit:cover}
+        .video-wrap{position:relative;width:fit-content;max-width:100%;margin:0 auto;background:#1a1a1a;cursor:pointer;overflow:hidden;border-radius:2px;display:flex;justify-content:center}
+        .video-wrap video{width:100%;height:100%;object-fit:contain;background:#000}
         .video-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:2}
         .video-wrap:hover .video-play-btn{transform:translate(-50%,-50%) scale(1.08)}
         .video-play-btn svg{width:26px;height:26px;fill:var(--black);margin-left:3px}
