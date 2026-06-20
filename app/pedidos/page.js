@@ -20,6 +20,8 @@ const TRADUCOES = {
     descontoInfo: "O valor do teu aluguer é descontado no preço final",
     timerEntrega: "A caminho",
     reservaTimer: "Disponível em",
+    reservaDisponivelTitulo: "🎉 Disponível agora!",
+    reservaConfirmar: "Confirmar e pagar",
   },
   fr: {
     titulo: "Mes commandes",
@@ -37,6 +39,8 @@ const TRADUCOES = {
     descontoInfo: "La valeur de votre location est déduite du prix final",
     timerEntrega: "En route",
     reservaTimer: "Disponible dans",
+    reservaDisponivelTitulo: "🎉 Disponible maintenant !",
+    reservaConfirmar: "Confirmer et payer",
   },
   lt: {
     titulo: "Mano užsakymai",
@@ -54,6 +58,8 @@ const TRADUCOES = {
     descontoInfo: "Nuomos vertė atskaitoma nuo galutinės kainos",
     timerEntrega: "Keliauja",
     reservaTimer: "Prieinama po",
+    reservaDisponivelTitulo: "🎉 Prieinama dabar!",
+    reservaConfirmar: "Patvirtinti ir mokėti",
   },
 };
 
@@ -67,6 +73,32 @@ function TimerEntrega({ i }) {
       </div>
     </div>
   );
+}
+
+// Calcula tempo restante até uma data; retorna null quando já passou.
+function useCountdown(dataAlvo) {
+  const [tempo, setTempo] = useState(null);
+  const [terminou, setTerminou] = useState(false);
+
+  useEffect(() => {
+    if (!dataAlvo) { setTerminou(true); return; }
+    const calc = () => {
+      const diff = new Date(dataAlvo) - new Date();
+      if (diff <= 0) { setTempo(null); setTerminou(true); return; }
+      const dias = Math.floor(diff / 86400000);
+      const horas = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (dias > 0) setTempo(`${dias}d ${horas}h`);
+      else if (horas > 0) setTempo(`${horas}h ${mins}m`);
+      else setTempo(`${mins}m`);
+      setTerminou(false);
+    };
+    calc();
+    const iv = setInterval(calc, 30000);
+    return () => clearInterval(iv);
+  }, [dataAlvo]);
+
+  return { tempo, terminou };
 }
 
 function BotaoCodigoDesconto({ aluguer, i }) {
@@ -142,12 +174,35 @@ function PedidosContent() {
 
     const { data: res } = await supabase
       .from("reservas_espera")
-      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos))")
+      .select("*, stock_tamanho_id, stock_tamanhos(id, tamanho, pecas(id, nome, fotos))")
       .eq("cliente_id", user.id)
       .eq("estado", "aguarda")
       .order("created_at", { ascending: false });
 
-    if (res) setReservas(res);
+    if (res && res.length > 0) {
+      // Para cada reserva, calcular a data real em que a peça fica disponível
+      const stockIds = [...new Set(res.map(r => r.stock_tamanho_id).filter(Boolean))];
+      const { data: alugueresAtivos } = await supabase
+        .from("alugueres")
+        .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
+        .in("stock_tamanho_id", stockIds)
+        .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+
+      const resComDisponibilidade = res.map(r => {
+        const ocupantes = (alugueresAtivos || []).filter(a => a.stock_tamanho_id === r.stock_tamanho_id);
+        let dataDisponivel = null;
+        ocupantes.forEach(a => {
+          const dataDisp = a.data_disponivel_novamente
+            ? new Date(a.data_disponivel_novamente)
+            : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+          if (!dataDisponivel || dataDisp > dataDisponivel) dataDisponivel = dataDisp;
+        });
+        return { ...r, dataDisponivel: dataDisponivel ? dataDisponivel.toISOString() : null };
+      });
+      setReservas(resComDisponibilidade);
+    } else {
+      setReservas([]);
+    }
     setLoading(false);
   };
 
@@ -190,8 +245,12 @@ function PedidosContent() {
 
   const CardReserva = ({ r }) => {
     const peca = r.stock_tamanhos?.pecas;
+    const { tempo, terminou } = useCountdown(r.dataDisponivel);
+    const disponivelAgora = r.dataDisponivel ? terminou : true; // sem ocupante = já disponível
+    const linkCheckout = `/checkout?peca=${peca?.id}&tamanho=${r.stock_tamanho_id}`;
+
     return (
-      <div style={{background:'#fff',padding:'1.25rem',borderBottom:'1px solid #f0eeeb'}}>
+      <div style={{background:'#fff',padding:'1.25rem',borderBottom:'1px solid #f0eeeb',borderLeft: disponivelAgora ? '3px solid #27ae60' : 'none'}}>
         <div style={{display:'flex',gap:'1rem',alignItems:'flex-start'}}>
           <div style={{width:60,height:75,flexShrink:0,background:'#f0eeeb',overflow:'hidden'}}>
             {peca?.fotos?.[0] && <img src={peca.fotos[0]} alt={peca?.nome} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top'}} />}
@@ -200,7 +259,26 @@ function PedidosContent() {
             <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:400,color:'#080808',marginBottom:'0.25rem'}}>{peca?.nome||"Peça"}</p>
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.35rem'}}>{i.tamanho}: {r.stock_tamanhos?.tamanho}</p>
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem'}}>{i.dataDesejada}: {r.data_inicio_desejada} → {r.data_fim_desejada}</p>
-            <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:'#fff8e1',color:'#f39c12'}}>{i.reservaEspera}</span>
+
+            {disponivelAgora ? (
+              <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:600,fontFamily:"'Jost',sans-serif",background:'#e8f5e9',color:'#27ae60'}}>{i.reservaDisponivelTitulo}</span>
+            ) : (
+              <>
+                <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:'#fff8e1',color:'#f39c12'}}>{i.reservaEspera}</span>
+                {tempo && (
+                  <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.6rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #f39c12'}}>
+                    <div style={{width:7,height:7,borderRadius:'50%',background:'#f39c12',flexShrink:0,animation:'pulse 2s infinite'}}/>
+                    <span style={{fontSize:'0.72rem',color:'#946200'}}>{i.reservaTimer} <strong>{tempo}</strong></span>
+                  </div>
+                )}
+              </>
+            )}
+
+            {disponivelAgora && (
+              <a href={linkCheckout} style={{display:'block',textAlign:'center',marginTop:'0.75rem',padding:'0.7rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",fontWeight:500}}>
+                {i.reservaConfirmar}
+              </a>
+            )}
           </div>
         </div>
       </div>
