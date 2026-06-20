@@ -3,6 +3,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
+
 const TRADUCOES = {
   pt: {
     titulo: "Os meus pedidos",
@@ -75,7 +76,6 @@ function TimerEntrega({ i }) {
   );
 }
 
-// Calcula tempo restante até uma data; retorna null quando já passou.
 function useCountdown(dataAlvo) {
   const [tempo, setTempo] = useState(null);
   const [terminou, setTerminou] = useState(false);
@@ -180,7 +180,6 @@ function PedidosContent() {
       .order("created_at", { ascending: false });
 
     if (res && res.length > 0) {
-      // Para cada reserva, calcular a data real em que a peça fica disponível
       const stockIds = [...new Set(res.map(r => r.stock_tamanho_id).filter(Boolean))];
       const { data: alugueresAtivos } = await supabase
         .from("alugueres")
@@ -246,7 +245,7 @@ function PedidosContent() {
   const CardReserva = ({ r }) => {
     const peca = r.stock_tamanhos?.pecas;
     const { tempo, terminou } = useCountdown(r.dataDisponivel);
-    const disponivelAgora = r.dataDisponivel ? terminou : true; // sem ocupante = já disponível
+    const disponivelAgora = r.dataDisponivel ? terminou : true;
     const linkCheckout = `/checkout?peca=${peca?.id}&tamanho=${r.stock_tamanho_id}`;
 
     return (
