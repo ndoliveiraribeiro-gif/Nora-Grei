@@ -44,6 +44,190 @@ const t = {
     obrigatorio: "Por favor preencha todos os campos",
     conflito: "Esta peça já está reservada para essas datas. Escolhe outro período.",
     nivel: "Nível",
+    voltar: "← Catálogo",
+    sucessoPago: "Pagamento confirmado!",
+    sucessoPendente: "Pedido registado!",
+    avisoTransferenciaFinal: "Envia o comprovativo da transferência para suporte@noragrei.com. O pedido fica reservado por 24h.",
+    avisoDinheiroFinal: "Paga em dinheiro no momento do levantamento presencial.",
+    verPedidos: "Ver os meus pedidos",
+    avisoPendenteResumo: "⏳ O teu pedido fica pendente até confirmarmos o pagamento.",
+    avisoMbway: "📱 A aguardar confirmação no MB Way...",
+    formCartaoNumero: "Número do cartão",
+    formCartaoNome: "Nome no cartão",
+    formCartaoValidade: "Validade",
+    formCartaoCvc: "CVC",
+    formCartaoNota: "🔒 Pagamento simulado para fins de demonstração. Nenhum dado real é processado.",
+    formMbwayTelefone: "Número de telefone associado ao MB Way",
+    formMbwayQrTexto: "Confirma o pagamento na app MB Way no teu telemóvel",
+    formMbwayNota: "🔒 Pagamento simulado para fins de demonstração.",
+    ibanLabel: "IBAN Nora Grei",
+    ibanValor: "Valor a transferir",
+    ibanReferencia: "Referência",
+    ibanReferenciaTexto: "Indica o teu nome completo",
+    comprovativoLabel: "Comprovativo de transferência *",
+    comprovativoVazio: "📎 Clica para anexar o comprovativo (imagem ou PDF)",
+    comprovativoErro: "Anexa o comprovativo da transferência",
+    comprovativoErroDeposito: "Anexa o comprovativo da transferência do depósito",
+    transferenciaAviso: "O teu pedido fica pendente até confirmarmos o comprovativo. Reservamos a peça por 24h.",
+    dinheiroAviso: "Paga em dinheiro no momento do levantamento presencial na nossa loja. O teu pedido fica reservado até essa data.",
+    imediato: "Imediato",
+    confirmacaoManual: "Confirmação manual",
+    aProcessar: "A processar...",
+    badgeCaucaoDesconto: "pagas apenas",
+    badgeCaucaoDesconto2: "da caução",
+    semCaucao: "Sem caução",
+    poupas: "Poupas",
+    platinaSemCaucao: "💎 Platina — sem caução!",
+  },
+  fr: {
+    peca: "Votre pièce",
+    datas: "Dates de location",
+    dataInicio: "Date de début",
+    dataFim: "Date de fin",
+    dias: (n) => `${n} jour${n !== 1 ? "s" : ""}`,
+    entrega: "Mode de livraison",
+    entregaOpcoes: [
+      { id: "envio", label: "Livraison à domicile", desc: "Livraison en 1-2 jours ouvrés" },
+      { id: "presencial", label: "Retrait en boutique", desc: "Dans notre boutique" },
+    ],
+    pagamento: "Mode de paiement",
+    pagamentoOpcoes: [
+      { id: "cartao", label: "Carte crédit/débit", desc: "Confirmation immédiate", automatico: true },
+      { id: "mbway", label: "MB Way", desc: "Confirmation immédiate", automatico: true },
+      { id: "transferencia", label: "Virement bancaire", desc: "Confirmé sous 1 jour ouvré", automatico: false },
+      { id: "dinheiro", label: "Espèces (en personne)", desc: "Payé au retrait", automatico: false },
+    ],
+    deposito: "Dépôt de garantie",
+    depositoOpcoes: [
+      { id: "cartao", label: "Carte crédit/débit", desc: "Remboursé automatiquement", automatico: true },
+      { id: "transferencia", label: "Virement bancaire", desc: "Remboursé sous 2 jours ouvrés", automatico: false },
+      { id: "dinheiro", label: "Espèces (en personne)", desc: "Payé et remboursé en mains propres", automatico: false },
+    ],
+    resumo: "Récapitulatif",
+    aluguer: "Location",
+    higienizacao: "Frais de nettoyage",
+    depositoVal: "Dépôt (remboursé)",
+    total: "Total à payer maintenant",
+    totalSemDeposito: "* Le dépôt sera remboursé après inspection de la pièce",
+    confirmar: "Payer maintenant",
+    confirmarPendente: "Confirmer la commande",
+    login: "Vous devez vous connecter pour continuer",
+    fazerLogin: "Se connecter",
+    tamanho: "Taille",
+    pontos: (n) => `Vous avez ${n} points — encore ${10 - (n % 10)} pour une location gratuite !`,
+    gratis: "🎉 Vous avez une location gratuite disponible ! Appliquée automatiquement.",
+    obrigatorio: "Veuillez remplir tous les champs",
+    conflito: "Cette pièce est déjà réservée pour ces dates. Choisissez une autre période.",
+    nivel: "Niveau",
+    voltar: "← Catalogue",
+    sucessoPago: "Paiement confirmé !",
+    sucessoPendente: "Commande enregistrée !",
+    avisoTransferenciaFinal: "Envoyez le justificatif du virement à suporte@noragrei.com. La commande est réservée pendant 24h.",
+    avisoDinheiroFinal: "Payez en espèces lors du retrait en personne.",
+    verPedidos: "Voir mes commandes",
+    avisoPendenteResumo: "⏳ Votre commande reste en attente jusqu'à confirmation du paiement.",
+    avisoMbway: "📱 En attente de confirmation sur MB Way...",
+    formCartaoNumero: "Numéro de carte",
+    formCartaoNome: "Nom sur la carte",
+    formCartaoValidade: "Date d'expiration",
+    formCartaoCvc: "CVC",
+    formCartaoNota: "🔒 Paiement simulé à des fins de démonstration. Aucune donnée réelle n'est traitée.",
+    formMbwayTelefone: "Numéro de téléphone associé au MB Way",
+    formMbwayQrTexto: "Confirmez le paiement dans l'application MB Way sur votre téléphone",
+    formMbwayNota: "🔒 Paiement simulé à des fins de démonstration.",
+    ibanLabel: "IBAN Nora Grei",
+    ibanValor: "Montant à transférer",
+    ibanReferencia: "Référence",
+    ibanReferenciaTexto: "Indiquez votre nom complet",
+    comprovativoLabel: "Justificatif de virement *",
+    comprovativoVazio: "📎 Cliquez pour joindre le justificatif (image ou PDF)",
+    comprovativoErro: "Joignez le justificatif du virement",
+    comprovativoErroDeposito: "Joignez le justificatif du virement du dépôt",
+    transferenciaAviso: "Votre commande reste en attente jusqu'à confirmation du justificatif. La pièce est réservée pendant 24h.",
+    dinheiroAviso: "Payez en espèces lors du retrait en personne dans notre boutique. Votre commande est réservée jusqu'à cette date.",
+    imediato: "Immédiat",
+    confirmacaoManual: "Confirmation manuelle",
+    aProcessar: "Traitement en cours...",
+    badgeCaucaoDesconto: "vous payez seulement",
+    badgeCaucaoDesconto2: "du dépôt",
+    semCaucao: "Sans dépôt",
+    poupas: "Vous économisez",
+    platinaSemCaucao: "💎 Platine — sans dépôt !",
+  },
+  lt: {
+    peca: "Jūsų drabužis",
+    datas: "Nuomos datos",
+    dataInicio: "Pradžios data",
+    dataFim: "Pabaigos data",
+    dias: (n) => `${n} diena${n !== 1 ? "s" : ""}`,
+    entrega: "Pristatymo būdas",
+    entregaOpcoes: [
+      { id: "envio", label: "Pristatymas į namus", desc: "Pristatymas per 1-2 darbo dienas" },
+      { id: "presencial", label: "Atsiėmimas asmeniškai", desc: "Mūsų parduotuvėje" },
+    ],
+    pagamento: "Mokėjimo būdas",
+    pagamentoOpcoes: [
+      { id: "cartao", label: "Kredito/debeto kortelė", desc: "Patvirtinama iš karto", automatico: true },
+      { id: "mbway", label: "MB Way", desc: "Patvirtinama iš karto", automatico: true },
+      { id: "transferencia", label: "Banko pavedimas", desc: "Patvirtinsime per 1 darbo dieną", automatico: false },
+      { id: "dinheiro", label: "Grynieji (asmeniškai)", desc: "Apmokama atsiėmimo metu", automatico: false },
+    ],
+    deposito: "Užstatas",
+    depositoOpcoes: [
+      { id: "cartao", label: "Kredito/debeto kortelė", desc: "Grąžinama automatiškai", automatico: true },
+      { id: "transferencia", label: "Banko pavedimas", desc: "Grąžiname per 2 darbo dienas", automatico: false },
+      { id: "dinheiro", label: "Grynieji (asmeniškai)", desc: "Mokama ir grąžinama rankomis", automatico: false },
+    ],
+    resumo: "Suvestinė",
+    aluguer: "Nuoma",
+    higienizacao: "Valymo mokestis",
+    depositoVal: "Užstatas (grąžinamas)",
+    total: "Iš viso mokėti dabar",
+    totalSemDeposito: "* Užstatas bus grąžintas po drabužio patikrinimo",
+    confirmar: "Mokėti dabar",
+    confirmarPendente: "Patvirtinti užsakymą",
+    login: "Norėdami tęsti, turite prisijungti",
+    fazerLogin: "Prisijungti",
+    tamanho: "Dydis",
+    pontos: (n) => `Turite ${n} taškų — dar ${10 - (n % 10)} iki nemokamos nuomos!`,
+    gratis: "🎉 Turite nemokamą nuomą! Pritaikyta automatiškai.",
+    obrigatorio: "Užpildykite visus laukus",
+    conflito: "Šis drabužis šiomis datomis jau užsakytas. Pasirinkite kitą laikotarpį.",
+    nivel: "Lygis",
+    voltar: "← Katalogas",
+    sucessoPago: "Mokėjimas patvirtintas!",
+    sucessoPendente: "Užsakymas užregistruotas!",
+    avisoTransferenciaFinal: "Atsiųskite pavedimo patvirtinimą į suporte@noragrei.com. Užsakymas rezervuotas 24 valandas.",
+    avisoDinheiroFinal: "Apmokėkite grynaisiais atsiėmimo metu.",
+    verPedidos: "Žiūrėti mano užsakymus",
+    avisoPendenteResumo: "⏳ Jūsų užsakymas laukia, kol patvirtinsime mokėjimą.",
+    avisoMbway: "📱 Laukiama patvirtinimo MB Way programoje...",
+    formCartaoNumero: "Kortelės numeris",
+    formCartaoNome: "Vardas ant kortelės",
+    formCartaoValidade: "Galiojimo data",
+    formCartaoCvc: "CVC",
+    formCartaoNota: "🔒 Mokėjimas imituojamas demonstracijos tikslais. Tikri duomenys nėra apdorojami.",
+    formMbwayTelefone: "Telefono numeris, susietas su MB Way",
+    formMbwayQrTexto: "Patvirtinkite mokėjimą MB Way programoje savo telefone",
+    formMbwayNota: "🔒 Mokėjimas imituojamas demonstracijos tikslais.",
+    ibanLabel: "Nora Grei IBAN",
+    ibanValor: "Pervedama suma",
+    ibanReferencia: "Nuoroda",
+    ibanReferenciaTexto: "Nurodykite savo pilną vardą",
+    comprovativoLabel: "Pavedimo patvirtinimas *",
+    comprovativoVazio: "📎 Spustelėkite, kad pridėtumėte patvirtinimą (nuotrauka arba PDF)",
+    comprovativoErro: "Pridėkite pavedimo patvirtinimą",
+    comprovativoErroDeposito: "Pridėkite užstato pavedimo patvirtinimą",
+    transferenciaAviso: "Jūsų užsakymas laukia, kol patvirtinsime dokumentą. Drabužis rezervuotas 24 valandas.",
+    dinheiroAviso: "Apmokėkite grynaisiais atsiėmimo metu mūsų parduotuvėje. Užsakymas rezervuotas iki tos datos.",
+    imediato: "Iš karto",
+    confirmacaoManual: "Rankinis patvirtinimas",
+    aProcessar: "Apdorojama...",
+    badgeCaucaoDesconto: "mokate tik",
+    badgeCaucaoDesconto2: "užstato",
+    semCaucao: "Be užstato",
+    poupas: "Sutaupote",
+    platinaSemCaucao: "💎 Platina — be užstato!",
   },
 };
 
@@ -62,7 +246,7 @@ function gerarNumeroRecibo() {
   return `NG-${ano}-${rand}`;
 }
 
-function FormularioCartao({ dados, setDados, erro }) {
+function FormularioCartao({ dados, setDados, erro, i }) {
   const formatarNumero = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ").trim();
   const formatarValidade = (v) => {
     const limpo = v.replace(/\D/g, "").slice(0, 4);
@@ -72,34 +256,34 @@ function FormularioCartao({ dados, setDados, erro }) {
   return (
     <div className="form-pag">
       <div className="fg">
-        <label className="lbl">Número do cartão</label>
+        <label className="lbl">{i.formCartaoNumero}</label>
         <input className="inp" placeholder="1234 5678 9012 3456" value={dados.numero || ""} onChange={e => setDados(d => ({ ...d, numero: formatarNumero(e.target.value) }))} maxLength={19} />
       </div>
       <div className="fg">
-        <label className="lbl">Nome no cartão</label>
+        <label className="lbl">{i.formCartaoNome}</label>
         <input className="inp" placeholder="MARIA SILVA" value={dados.nome || ""} onChange={e => setDados(d => ({ ...d, nome: e.target.value.toUpperCase() }))} />
       </div>
       <div className="row2">
         <div className="fg">
-          <label className="lbl">Validade</label>
+          <label className="lbl">{i.formCartaoValidade}</label>
           <input className="inp" placeholder="MM/AA" value={dados.validade || ""} onChange={e => setDados(d => ({ ...d, validade: formatarValidade(e.target.value) }))} maxLength={5} />
         </div>
         <div className="fg">
-          <label className="lbl">CVC</label>
+          <label className="lbl">{i.formCartaoCvc}</label>
           <input className="inp" placeholder="123" value={dados.cvc || ""} onChange={e => setDados(d => ({ ...d, cvc: e.target.value.replace(/\D/g, "").slice(0, 3) }))} maxLength={3} />
         </div>
       </div>
       {erro && <p className="erro-campo">{erro}</p>}
-      <p className="nota-seguranca">🔒 Pagamento simulado para fins de demonstração. Nenhum dado real é processado.</p>
+      <p className="nota-seguranca">{i.formCartaoNota}</p>
     </div>
   );
 }
 
-function FormularioMBWay({ telefone, setTelefone, qrAtivo, erro }) {
+function FormularioMBWay({ telefone, setTelefone, qrAtivo, erro, i }) {
   return (
     <div className="form-pag">
       <div className="fg">
-        <label className="lbl">Número de telefone associado ao MB Way</label>
+        <label className="lbl">{i.formMbwayTelefone}</label>
         <input className="inp" placeholder="+351 912 345 678" value={telefone} onChange={e => setTelefone(e.target.value)} />
       </div>
       {erro && <p className="erro-campo">{erro}</p>}
@@ -120,51 +304,51 @@ function FormularioMBWay({ telefone, setTelefone, qrAtivo, erro }) {
               <rect x="50" y="75" width="25" height="10" fill="#080808"/>
             </svg>
           </div>
-          <p className="qr-texto">Confirma o pagamento na app MB Way no teu telemóvel</p>
+          <p className="qr-texto">{i.formMbwayQrTexto}</p>
         </div>
       )}
-      <p className="nota-seguranca">🔒 Pagamento simulado para fins de demonstração.</p>
+      <p className="nota-seguranca">{i.formMbwayNota}</p>
     </div>
   );
 }
 
-function InfoTransferencia({ valor, comprovativo, setComprovativo, erro }) {
+function InfoTransferencia({ valor, comprovativo, setComprovativo, erro, i }) {
   return (
     <div className="form-pag">
       <div className="iban-box">
-        <p className="iban-label">IBAN Nora Grei</p>
+        <p className="iban-label">{i.ibanLabel}</p>
         <p className="iban-val">PT50 0000 0000 0000 0000 0000 0</p>
-        <p className="iban-label" style={{ marginTop: "0.75rem" }}>Valor a transferir</p>
+        <p className="iban-label" style={{ marginTop: "0.75rem" }}>{i.ibanValor}</p>
         <p className="iban-val">{valor.toFixed(2)}€</p>
-        <p className="iban-label" style={{ marginTop: "0.75rem" }}>Referência</p>
-        <p className="iban-val">Indica o teu nome completo</p>
+        <p className="iban-label" style={{ marginTop: "0.75rem" }}>{i.ibanReferencia}</p>
+        <p className="iban-val">{i.ibanReferenciaTexto}</p>
       </div>
       <div className="fg">
-        <label className="lbl">Comprovativo de transferência *</label>
+        <label className="lbl">{i.comprovativoLabel}</label>
         <label className="upload-box">
           <input type="file" accept="image/*,.pdf" onChange={e => setComprovativo(e.target.files?.[0] || null)} style={{ display: "none" }} />
           {comprovativo ? (
             <span className="upload-ok">✓ {comprovativo.name}</span>
           ) : (
-            <span className="upload-vazio">📎 Clica para anexar o comprovativo (imagem ou PDF)</span>
+            <span className="upload-vazio">{i.comprovativoVazio}</span>
           )}
         </label>
         {erro && <p className="erro-campo">{erro}</p>}
       </div>
-      <p className="nota-aviso">O teu pedido fica pendente até confirmarmos o comprovativo. Reservamos a peça por 24h.</p>
+      <p className="nota-aviso">{i.transferenciaAviso}</p>
     </div>
   );
 }
 
-function InfoDinheiro() {
+function InfoDinheiro({ i }) {
   return (
     <div className="form-pag">
-      <p className="nota-aviso">Paga em dinheiro no momento do levantamento presencial na nossa loja. O teu pedido fica reservado até essa data.</p>
+      <p className="nota-aviso">{i.dinheiroAviso}</p>
     </div>
   );
 }
 
-function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, valorDeposito, automatico }) {
+function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, valorDeposito, automatico, i }) {
   return (
     <div className="talao">
       <div className="talao-header">
@@ -172,21 +356,21 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
         <span className="talao-num">{recibo.numero}</span>
       </div>
       <div className="talao-linha"><span>Data</span><span>{new Date(recibo.created_at).toLocaleString("pt-PT")}</span></div>
-      <div className="talao-linha"><span>Peça</span><span>{peca?.nome}</span></div>
-      <div className="talao-linha"><span>Tamanho</span><span>{tamanhoNome}</span></div>
-      <div className="talao-linha"><span>Período</span><span>{dataInicio} → {dataFim}</span></div>
-      <div className="talao-linha"><span>Método</span><span style={{ textTransform: "capitalize" }}>{recibo.metodo_pagamento}</span></div>
+      <div className="talao-linha"><span>{i.peca}</span><span>{peca?.nome}</span></div>
+      <div className="talao-linha"><span>{i.tamanho}</span><span>{tamanhoNome}</span></div>
+      <div className="talao-linha"><span>{dataInicio} → {dataFim}</span></div>
+      <div className="talao-linha"><span>{i.pagamento}</span><span style={{ textTransform: "capitalize" }}>{recibo.metodo_pagamento}</span></div>
       {recibo.comprovativo_url && (
-        <div className="talao-linha"><span>Comprovativo</span><a href={recibo.comprovativo_url} target="_blank" rel="noopener noreferrer" style={{ color: "#27ae60" }}>✓ Anexado</a></div>
+        <div className="talao-linha"><span>{i.comprovativoLabel.replace(" *","")}</span><a href={recibo.comprovativo_url} target="_blank" rel="noopener noreferrer" style={{ color: "#27ae60" }}>✓</a></div>
       )}
       <div className="talao-sep" />
-      <div className="talao-linha"><span>Aluguer</span><span>{valorAluguer.toFixed(2)}€</span></div>
-      <div className="talao-linha"><span>Higienização</span><span>{HIGIENIZACAO}€</span></div>
-      <div className="talao-linha"><span>Depósito</span><span>{valorDeposito.toFixed(2)}€</span></div>
+      <div className="talao-linha"><span>{i.aluguer}</span><span>{valorAluguer.toFixed(2)}€</span></div>
+      <div className="talao-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
+      <div className="talao-linha"><span>{i.deposito}</span><span>{valorDeposito.toFixed(2)}€</span></div>
       <div className="talao-sep" />
-      <div className="talao-total"><span>Total</span><span>{recibo.valor_total.toFixed(2)}€</span></div>
+      <div className="talao-total"><span>{i.total}</span><span>{recibo.valor_total.toFixed(2)}€</span></div>
       <div className="talao-estado" style={{ color: automatico ? "#27ae60" : "#f39c12" }}>
-        {automatico ? "✓ PAGO" : "⏳ A CONFIRMAR"}
+        {automatico ? "✓" : "⏳"}
       </div>
     </div>
   );
@@ -224,7 +408,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
-    if (saved) setLang(saved);
+    if (saved && t[saved]) setLang(saved);
     carregarDados();
   }, []);
 
@@ -274,8 +458,8 @@ function CheckoutContent() {
   const valorDeposito = Math.round(valorDepositoBase * nv.caucao / 100);
   const descontoDeposito = valorDepositoBase - valorDeposito;
 
-  const pagamentoSelecionado = t.pt.pagamentoOpcoes.find(p => p.id === pagamento);
-  const depositoSelecionado = t.pt.depositoOpcoes.find(p => p.id === deposito);
+  const pagamentoSelecionado = i.pagamentoOpcoes.find(p => p.id === pagamento);
+  const depositoSelecionado = i.depositoOpcoes.find(p => p.id === deposito);
   const tudoAutomatico = pagamentoSelecionado?.automatico && (valorDeposito === 0 || depositoSelecionado?.automatico);
 
   const totalAgora = valorAluguer + HIGIENIZACAO + (deposito === "cartao" ? valorDeposito : 0);
@@ -302,16 +486,16 @@ function CheckoutContent() {
 
   const validarFormularioPagamento = () => {
     if (pagamento === "cartao") {
-      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo("Número de cartão inválido"); return false; }
-      if (!dadosCartao.nome) { setErroCampo("Indica o nome no cartão"); return false; }
-      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("Validade inválida"); return false; }
-      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("CVC inválido"); return false; }
+      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo("..."); return false; }
+      if (!dadosCartao.nome) { setErroCampo("..."); return false; }
+      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("..."); return false; }
+      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("..."); return false; }
     }
     if (pagamento === "mbway") {
-      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("Indica um número de telefone válido"); return false; }
+      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("..."); return false; }
     }
-    if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo("Anexa o comprovativo da transferência"); return false; }
-    if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo("Anexa o comprovativo da transferência do depósito"); return false; }
+    if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo(i.comprovativoErro); return false; }
+    if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo(i.comprovativoErroDeposito); return false; }
     setErroCampo("");
     setErroComprovativo("");
     return true;
@@ -350,7 +534,6 @@ function CheckoutContent() {
       const estadoInicial = tudoConfirmado ? "confirmado" : "pendente";
       const depositoEstadoInicial = depositoAutomatico ? "recebido" : "pendente";
 
-      // Upload de comprovativos, se houver
       let urlComprovativoPagamento = null;
       let urlComprovativoDeposito = null;
       if (comprovativoPagamento) {
@@ -420,15 +603,15 @@ function CheckoutContent() {
       <div className="pagina-sucesso">
         <style>{ESTILOS}</style>
         <div className="sucesso-icon">{automatico ? "🎉" : "⏳"}</div>
-        <h1 className="sucesso-titulo">{automatico ? "Pagamento confirmado!" : "Pedido registado!"}</h1>
-        <Talao recibo={recibo} peca={peca} tamanhoNome={tamanhoNome} dataInicio={dataInicio} dataFim={dataFim} valorAluguer={valorAluguer} valorDeposito={valorDeposito} automatico={automatico} />
+        <h1 className="sucesso-titulo">{automatico ? i.sucessoPago : i.sucessoPendente}</h1>
+        <Talao recibo={recibo} peca={peca} tamanhoNome={tamanhoNome} dataInicio={dataInicio} dataFim={dataFim} valorAluguer={valorAluguer} valorDeposito={valorDeposito} automatico={automatico} i={i} />
         {!automatico && (pagamento === "transferencia" || deposito === "transferencia") && (
-          <div className="aviso-final aviso-amarelo">Envia o comprovativo da transferência para suporte@noragrei.com. O pedido fica reservado por 24h.</div>
+          <div className="aviso-final aviso-amarelo">{i.avisoTransferenciaFinal}</div>
         )}
         {!automatico && (pagamento === "dinheiro" || deposito === "dinheiro") && (
-          <div className="aviso-final aviso-cinza">Paga em dinheiro no momento do levantamento presencial.</div>
+          <div className="aviso-final aviso-cinza">{i.avisoDinheiroFinal}</div>
         )}
-        <a href="/pedidos" className="btn-pedidos">Ver os meus pedidos</a>
+        <a href="/pedidos" className="btn-pedidos">{i.verPedidos}</a>
       </div>
     );
   }
@@ -440,7 +623,7 @@ function CheckoutContent() {
 
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
-        <a href="/catalogo" className="nav-back">← Catálogo</a>
+        <a href="/catalogo" className="nav-back">{i.voltar}</a>
       </nav>
 
       <div className="page">
@@ -466,7 +649,7 @@ function CheckoutContent() {
                 <span style={{ fontSize: "1.2rem" }}>{nv.icon}</span>
                 <div>
                   <div style={{ fontWeight: 500, fontSize: "0.88rem" }}>{i.nivel} {nv.nome}</div>
-                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.caucao === 0 ? "Sem caução" : `Caução com ${100 - nv.caucao}% de desconto`}</div>
+                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.caucao === 0 ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
                 </div>
               </div>
               {temGratis ? <div className="gratis-box">{i.gratis}</div> : pontos > 0 ? <div className="pontos-box">{i.pontos(pontos)}</div> : null}
@@ -487,7 +670,7 @@ function CheckoutContent() {
             </div>
             {numDias > 0 && (
               <p style={{ fontSize: "0.9rem", color: "#5a5855", marginTop: "0.75rem" }}>
-                {i.dias(numDias)} selecionados — {temGratis ? <span style={{ color: "#c4748a", fontWeight: 500 }}>Grátis</span> : `${(peca?.preco_aluguer_dia * numDias).toFixed(2)}€`}
+                {i.dias(numDias)} {temGratis ? "" : `— ${(peca?.preco_aluguer_dia * numDias).toFixed(2)}€`}
               </p>
             )}
           </div>
@@ -511,27 +694,27 @@ function CheckoutContent() {
                 <div key={op.id} className={`opt${pagamento === op.id ? " on" : ""}`} onClick={() => { setPagamento(op.id); setQrAtivo(false); setErroCampo(""); setErroComprovativo(""); }}>
                   <div className="opt-radio" />
                   <div>
-                    <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
+                    <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? i.imediato : i.confirmacaoManual}</span></div>
                     <div className="opt-desc">{op.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
-            {pagamento === "cartao" && <FormularioCartao dados={dadosCartao} setDados={setDadosCartao} erro={erroCampo} />}
-            {pagamento === "mbway" && <FormularioMBWay telefone={telefoneMbway} setTelefone={setTelefoneMbway} qrAtivo={qrAtivo} erro={erroCampo} />}
-            {pagamento === "transferencia" && <InfoTransferencia valor={totalAgora} comprovativo={comprovativoPagamento} setComprovativo={setComprovativoPagamento} erro={erroComprovativo} />}
-            {pagamento === "dinheiro" && <InfoDinheiro />}
+            {pagamento === "cartao" && <FormularioCartao dados={dadosCartao} setDados={setDadosCartao} erro={erroCampo} i={i} />}
+            {pagamento === "mbway" && <FormularioMBWay telefone={telefoneMbway} setTelefone={setTelefoneMbway} qrAtivo={qrAtivo} erro={erroCampo} i={i} />}
+            {pagamento === "transferencia" && <InfoTransferencia valor={totalAgora} comprovativo={comprovativoPagamento} setComprovativo={setComprovativoPagamento} erro={erroComprovativo} i={i} />}
+            {pagamento === "dinheiro" && <InfoDinheiro i={i} />}
           </div>
 
           <div className="sec">
             <p className="sec-t">{i.deposito}</p>
             {nv.caucao < 100 && (
               <div style={{ padding: "0.75rem 1rem", background: "#e8f5e9", borderLeft: "3px solid #27ae60", marginBottom: "1rem", fontSize: "0.85rem", color: "#27ae60" }}>
-                {nv.icon} Nível {nv.nome} — pagas apenas {nv.caucao}% da caução ({valorDeposito}€ em vez de {valorDepositoBase}€)
+                {nv.icon} {i.nivel} {nv.nome} — {i.badgeCaucaoDesconto} {nv.caucao}% {i.badgeCaucaoDesconto2} ({valorDeposito}€ / {valorDepositoBase}€)
               </div>
             )}
             {nv.caucao === 0 ? (
-              <div style={{ padding: "0.75rem 1rem", background: "#f8f4ff", borderLeft: "3px solid #6c5ce7", fontSize: "0.85rem", color: "#6c5ce7" }}>💎 Platina — sem caução!</div>
+              <div style={{ padding: "0.75rem 1rem", background: "#f8f4ff", borderLeft: "3px solid #6c5ce7", fontSize: "0.85rem", color: "#6c5ce7" }}>{i.platinaSemCaucao}</div>
             ) : (
               <>
                 <div className="opts">
@@ -539,14 +722,14 @@ function CheckoutContent() {
                     <div key={op.id} className={`opt${deposito === op.id ? " on" : ""}`} onClick={() => setDeposito(op.id)}>
                       <div className="opt-radio" />
                       <div>
-                        <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? "Imediato" : "Confirmação manual"}</span></div>
+                        <div className="opt-label">{op.label}<span className={op.automatico ? "badge-auto" : "badge-manual"}>{op.automatico ? i.imediato : i.confirmacaoManual}</span></div>
                         <div className="opt-desc">{op.desc}</div>
                       </div>
                     </div>
                   ))}
                 </div>
                 {deposito === "transferencia" && pagamento !== "transferencia" && (
-                  <InfoTransferencia valor={valorDeposito} comprovativo={comprovativoDeposito} setComprovativo={setComprovativoDeposito} erro={erroComprovativo} />
+                  <InfoTransferencia valor={valorDeposito} comprovativo={comprovativoDeposito} setComprovativo={setComprovativoDeposito} erro={erroComprovativo} i={i} />
                 )}
               </>
             )}
@@ -563,22 +746,22 @@ function CheckoutContent() {
           ) : (
             <>
               {!tudoAutomatico && (
-                <div className="aviso-pendente">⏳ O teu pedido fica <strong>pendente</strong> até confirmarmos o pagamento.</div>
+                <div className="aviso-pendente">{i.avisoPendenteResumo}</div>
               )}
               {qrAtivo && (
-                <div className="aviso-pendente" style={{ background: "#e3f2fd", borderColor: "#1976d2", color: "#1565c0" }}>📱 A aguardar confirmação no MB Way...</div>
+                <div className="aviso-pendente" style={{ background: "#e3f2fd", borderColor: "#1976d2", color: "#1565c0" }}>{i.avisoMbway}</div>
               )}
-              <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? <span style={{ color: "#c4748a", fontWeight: 500 }}>Grátis</span> : `${valorAluguer.toFixed(2)}€`}</span></div>
+              <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguer.toFixed(2)}€`}</span></div>
               <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
               <div className="r-linha">
-                <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">Poupas {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
+                <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
                 <span>{valorDeposito}€</span>
               </div>
               <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
               <p className="r-nota">{i.totalSemDeposito}</p>
               {erro && <div className="erro">{erro}</div>}
               <button className="btn" onClick={confirmar} disabled={loading || !dataInicio || !dataFim}>
-                {loading ? "A processar..." : (tudoAutomatico ? i.confirmar : i.confirmarPendente)}
+                {loading ? i.aProcessar : (tudoAutomatico ? i.confirmar : i.confirmarPendente)}
               </button>
             </>
           )}
@@ -661,7 +844,7 @@ const ESTILOS = `
   .talao-linha{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.35rem 0;color:#1a1a18}
   .talao-sep{border-top:1px dashed var(--g2);margin:0.5rem 0}
   .talao-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:600;padding:0.5rem 0}
-  .talao-estado{text-align:center;font-size:0.72rem;letter-spacing:0.15em;font-weight:700;margin-top:0.75rem;padding-top:0.75rem;border-top:2px dashed var(--g2)}
+  .talao-estado{text-align:center;font-size:1.2rem;font-weight:700;margin-top:0.75rem;padding-top:0.75rem;border-top:2px dashed var(--g2)}
   .aviso-final{max-width:380px;font-size:0.82rem;padding:0.85rem 1rem;line-height:1.5}
   .aviso-amarelo{background:#fff8e1;color:#946200;border-left:3px solid #f39c12}
   .aviso-cinza{background:#f0eeeb;color:#5a5855;border-left:3px solid #888}
@@ -678,7 +861,7 @@ const ESTILOS = `
 
 export default function Checkout() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif", fontSize: "0.8rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#888" }}>A carregar...</div>}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif", fontSize: "0.8rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#888" }}>...</div>}>
       <CheckoutContent />
     </Suspense>
   );
