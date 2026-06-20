@@ -95,6 +95,36 @@ function TimerInfo({ aluguer, lang }) {
   return null;
 }
 
+function BotaoConfirmarRecepcao({ aluguer, i, onConfirmado }) {
+  const [loading, setLoading] = useState(false);
+  const [confirmado, setConfirmado] = useState(false);
+
+  const confirmar = async () => {
+    setLoading(true);
+    const agora = new Date().toISOString();
+    const { error } = await supabase.from("alugueres").update({
+      estado: "ativo",
+      data_inicio_real: agora,
+      data_confirmacao_recepcao: agora,
+    }).eq("id", aluguer.id);
+    setLoading(false);
+    if (!error) {
+      setConfirmado(true);
+      setTimeout(() => onConfirmado && onConfirmado(), 1200);
+    }
+  };
+
+  if (confirmado) {
+    return <div style={{marginTop:'0.5rem',padding:'0.6rem 0.75rem',background:'#e8f5e9',color:'#27ae60',fontSize:'0.78rem',fontWeight:500}}>✓ {i.recepcaoConfirmada}</div>;
+  }
+
+  return (
+    <button onClick={confirmar} disabled={loading} style={{width:'100%',marginTop:'0.5rem',padding:'0.65rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontWeight:500,fontFamily:"'Jost',sans-serif"}}>
+      {loading ? i.confirmandoRecepcao : i.confirmarRecepcao}
+    </button>
+  );
+}
+
 function GeradorCodigo({ aluguer, i }) {
   const [codigo, setCodigo] = useState(null);
   const [copiado, setCopiado] = useState(false);
@@ -191,6 +221,10 @@ const t = {
     irLoja: "Ir à loja ↗",
     comprarPeca: "Comprar esta peça",
     voltarInicio: "← Início",
+    confirmarRecepcao: "📦 Confirmar receção",
+    confirmandoRecepcao: "A confirmar...",
+    recepcaoConfirmada: "Receção confirmada! O teu aluguer está agora ativo.",
+    referencia: "Ref.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -233,6 +267,10 @@ const t = {
     irLoja: "Aller à la boutique ↗",
     comprarPeca: "Acheter cette pièce",
     voltarInicio: "← Accueil",
+    confirmarRecepcao: "📦 Confirmer la réception",
+    confirmandoRecepcao: "Confirmation...",
+    recepcaoConfirmada: "Réception confirmée ! Votre location est maintenant active.",
+    referencia: "Réf.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -275,6 +313,10 @@ const t = {
     irLoja: "Eiti į parduotuvę ↗",
     comprarPeca: "Pirkti šį drabužį",
     voltarInicio: "← Pradžia",
+    confirmarRecepcao: "📦 Patvirtinti gavimą",
+    confirmandoRecepcao: "Tvirtinama...",
+    recepcaoConfirmada: "Gavimas patvirtintas! Jūsų nuoma dabar aktyvi.",
+    referencia: "Nr.",
   },
 };
 
@@ -309,7 +351,7 @@ export default function Perfil() {
       setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
     }
 
-    const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
+    const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
     if (al) {
       setAlugueres(al);
       const completos = al.filter(a => ["devolvido","devolvido_danificado"].includes(a.estado)).length;
@@ -437,8 +479,9 @@ export default function Perfil() {
         .nota-obrigatorio{font-size:0.7rem;color:var(--g5);font-style:italic;margin-top:0.5rem}
         .aluguer-card{background:var(--white);padding:1.25rem 1.5rem;margin-bottom:1px}
         .aluguer-row{display:flex;align-items:flex-start;gap:1.5rem}
-        .aluguer-img{width:56px;height:70px;flex-shrink:0;background:var(--g1);overflow:hidden}
+        .aluguer-img{width:56px;height:70px;flex-shrink:0;background:var(--g1);overflow:hidden;display:flex;align-items:center;justify-content:center}
         .aluguer-nome{font-family:var(--serif);font-size:1.15rem;font-weight:400;margin-bottom:0.2rem}
+        .aluguer-ref{font-size:0.62rem;color:#c4748a;font-weight:600;font-family:monospace;letter-spacing:0.05em}
         .aluguer-meta{font-size:0.82rem;color:var(--g5)}
         .estado-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.3rem 0.7rem;font-weight:500;display:inline-block;margin-top:0.4rem}
         .btn-pedidos{display:block;width:100%;padding:1rem;background:var(--g1);color:var(--black);border:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-align:center;text-decoration:none;margin-top:1rem}
@@ -551,12 +594,16 @@ export default function Perfil() {
               return (
                 <div key={a.id} className="aluguer-card">
                   <div className="aluguer-row">
-                    <div className="aluguer-img">{peca?.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />}</div>
+                    <div className="aluguer-img">
+                      {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.5rem',color:'rgba(0,0,0,0.1)',fontStyle:'italic'}}>NG</span>}
+                    </div>
                     <div style={{flex:1}}>
                       <div className="aluguer-nome">{peca?.nome || "—"}</div>
+                      {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
                       <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                       <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
                       <TimerInfo aluguer={a} lang={lang} />
+                      {a.estado === "enviado" && <BotaoConfirmarRecepcao aluguer={a} i={i} onConfirmado={carregarPerfil} />}
                     </div>
                   </div>
                 </div>
@@ -613,9 +660,12 @@ export default function Perfil() {
                 return (
                   <div key={a.id} className="aluguer-card">
                     <div className="aluguer-row">
-                      <div className="aluguer-img">{peca?.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />}</div>
+                      <div className="aluguer-img">
+                        {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.5rem',color:'rgba(0,0,0,0.1)',fontStyle:'italic'}}>NG</span>}
+                      </div>
                       <div style={{flex:1}}>
                         <div className="aluguer-nome">{peca?.nome || "—"}</div>
+                        {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
                         <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                         <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
                         {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
