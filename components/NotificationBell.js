@@ -1,32 +1,31 @@
-@'
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 const TXT = {
   pt: {
-    semNotificacoes: "Sem notificacoes por agora.",
-    ultimoDiaTitulo: "Ultimo dia de uso",
-    ultimoDiaMsg: (nome) => `Amanha e o ultimo dia de uso de "${nome}". Prepara-te para enviar a devolucao - tens 24h apos o fim do aluguer.`,
-    atrasoTitulo: "Devolucao em atraso",
-    atrasoMsg: (nome, dias) => `"${nome}" devia ja ter sido devolvida. Estas ${dias} dia${dias !== 1 ? "s" : ""} em atraso - podem aplicar-se custos extra.`,
+    semNotificacoes: "Sem notificações por agora.",
+    ultimoDiaTitulo: "Último dia de uso",
+    ultimoDiaMsg: (nome) => `Amanhã é o último dia de uso de "${nome}". Prepara-te para enviar a devolução — tens 24h após o fim do aluguer.`,
+    atrasoTitulo: "Devolução em atraso",
+    atrasoMsg: (nome, dias) => `"${nome}" devia já ter sido devolvida. Estás ${dias} dia${dias !== 1 ? "s" : ""} em atraso — podem aplicar-se custos extra.`,
     marcarLidas: "Marcar todas como lidas",
   },
   fr: {
     semNotificacoes: "Aucune notification pour le moment.",
     ultimoDiaTitulo: "Dernier jour d'utilisation",
-    ultimoDiaMsg: (nome) => `Demain est le dernier jour d'utilisation de "${nome}". Preparez le retour - vous avez 24h apres la fin de la location.`,
+    ultimoDiaMsg: (nome) => `Demain est le dernier jour d'utilisation de "${nome}". Préparez le retour — vous avez 24h après la fin de la location.`,
     atrasoTitulo: "Retour en retard",
-    atrasoMsg: (nome, dias) => `"${nome}" devrait deja etre retournee. Vous avez ${dias} jour${dias !== 1 ? "s" : ""} de retard - des frais supplementaires peuvent s'appliquer.`,
+    atrasoMsg: (nome, dias) => `"${nome}" devrait déjà être retournée. Vous avez ${dias} jour${dias !== 1 ? "s" : ""} de retard — des frais supplémentaires peuvent s'appliquer.`,
     marcarLidas: "Tout marquer comme lu",
   },
   lt: {
-    semNotificacoes: "Kol kas nera pranesimu.",
-    ultimoDiaTitulo: "Paskutine naudojimo diena",
-    ultimoDiaMsg: (nome) => `Rytoj yra paskutine "${nome}" naudojimo diena. Pasiruoskite grazinimui - turite 24h po nuomos pabaigos.`,
-    atrasoTitulo: "Veluojantis grazinimas",
-    atrasoMsg: (nome, dias) => `"${nome}" turejo buti grazinta. Veluojate ${dias} diena(-as) - gali buti taikomi papildomi mokesciai.`,
-    marcarLidas: "Pazymeti visus kaip skaitytus",
+    semNotificacoes: "Kol kas nėra pranešimų.",
+    ultimoDiaTitulo: "Paskutinė naudojimo diena",
+    ultimoDiaMsg: (nome) => `Rytoj yra paskutinė "${nome}" naudojimo diena. Pasiruoškite grąžinimui — turite 24h po nuomos pabaigos.`,
+    atrasoTitulo: "Vėluojantis grąžinimas",
+    atrasoMsg: (nome, dias) => `"${nome}" turėjo būti grąžinta. Vėluojate ${dias} dieną(-as) — gali būti taikomi papildomi mokesčiai.`,
+    marcarLidas: "Pažymėti visus kaip skaitytus",
   },
 };
 
@@ -65,7 +64,7 @@ export default function NotificationBell({ lang = "pt" }) {
     hoje.setHours(0, 0, 0, 0);
 
     for (const a of alugueres) {
-      const nome = a.stock_tamanhos?.pecas?.nome || "a peca";
+      const nome = a.stock_tamanhos?.pecas?.nome || "a peça";
       const dataFim = new Date(a.data_fim);
       dataFim.setHours(0, 0, 0, 0);
       const diffDias = Math.round((dataFim - hoje) / 86400000);
@@ -120,7 +119,7 @@ export default function NotificationBell({ lang = "pt" }) {
       <button
         onClick={() => setAberto(prev => !prev)}
         style={{ position: "relative", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", display: "flex", alignItems: "center" }}
-        aria-label="Notificacoes"
+        aria-label="Notificações"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#080808" }}>
           <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -162,4 +161,3 @@ export default function NotificationBell({ lang = "pt" }) {
     </div>
   );
 }
-'@ | Set-Content -Path "components\NotificationBell.js" -Encoding UTF8
