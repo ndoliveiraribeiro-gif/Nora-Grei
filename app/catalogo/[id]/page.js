@@ -1,193 +1,346 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import PecaCard from "@/components/PecaCard";
 
-const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"];
+function Timer({ dataFim, lang }) {
+  const [tempo, setTempo] = useState("");
+  const labels = { pt: "Disponível em", fr: "Disponible dans", lt: "Prieinama po" };
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(dataFim) - new Date();
+      if (diff <= 0) { setTempo(""); return; }
+      const dias = Math.floor(diff / 86400000);
+      const horas = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (dias > 0) setTempo(`${dias}d ${horas}h`);
+      else if (horas > 0) setTempo(`${horas}h ${mins}m`);
+      else setTempo(`${mins}m`);
+    };
+    calc();
+    const i = setInterval(calc, 60000);
+    return () => clearInterval(i);
+  }, [dataFim]);
+  if (!tempo) return null;
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.75rem 1rem',marginBottom:'1rem',border:'1px solid #f39c12'}}>
+      <div style={{width:8,height:8,borderRadius:'50%',background:'#f39c12',flexShrink:0,animation:'pulse 2s infinite'}}/>
+      <span style={{fontSize:'0.72rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#e67e22',fontFamily:"'Jost',sans-serif"}}>
+        {labels[lang]||labels.pt} <strong>{tempo}</strong>
+      </span>
+    </div>
+  );
+}
 
-const translations = {
-  pt: {
-    titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas",
-    semResultados: "Nenhuma peça encontrada.", loading: "A carregar...",
-    categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"],
-    ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
-  },
-  fr: {
-    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout",
-    semResultados: "Aucune pièce trouvée.", loading: "Chargement...",
-    categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes"],
-    ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
-  },
-  lt: {
-    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi",
-    semResultados: "Drabužių nerasta.", loading: "Kraunama...",
-    categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai"],
-    ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
-  },
+const TRADUCOES = {
+  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo" },
+  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue" },
+  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą" },
 };
 
-const pecasExemplo = [
-  { id: "1", nome: "Vestido Seda Noite", categoria: "Vestidos", preco_aluguer_dia: 35, estado: "disponivel", tamanhos: ["XS", "S", "M"], fotos: ["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80"] },
-  { id: "2", nome: "Casaco Tweed Dourado", categoria: "Casacos", preco_aluguer_dia: 28, estado: "disponivel", tamanhos: ["S", "M", "L"], fotos: ["https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"] },
-];
-
-export default function Catalogo() {
-  const [pecas, setPecas] = useState(pecasExemplo);
-  const [loading, setLoading] = useState(false);
-  const [filtroCategoria, setFiltroCategoria] = useState("todas");
-  const [ordenar, setOrdenar] = useState("recentes");
+export default function PecaDetalhe() {
+  const { id } = useParams();
+  const router = useRouter();
+  const [peca, setPeca] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [fotoAtiva, setFotoAtiva] = useState(0);
+  const [tamanhoSelecionado, setTamanhoSelecionado] = useState(null);
   const [lang, setLang] = useState("pt");
+  const [userLogado, setUserLogado] = useState(null);
+  const [dataFimTimer, setDataFimTimer] = useState(null);
+  const [pecaIndisponivel, setPecaIndisponivel] = useState(false);
+  const [partilhado, setPartilhado] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
-    if (saved && translations[saved]) setLang(saved);
-    carregarPecas();
-  }, []);
+    if (saved && TRADUCOES[saved]) setLang(saved);
+    carregarPeca();
+    supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(data.session.user); });
+  }, [id]);
 
-  const carregarPecas = async () => {
+  const carregarPeca = async () => {
     setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("pecas")
-        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
-        .order("created_at", { ascending: false });
+    const { data } = await supabase
+      .from("pecas")
+      .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
+      .eq("id", id)
+      .single();
 
-      if (error) throw error;
+    if (data) {
+      setPeca(data);
+      const disponivel = data.stock_tamanhos?.find(s => s.quantidade_disponivel > 0);
+      if (disponivel) setTamanhoSelecionado(disponivel.id);
 
-      const { data: alugueresAtivos } = await supabase
-        .from("alugueres")
-        .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
-        .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+      const stockIds = data.stock_tamanhos?.map(s => s.id) || [];
+      if (stockIds.length > 0) {
+        const { data: alugueresEmCurso } = await supabase
+          .from("alugueres")
+          .select("data_fim, data_disponivel_novamente, estado")
+          .in("stock_tamanho_id", stockIds)
+          .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
 
-      if (data && data.length > 0) {
-        const agora = new Date();
-        const formatadas = data.map(p => {
-          const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
-          const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
-
-          const aluguerEmCurso = (alugueresAtivos || [])
-            .filter(a => stockIds.includes(a.stock_tamanho_id))
-            .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
-
-          let dataFimFinal = null;
-          let indisponivel = false;
-
-          if (aluguerEmCurso) {
-            const dataDisp = aluguerEmCurso.data_disponivel_novamente
-              ? new Date(aluguerEmCurso.data_disponivel_novamente)
-              : new Date(new Date(aluguerEmCurso.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
-
-            if (dataDisp > agora) {
-              dataFimFinal = dataDisp.toISOString();
-              indisponivel = true;
+        if (alugueresEmCurso && alugueresEmCurso.length > 0) {
+          const agora = new Date();
+          let dataMaisDistante = null;
+          alugueresEmCurso.forEach(a => {
+            const dataDisp = a.data_disponivel_novamente
+              ? new Date(a.data_disponivel_novamente)
+              : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+            if (dataDisp > agora && (!dataMaisDistante || dataDisp > dataMaisDistante)) {
+              dataMaisDistante = dataDisp;
             }
+          });
+          if (dataMaisDistante) {
+            setDataFimTimer(dataMaisDistante.toISOString());
+            setPecaIndisponivel(true);
           }
-
-          return {
-            ...p,
-            categoria: p.categorias?.nome || "",
-            tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
-            data_fim: dataFimFinal,
-            estado: (temStock && !indisponivel) ? "disponivel" : "indisponivel",
-          };
-        });
-        setPecas(formatadas);
+        }
       }
-    } catch (e) {
-      console.error("Erro ao carregar peças:", e);
     }
     setLoading(false);
   };
 
-  const t = translations[lang] || translations.pt;
+  const t = TRADUCOES[lang] || TRADUCOES.pt;
 
-  // Mapeia índice da categoria traduzida -> valor real em PT na BD
-  const categoriaTraduzidaParaBD = (catTraduzida) => {
-    const idx = t.categorias.indexOf(catTraduzida);
-    return idx >= 0 ? CATEGORIAS_BD[idx] : catTraduzida;
+  const irParaCheckout = () => {
+    if (!tamanhoSelecionado) return;
+    if (!userLogado) { router.push("/entrar"); return; }
+    router.push(`/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`);
   };
 
-  const pecasFiltradas = pecas
-    .filter(p => filtroCategoria === "todas" || p.categoria === categoriaTraduzidaParaBD(filtroCategoria))
-    .sort((a, b) => {
-      if (ordenar === "precoAsc") return a.preco_aluguer_dia - b.preco_aluguer_dia;
-      if (ordenar === "precoDesc") return b.preco_aluguer_dia - a.preco_aluguer_dia;
-      return 0;
-    });
+  const partilhar = (rede) => {
+    const url = encodeURIComponent(window.location.href);
+    const texto = encodeURIComponent(`${peca.nome} — Nora Grei | Aluga peças exclusivas de moda`);
+    const links = {
+      whatsapp: `https://wa.me/?text=${texto}%20${url}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      instagram: `https://www.instagram.com/`,
+      link: null,
+    };
+    if (rede === "link") {
+      navigator.clipboard.writeText(window.location.href);
+      setPartilhado(true);
+      setTimeout(() => setPartilhado(false), 2000);
+    } else {
+      window.open(links[rede], "_blank");
+    }
+  };
+
+  if (loading) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',color:'#888',textTransform:'uppercase'}}>
+      A carregar...
+    </div>
+  );
+
+  if (!peca) return (
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",gap:'1rem'}}>
+      <p style={{fontSize:'0.85rem',color:'#888'}}>Peça não encontrada</p>
+      <a href="/catalogo" style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#080808'}}>← Voltar ao catálogo</a>
+    </div>
+  );
+
+  const fotos = peca.fotos?.filter(f => f)?.length > 0 ? peca.fotos.filter(f => f) : [null];
+  const tamanhosDisponiveis = pecaIndisponivel ? [] : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || []);
+  const tamanhosSemStock = pecaIndisponivel ? (peca.stock_tamanhos || []) : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0) || []);
+  const disponivel = !pecaIndisponivel && peca.estado === "disponivel" && tamanhosDisponiveis.length > 0;
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
-        body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-        .cat-nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
-        .cat-nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .cat-nav-back { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; color:#3a3835; text-decoration:none; font-weight:400; transition:color 0.2s; }
-        .cat-nav-back:hover { color:var(--black); }
-        .cat-header { padding: 8rem 4rem 3rem; }
-        .cat-header-label { font-size:0.75rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.75rem; font-weight:400; }
-        .cat-header-title { font-family:var(--serif); font-size:clamp(2.5rem,4vw,4rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; }
-        .cat-filters { padding:0 4rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:3rem; }
-        .filter-btn { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.6rem 1.25rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
-        .filter-btn:hover { border-color:var(--black); color:var(--black); }
-        .filter-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
-        .filter-sep { width:1px; height:20px; background:var(--grey-200); }
-        .filter-select { font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.6rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; }
-        .cat-grid { padding:0 4rem 6rem; display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
-        .cat-empty { padding:4rem; text-align:center; font-family:var(--serif); font-size:1.5rem; font-weight:300; color:#3a3835; font-style:italic; }
-        .cat-loading { padding:4rem; text-align:center; font-size:0.82rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; font-weight:400; }
-        @media (max-width:900px) {
-          .cat-nav { padding:1rem 1.5rem; }
-          .cat-header { padding:6rem 1.5rem 2rem; }
-          .cat-header-label { font-size:0.88rem; color:#080808; font-weight:500; }
-          .cat-header-title { font-size:clamp(1.8rem,7vw,2.5rem); color:#080808; }
-          .cat-filters { padding:0 1.5rem 1.5rem; }
-          .filter-btn { font-size:0.82rem; color:#080808; }
-          .filter-select { font-size:0.82rem; color:#080808; }
-          .cat-grid { padding:0 1.5rem 4rem; grid-template-columns:repeat(2,1fr); gap:1rem; }
-          body { font-size:17px; color:#080808; }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--rosa:#c4748a;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
+        body{background:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased;color:var(--black)}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
+        .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
+        .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:#3a3835;text-decoration:none;transition:color 0.2s}
+        .nav-back:hover{color:var(--black)}
+        .layout{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:72px}
+        .fotos{position:sticky;top:72px;height:calc(100vh - 72px);display:flex;flex-direction:column;gap:0.5rem;padding:1.5rem;background:var(--g1)}
+        .foto-main{flex:1;overflow:hidden;position:relative}
+        .foto-main img{width:100%;height:100%;object-fit:contain;background:var(--g1)}
+        .foto-counter{position:absolute;top:1rem;right:1rem;background:rgba(8,8,8,0.6);color:#fff;font-size:0.65rem;letter-spacing:0.1em;padding:0.3rem 0.6rem;font-family:var(--sans)}
+        .foto-placeholder{width:100%;height:100%;background:linear-gradient(160deg,#e8e4e0,#d5d0c8);display:flex;align-items:center;justify-content:center}
+        .fotos-thumb{display:flex;gap:0.5rem;height:80px;overflow-x:auto}
+        .thumb{flex-shrink:0;width:80px;cursor:pointer;overflow:hidden;opacity:0.5;transition:opacity 0.2s;border:2px solid transparent}
+        .thumb.active{opacity:1;border-color:var(--black)}
+        .thumb img{width:100%;height:100%;object-fit:cover}
+        .info{padding:3rem;overflow-y:auto}
+        .badge-cat{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:#aaa89f;margin-bottom:0.5rem}
+        .nome{font-family:var(--serif);font-size:clamp(2rem,3vw,3rem);font-weight:300;line-height:1.1;margin-bottom:1rem}
+        .preco-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.75rem}
+        .preco-val{font-family:var(--serif);font-size:2rem;font-weight:300}
+        .preco-unit{font-size:0.72rem;color:#aaa89f;letter-spacing:0.1em}
+        .badge-estado{display:inline-block;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.75rem;margin-bottom:1.25rem}
+        .secao{margin-bottom:1.75rem}
+        .secao-label{font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:#5a5855;margin-bottom:0.75rem}
+        .tamanhos-grid{display:flex;gap:0.5rem;flex-wrap:wrap}
+        .tam-btn{padding:0.5rem 1rem;font-size:0.72rem;letter-spacing:0.1em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s}
+        .tam-btn:hover{border-color:var(--black)}
+        .tam-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+        .tam-btn.sem-stock{opacity:0.35;cursor:not-allowed;text-decoration:line-through}
+        .ocasioes-wrap{display:flex;gap:0.4rem;flex-wrap:wrap}
+        .ocasiao-tag{font-size:0.62rem;letter-spacing:0.1em;padding:0.3rem 0.65rem;background:var(--g1);color:#5a5855;border:1px solid var(--g2)}
+        .sep{border:none;border-top:1px solid var(--g2);margin:1.5rem 0}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--g1);font-size:0.85rem}
+        .info-key{color:#5a5855;font-size:0.72rem;letter-spacing:0.1em}
+        .deposito-box{background:var(--g1);padding:1rem 1.25rem;margin-bottom:1.5rem;border-left:3px solid var(--g2)}
+        .deposito-val{font-family:var(--serif);font-size:1.5rem;font-weight:300}
+        .deposito-desc{font-size:0.72rem;color:#5a5855;margin-top:0.2rem}
+        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s;margin-bottom:0.75rem}
+        .btn-alugar:hover{background:#2a2926}
+        .btn-alugar:disabled{background:#ccc;cursor:not-allowed}
+        .btn-reservar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--g2);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:border-color 0.2s;text-decoration:none;display:block;text-align:center;margin-bottom:0.75rem}
+        .btn-reservar:hover{border-color:var(--black)}
+        .btn-comprar{width:100%;padding:1rem;background:var(--rosa);color:var(--white);border:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:block;text-align:center;transition:background 0.2s}
+        .btn-comprar:hover{background:#a85c72}
+        .descricao{font-size:0.92rem;line-height:1.7;color:#3a3835}
+        .partilha{display:flex;gap:0.5rem;align-items:center;margin-top:1.5rem}
+        .partilha-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;margin-right:0.25rem}
+        .partilha-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--g2);background:var(--white);cursor:pointer;font-size:1rem;transition:all 0.2s;text-decoration:none;color:var(--black)}
+        .partilha-btn:hover{border-color:var(--black);background:var(--g1)}
+        @media(max-width:768px){
+          .nav{padding:1rem 1.5rem}
+          .layout{grid-template-columns:1fr;padding-top:60px}
+          .fotos{position:static;height:auto;padding:0}
+          .foto-main{height:75vw}
+          .fotos-thumb{height:65px;padding:0.5rem 0.75rem}
+          .thumb{width:65px}
+          .info{padding:1.5rem}
+          .nome{font-size:clamp(1.8rem,7vw,2.5rem)}
         }
-        @media (max-width:480px) { .cat-grid { grid-template-columns:1fr; } }
       `}</style>
 
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
-
-      <nav className="cat-nav">
-        <a href="/" className="cat-nav-logo">Nora Grei</a>
-        <a href="/" className="cat-nav-back">← Início</a>
+      <nav className="nav">
+        <a href="/" className="nav-logo">Nora Grei</a>
+        <a href="/catalogo" className="nav-back">{t.voltar}</a>
       </nav>
 
-      <div className="cat-header">
-        <p className="cat-header-label">{t.titulo}</p>
-        <h1 className="cat-header-title">{t.subtitulo}</h1>
-      </div>
-
-      <div className="cat-filters">
-        <button className={`filter-btn${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
-        {t.categorias.map(cat => (
-          <button key={cat} className={`filter-btn${filtroCategoria === cat ? " active" : ""}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
-        ))}
-        <div className="filter-sep"></div>
-        <select className="filter-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
-          <option value="recentes">{t.recentes}</option>
-          <option value="precoAsc">{t.precoAsc}</option>
-          <option value="precoDesc">{t.precoDesc}</option>
-        </select>
-      </div>
-
-      {loading ? (
-        <div className="cat-loading">{t.loading}</div>
-      ) : pecasFiltradas.length === 0 ? (
-        <div className="cat-empty">{t.semResultados}</div>
-      ) : (
-        <div className="cat-grid">
-          {pecasFiltradas.map(peca => (
-            <PecaCard key={peca.id} peca={peca} lang={lang} />
-          ))}
+      <div className="layout">
+        <div className="fotos">
+          <div className="foto-main">
+            {fotos[fotoAtiva] ? (
+              <img src={fotos[fotoAtiva]} alt={peca.nome} />
+            ) : (
+              <div className="foto-placeholder">
+                <span style={{fontFamily:'var(--serif)',fontSize:'4rem',fontWeight:300,color:'rgba(0,0,0,0.08)',fontStyle:'italic'}}>NG</span>
+              </div>
+            )}
+            {fotos.length > 1 && (
+              <div className="foto-counter">{fotoAtiva + 1}/{fotos.length}</div>
+            )}
+          </div>
+          {fotos.length > 1 && (
+            <div className="fotos-thumb">
+              {fotos.map((f, i) => (
+                <div key={i} className={`thumb${fotoAtiva === i ? " active" : ""}`} onClick={() => setFotoAtiva(i)}>
+                  {f ? <img src={f} alt="" /> : <div style={{width:'100%',height:'100%',background:'var(--g2)'}}/>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="info">
+          {peca.categorias?.nome && <p className="badge-cat">{peca.categorias.nome}</p>}
+          <h1 className="nome">{peca.nome}</h1>
+
+          <div className="preco-row">
+            <span className="preco-val">{peca.preco_aluguer_dia}€</span>
+            <span className="preco-unit">{t.porcDia}</span>
+            {peca.preco_avulso && <>
+              <span style={{color:'#ccc',fontSize:'0.8rem'}}>·</span>
+              <span className="preco-val" style={{fontSize:'1.3rem'}}>{peca.preco_avulso}€</span>
+              <span className="preco-unit">/ocasião</span>
+            </>}
+          </div>
+
+          <span className="badge-estado" style={{background:disponivel?'#e8f5e9':'#f0eeeb',color:disponivel?'#27ae60':'#5a5855'}}>
+            {disponivel ? t.disponivel : t.indisponivel}
+          </span>
+
+          {!disponivel && dataFimTimer && <Timer dataFim={dataFimTimer} lang={lang} />}
+
+          {peca.stock_tamanhos?.length > 0 && (
+            <div className="secao">
+              <p className="secao-label">{t.tamanho}</p>
+              <div className="tamanhos-grid">
+                {tamanhosDisponiveis.map(s => (
+                  <button key={s.id} className={`tam-btn${tamanhoSelecionado === s.id ? " active" : ""}`} onClick={() => setTamanhoSelecionado(s.id)}>
+                    {s.tamanho}
+                  </button>
+                ))}
+                {tamanhosSemStock.map(s => (
+                  <button key={s.id} className="tam-btn sem-stock" disabled>{s.tamanho}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {peca.ocasioes?.length > 0 && (
+            <div className="secao">
+              <p className="secao-label">{t.ocasioes}</p>
+              <div className="ocasioes-wrap">
+                {peca.ocasioes.map(o => <span key={o} className="ocasiao-tag">{o}</span>)}
+              </div>
+            </div>
+          )}
+
+          <div className="deposito-box">
+            <p className="secao-label">{t.deposito}</p>
+            <p className="deposito-val">{peca.valor_peca}€</p>
+            <p className="deposito-desc">{t.depositoDesc}</p>
+          </div>
+
+          {disponivel ? (
+            <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
+              {tamanhoSelecionado ? t.alugar : t.semTamanho}
+            </button>
+          ) : (
+            <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
+          )}
+
+          <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="btn-comprar">
+            {t.comprar} — noragrei.com ↗
+          </a>
+
+          <hr className="sep" />
+
+          {peca.descricao && (
+            <div className="secao">
+              <p className="secao-label">{t.descricao}</p>
+              <p className="descricao">{peca.descricao}</p>
+            </div>
+          )}
+
+          <div style={{marginBottom:'1.5rem'}}>
+            {peca.material && <div className="info-row"><span className="info-key">{t.material}</span><span>{peca.material}</span></div>}
+            {peca.origem && <div className="info-row"><span className="info-key">{t.origem}</span><span>{peca.origem}</span></div>}
+            {peca.categorias?.nome && <div className="info-row"><span className="info-key">{t.categoria}</span><span>{peca.categorias.nome}</span></div>}
+          </div>
+
+          <div className="partilha">
+            <span className="partilha-label">{t.partilhar}</span>
+            <button className="partilha-btn" onClick={() => partilhar("whatsapp")} title="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.858L.057 23.998l6.305-1.654A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.64-.516-5.14-1.41l-.368-.218-3.812 1 1.021-3.727-.239-.385A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            </button>
+            <button className="partilha-btn" onClick={() => partilhar("facebook")} title="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </button>
+            <a className="partilha-btn" href={`https://www.instagram.com/`} target="_blank" rel="noopener noreferrer" title="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <button className="partilha-btn" onClick={() => partilhar("link")} title="Copiar link">
+              {partilhado ? "✓" : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
+            </button>
+          </div>
+
+          <a href="/catalogo" style={{display:'block',textAlign:'center',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#5a5855',marginTop:'2rem',textDecoration:'none',paddingTop:'1rem',borderTop:'1px solid var(--g2)'}}>
+            {t.verCatalogo} →
+          </a>
+        </div>
+      </div>
     </>
   );
 }
