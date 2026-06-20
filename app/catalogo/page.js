@@ -3,23 +3,25 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import PecaCard from "@/components/PecaCard";
 
+const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"];
+
 const translations = {
   pt: {
     titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas",
     semResultados: "Nenhuma peça encontrada.", loading: "A carregar...",
-    categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Calçado", "Novidades"],
+    categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"],
     ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
   },
   fr: {
     titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout",
     semResultados: "Aucune pièce trouvée.", loading: "Chargement...",
-    categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Chaussures", "Nouveautés"],
+    categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes"],
     ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
   },
   lt: {
     titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi",
     semResultados: "Drabužių nerasta.", loading: "Kraunama...",
-    categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Avalynė", "Naujienos"],
+    categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai"],
     ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
   },
 };
@@ -52,7 +54,6 @@ export default function Catalogo() {
 
       if (error) throw error;
 
-      // Buscar TODOS os alugueres não finalizados (qualquer estado ativo no processo)
       const { data: alugueresAtivos } = await supabase
         .from("alugueres")
         .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
@@ -64,7 +65,6 @@ export default function Catalogo() {
           const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
           const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
 
-          // Encontrar o aluguer mais recente desta peça que ainda está em curso
           const aluguerEmCurso = (alugueresAtivos || [])
             .filter(a => stockIds.includes(a.stock_tamanho_id))
             .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
@@ -73,7 +73,6 @@ export default function Catalogo() {
           let indisponivel = false;
 
           if (aluguerEmCurso) {
-            // Usar data_disponivel_novamente se existir, senão calcular: data_fim + 3 dias
             const dataDisp = aluguerEmCurso.data_disponivel_novamente
               ? new Date(aluguerEmCurso.data_disponivel_novamente)
               : new Date(new Date(aluguerEmCurso.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
@@ -102,8 +101,14 @@ export default function Catalogo() {
 
   const t = translations[lang] || translations.pt;
 
+  // Mapeia índice da categoria traduzida -> valor real em PT na BD
+  const categoriaTraduzidaParaBD = (catTraduzida) => {
+    const idx = t.categorias.indexOf(catTraduzida);
+    return idx >= 0 ? CATEGORIAS_BD[idx] : catTraduzida;
+  };
+
   const pecasFiltradas = pecas
-    .filter(p => filtroCategoria === "todas" || p.categoria === filtroCategoria)
+    .filter(p => filtroCategoria === "todas" || p.categoria === categoriaTraduzidaParaBD(filtroCategoria))
     .sort((a, b) => {
       if (ordenar === "precoAsc") return a.preco_aluguer_dia - b.preco_aluguer_dia;
       if (ordenar === "precoDesc") return b.preco_aluguer_dia - a.preco_aluguer_dia;
