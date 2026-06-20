@@ -31,6 +31,9 @@ const t = {
     voltar: "← Catálogo",
     esgotado: "Esgotado",
     nota: "Receberás uma notificação quando a peça ficar disponível. Tens 24h para confirmar.",
+    resumoTitulo: "Resumo da reserva",
+    rPeca: "Peça", rTamanho: "Tamanho", rDatas: "Datas", rEntrega: "Entrega",
+    envioPostal: "Envio postal", presencial: "Presencial",
   },
   fr: {
     titulo: "Réserver une pièce", subtitulo: "Quand cette pièce sera disponible, vous serez le premier à le savoir.",
@@ -42,6 +45,9 @@ const t = {
     verPedidos: "Voir mes commandes", login: "Vous devez vous connecter", fazerLogin: "Se connecter",
     timer: "Disponible dans", semStock: "Aucune taille disponible", selTamanho: "Sélectionnez une taille",
     voltar: "← Catalogue", esgotado: "Épuisé", nota: "Vous recevrez une notification. Vous avez 24h pour confirmer.",
+    resumoTitulo: "Récapitulatif de la réservation",
+    rPeca: "Pièce", rTamanho: "Taille", rDatas: "Dates", rEntrega: "Livraison",
+    envioPostal: "Envoi postal", presencial: "En personne",
   },
   lt: {
     titulo: "Rezervuoti drabužį", subtitulo: "Kai šis drabužis bus prieinamas, būsite pirmasis sužinojęs.",
@@ -53,6 +59,9 @@ const t = {
     verPedidos: "Žiūrėti užsakymus", login: "Turite prisijungti", fazerLogin: "Prisijungti",
     timer: "Prieinama po", semStock: "Nėra dydžių", selTamanho: "Pasirinkite dydį",
     voltar: "← Katalogas", esgotado: "Išparduota", nota: "Gausite pranešimą. Turėsite 24h patvirtinti.",
+    resumoTitulo: "Rezervacijos suvestinė",
+    rPeca: "Drabužis", rTamanho: "Dydis", rDatas: "Datos", rEntrega: "Pristatymas",
+    envioPostal: "Pristatymas paštu", presencial: "Asmeniškai",
   },
 };
 
@@ -318,7 +327,7 @@ function ReservaContent() {
         </div>
 
         <div className="resumo">
-          <p className="sec-t">Resumo da reserva</p>
+          <p className="sec-t">{i.resumoTitulo}</p>
           {!user ? (
             <div className="login-box">
               <p>{i.login}</p>
@@ -330,20 +339,20 @@ function ReservaContent() {
               {peca && (
                 <div style={{marginBottom:'1.25rem'}}>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                    <span>Peça</span><span style={{color:'var(--black)',fontWeight:500}}>{peca.nome}</span>
+                    <span>{i.rPeca}</span><span style={{color:'var(--black)',fontWeight:500}}>{peca.nome}</span>
                   </div>
                   {tamanho && (
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                      <span>Tamanho</span><span style={{color:'var(--black)',fontWeight:500}}>{tamanho}</span>
+                      <span>{i.rTamanho}</span><span style={{color:'var(--black)',fontWeight:500}}>{tamanho}</span>
                     </div>
                   )}
                   {dataInicio && dataFim && (
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',borderBottom:'1px solid var(--grey-100)',color:'#5a5855'}}>
-                      <span>Datas</span><span style={{color:'var(--black)',fontWeight:500}}>{dataInicio} → {dataFim}</span>
+                      <span>{i.rDatas}</span><span style={{color:'var(--black)',fontWeight:500}}>{dataInicio} → {dataFim}</span>
                     </div>
                   )}
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.92rem',padding:'0.6rem 0',color:'#5a5855'}}>
-                    <span>Entrega</span><span style={{color:'var(--black)',fontWeight:500}}>{entrega === 'envio' ? 'Envio postal' : 'Presencial'}</span>
+                    <span>{i.rEntrega}</span><span style={{color:'var(--black)',fontWeight:500}}>{entrega === 'envio' ? i.envioPostal : i.presencial}</span>
                   </div>
                 </div>
               )}
