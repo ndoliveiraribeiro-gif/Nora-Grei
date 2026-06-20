@@ -179,6 +179,42 @@ function GeradorCodigo({ aluguer, i }) {
   );
 }
 
+function ReservaDisponivelCard({ reserva, i }) {
+  const peca = reserva.stock_tamanhos?.pecas;
+  const tamanho = reserva.stock_tamanhos?.tamanho;
+  const linkCheckout = reserva.link_checkout || `/checkout?peca=${peca?.id}&tamanho=${reserva.stock_tamanho_id}`;
+
+  const [horasRestantes, setHorasRestantes] = useState(null);
+  useEffect(() => {
+    if (!reserva.prazo_confirmacao) return;
+    const calc = () => {
+      const diff = new Date(reserva.prazo_confirmacao) - new Date();
+      setHorasRestantes(diff > 0 ? Math.ceil(diff / 3600000) : 0);
+    };
+    calc();
+    const iv = setInterval(calc, 60000);
+    return () => clearInterval(iv);
+  }, [reserva.prazo_confirmacao]);
+
+  return (
+    <div style={{display:'flex',gap:'1rem',alignItems:'center',background:'#fff',padding:'1rem 1.25rem',marginBottom:'0.6rem',borderLeft:'3px solid #27ae60'}}>
+      <div style={{width:48,height:60,flexShrink:0,background:'#f0eeeb',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
+      </div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400}}>{peca?.nome || "—"}</div>
+        <div style={{fontSize:'0.78rem',color:'#3f3e3c'}}>{i.reservaTamanho} {tamanho} · {reserva.data_inicio_desejada} → {reserva.data_fim_desejada}</div>
+        {horasRestantes !== null && horasRestantes > 0 && (
+          <div style={{fontSize:'0.7rem',color:'#27ae60',fontWeight:500,marginTop:'0.2rem'}}>{i.reservaPrazo(horasRestantes)}</div>
+        )}
+      </div>
+      <a href={linkCheckout} style={{flexShrink:0,padding:'0.65rem 1.25rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:500,fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap'}}>
+        {i.reservaConfirmar}
+      </a>
+    </div>
+  );
+}
+
 const t = {
   pt: {
     titulo: "O meu perfil", dadosPessoais: "Dados pessoais",
@@ -225,6 +261,11 @@ const t = {
     confirmandoRecepcao: "A confirmar...",
     recepcaoConfirmada: "Receção confirmada! O teu aluguer está agora ativo.",
     referencia: "Ref.",
+    reservaDisponivelTitulo: "🎉 A peça que reservaste está disponível!",
+    reservaDisponivelDesc: "Confirma o pagamento para garantir o teu aluguer antes que a reserva expire.",
+    reservaTamanho: "Tam.",
+    reservaConfirmar: "Confirmar e pagar",
+    reservaPrazo: (h) => h === 1 ? "Tens 1 hora para confirmar" : `Tens ${h} horas para confirmar`,
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -271,6 +312,11 @@ const t = {
     confirmandoRecepcao: "Confirmation...",
     recepcaoConfirmada: "Réception confirmée ! Votre location est maintenant active.",
     referencia: "Réf.",
+    reservaDisponivelTitulo: "🎉 La pièce que vous avez réservée est disponible !",
+    reservaDisponivelDesc: "Confirmez le paiement pour garantir votre location avant l'expiration de la réservation.",
+    reservaTamanho: "Taille",
+    reservaConfirmar: "Confirmer et payer",
+    reservaPrazo: (h) => h === 1 ? "Vous avez 1 heure pour confirmer" : `Vous avez ${h} heures pour confirmer`,
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -317,6 +363,11 @@ const t = {
     confirmandoRecepcao: "Tvirtinama...",
     recepcaoConfirmada: "Gavimas patvirtintas! Jūsų nuoma dabar aktyvi.",
     referencia: "Nr.",
+    reservaDisponivelTitulo: "🎉 Jūsų rezervuotas drabužis yra prieinamas!",
+    reservaDisponivelDesc: "Patvirtinkite mokėjimą, kad užtikrintumėte savo nuomą, kol rezervacija nepasibaigė.",
+    reservaTamanho: "Dydis",
+    reservaConfirmar: "Patvirtinti ir mokėti",
+    reservaPrazo: (h) => h === 1 ? "Turite 1 valandą patvirtinti" : `Turite ${h} valandas patvirtinti`,
   },
 };
 
@@ -327,6 +378,7 @@ export default function Perfil() {
   const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
+  const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
   const [loading, setLoading] = useState(true);
   const [guardado, setGuardado] = useState(false);
   const [uploadingFoto, setUploadingFoto] = useState(false);
@@ -362,6 +414,17 @@ export default function Perfil() {
 
     const { data: res } = await supabase.from("reservas_espera").select("id").eq("cliente_id", user.id).eq("estado", "aguarda");
     if (res) setStats(prev => ({ ...prev, reservas: res.length }));
+
+    const agora = new Date().toISOString();
+    const { data: resDisponiveis } = await supabase
+      .from("reservas_espera")
+      .select("*, stock_tamanhos(id, tamanho, pecas(id, nome, codigo_referencia, fotos))")
+      .eq("cliente_id", user.id)
+      .eq("estado", "notificado")
+      .gt("prazo_confirmacao", agora)
+      .order("notificado_em", { ascending: false });
+    if (resDisponiveis) setReservasDisponiveis(resDisponiveis);
+
     setLoading(false);
   };
 
@@ -441,6 +504,9 @@ export default function Perfil() {
         .alerta-perfil{background:#fff8e1;border-left:3px solid #f39c12;padding:1.25rem 1.5rem}
         .alerta-perfil-titulo{font-size:0.85rem;font-weight:600;color:#7a4d00;margin-bottom:0.3rem}
         .alerta-perfil-desc{font-size:0.78rem;color:#7a4d00;line-height:1.5}
+        .alerta-reserva{background:#e8f5e9;border-left:3px solid #27ae60;padding:1.25rem 1.5rem}
+        .alerta-reserva-titulo{font-size:0.92rem;font-weight:600;color:#1e7e3e;margin-bottom:0.3rem}
+        .alerta-reserva-desc{font-size:0.8rem;color:#1e7e3e;line-height:1.5;margin-bottom:1rem}
         .nivel-card{background:var(--white);padding:2rem 2.5rem}
         .nivel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
         .nivel-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;font-size:0.82rem;font-weight:500}
@@ -522,6 +588,14 @@ export default function Perfil() {
             {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.3rem'}}>📍 {perfil.cidade}, {perfil.pais}</div>}
           </div>
         </div>
+
+        {reservasDisponiveis.length > 0 && (
+          <div className="alerta-reserva">
+            <div className="alerta-reserva-titulo">{i.reservaDisponivelTitulo}</div>
+            <div className="alerta-reserva-desc">{i.reservaDisponivelDesc}</div>
+            {reservasDisponiveis.map(r => <ReservaDisponivelCard key={r.id} reserva={r} i={i} />)}
+          </div>
+        )}
 
         {perfilIncompleto && (
           <div className="alerta-perfil">
