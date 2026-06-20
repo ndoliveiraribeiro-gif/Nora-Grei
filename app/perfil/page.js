@@ -4,69 +4,70 @@ import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
 
 const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", cor: "#6c5ce7", caucao: 0, proximo: null, falta: 0 };
-  if (n >= 10) return { nome: "Ouro", icon: "🥇", cor: "#f39c12", caucao: 50, proximo: "Platina", falta: 20 - n };
-  if (n >= 5)  return { nome: "Prata", icon: "🥈", cor: "#95a5a6", caucao: 75, proximo: "Ouro", falta: 10 - n };
-  return { nome: "Bronze", icon: "🥉", cor: "#cd7f32", caucao: 100, proximo: "Prata", falta: 5 - n };
+  if (n >= 20) return { nome: "Platina", sigla: "PLT", cor: "#6c5ce7", caucao: 0, proximo: null, falta: 0 };
+  if (n >= 10) return { nome: "Ouro", sigla: "OUR", cor: "#b8860b", caucao: 50, proximo: "Platina", falta: 20 - n };
+  if (n >= 5)  return { nome: "Prata", sigla: "PRT", cor: "#6b7280", caucao: 75, proximo: "Ouro", falta: 10 - n };
+  return { nome: "Bronze", sigla: "BRZ", cor: "#a8632f", caucao: 100, proximo: "Prata", falta: 5 - n };
 };
 
 const ESTADO_INFO = {
   pt: {
-    pendente: { label: "A aguardar pagamento", cor: "#f39c12", bg: "#fff8e1" },
-    confirmado: { label: "Pagamento confirmado", cor: "#7b1fa2", bg: "#f3e5f5" },
-    enviado: { label: "A caminho", cor: "#1976d2", bg: "#e3f2fd" },
-    ativo: { label: "A usar", cor: "#27ae60", bg: "#e8f5e9" },
-    em_verificacao: { label: "Em inspeção", cor: "#e67e22", bg: "#fff8e1" },
-    devolvido: { label: "Concluído", cor: "#5a5855", bg: "#f0eeeb" },
-    devolvido_danificado: { label: "Concluído — com danos", cor: "#e74c3c", bg: "#fff5f5" },
-    cancelado: { label: "Cancelado", cor: "#e74c3c", bg: "#fff5f5" },
+    pendente: { label: "A aguardar pagamento", cor: "#b8860b", bg: "#fff8e1" },
+    confirmado: { label: "Pagamento confirmado", cor: "#6b3fa0", bg: "#f3e5f5" },
+    enviado: { label: "A caminho", cor: "#1565c0", bg: "#e3f2fd" },
+    ativo: { label: "A usar", cor: "#1e7e3e", bg: "#e8f5e9" },
+    em_verificacao: { label: "Em inspeção", cor: "#b35900", bg: "#fff8e1" },
+    devolvido: { label: "Concluído", cor: "#3f3e3c", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Concluído — com danos", cor: "#c0392b", bg: "#fff5f5" },
+    cancelado: { label: "Cancelado", cor: "#c0392b", bg: "#fff5f5" },
   },
   fr: {
-    pendente: { label: "En attente de paiement", cor: "#f39c12", bg: "#fff8e1" },
-    confirmado: { label: "Paiement confirmé", cor: "#7b1fa2", bg: "#f3e5f5" },
-    enviado: { label: "En route", cor: "#1976d2", bg: "#e3f2fd" },
-    ativo: { label: "En cours d'utilisation", cor: "#27ae60", bg: "#e8f5e9" },
-    em_verificacao: { label: "En inspection", cor: "#e67e22", bg: "#fff8e1" },
-    devolvido: { label: "Terminé", cor: "#5a5855", bg: "#f0eeeb" },
-    devolvido_danificado: { label: "Terminé — avec dommages", cor: "#e74c3c", bg: "#fff5f5" },
-    cancelado: { label: "Annulé", cor: "#e74c3c", bg: "#fff5f5" },
+    pendente: { label: "En attente de paiement", cor: "#b8860b", bg: "#fff8e1" },
+    confirmado: { label: "Paiement confirmé", cor: "#6b3fa0", bg: "#f3e5f5" },
+    enviado: { label: "En route", cor: "#1565c0", bg: "#e3f2fd" },
+    ativo: { label: "En cours d'utilisation", cor: "#1e7e3e", bg: "#e8f5e9" },
+    em_verificacao: { label: "En inspection", cor: "#b35900", bg: "#fff8e1" },
+    devolvido: { label: "Terminé", cor: "#3f3e3c", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Terminé — avec dommages", cor: "#c0392b", bg: "#fff5f5" },
+    cancelado: { label: "Annulé", cor: "#c0392b", bg: "#fff5f5" },
   },
   lt: {
-    pendente: { label: "Laukiama mokėjimo", cor: "#f39c12", bg: "#fff8e1" },
-    confirmado: { label: "Mokėjimas patvirtintas", cor: "#7b1fa2", bg: "#f3e5f5" },
-    enviado: { label: "Keliauja", cor: "#1976d2", bg: "#e3f2fd" },
-    ativo: { label: "Naudojama", cor: "#27ae60", bg: "#e8f5e9" },
-    em_verificacao: { label: "Tikrinama", cor: "#e67e22", bg: "#fff8e1" },
-    devolvido: { label: "Užbaigta", cor: "#5a5855", bg: "#f0eeeb" },
-    devolvido_danificado: { label: "Užbaigta — su pažeidimais", cor: "#e74c3c", bg: "#fff5f5" },
-    cancelado: { label: "Atšaukta", cor: "#e74c3c", bg: "#fff5f5" },
+    pendente: { label: "Laukiama mokėjimo", cor: "#b8860b", bg: "#fff8e1" },
+    confirmado: { label: "Mokėjimas patvirtintas", cor: "#6b3fa0", bg: "#f3e5f5" },
+    enviado: { label: "Keliauja", cor: "#1565c0", bg: "#e3f2fd" },
+    ativo: { label: "Naudojama", cor: "#1e7e3e", bg: "#e8f5e9" },
+    em_verificacao: { label: "Tikrinama", cor: "#b35900", bg: "#fff8e1" },
+    devolvido: { label: "Užbaigta", cor: "#3f3e3c", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Užbaigta — su pažeidimais", cor: "#c0392b", bg: "#fff5f5" },
+    cancelado: { label: "Atšaukta", cor: "#c0392b", bg: "#fff5f5" },
   },
 };
 
-function TimerInfo({ aluguer, lang }) {
+function useCountdownDetalhado(dataAlvo) {
   const [tempo, setTempo] = useState("");
-
   useEffect(() => {
-    if (aluguer.estado !== "enviado" && aluguer.estado !== "ativo") return;
+    if (!dataAlvo) return;
     const calc = () => {
-      let alvo;
-      if (aluguer.estado === "enviado") {
-        alvo = aluguer.data_entrega_prevista || aluguer.data_inicio;
-      } else if (aluguer.estado === "ativo") {
-        alvo = aluguer.data_fim;
-      }
-      if (!alvo) { setTempo(""); return; }
-      const diff = new Date(alvo) - new Date();
+      const diff = new Date(dataAlvo) - new Date();
       if (diff <= 0) { setTempo(""); return; }
       const dias = Math.floor(diff / 86400000);
       const horas = Math.floor((diff % 86400000) / 3600000);
-      if (dias > 0) setTempo(`${dias}d ${horas}h`);
-      else setTempo(`${horas}h`);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (dias > 0) setTempo(`${dias}d ${horas}h ${mins}m`);
+      else setTempo(`${horas}h ${mins}m`);
     };
     calc();
-    const iv = setInterval(calc, 60000);
+    const iv = setInterval(calc, 30000);
     return () => clearInterval(iv);
-  }, [aluguer]);
+  }, [dataAlvo]);
+  return tempo;
+}
+
+function TimerInfo({ aluguer, lang }) {
+  let alvo = null;
+  if (aluguer.estado === "enviado") alvo = aluguer.data_entrega_prevista || aluguer.data_inicio;
+  else if (aluguer.estado === "ativo") alvo = aluguer.data_fim;
+  const tempo = useCountdownDetalhado(alvo);
 
   const TXT = {
     pt: { chega: "Chega em", aCaminho: "A caminho", devolver: "Devolver em" },
@@ -77,9 +78,9 @@ function TimerInfo({ aluguer, lang }) {
 
   if (aluguer.estado === "enviado") {
     return (
-      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#e3f2fd',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #1976d2'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#e3f2fd',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #1565c0'}}>
         <span style={{fontSize:'0.9rem'}}>🚚</span>
-        <span style={{fontSize:'0.72rem',color:'#1565c0'}}>
+        <span style={{fontSize:'0.74rem',color:'#0d47a1'}}>
           {tempo ? <>{x.chega} <strong>{tempo}</strong></> : x.aCaminho}
         </span>
       </div>
@@ -87,9 +88,9 @@ function TimerInfo({ aluguer, lang }) {
   }
   if (aluguer.estado === "ativo" && tempo) {
     return (
-      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #f39c12'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #b8860b'}}>
         <span style={{fontSize:'0.9rem'}}>↩</span>
-        <span style={{fontSize:'0.72rem',color:'#e67e22'}}>{x.devolver} <strong>{tempo}</strong></span>
+        <span style={{fontSize:'0.74rem',color:'#8a5a00'}}>{x.devolver} <strong>{tempo}</strong></span>
       </div>
     );
   }
@@ -116,13 +117,61 @@ function BotaoConfirmarRecepcao({ aluguer, i, onConfirmado }) {
   };
 
   if (confirmado) {
-    return <div style={{marginTop:'0.5rem',padding:'0.6rem 0.75rem',background:'#e8f5e9',color:'#1e7e3e',fontSize:'0.78rem',fontWeight:500}}>✓ {i.recepcaoConfirmada}</div>;
+    return <div style={{marginTop:'0.5rem',padding:'0.6rem 0.75rem',background:'#e8f5e9',color:'#1e7e3e',fontSize:'0.78rem',fontWeight:600}}>✓ {i.recepcaoConfirmada}</div>;
   }
 
   return (
     <button onClick={confirmar} disabled={loading} style={{width:'100%',marginTop:'0.5rem',padding:'0.65rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontWeight:500,fontFamily:"'Jost',sans-serif"}}>
       {loading ? i.confirmandoRecepcao : i.confirmarRecepcao}
     </button>
+  );
+}
+
+function BotaoVerTalao({ aluguer, i }) {
+  const [recibo, setRecibo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [aberto, setAberto] = useState(false);
+
+  const buscarRecibo = async () => {
+    if (recibo) { setAberto(true); return; }
+    setLoading(true);
+    const { data } = await supabase.from("recibos").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    setLoading(false);
+    if (data) { setRecibo(data); setAberto(true); }
+  };
+
+  return (
+    <>
+      <button onClick={buscarRecibo} disabled={loading} style={{ width:'100%',marginTop:'0.5rem',padding:'0.55rem',background:'#fff',color:'#080808',border:'1.5px solid #2e2d2b',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontWeight:600,fontFamily:"'Jost',sans-serif" }}>
+        {loading ? "..." : `${i.verTalao}`}
+      </button>
+      {aberto && recibo && (
+        <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && setAberto(false)}>
+          <div style={{ background:"#fff",width:"100%",maxWidth:380,padding:"1.75rem",position:"relative" }}>
+            <button onClick={() => setAberto(false)} style={{ position:"absolute",top:"1rem",right:"1rem",background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#3f3e3c" }}>✕</button>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:"1rem",paddingBottom:"0.75rem",borderBottom:"2px dashed #e2dfda" }}>
+              <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",letterSpacing:"0.15em",textTransform:"uppercase" }}>NORA GREI</span>
+              <span style={{ fontSize:"0.68rem",color:"#3f3e3c",fontFamily:"monospace" }}>{recibo.numero}</span>
+            </div>
+            {[
+              ["Data", new Date(recibo.created_at).toLocaleString("pt-PT")],
+              ["Método", recibo.metodo_pagamento],
+            ].map(([k,v]) => (
+              <div key={k} style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{k}</span><span style={{textTransform:"capitalize"}}>{v}</span></div>
+            ))}
+            <div style={{ borderTop:"1px dashed #e2dfda", margin:"0.5rem 0" }} />
+            <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{i.aluguer}</span><span>{recibo.valor_aluguer}€</span></div>
+            <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{i.higienizacao}</span><span>{recibo.valor_higienizacao}€</span></div>
+            <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{i.deposito}</span><span>{recibo.valor_deposito}€</span></div>
+            <div style={{ borderTop:"1px dashed #e2dfda", margin:"0.5rem 0" }} />
+            <div style={{ display:"flex",justifyContent:"space-between",fontSize:"1.05rem",fontWeight:700,padding:"0.5rem 0" }}><span>{i.total}</span><span>{recibo.valor_total}€</span></div>
+            <div style={{ textAlign:"center",fontSize:"1rem",fontWeight:700,marginTop:"0.75rem",paddingTop:"0.75rem",borderTop:"2px dashed #e2dfda",color:recibo.estado==="pago"?"#1e7e3e":"#b8860b" }}>
+              {recibo.estado==="pago" ? i.pago : i.aguardarPagamento}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -162,20 +211,20 @@ function GeradorCodigo({ aluguer, i }) {
   };
 
   if (aberto && codigo) return (
-    <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'0.85rem',marginTop:'0.5rem'}}>
-      <p style={{fontSize:'0.58rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.4rem'}}>{i.codigoDesconto}</p>
-      <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,letterSpacing:'0.15em',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
-      <p style={{fontSize:'0.68rem',color:'#5a5855',marginBottom:'0.6rem'}}>{i.descontoInfo} <strong>{codigo.valor}€</strong></p>
+    <div style={{background:'#2a1820',border:'1px solid #4a2530',padding:'0.9rem',marginTop:'0.5rem'}}>
+      <p style={{fontSize:'0.58rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#e8a4b8',fontWeight:700,marginBottom:'0.4rem'}}>{i.codigoDesconto}</p>
+      <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:400,letterSpacing:'0.15em',marginBottom:'0.3rem',color:'#fff'}}>{codigo.codigo}</div>
+      <p style={{fontSize:'0.7rem',color:'#e8d5db',marginBottom:'0.6rem'}}>{i.descontoInfo} <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.4rem'}}>
-        <button onClick={copiar} style={{flex:1,padding:'0.45rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif"}}>{copiado?i.copiado:i.copiar}</button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.45rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',textDecoration:'none',textAlign:'center',fontFamily:"'Jost',sans-serif"}}>{i.irLoja}</a>
+        <button onClick={copiar} style={{flex:1,padding:'0.5rem',background:copiado?'#1e7e3e':'#fff',color:copiado?'#fff':'#080808',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif",fontWeight:700}}>{copiado?i.copiado:i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.5rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',textDecoration:'none',textAlign:'center',fontFamily:"'Jost',sans-serif",fontWeight:700}}>{i.irLoja}</a>
       </div>
     </div>
   );
 
   return (
-    <button onClick={gerar} disabled={loading} style={{width:'100%',padding:'0.55rem',marginTop:'0.5rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',cursor:'pointer',fontWeight:500,fontFamily:"'Jost',sans-serif"}}>
-      {loading ? "..." : `🏷️ ${i.comprarPeca}`}
+    <button onClick={gerar} disabled={loading} style={{width:'100%',padding:'0.6rem',marginTop:'0.5rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.64rem',letterSpacing:'0.12em',textTransform:'uppercase',cursor:'pointer',fontWeight:600,fontFamily:"'Jost',sans-serif"}}>
+    {loading ? "..." : i.comprarPeca}
     </button>
   );
 }
@@ -184,32 +233,21 @@ function ReservaDisponivelCard({ reserva, i }) {
   const peca = reserva.stock_tamanhos?.pecas;
   const tamanho = reserva.stock_tamanhos?.tamanho;
   const linkCheckout = reserva.link_checkout || `/checkout?peca=${peca?.id}&tamanho=${reserva.stock_tamanho_id}`;
-
-  const [horasRestantes, setHorasRestantes] = useState(null);
-  useEffect(() => {
-    if (!reserva.prazo_confirmacao) return;
-    const calc = () => {
-      const diff = new Date(reserva.prazo_confirmacao) - new Date();
-      setHorasRestantes(diff > 0 ? Math.ceil(diff / 3600000) : 0);
-    };
-    calc();
-    const iv = setInterval(calc, 60000);
-    return () => clearInterval(iv);
-  }, [reserva.prazo_confirmacao]);
+  const tempo = useCountdownDetalhado(reserva.prazo_confirmacao);
 
   return (
-    <div style={{display:'flex',gap:'1rem',alignItems:'center',background:'#fff',padding:'1rem 1.25rem',marginBottom:'0.6rem',borderLeft:'3px solid #27ae60'}}>
+    <div style={{display:'flex',gap:'1rem',alignItems:'center',background:'#fff',padding:'1rem 1.25rem',marginBottom:'0.6rem',borderLeft:'3px solid #1e7e3e'}}>
       <div style={{width:48,height:60,flexShrink:0,background:'#f0eeeb',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
         {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
       </div>
       <div style={{flex:1,minWidth:0}}>
         <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400}}>{peca?.nome || "—"}</div>
         <div style={{fontSize:'0.78rem',color:'#3f3e3c'}}>{i.reservaTamanho} {tamanho} · {reserva.data_inicio_desejada} → {reserva.data_fim_desejada}</div>
-        {horasRestantes !== null && horasRestantes > 0 && (
-          <div style={{fontSize:'0.7rem',color:'#27ae60',fontWeight:500,marginTop:'0.2rem'}}>{i.reservaPrazo(horasRestantes)}</div>
+        {tempo && (
+          <div style={{fontSize:'0.72rem',color:'#1e7e3e',fontWeight:600,marginTop:'0.25rem'}}>{i.reservaPrazoTempo} {tempo}</div>
         )}
       </div>
-      <a href={linkCheckout} style={{flexShrink:0,padding:'0.65rem 1.25rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:500,fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap'}}>
+      <a href={linkCheckout} style={{flexShrink:0,padding:'0.65rem 1.25rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600,fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap'}}>
         {i.reservaConfirmar}
       </a>
     </div>
@@ -227,15 +265,15 @@ const t = {
     localizacao: "Localização", cidade: "Cidade", pais: "País",
     codigoPostal: "Código postal", morada: "Morada completa",
     numeroPorta: "Número de porta", andar: "Andar / Fração",
-    detectarLocalizacao: "📍 Detectar automaticamente",
-    localizacaoOk: "📍 Localização detectada ✓",
+    detectarLocalizacao: "Detectar automaticamente",
+    localizacaoOk: "Localização detectada ✓",
     guardar: "Guardar", guardado: "Guardado! ✓",
     historico: "Histórico de alugueres",
     semHistorico: "Ainda não tens alugueres.",
     verCatalogo: "Explorar catálogo",
     sair: "Terminar sessão",
     verPedidos: "Ver os meus pedidos",
-    perfilIncompleto: "⚠️ Perfil incompleto",
+    perfilIncompleto: "Perfil incompleto",
     perfilIncompletoDesc: "Para poderes alugar peças, precisamos destes dados para a entrega: morada completa, código postal, cidade, NIF, número de Cartão de Cidadão e telefone.",
     camposObrigatorios: "* Campos obrigatórios para alugar",
     nivelConfianca: "Nível de confiança",
@@ -243,7 +281,7 @@ const t = {
     semCaucao: "Sem",
     faltam: "Faltam",
     para: "para",
-    nivelMaximo: "💎 Nível máximo — caução gratuita!",
+    nivelMaximo: "Nível máximo — caução gratuita",
     pontosFidelizacao: "Pontos de fidelização",
     pontosDesc: "1 ponto por peça alugada · A 10ª peça é grátis",
     emCurso: "Em curso",
@@ -258,15 +296,18 @@ const t = {
     irLoja: "Ir à loja ↗",
     comprarPeca: "Comprar esta peça",
     voltarInicio: "← Início",
-    confirmarRecepcao: "📦 Confirmar receção",
+    confirmarRecepcao: "Confirmar receção",
     confirmandoRecepcao: "A confirmar...",
     recepcaoConfirmada: "Receção confirmada! O teu aluguer está agora ativo.",
     referencia: "Ref.",
-    reservaDisponivelTitulo: "🎉 A peça que reservaste está disponível!",
+    reservaDisponivelTitulo: "A peça que reservaste está disponível",
     reservaDisponivelDesc: "Confirma o pagamento para garantir o teu aluguer antes que a reserva expire.",
     reservaTamanho: "Tam.",
     reservaConfirmar: "Confirmar e pagar",
-    reservaPrazo: (h) => h === 1 ? "Tens 1 hora para confirmar" : `Tens ${h} horas para confirmar`,
+    reservaPrazoTempo: "Tempo restante para confirmar:",
+    verTalao: "Ver talão",
+    aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -278,15 +319,15 @@ const t = {
     localizacao: "Localisation", cidade: "Ville", pais: "Pays",
     codigoPostal: "Code postal", morada: "Adresse complète",
     numeroPorta: "Numéro de rue", andar: "Étage / Appartement",
-    detectarLocalizacao: "📍 Détecter automatiquement",
-    localizacaoOk: "📍 Localisation détectée ✓",
+    detectarLocalizacao: "Détecter automatiquement",
+    localizacaoOk: "Localisation détectée ✓",
     guardar: "Enregistrer", guardado: "Enregistré ! ✓",
     historico: "Historique des locations",
     semHistorico: "Vous n'avez pas encore de locations.",
     verCatalogo: "Explorer le catalogue",
     sair: "Se déconnecter",
     verPedidos: "Voir mes commandes",
-    perfilIncompleto: "⚠️ Profil incomplet",
+    perfilIncompleto: "Profil incomplet",
     perfilIncompletoDesc: "Pour louer des pièces, nous avons besoin de ces informations pour la livraison : adresse complète, code postal, ville, NIF, numéro de carte d'identité et téléphone.",
     camposObrigatorios: "* Champs obligatoires pour louer",
     nivelConfianca: "Niveau de confiance",
@@ -294,7 +335,7 @@ const t = {
     semCaucao: "Sans",
     faltam: "Encore",
     para: "pour",
-    nivelMaximo: "💎 Niveau maximum — dépôt gratuit !",
+    nivelMaximo: "Niveau maximum — dépôt gratuit",
     pontosFidelizacao: "Points de fidélité",
     pontosDesc: "1 point par location · La 10ème pièce est gratuite",
     emCurso: "En cours",
@@ -309,15 +350,18 @@ const t = {
     irLoja: "Aller à la boutique ↗",
     comprarPeca: "Acheter cette pièce",
     voltarInicio: "← Accueil",
-    confirmarRecepcao: "📦 Confirmer la réception",
+    confirmarRecepcao: "Confirmer la réception",
     confirmandoRecepcao: "Confirmation...",
     recepcaoConfirmada: "Réception confirmée ! Votre location est maintenant active.",
     referencia: "Réf.",
-    reservaDisponivelTitulo: "🎉 La pièce que vous avez réservée est disponible !",
+    reservaDisponivelTitulo: "La pièce que vous avez réservée est disponible",
     reservaDisponivelDesc: "Confirmez le paiement pour garantir votre location avant l'expiration de la réservation.",
     reservaTamanho: "Taille",
     reservaConfirmar: "Confirmer et payer",
-    reservaPrazo: (h) => h === 1 ? "Vous avez 1 heure pour confirmer" : `Vous avez ${h} heures pour confirmer`,
+    reservaPrazoTempo: "Temps restant pour confirmer :",
+    verTalao: "Voir le reçu",
+    aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -329,15 +373,15 @@ const t = {
     localizacao: "Vieta", cidade: "Miestas", pais: "Šalis",
     codigoPostal: "Pašto kodas", morada: "Pilnas adresas",
     numeroPorta: "Namo numeris", andar: "Aukštas / Butas",
-    detectarLocalizacao: "📍 Nustatyti automatiškai",
-    localizacaoOk: "📍 Vieta nustatyta ✓",
+    detectarLocalizacao: "Nustatyti automatiškai",
+    localizacaoOk: "Vieta nustatyta ✓",
     guardar: "Išsaugoti", guardado: "Išsaugota! ✓",
     historico: "Nuomos istorija",
     semHistorico: "Kol kas neturite nuomos.",
     verCatalogo: "Naršyti katalogą",
     sair: "Atsijungti",
     verPedidos: "Žiūrėti mano užsakymus",
-    perfilIncompleto: "⚠️ Profilis nepilnas",
+    perfilIncompleto: "Profilis nepilnas",
     perfilIncompletoDesc: "Norėdami nuomoti drabužius, mums reikia šių pristatymo duomenų: pilno adreso, pašto kodo, miesto, mokesčių kodo, asmens dokumento numerio ir telefono.",
     camposObrigatorios: "* Privalomi laukai norint nuomoti",
     nivelConfianca: "Pasitikėjimo lygis",
@@ -345,7 +389,7 @@ const t = {
     semCaucao: "Be",
     faltam: "Trūksta",
     para: "iki",
-    nivelMaximo: "💎 Maksimalus lygis — užstatas nemokamas!",
+    nivelMaximo: "Maksimalus lygis — užstatas nemokamas",
     pontosFidelizacao: "Lojalumo taškai",
     pontosDesc: "1 taškas už kiekvieną nuomą · 10-as drabužis nemokamas",
     emCurso: "Vykstantys",
@@ -360,15 +404,18 @@ const t = {
     irLoja: "Eiti į parduotuvę ↗",
     comprarPeca: "Pirkti šį drabužį",
     voltarInicio: "← Pradžia",
-    confirmarRecepcao: "📦 Patvirtinti gavimą",
+    confirmarRecepcao: "Patvirtinti gavimą",
     confirmandoRecepcao: "Tvirtinama...",
     recepcaoConfirmada: "Gavimas patvirtintas! Jūsų nuoma dabar aktyvi.",
     referencia: "Nr.",
-    reservaDisponivelTitulo: "🎉 Jūsų rezervuotas drabužis yra prieinamas!",
+    reservaDisponivelTitulo: "Jūsų rezervuotas drabužis yra prieinamas",
     reservaDisponivelDesc: "Patvirtinkite mokėjimą, kad užtikrintumėte savo nuomą, kol rezervacija nepasibaigė.",
     reservaTamanho: "Dydis",
     reservaConfirmar: "Patvirtinti ir mokėti",
-    reservaPrazo: (h) => h === 1 ? "Turite 1 valandą patvirtinti" : `Turite ${h} valandas patvirtinti`,
+    reservaPrazoTempo: "Laikas patvirtinti:",
+    verTalao: "Žiūrėti kvitą",
+    aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo",
   },
 };
 
@@ -473,7 +520,7 @@ export default function Perfil() {
   const i = t[lang] || t.pt;
   const estadoInfo = ESTADO_INFO[lang] || ESTADO_INFO.pt;
 
-  if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#5a5855'}}>...</div>;
+  if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#3f3e3c'}}>...</div>;
 
   const nv = NIVEL(stats.totalPecas);
   const proximoNivelMin = nv.nome === "Bronze" ? 5 : nv.nome === "Prata" ? 10 : nv.nome === "Ouro" ? 20 : 20;
@@ -484,12 +531,18 @@ export default function Perfil() {
 
   const perfilIncompleto = !CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
 
+  const NIVEIS_TABELA = [
+    { sigla: "BRZ", nome: "Bronze", cor: "#a8632f", caucao: "100%" },
+    { sigla: "PRT", nome: "Prata", cor: "#6b7280", caucao: "75%" },
+    { sigla: "OUR", nome: "Ouro", cor: "#b8860b", caucao: "50%" },
+  ];
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g5:#5a5855;--g6:#3f3e3c;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
+        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g6:#3f3e3c;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
         body{background:var(--g1);font-family:var(--sans);font-size:17px;-webkit-font-smoothing:antialiased}
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
@@ -502,21 +555,22 @@ export default function Perfil() {
         .avatar-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--black);color:var(--white);border:2px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:400;line-height:1.1;margin-bottom:0.3rem}
         .hero-email{font-size:0.92rem;color:var(--g6)}
-        .alerta-perfil{background:#fff8e1;border-left:3px solid #f39c12;padding:1.25rem 1.5rem}
-        .alerta-perfil-titulo{font-size:0.85rem;font-weight:600;color:#7a4d00;margin-bottom:0.3rem}
-        .alerta-perfil-desc{font-size:0.78rem;color:#7a4d00;line-height:1.5}
-        .alerta-reserva{background:#e8f5e9;border-left:3px solid #27ae60;padding:1.25rem 1.5rem}
-        .alerta-reserva-titulo{font-size:0.92rem;font-weight:600;color:#1e7e3e;margin-bottom:0.3rem}
-        .alerta-reserva-desc{font-size:0.8rem;color:#1e7e3e;line-height:1.5;margin-bottom:1rem}
+        .alerta-perfil{background:#fff8e1;border-left:3px solid #b8860b;padding:1.25rem 1.5rem}
+        .alerta-perfil-titulo{font-size:0.85rem;font-weight:700;color:#6b4500;margin-bottom:0.3rem}
+        .alerta-perfil-desc{font-size:0.78rem;color:#6b4500;line-height:1.5}
+        .alerta-reserva{background:#e8f5e9;border-left:3px solid #1e7e3e;padding:1.25rem 1.5rem}
+        .alerta-reserva-titulo{font-size:0.92rem;font-weight:700;color:#175c2e;margin-bottom:0.3rem}
+        .alerta-reserva-desc{font-size:0.8rem;color:#175c2e;line-height:1.5;margin-bottom:1rem}
         .nivel-card{background:var(--white);padding:2rem 2.5rem}
         .nivel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-        .nivel-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;font-size:0.82rem;font-weight:500}
+        .nivel-badge{display:inline-flex;align-items:center;gap:0.6rem;padding:0.4rem 1rem;font-size:0.82rem;font-weight:600}
+        .nivel-sigla{width:28px;height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;letter-spacing:0.02em;color:#fff}
         .nivel-barra{height:6px;background:var(--g2);border-radius:3px;overflow:hidden}
         .nivel-barra-fill{height:100%;border-radius:3px;transition:width 0.8s ease}
         .nivel-info{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--g6);margin-top:0.4rem}
         .nivel-beneficios{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--g1)}
         .beneficio{text-align:center;padding:1rem}
-        .beneficio-val{font-family:var(--serif);font-size:1.8rem;font-weight:300;margin-bottom:0.3rem}
+        .beneficio-sigla{width:32px;height:32px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff;margin:0 auto 0.5rem}
         .beneficio-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6)}
         .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--g2)}
         .stat{background:var(--white);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:background 0.2s}
@@ -525,22 +579,22 @@ export default function Perfil() {
         .stat-label{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6)}
         .pontos-card{background:var(--white);padding:2rem 2.5rem}
         .pontos-circles{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap}
-        .ponto{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600}
+        .ponto{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700}
         .card{background:var(--white);padding:2rem 2.5rem}
-        .card-t{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--g6);font-weight:500;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
+        .card-t{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--g6);font-weight:600;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
         .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
         .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
         .full{grid-column:1/-1}
         .fg{display:flex;flex-direction:column;gap:0.5rem}
-        .lbl{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#1a1a18;font-weight:500}
+        .lbl{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#1a1a18;font-weight:600}
         .inp{width:100%;padding:0.9rem 1rem;border:1.5px solid var(--g2);background:var(--white);font-size:1rem;font-family:var(--sans);color:var(--black);outline:none}
         .inp:focus{border-color:var(--black)}
         .inp:disabled{background:var(--g1);color:var(--g6)}
-        .inp::placeholder{color:#8a8884}
-        .loc-btn{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--black);background:none;border:1.5px solid var(--g2);padding:0.9rem 1rem;cursor:pointer;font-family:var(--sans);font-weight:500;width:100%}
+        .inp::placeholder{color:#7a7874}
+        .loc-btn{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--black);background:none;border:1.5px solid var(--g2);padding:0.9rem 1rem;cursor:pointer;font-family:var(--sans);font-weight:600;width:100%}
         .loc-btn:hover{border-color:var(--black)}
         .save-row{display:flex;align-items:center;gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--g1)}
-        .btn-save{padding:0.9rem 2.5rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer}
+        .btn-save{padding:0.9rem 2.5rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;font-weight:600}
         .btn-save:hover{background:#2e2d2b}
         .btn-ok{background:#1e7e3e}
         .divider{height:1px;background:var(--g1);margin:1.25rem 0}
@@ -549,10 +603,10 @@ export default function Perfil() {
         .aluguer-row{display:flex;align-items:flex-start;gap:1.5rem}
         .aluguer-img{width:56px;height:70px;flex-shrink:0;background:var(--g1);overflow:hidden;display:flex;align-items:center;justify-content:center}
         .aluguer-nome{font-family:var(--serif);font-size:1.15rem;font-weight:400;margin-bottom:0.2rem}
-        .aluguer-ref{font-size:0.62rem;color:#a85c72;font-weight:600;font-family:monospace;letter-spacing:0.05em}
+        .aluguer-ref{font-size:0.64rem;color:#9c4d63;font-weight:700;font-family:monospace;letter-spacing:0.05em}
         .aluguer-meta{font-size:0.82rem;color:var(--g6)}
-        .estado-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.3rem 0.7rem;font-weight:500;display:inline-block;margin-top:0.4rem}
-        .btn-pedidos{display:block;width:100%;padding:1rem;background:var(--g1);color:var(--black);border:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-align:center;text-decoration:none;margin-top:1rem}
+        .estado-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.3rem 0.7rem;font-weight:600;display:inline-block;margin-top:0.4rem}
+        .btn-pedidos{display:block;width:100%;padding:1rem;background:var(--g1);color:var(--black);border:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-align:center;text-decoration:none;margin-top:1rem;font-weight:600}
         .btn-pedidos:hover{background:var(--g2)}
         .btn-sair{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g6);background:none;border:none;cursor:pointer;font-family:var(--sans);text-decoration:underline}
         .btn-sair:hover{color:#c0392b}
@@ -589,7 +643,7 @@ export default function Perfil() {
           <div>
             <div className="hero-nome">{perfil.nome || "—"}</div>
             <div className="hero-email">{user?.email}</div>
-            {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.3rem'}}>📍 {perfil.cidade}, {perfil.pais}</div>}
+            {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.3rem'}}>{perfil.cidade}, {perfil.pais}</div>}
           </div>
         </div>
 
@@ -612,26 +666,29 @@ export default function Perfil() {
           <div className="nivel-top">
             <div>
               <div style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
-              <div className="nivel-badge" style={{background: nv.cor+'22', color: nv.cor}}>
-                <span style={{fontSize:'1.2rem'}}>{nv.icon}</span><span style={{fontWeight:600}}>{nv.nome}</span>
+              <div className="nivel-badge" style={{background: nv.cor+'1a', color: nv.cor}}>
+                <span className="nivel-sigla" style={{background:nv.cor}}>{nv.sigla}</span><span style={{fontWeight:700}}>{nv.nome}</span>
               </div>
             </div>
             <div style={{textAlign:'right'}}>
               <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:nv.cor}}>{nv.caucao===0?i.semCaucao:nv.caucao+"%"}</div>
-              <div style={{fontSize:'0.75rem',color:'var(--g6)'}}>{nv.caucao===0?i.caucao:i.caucao}</div>
+              <div style={{fontSize:'0.75rem',color:'var(--g6)'}}>{i.caucao}</div>
             </div>
           </div>
           {nv.proximo && (
             <div>
               <div className="nivel-barra"><div className="nivel-barra-fill" style={{width:`${progressoPct}%`,background:nv.cor}} /></div>
-              <div className="nivel-info"><span>{stats.totalPecas} · {i.alugueresLabel}</span><span>{i.faltam} {nv.falta} {i.para} {nv.icon} {nv.proximo}</span></div>
+              <div className="nivel-info"><span>{stats.totalPecas} · {i.alugueresLabel}</span><span>{i.faltam} {nv.falta} {i.para} {nv.nome}</span></div>
             </div>
           )}
-          {!nv.proximo && <div style={{fontSize:'0.82rem',color:nv.cor,fontWeight:500,marginTop:'0.5rem'}}>{i.nivelMaximo}</div>}
+          {!nv.proximo && <div style={{fontSize:'0.82rem',color:nv.cor,fontWeight:600,marginTop:'0.5rem'}}>{i.nivelMaximo}</div>}
           <div className="nivel-beneficios">
-            <div className="beneficio"><div className="beneficio-val" style={{color:'#cd7f32'}}>🥉</div><div className="beneficio-label">Bronze · 100%</div></div>
-            <div className="beneficio"><div className="beneficio-val" style={{color:'#7d8a8c'}}>🥈</div><div className="beneficio-label">Prata · 75%</div></div>
-            <div className="beneficio"><div className="beneficio-val" style={{color:'#f39c12'}}>🥇</div><div className="beneficio-label">Ouro · 50%</div></div>
+            {NIVEIS_TABELA.map(nivel => (
+              <div key={nivel.sigla} className="beneficio">
+                <div className="beneficio-sigla" style={{background:nivel.cor}}>{nivel.sigla}</div>
+                <div className="beneficio-label">{nivel.nome} · {nivel.caucao}</div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -640,7 +697,7 @@ export default function Perfil() {
             { val: stats.totalAlugueres, label: i.alugueresLabel, href: "/pedidos" },
             { val: Number(stats.totalGasto).toFixed(0)+"€", label: i.totalGasto },
             { val: stats.pecasAtivas, label: i.emCurso },
-            { val: stats.reservas, label: i.reservas, cor: stats.reservas>0?"#e67e22":undefined, href: "/pedidos?tab=reservas" },
+            { val: stats.reservas, label: i.reservas, cor: stats.reservas>0?"#b35900":undefined, href: "/pedidos?tab=reservas" },
             { val: stats.pontos||stats.totalPecas, label: i.pontosLabel },
           ].map((s,idx) => (
             <div key={idx} className="stat" onClick={() => s.href && (window.location.href = s.href)}>
@@ -651,7 +708,7 @@ export default function Perfil() {
         </div>
 
         <div className="pontos-card">
-          <p style={{fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g6)',fontWeight:500}}>{i.pontosFidelizacao}</p>
+          <p style={{fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g6)',fontWeight:600}}>{i.pontosFidelizacao}</p>
           <p style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.5rem'}}>{i.pontosDesc}</p>
           <div className="pontos-circles">
             {Array.from({length:10}).map((_,idx) => {
@@ -659,7 +716,7 @@ export default function Perfil() {
               const ciclo = pontos % 10;
               const cheio = idx < ciclo;
               const gratuito = idx === 9;
-              return <div key={idx} className="ponto" style={{background:cheio?(gratuito?'#c4748a':'var(--black)'):'var(--g1)',color:cheio?'#fff':'var(--g6)',border:gratuito?'2px solid #c4748a':'none'}}>{gratuito?"🎁":(cheio?"✓":idx+1)}</div>;
+              return <div key={idx} className="ponto" style={{background:cheio?(gratuito?'#c4748a':'var(--black)'):'var(--g1)',color:cheio?'#fff':'var(--g6)',border:gratuito?'2px solid #c4748a':'none'}}>{gratuito?"★":(cheio?"✓":idx+1)}</div>;
             })}
           </div>
         </div>
@@ -683,6 +740,7 @@ export default function Perfil() {
                       <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
                       <TimerInfo aluguer={a} lang={lang} />
                       {a.estado === "enviado" && <BotaoConfirmarRecepcao aluguer={a} i={i} onConfirmado={carregarPerfil} />}
+                      <BotaoVerTalao aluguer={a} i={i} />
                     </div>
                   </div>
                 </div>
@@ -729,7 +787,7 @@ export default function Perfil() {
           {alugueresHistorico.length === 0 ? (
             <div style={{textAlign:'center',padding:'0 2.5rem 2rem'}}>
               <p style={{color:'var(--g6)',marginBottom:'1.25rem'}}>{i.semHistorico}</p>
-              <a href="/catalogo" style={{display:'inline-block',padding:'0.9rem 2rem',background:'var(--black)',color:'var(--white)',textDecoration:'none',fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif"}}>{i.verCatalogo}</a>
+              <a href="/catalogo" style={{display:'inline-block',padding:'0.9rem 2rem',background:'var(--black)',color:'var(--white)',textDecoration:'none',fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",fontWeight:600}}>{i.verCatalogo}</a>
             </div>
           ) : (
             <>
@@ -747,6 +805,7 @@ export default function Perfil() {
                         {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
                         <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                         <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
+                        <BotaoVerTalao aluguer={a} i={i} />
                         {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
                       </div>
                     </div>
