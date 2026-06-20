@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
+import NotificationBell from "@/components/NotificationBell";
 const TRADUCOES = {
   pt: {
     titulo: "Os meus pedidos",
@@ -315,7 +315,10 @@ function PedidosContent() {
 
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
-        <a href="/" className="nav-back">{i.voltar}</a>
+        <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+          <NotificationBell lang={lang} />
+          <a href="/" className="nav-back">{i.voltar}</a>
+        </div>
       </nav>
 
       <div className="page">
