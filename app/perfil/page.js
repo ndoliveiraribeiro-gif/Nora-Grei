@@ -10,17 +10,39 @@ const NIVEL = (n) => {
 };
 
 const ESTADO_INFO = {
-  pendente: { label: "Pendente", cor: "#f39c12", bg: "#fff8e1" },
-  confirmado: { label: "Confirmado", cor: "#7b1fa2", bg: "#f3e5f5" },
-  enviado: { label: "Enviado", cor: "#1976d2", bg: "#e3f2fd" },
-  ativo: { label: "Ativo", cor: "#27ae60", bg: "#e8f5e9" },
-  em_verificacao: { label: "Em verificação", cor: "#e67e22", bg: "#fff8e1" },
-  devolvido: { label: "Devolvido", cor: "#5a5855", bg: "#f0eeeb" },
-  devolvido_danificado: { label: "Devolvido c/ danos", cor: "#e74c3c", bg: "#fff5f5" },
-  cancelado: { label: "Cancelado", cor: "#e74c3c", bg: "#fff5f5" },
+  pt: {
+    pendente: { label: "A aguardar pagamento", cor: "#f39c12", bg: "#fff8e1" },
+    confirmado: { label: "Pagamento confirmado", cor: "#7b1fa2", bg: "#f3e5f5" },
+    enviado: { label: "A caminho", cor: "#1976d2", bg: "#e3f2fd" },
+    ativo: { label: "A usar", cor: "#27ae60", bg: "#e8f5e9" },
+    em_verificacao: { label: "Em inspeção", cor: "#e67e22", bg: "#fff8e1" },
+    devolvido: { label: "Concluído", cor: "#5a5855", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Concluído — com danos", cor: "#e74c3c", bg: "#fff5f5" },
+    cancelado: { label: "Cancelado", cor: "#e74c3c", bg: "#fff5f5" },
+  },
+  fr: {
+    pendente: { label: "En attente de paiement", cor: "#f39c12", bg: "#fff8e1" },
+    confirmado: { label: "Paiement confirmé", cor: "#7b1fa2", bg: "#f3e5f5" },
+    enviado: { label: "En route", cor: "#1976d2", bg: "#e3f2fd" },
+    ativo: { label: "En cours d'utilisation", cor: "#27ae60", bg: "#e8f5e9" },
+    em_verificacao: { label: "En inspection", cor: "#e67e22", bg: "#fff8e1" },
+    devolvido: { label: "Terminé", cor: "#5a5855", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Terminé — avec dommages", cor: "#e74c3c", bg: "#fff5f5" },
+    cancelado: { label: "Annulé", cor: "#e74c3c", bg: "#fff5f5" },
+  },
+  lt: {
+    pendente: { label: "Laukiama mokėjimo", cor: "#f39c12", bg: "#fff8e1" },
+    confirmado: { label: "Mokėjimas patvirtintas", cor: "#7b1fa2", bg: "#f3e5f5" },
+    enviado: { label: "Keliauja", cor: "#1976d2", bg: "#e3f2fd" },
+    ativo: { label: "Naudojama", cor: "#27ae60", bg: "#e8f5e9" },
+    em_verificacao: { label: "Tikrinama", cor: "#e67e22", bg: "#fff8e1" },
+    devolvido: { label: "Užbaigta", cor: "#5a5855", bg: "#f0eeeb" },
+    devolvido_danificado: { label: "Užbaigta — su pažeidimais", cor: "#e74c3c", bg: "#fff5f5" },
+    cancelado: { label: "Atšaukta", cor: "#e74c3c", bg: "#fff5f5" },
+  },
 };
 
-function TimerInfo({ aluguer }) {
+function TimerInfo({ aluguer, lang }) {
   const [tempo, setTempo] = useState("");
 
   useEffect(() => {
@@ -28,10 +50,8 @@ function TimerInfo({ aluguer }) {
     const calc = () => {
       let alvo;
       if (aluguer.estado === "enviado") {
-        // Timer até receber — usa data_entrega_prevista ou data_inicio
         alvo = aluguer.data_entrega_prevista || aluguer.data_inicio;
       } else if (aluguer.estado === "ativo") {
-        // Timer até devolução
         alvo = aluguer.data_fim;
       }
       if (!alvo) { setTempo(""); return; }
@@ -47,12 +67,19 @@ function TimerInfo({ aluguer }) {
     return () => clearInterval(iv);
   }, [aluguer]);
 
+  const TXT = {
+    pt: { chega: "Chega em", aCaminho: "A caminho", devolver: "Devolver em" },
+    fr: { chega: "Arrive dans", aCaminho: "En route", devolver: "À retourner dans" },
+    lt: { chega: "Atvyks per", aCaminho: "Keliauja", devolver: "Grąžinti per" },
+  };
+  const x = TXT[lang] || TXT.pt;
+
   if (aluguer.estado === "enviado") {
     return (
       <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#e3f2fd',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #1976d2'}}>
         <span style={{fontSize:'0.9rem'}}>🚚</span>
         <span style={{fontSize:'0.72rem',color:'#1565c0'}}>
-          {tempo ? <>Chega em <strong>{tempo}</strong></> : "A caminho"}
+          {tempo ? <>{x.chega} <strong>{tempo}</strong></> : x.aCaminho}
         </span>
       </div>
     );
@@ -61,14 +88,14 @@ function TimerInfo({ aluguer }) {
     return (
       <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.5rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #f39c12'}}>
         <span style={{fontSize:'0.9rem'}}>↩</span>
-        <span style={{fontSize:'0.72rem',color:'#e67e22'}}>Devolver em <strong>{tempo}</strong></span>
+        <span style={{fontSize:'0.72rem',color:'#e67e22'}}>{x.devolver} <strong>{tempo}</strong></span>
       </div>
     );
   }
   return null;
 }
 
-function GeradorCodigo({ aluguer }) {
+function GeradorCodigo({ aluguer, i }) {
   const [codigo, setCodigo] = useState(null);
   const [copiado, setCopiado] = useState(false);
   const [aberto, setAberto] = useState(false);
@@ -105,19 +132,19 @@ function GeradorCodigo({ aluguer }) {
 
   if (aberto && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'0.85rem',marginTop:'0.5rem'}}>
-      <p style={{fontSize:'0.58rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.4rem'}}>Código de desconto</p>
+      <p style={{fontSize:'0.58rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.4rem'}}>{i.codigoDesconto}</p>
       <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,letterSpacing:'0.15em',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
-      <p style={{fontSize:'0.68rem',color:'#5a5855',marginBottom:'0.6rem'}}>Desconta <strong>{codigo.valor}€</strong> no preço final em noragrei.com</p>
+      <p style={{fontSize:'0.68rem',color:'#5a5855',marginBottom:'0.6rem'}}>{i.descontoInfo} <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.4rem'}}>
-        <button onClick={copiar} style={{flex:1,padding:'0.45rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif"}}>{copiado?"Copiado!":"Copiar"}</button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.45rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',textDecoration:'none',textAlign:'center',fontFamily:"'Jost',sans-serif"}}>Ir à loja ↗</a>
+        <button onClick={copiar} style={{flex:1,padding:'0.45rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif"}}>{copiado?i.copiado:i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.45rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',textDecoration:'none',textAlign:'center',fontFamily:"'Jost',sans-serif"}}>{i.irLoja}</a>
       </div>
     </div>
   );
 
   return (
     <button onClick={gerar} disabled={loading} style={{width:'100%',padding:'0.55rem',marginTop:'0.5rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',cursor:'pointer',fontWeight:500,fontFamily:"'Jost',sans-serif"}}>
-      {loading ? "..." : "🏷️ Comprar esta peça"}
+      {loading ? "..." : `🏷️ ${i.comprarPeca}`}
     </button>
   );
 }
@@ -144,6 +171,110 @@ const t = {
     perfilIncompleto: "⚠️ Perfil incompleto",
     perfilIncompletoDesc: "Para poderes alugar peças, precisamos destes dados para a entrega: morada completa, código postal, cidade, NIF, número de Cartão de Cidadão e telefone.",
     camposObrigatorios: "* Campos obrigatórios para alugar",
+    nivelConfianca: "Nível de confiança",
+    caucao: "caução",
+    semCaucao: "Sem",
+    faltam: "Faltam",
+    para: "para",
+    nivelMaximo: "💎 Nível máximo — caução gratuita!",
+    pontosFidelizacao: "Pontos de fidelização",
+    pontosDesc: "1 ponto por peça alugada · A 10ª peça é grátis",
+    emCurso: "Em curso",
+    alugueresLabel: "Alugueres",
+    totalGasto: "Total gasto",
+    reservas: "Reservas",
+    pontosLabel: "Pontos",
+    codigoDesconto: "Código de desconto",
+    descontoInfo: "Desconta no preço final em noragrei.com —",
+    copiado: "Copiado!",
+    copiar: "Copiar",
+    irLoja: "Ir à loja ↗",
+    comprarPeca: "Comprar esta peça",
+    voltarInicio: "← Início",
+  },
+  fr: {
+    titulo: "Mon profil", dadosPessoais: "Informations personnelles",
+    nome: "Nom complet", email: "Email", telefone: "Téléphone",
+    dataNascimento: "Date de naissance", genero: "Genre",
+    generosOpcoes: ["Femme", "Homme", "Préfère ne pas préciser"],
+    nif: "NIF (numéro fiscal)", nifPlaceholder: "123 456 789",
+    numeroCC: "Numéro de carte d'identité", numeroCCPlaceholder: "12345678 9 ZZ0",
+    localizacao: "Localisation", cidade: "Ville", pais: "Pays",
+    codigoPostal: "Code postal", morada: "Adresse complète",
+    numeroPorta: "Numéro de rue", andar: "Étage / Appartement",
+    detectarLocalizacao: "📍 Détecter automatiquement",
+    localizacaoOk: "📍 Localisation détectée ✓",
+    guardar: "Enregistrer", guardado: "Enregistré ! ✓",
+    historico: "Historique des locations",
+    semHistorico: "Vous n'avez pas encore de locations.",
+    verCatalogo: "Explorer le catalogue",
+    sair: "Se déconnecter",
+    verPedidos: "Voir mes commandes",
+    perfilIncompleto: "⚠️ Profil incomplet",
+    perfilIncompletoDesc: "Pour louer des pièces, nous avons besoin de ces informations pour la livraison : adresse complète, code postal, ville, NIF, numéro de carte d'identité et téléphone.",
+    camposObrigatorios: "* Champs obligatoires pour louer",
+    nivelConfianca: "Niveau de confiance",
+    caucao: "dépôt",
+    semCaucao: "Sans",
+    faltam: "Encore",
+    para: "pour",
+    nivelMaximo: "💎 Niveau maximum — dépôt gratuit !",
+    pontosFidelizacao: "Points de fidélité",
+    pontosDesc: "1 point par location · La 10ème pièce est gratuite",
+    emCurso: "En cours",
+    alugueresLabel: "Locations",
+    totalGasto: "Total dépensé",
+    reservas: "Réservations",
+    pontosLabel: "Points",
+    codigoDesconto: "Code de réduction",
+    descontoInfo: "Déduit du prix final sur noragrei.com —",
+    copiado: "Copié !",
+    copiar: "Copier",
+    irLoja: "Aller à la boutique ↗",
+    comprarPeca: "Acheter cette pièce",
+    voltarInicio: "← Accueil",
+  },
+  lt: {
+    titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
+    nome: "Vardas, pavardė", email: "El. paštas", telefone: "Telefonas",
+    dataNascimento: "Gimimo data", genero: "Lytis",
+    generosOpcoes: ["Moteris", "Vyras", "Nenoriu nurodyti"],
+    nif: "Mokesčių mokėtojo kodas", nifPlaceholder: "123 456 789",
+    numeroCC: "Asmens kodas / dokumento numeris", numeroCCPlaceholder: "12345678 9 ZZ0",
+    localizacao: "Vieta", cidade: "Miestas", pais: "Šalis",
+    codigoPostal: "Pašto kodas", morada: "Pilnas adresas",
+    numeroPorta: "Namo numeris", andar: "Aukštas / Butas",
+    detectarLocalizacao: "📍 Nustatyti automatiškai",
+    localizacaoOk: "📍 Vieta nustatyta ✓",
+    guardar: "Išsaugoti", guardado: "Išsaugota! ✓",
+    historico: "Nuomos istorija",
+    semHistorico: "Kol kas neturite nuomos.",
+    verCatalogo: "Naršyti katalogą",
+    sair: "Atsijungti",
+    verPedidos: "Žiūrėti mano užsakymus",
+    perfilIncompleto: "⚠️ Profilis nepilnas",
+    perfilIncompletoDesc: "Norėdami nuomoti drabužius, mums reikia šių pristatymo duomenų: pilno adreso, pašto kodo, miesto, mokesčių kodo, asmens dokumento numerio ir telefono.",
+    camposObrigatorios: "* Privalomi laukai norint nuomoti",
+    nivelConfianca: "Pasitikėjimo lygis",
+    caucao: "užstatas",
+    semCaucao: "Be",
+    faltam: "Trūksta",
+    para: "iki",
+    nivelMaximo: "💎 Maksimalus lygis — užstatas nemokamas!",
+    pontosFidelizacao: "Lojalumo taškai",
+    pontosDesc: "1 taškas už kiekvieną nuomą · 10-as drabužis nemokamas",
+    emCurso: "Vykstantys",
+    alugueresLabel: "Nuomos",
+    totalGasto: "Iš viso išleista",
+    reservas: "Rezervacijos",
+    pontosLabel: "Taškai",
+    codigoDesconto: "Nuolaidos kodas",
+    descontoInfo: "Atskaitoma nuo galutinės kainos noragrei.com —",
+    copiado: "Nukopijuota!",
+    copiar: "Kopijuoti",
+    irLoja: "Eiti į parduotuvę ↗",
+    comprarPeca: "Pirkti šį drabužį",
+    voltarInicio: "← Pradžia",
   },
 };
 
@@ -159,10 +290,14 @@ export default function Perfil() {
   const [uploadingFoto, setUploadingFoto] = useState(false);
   const [detectandoLoc, setDetectandoLoc] = useState(false);
   const [locDetectada, setLocDetectada] = useState(false);
-  const [lang] = useState("pt");
+  const [lang, setLang] = useState("pt");
   const fileRef = useRef();
 
-  useEffect(() => { carregarPerfil(); }, []);
+  useEffect(() => {
+    const saved = localStorage.getItem("ng_lang");
+    if (saved && t[saved]) setLang(saved);
+    carregarPerfil();
+  }, []);
 
   const carregarPerfil = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -230,16 +365,15 @@ export default function Perfil() {
   const sair = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
   const set = (k, v) => setPerfil(prev => ({ ...prev, [k]: v }));
   const i = t[lang] || t.pt;
+  const estadoInfo = ESTADO_INFO[lang] || ESTADO_INFO.pt;
 
-  if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#888'}}>A carregar...</div>;
+  if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#888'}}>...</div>;
 
   const nv = NIVEL(stats.totalPecas);
   const proximoNivelMin = nv.nome === "Bronze" ? 5 : nv.nome === "Prata" ? 10 : nv.nome === "Ouro" ? 20 : 20;
   const progressoPct = nv.proximo ? Math.min(100, Math.round(((stats.totalPecas - (proximoNivelMin - nv.falta)) / nv.falta) * 100)) : 100;
 
-  // Alugueres em curso (não finalizados) — onde mostramos timer
   const alugueresAtivos = alugueres.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado));
-  // Histórico (finalizados) — onde mostramos botão de comprar
   const alugueresHistorico = alugueres.filter(a => ["devolvido","devolvido_danificado","cancelado"].includes(a.estado));
 
   const perfilIncompleto = !CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
@@ -327,12 +461,11 @@ export default function Perfil() {
 
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
-        <a href="/" className="nav-back">← Início</a>
+        <a href="/" className="nav-back">{i.voltarInicio}</a>
       </nav>
 
       <div className="page">
 
-        {/* HERO */}
         <div className="hero">
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
@@ -340,13 +473,12 @@ export default function Perfil() {
             <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={uploadFoto} />
           </div>
           <div>
-            <div className="hero-nome">{perfil.nome || "Cliente"}</div>
+            <div className="hero-nome">{perfil.nome || "—"}</div>
             <div className="hero-email">{user?.email}</div>
             {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g5)',marginTop:'0.3rem'}}>📍 {perfil.cidade}, {perfil.pais}</div>}
           </div>
         </div>
 
-        {/* ALERTA PERFIL INCOMPLETO */}
         {perfilIncompleto && (
           <div className="alerta-perfil">
             <div className="alerta-perfil-titulo">{i.perfilIncompleto}</div>
@@ -354,27 +486,26 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* NÍVEL */}
         <div className="nivel-card">
           <div className="nivel-top">
             <div>
-              <div style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g5)',marginBottom:'0.4rem'}}>Nível de confiança</div>
+              <div style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g5)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
               <div className="nivel-badge" style={{background: nv.cor+'22', color: nv.cor}}>
                 <span style={{fontSize:'1.2rem'}}>{nv.icon}</span><span style={{fontWeight:600}}>{nv.nome}</span>
               </div>
             </div>
             <div style={{textAlign:'right'}}>
-              <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:nv.cor}}>{nv.caucao===0?"Sem":nv.caucao+"%"}</div>
-              <div style={{fontSize:'0.75rem',color:'var(--g5)'}}>{nv.caucao===0?"caução":"de caução"}</div>
+              <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:nv.cor}}>{nv.caucao===0?i.semCaucao:nv.caucao+"%"}</div>
+              <div style={{fontSize:'0.75rem',color:'var(--g5)'}}>{nv.caucao===0?i.caucao:i.caucao}</div>
             </div>
           </div>
           {nv.proximo && (
             <div>
               <div className="nivel-barra"><div className="nivel-barra-fill" style={{width:`${progressoPct}%`,background:nv.cor}} /></div>
-              <div className="nivel-info"><span>{stats.totalPecas} peças alugadas</span><span>Faltam {nv.falta} para {nv.icon} {nv.proximo}</span></div>
+              <div className="nivel-info"><span>{stats.totalPecas} · {i.alugueresLabel}</span><span>{i.faltam} {nv.falta} {i.para} {nv.icon} {nv.proximo}</span></div>
             </div>
           )}
-          {!nv.proximo && <div style={{fontSize:'0.82rem',color:nv.cor,fontWeight:500,marginTop:'0.5rem'}}>💎 Nível máximo — caução gratuita!</div>}
+          {!nv.proximo && <div style={{fontSize:'0.82rem',color:nv.cor,fontWeight:500,marginTop:'0.5rem'}}>{i.nivelMaximo}</div>}
           <div className="nivel-beneficios">
             <div className="beneficio"><div className="beneficio-val" style={{color:'#cd7f32'}}>🥉</div><div className="beneficio-label">Bronze · 100%</div></div>
             <div className="beneficio"><div className="beneficio-val" style={{color:'#95a5a6'}}>🥈</div><div className="beneficio-label">Prata · 75%</div></div>
@@ -382,53 +513,50 @@ export default function Perfil() {
           </div>
         </div>
 
-        {/* STATS */}
         <div className="stats">
           {[
-            { val: stats.totalAlugueres, label: "Alugueres", href: "/pedidos" },
-            { val: Number(stats.totalGasto).toFixed(0)+"€", label: "Total gasto" },
-            { val: stats.pecasAtivas, label: "Em curso" },
-            { val: stats.reservas, label: "Reservas", cor: stats.reservas>0?"#e67e22":undefined, href: "/pedidos?tab=reservas" },
-            { val: stats.pontos||stats.totalPecas, label: "Pontos" },
-          ].map((s,i) => (
-            <div key={i} className="stat" onClick={() => s.href && (window.location.href = s.href)}>
+            { val: stats.totalAlugueres, label: i.alugueresLabel, href: "/pedidos" },
+            { val: Number(stats.totalGasto).toFixed(0)+"€", label: i.totalGasto },
+            { val: stats.pecasAtivas, label: i.emCurso },
+            { val: stats.reservas, label: i.reservas, cor: stats.reservas>0?"#e67e22":undefined, href: "/pedidos?tab=reservas" },
+            { val: stats.pontos||stats.totalPecas, label: i.pontosLabel },
+          ].map((s,idx) => (
+            <div key={idx} className="stat" onClick={() => s.href && (window.location.href = s.href)}>
               <div className="stat-val" style={s.cor?{color:s.cor}:{}}>{s.val}</div>
               <div className="stat-label">{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* PONTOS */}
         <div className="pontos-card">
-          <p style={{fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g5)',fontWeight:500}}>Pontos de fidelização</p>
-          <p style={{fontSize:'0.85rem',color:'var(--g5)',marginTop:'0.5rem'}}>1 ponto por peça alugada · A 10ª peça é <strong>grátis</strong></p>
+          <p style={{fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g5)',fontWeight:500}}>{i.pontosFidelizacao}</p>
+          <p style={{fontSize:'0.85rem',color:'var(--g5)',marginTop:'0.5rem'}}>{i.pontosDesc}</p>
           <div className="pontos-circles">
-            {Array.from({length:10}).map((_,i) => {
+            {Array.from({length:10}).map((_,idx) => {
               const pontos = stats.pontos||stats.totalPecas;
               const ciclo = pontos % 10;
-              const cheio = i < ciclo;
-              const gratuito = i === 9;
-              return <div key={i} className="ponto" style={{background:cheio?(gratuito?'#c4748a':'var(--black)'):'var(--g1)',color:cheio?'#fff':'var(--g5)',border:gratuito?'2px solid #c4748a':'none'}}>{gratuito?"🎁":(cheio?"✓":i+1)}</div>;
+              const cheio = idx < ciclo;
+              const gratuito = idx === 9;
+              return <div key={idx} className="ponto" style={{background:cheio?(gratuito?'#c4748a':'var(--black)'):'var(--g1)',color:cheio?'#fff':'var(--g5)',border:gratuito?'2px solid #c4748a':'none'}}>{gratuito?"🎁":(cheio?"✓":idx+1)}</div>;
             })}
           </div>
         </div>
 
-        {/* ALUGUERES EM CURSO — com timer e estado */}
         {alugueresAtivos.length > 0 && (
           <div className="card" style={{padding:0,overflow:'hidden'}}>
-            <p className="card-t" style={{padding:'2rem 2.5rem 0',border:'none',marginBottom:'1rem'}}>Em curso</p>
+            <p className="card-t" style={{padding:'2rem 2.5rem 0',border:'none',marginBottom:'1rem'}}>{i.emCurso}</p>
             {alugueresAtivos.map(a => {
               const peca = a.stock_tamanhos?.pecas;
-              const ei = ESTADO_INFO[a.estado] || ESTADO_INFO.pendente;
+              const ei = estadoInfo[a.estado] || estadoInfo.pendente;
               return (
                 <div key={a.id} className="aluguer-card">
                   <div className="aluguer-row">
                     <div className="aluguer-img">{peca?.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />}</div>
                     <div style={{flex:1}}>
-                      <div className="aluguer-nome">{peca?.nome || "Peça"}</div>
+                      <div className="aluguer-nome">{peca?.nome || "—"}</div>
                       <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                       <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
-                      <TimerInfo aluguer={a} />
+                      <TimerInfo aluguer={a} lang={lang} />
                     </div>
                   </div>
                 </div>
@@ -437,7 +565,6 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* DADOS PESSOAIS */}
         <div className="card">
           <p className="card-t">{i.dadosPessoais}</p>
           <div className="grid2">
@@ -457,7 +584,7 @@ export default function Perfil() {
           <div className="divider" />
           <p className="card-t" style={{marginBottom:'1rem'}}>{i.localizacao}</p>
           <div className="grid2">
-            <div className="fg full"><button className="loc-btn" onClick={detectarLocalizacao} disabled={detectandoLoc}>{detectandoLoc?"A detectar...":locDetectada?i.localizacaoOk:i.detectarLocalizacao}</button></div>
+            <div className="fg full"><button className="loc-btn" onClick={detectarLocalizacao} disabled={detectandoLoc}>{detectandoLoc?"...":locDetectada?i.localizacaoOk:i.detectarLocalizacao}</button></div>
             <div className="fg"><label className="lbl">{i.cidade} *</label><input className="inp" value={perfil.cidade} onChange={e => set("cidade", e.target.value)} placeholder="Lisboa" /></div>
             <div className="fg"><label className="lbl">{i.codigoPostal} *</label><input className="inp" value={perfil.codigo_postal} onChange={e => set("codigo_postal", e.target.value)} placeholder="1000-001" /></div>
             <div className="fg"><label className="lbl">{i.pais}</label><input className="inp" value={perfil.pais} onChange={e => set("pais", e.target.value)} /></div>
@@ -471,7 +598,6 @@ export default function Perfil() {
           <div className="save-row"><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
         </div>
 
-        {/* HISTÓRICO — com gerador de código */}
         <div className="card" style={{padding:0,overflow:'hidden'}}>
           <p className="card-t" style={{padding:'2rem 2.5rem 0',border:'none',marginBottom: alugueresHistorico.length ? '1rem' : '2rem'}}>{i.historico}</p>
           {alugueresHistorico.length === 0 ? (
@@ -483,16 +609,16 @@ export default function Perfil() {
             <>
               {alugueresHistorico.slice(0,5).map(a => {
                 const peca = a.stock_tamanhos?.pecas;
-                const ei = ESTADO_INFO[a.estado] || ESTADO_INFO.devolvido;
+                const ei = estadoInfo[a.estado] || estadoInfo.devolvido;
                 return (
                   <div key={a.id} className="aluguer-card">
                     <div className="aluguer-row">
                       <div className="aluguer-img">{peca?.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />}</div>
                       <div style={{flex:1}}>
-                        <div className="aluguer-nome">{peca?.nome || "Peça"}</div>
+                        <div className="aluguer-nome">{peca?.nome || "—"}</div>
                         <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                         <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
-                        {a.estado === "devolvido" && <GeradorCodigo aluguer={a} />}
+                        {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
                       </div>
                     </div>
                   </div>
