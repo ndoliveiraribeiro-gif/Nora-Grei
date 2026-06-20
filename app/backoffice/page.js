@@ -420,20 +420,45 @@ export default function Backoffice() {
   };
 
   const carregarEstatisticas = async () => {
-    const [alRes, pecasRes, clientesRes, reservasRes] = await Promise.all([
+    const [alRes, pecasRes, clientesRes, reservasRes, recibosRes] = await Promise.all([
       supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))), clientes(nome, email, cidade)"),
       supabase.from("pecas").select("*, categorias(nome), stock_tamanhos(quantidade_total, quantidade_disponivel)"),
       supabase.from("clientes").select("*, alugueres(id, estado, valor_aluguer, created_at)"),
       supabase.from("reservas_espera").select("*, stock_tamanhos(pecas(nome))"),
+      supabase.from("recibos").select("*, clientes(nome, email)"),
     ]);
-    const al = alRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [];
+    const al = alRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [], recibos = recibosRes.data || [];
     const roiPecas = pl.map(p => { const ap = al.filter(a => a.stock_tamanhos?.pecas?.id === p.id); const rec = ap.reduce((s, a) => s + (a.valor_aluguer || 0), 0); return { ...p, receitaGerada: rec, vezesAlugada: ap.length, roi: p.valor_peca > 0 ? ((rec/p.valor_peca)*100).toFixed(0) : 0, danificada: ap.filter(a => a.estado === "devolvido_danificado").length }; }).sort((a,b) => b.vezesAlugada - a.vezesAlugada);
     const pecasEspera = {}; rl.forEach(r => { const n = r.stock_tamanhos?.pecas?.nome || "—"; pecasEspera[n] = (pecasEspera[n]||0)+1; });
     const cidades = {}; al.forEach(a => { const c = a.clientes?.cidade || "Desconhecida"; cidades[c] = (cidades[c]||0)+1; });
     const catCount = {}; al.forEach(a => { const c = a.stock_tamanhos?.pecas?.categorias?.nome || "Outro"; catCount[c] = (catCount[c]||0)+1; });
     const clNivel = cl.map(c => { const comp = (c.alugueres||[]).filter(a => ["devolvido","devolvido_danificado"].includes(a.estado)).length; const tot = (c.alugueres||[]).filter(a => a.estado !== "cancelado").length; const gasto = (c.alugueres||[]).reduce((s,a) => s+(a.valor_aluguer||0),0); return { ...c, alugueresTotal: tot, alugueresCompletos: comp, totalGasto: gasto, nivel: NIVEL(comp) }; });
     const ltv = clNivel.reduce((s,c) => s+c.totalGasto,0) / (clNivel.length||1);
-    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.alugueresTotal-a.alugueresTotal).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: al.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: al.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", pecaMenosAlugada: [...roiPecas].reverse()[0]?.nome || "—" });
+
+    // --- Métricas a partir dos recibos/talões ---
+    const porMetodo = {};
+    recibos.forEach(r => {
+      const m = r.metodo_pagamento || "outro";
+      if (!porMetodo[m]) porMetodo[m] = { total: 0, pagos: 0, pendentes: 0, valorPago: 0, valorPendente: 0, somaTempoConfirmacao: 0, nConfirmados: 0 };
+      porMetodo[m].total++;
+      if (r.estado === "pago") { porMetodo[m].pagos++; porMetodo[m].valorPago += (r.valor_total || 0); }
+      else { porMetodo[m].pendentes++; porMetodo[m].valorPendente += (r.valor_total || 0); }
+    });
+    const distribuicaoPagamento = Object.entries(porMetodo).map(([metodo, d]) => ({
+      metodo, total: d.total, pagos: d.pagos, pendentes: d.pendentes,
+      taxaConversao: d.total > 0 ? ((d.pagos / d.total) * 100).toFixed(0) : 0,
+      ticketMedio: d.total > 0 ? ((d.valorPago + d.valorPendente) / d.total).toFixed(0) : 0,
+    })).sort((a, b) => b.total - a.total);
+
+    const receitaRecebida = recibos.filter(r => r.estado === "pago").reduce((s, r) => s + (r.valor_total || 0), 0);
+    const receitaPendente = recibos.filter(r => r.estado !== "pago").reduce((s, r) => s + (r.valor_total || 0), 0);
+    const ticketMedioGeral = recibos.length > 0 ? ((receitaRecebida + receitaPendente) / recibos.length).toFixed(0) : 0;
+
+    const comprovativosPendentes = recibos
+      .filter(r => r.estado !== "pago" && r.comprovativo_url)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.alugueresTotal-a.alugueresTotal).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: al.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: al.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", pecaMenosAlugada: [...roiPecas].reverse()[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length });
   };
 
   const perguntarAI = async () => {
@@ -1217,6 +1242,60 @@ export default function Backoffice() {
                     </table>
                   </div>
                 </div>
+                <div style={{ ...CARD,marginTop:"1rem" }}>
+                  <p style={CARD_T}>Pagamentos & Recibos ({estatisticas.totalRecibos} talões)</p>
+                  <div style={COL4}>
+                    {[
+                      { val: `${estatisticas.receitaRecebida.toFixed(0)}€`, lbl: "Receita recebida", cor: "#27ae60" },
+                      { val: `${estatisticas.receitaPendente.toFixed(0)}€`, lbl: "Receita pendente", cor: "#f39c12" },
+                      { val: `${estatisticas.ticketMedioGeral}€`, lbl: "Ticket médio", cor: "#c4748a" },
+                      { val: estatisticas.comprovativosPendentes.length, lbl: "Comprovativos a validar", cor: estatisticas.comprovativosPendentes.length > 0 ? "#e74c3c" : "#27ae60" },
+                    ].map((s,i) => (
+                      <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
+                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p style={{ ...CARD_T,marginTop:"1.5rem" }}>Distribuição por método de pagamento</p>
+                  <div style={{ overflowX:"auto" }}>
+                    <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                      <thead><tr>{["Método","Total","Pagos","Pendentes","Taxa conversão","Ticket médio"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        {estatisticas.distribuicaoPagamento.map(d => (
+                          <tr key={d.metodo} style={{ background:"#fff" }}>
+                            <td style={TD}><strong style={{ textTransform:"capitalize" }}>{d.metodo}</strong></td>
+                            <td style={TD}>{d.total}</td>
+                            <td style={{ ...TD,color:"#27ae60",fontWeight:600 }}>{d.pagos}</td>
+                            <td style={{ ...TD,color:"#f39c12",fontWeight:600 }}>{d.pendentes}</td>
+                            <td style={TD}><span style={{ color:d.taxaConversao>=80?"#27ae60":d.taxaConversao>=50?"#f39c12":"#e74c3c",fontWeight:700 }}>{d.taxaConversao}%</span></td>
+                            <td style={TD}>{d.ticketMedio}€</td>
+                          </tr>
+                        ))}
+                        {estatisticas.distribuicaoPagamento.length === 0 && (
+                          <tr><td colSpan={6} style={{ ...TD,textAlign:"center",color:"#888" }}>Sem dados de pagamento ainda</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {estatisticas.comprovativosPendentes.length > 0 && (
+                    <>
+                      <p style={{ ...CARD_T,marginTop:"1.5rem" }}>⚠️ Comprovativos à espera de validação</p>
+                      {estatisticas.comprovativosPendentes.map(r => (
+                        <div key={r.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.75rem 0",borderBottom:"1px solid #f8f8f6" }}>
+                          <div>
+                            <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{r.clientes?.nome || "—"}</div>
+                            <div style={{ fontSize:"0.72rem",color:"#888" }}>{r.numero} · {new Date(r.created_at).toLocaleDateString("pt-PT")} · {r.valor_total}€</div>
+                          </div>
+                          <a href={r.comprovativo_url} target="_blank" rel="noopener noreferrer" style={BTN("outline","sm")}>Ver comprovativo ↗</a>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+
                 <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginTop:"1rem" }}>
                   <div style={CARD}>
                     <p style={CARD_T}>Clientes mais ativos</p>
