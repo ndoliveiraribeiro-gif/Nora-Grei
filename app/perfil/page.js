@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import NotificationBell from "@/components/NotificationBell";
 
 const NIVEL = (n) => {
   if (n >= 20) return { nome: "Platina", icon: "💎", cor: "#6c5ce7", caucao: 0, proximo: null, falta: 0 };
@@ -571,7 +572,10 @@ export default function Perfil() {
 
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
-        <a href="/" className="nav-back">{i.voltarInicio}</a>
+        <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+          <NotificationBell lang={lang} />
+          <a href="/" className="nav-back">{i.voltarInicio}</a>
+        </div>
       </nav>
 
       <div className="page">
