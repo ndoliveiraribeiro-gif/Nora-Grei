@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
@@ -313,6 +313,174 @@ function SeeWhois() {
     </>
   );
 }
+
+// --- CAIXA / CONTABILIDADE ---
+const CATEGORIAS_DESPESA = ["Compra de stock", "Manutenção", "Envio/Logística", "Marketing", "Higienização", "Outro"];
+
+function Caixa() {
+  const [movimentos, setMovimentos] = useState([]);
+  const [despesas, setDespesas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [novaDespesa, setNovaDespesa] = useState({ descricao: "", categoria: CATEGORIAS_DESPESA[0], valor: "", data: new Date().toISOString().split("T")[0] });
+  const [aGuardar, setAGuardar] = useState(false);
+  const [mesFiltro, setMesFiltro] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+
+  useEffect(() => { carregarCaixa(); }, []);
+
+  const carregarCaixa = async () => {
+    setLoading(true);
+    const [recibosRes, alugueresRes, despesasRes] = await Promise.all([
+      supabase.from("recibos").select("*, clientes(nome)").eq("estado", "pago").order("created_at", { ascending: false }),
+      supabase.from("alugueres").select("id, valor_aluguer, deposito_valor, deposito_estado, caucao_libertada_em, clientes(nome)").eq("deposito_estado", "libertado").not("caucao_libertada_em", "is", null),
+      supabase.from("despesas").select("*").order("data", { ascending: false }),
+    ]);
+
+    const entradas = (recibosRes.data || []).map(r => ({
+      tipo: "entrada", data: r.created_at, descricao: `Recibo ${r.numero} — ${r.clientes?.nome || "Cliente"}`, valor: r.valor_total, categoria: r.metodo_pagamento,
+    }));
+    const saidasCaucao = (alugueresRes.data || []).map(a => ({
+      tipo: "saida", data: a.caucao_libertada_em, descricao: `Caução devolvida — ${a.clientes?.nome || "Cliente"}`, valor: a.deposito_valor || 0, categoria: "Caução",
+    }));
+    const saidasDespesas = (despesasRes.data || []).map(d => ({
+      tipo: "saida", data: d.data, descricao: d.descricao, valor: d.valor, categoria: d.categoria, id: d.id,
+    }));
+
+    const todos = [...entradas, ...saidasCaucao, ...saidasDespesas].sort((a, b) => new Date(b.data) - new Date(a.data));
+    setMovimentos(todos);
+    setDespesas(despesasRes.data || []);
+    setLoading(false);
+  };
+
+  const registarDespesa = async () => {
+    if (!novaDespesa.descricao || !novaDespesa.valor) { alert("Descrição e valor são obrigatórios"); return; }
+    setAGuardar(true);
+    const { error } = await supabase.from("despesas").insert({
+      descricao: novaDespesa.descricao, categoria: novaDespesa.categoria,
+      valor: parseFloat(novaDespesa.valor), data: novaDespesa.data,
+    });
+    setAGuardar(false);
+    if (error) { alert("Erro: " + error.message); return; }
+    setNovaDespesa({ descricao: "", categoria: CATEGORIAS_DESPESA[0], valor: "", data: new Date().toISOString().split("T")[0] });
+    carregarCaixa();
+  };
+
+  const apagarDespesa = async (id) => {
+    if (!confirm("Apagar esta despesa?")) return;
+    await supabase.from("despesas").delete().eq("id", id);
+    carregarCaixa();
+  };
+
+  const movimentosDoMes = movimentos.filter(m => m.data && m.data.slice(0, 7) === mesFiltro);
+
+  // Agrupar por dia para o livro de caixa, com saldo acumulado
+  const porDia = {};
+  movimentosDoMes.forEach(m => {
+    const dia = m.data.slice(0, 10);
+    if (!porDia[dia]) porDia[dia] = { entradas: 0, saidas: 0, itens: [] };
+    if (m.tipo === "entrada") porDia[dia].entradas += m.valor;
+    else porDia[dia].saidas += m.valor;
+    porDia[dia].itens.push(m);
+  });
+  const diasOrdenados = Object.keys(porDia).sort((a, b) => new Date(a) - new Date(b));
+  let saldoAcumulado = 0;
+  const linhasCaixa = diasOrdenados.map(dia => {
+    const d = porDia[dia];
+    const saldoDia = d.entradas - d.saidas;
+    saldoAcumulado += saldoDia;
+    return { dia, ...d, saldoDia, saldoAcumulado };
+  }).reverse();
+
+  const totalEntradasMes = movimentosDoMes.filter(m => m.tipo === "entrada").reduce((s, m) => s + m.valor, 0);
+  const totalSaidasMes = movimentosDoMes.filter(m => m.tipo === "saida").reduce((s, m) => s + m.valor, 0);
+
+  if (loading) return <div style={{ textAlign:"center",padding:"3rem",color:"#888" }}>A carregar caixa...</div>;
+
+  return (
+    <>
+      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Caixa</h1>
+      <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Livro de caixa diário — entradas e saídas reais</p>
+
+      <div style={CARD}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem" }}>
+          <p style={{ ...CARD_T, marginBottom:0, border:"none", paddingBottom:0 }}>Mês</p>
+          <input type="month" style={{ ...INP, width:"auto" }} value={mesFiltro} onChange={e => setMesFiltro(e.target.value)} />
+        </div>
+        <div style={COL4}>
+          {[
+            { val: `${totalEntradasMes.toFixed(0)}€`, lbl: "Entradas no mês", cor: "#27ae60" },
+            { val: `${totalSaidasMes.toFixed(0)}€`, lbl: "Saídas no mês", cor: "#e74c3c" },
+            { val: `${(totalEntradasMes - totalSaidasMes).toFixed(0)}€`, lbl: "Saldo do mês", cor: (totalEntradasMes - totalSaidasMes) >= 0 ? "#27ae60" : "#e74c3c" },
+            { val: movimentosDoMes.length, lbl: "Movimentos" },
+          ].map((s,i) => (
+            <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
+              <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
+              <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={CARD}>
+        <p style={CARD_T}>Registar nova despesa</p>
+        <div style={COL4}>
+          <div style={{ gridColumn:"span 2" }}><label style={LBL}>Descrição *</label><input style={INP} value={novaDespesa.descricao} onChange={e => setNovaDespesa(p=>({...p,descricao:e.target.value}))} placeholder="Compra de 5 vestidos novos" /></div>
+          <div><label style={LBL}>Categoria</label>
+            <select style={INP} value={novaDespesa.categoria} onChange={e => setNovaDespesa(p=>({...p,categoria:e.target.value}))}>
+              {CATEGORIAS_DESPESA.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div><label style={LBL}>Valor (€) *</label><input style={INP} type="number" value={novaDespesa.valor} onChange={e => setNovaDespesa(p=>({...p,valor:e.target.value}))} placeholder="120" /></div>
+        </div>
+        <div style={{ ...COL2, marginTop:"1rem", maxWidth:300 }}>
+          <div><label style={LBL}>Data</label><input style={INP} type="date" value={novaDespesa.data} onChange={e => setNovaDespesa(p=>({...p,data:e.target.value}))} /></div>
+        </div>
+        <button style={{ ...BTN("black"), marginTop:"1rem", opacity:aGuardar?0.6:1 }} onClick={registarDespesa} disabled={aGuardar}>{aGuardar?"A guardar...":"+ Registar despesa"}</button>
+      </div>
+
+      <div style={CARD}>
+        <p style={CARD_T}>Livro de caixa — {mesFiltro}</p>
+        {linhasCaixa.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem movimentos neste mês</p> : (
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%",borderCollapse:"collapse" }}>
+              <thead><tr>{["Dia","Entradas","Saídas","Saldo do dia","Saldo acumulado",""].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+              <tbody>
+                {linhasCaixa.map(l => (
+                  <RowDia key={l.dia} linha={l} onApagarDespesa={apagarDespesa} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function RowDia({ linha, onApagarDespesa }) {
+  const [aberto, setAberto] = useState(false);
+  return (
+    <>
+      <tr style={{ background:"#fff",cursor:"pointer" }} onClick={() => setAberto(!aberto)}>
+        <td style={TD}><strong>{new Date(linha.dia).toLocaleDateString("pt-PT", { weekday:"short", day:"2-digit", month:"short" })}</strong></td>
+        <td style={{ ...TD,color:"#27ae60",fontWeight:600 }}>+{linha.entradas.toFixed(0)}€</td>
+        <td style={{ ...TD,color:"#e74c3c",fontWeight:600 }}>-{linha.saidas.toFixed(0)}€</td>
+        <td style={{ ...TD,fontWeight:600,color:linha.saldoDia>=0?"#27ae60":"#e74c3c" }}>{linha.saldoDia>=0?"+":""}{linha.saldoDia.toFixed(0)}€</td>
+        <td style={{ ...TD,fontWeight:700 }}>{linha.saldoAcumulado.toFixed(0)}€</td>
+        <td style={TD}><span style={{ fontSize:"0.7rem",color:"#888" }}>{aberto?"▲":"▼"} {linha.itens.length} itens</span></td>
+      </tr>
+      {aberto && linha.itens.map((item, idx) => (
+        <tr key={idx} style={{ background:"#f8f8f6" }}>
+          <td style={{ ...TD,paddingLeft:"2rem",fontSize:"0.78rem",color:"#888" }}>↳</td>
+          <td colSpan={2} style={{ ...TD,fontSize:"0.78rem" }}>{item.descricao} <span style={{ color:"#aaa" }}>({item.categoria})</span></td>
+          <td style={{ ...TD,fontSize:"0.78rem",color:item.tipo==="entrada"?"#27ae60":"#e74c3c",fontWeight:600 }}>{item.tipo==="entrada"?"+":"-"}{item.valor.toFixed(0)}€</td>
+          <td style={TD}></td>
+          <td style={TD}>{item.id && <button onClick={(e) => { e.stopPropagation(); onApagarDespesa(item.id); }} style={{ ...BTN("red","sm") }}>Apagar</button>}</td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
 
 export default function Backoffice() {
   const [logado, setLogado] = useState(false);
@@ -694,6 +862,8 @@ export default function Backoffice() {
         )}
 
         {tab === "seewhois" && <SeeWhois />}
+
+        {tab === "caixa" && <Caixa />}
 
         {tab === "catalogo" && (
           <>
