@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+const TABS = ["dashboard", "seewhois", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
@@ -31,6 +31,7 @@ const TD = { fontSize: "0.85rem", padding: "0.85rem 0.75rem", borderBottom: "1px
 
 const ETAPAS_ALUGUER = ["pendente", "confirmado", "enviado", "ativo", "em_verificacao", "devolvido"];
 const ETAPA_LABEL = { pendente: "Pago", confirmado: "Pago", enviado: "Enviado", ativo: "A usar", em_verificacao: "Verificação", devolvido: "Concluído" };
+const ESTADO_LABEL_PT = { pendente: "A aguardar pagamento", confirmado: "Pagamento confirmado", enviado: "A caminho", ativo: "A usar", em_verificacao: "Em inspeção", devolvido: "Concluído", devolvido_danificado: "Concluído — com danos", cancelado: "Cancelado", nao_devolvido: "Não devolvido" };
 
 function ProgressoAluguer({ estado }) {
   const idx = ETAPAS_ALUGUER.indexOf(estado);
@@ -58,6 +59,258 @@ function ProgressoAluguer({ estado }) {
       </div>
       <div style={{ fontSize: "0.6rem", color: "#888", marginTop: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{ETAPA_LABEL[estado] || estado}</div>
     </div>
+  );
+}
+
+// --- TALÃO / RECIBO (modal) ---
+function ModalRecibo({ recibo, aluguer, peca, tamanho, onClose }) {
+  if (!recibo) return null;
+  return (
+    <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:1100,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={{ background:"#fff",width:"100%",maxWidth:400,padding:"2rem",position:"relative" }}>
+        <button onClick={onClose} style={{ position:"absolute",top:"1rem",right:"1rem",background:"none",border:"none",fontSize:"1.3rem",cursor:"pointer",color:"#888" }}>✕</button>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:"1rem",paddingBottom:"0.75rem",borderBottom:"2px dashed #e2dfda" }}>
+          <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",letterSpacing:"0.15em",textTransform:"uppercase" }}>NORA GREI</span>
+          <span style={{ fontSize:"0.68rem",color:"#888",fontFamily:"monospace" }}>{recibo.numero}</span>
+        </div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Data</span><span>{new Date(recibo.created_at).toLocaleString("pt-PT")}</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Peça</span><span>{peca?.nome || "—"}</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Tamanho</span><span>{tamanho || "—"}</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Datas</span><span>{aluguer?.data_inicio} → {aluguer?.data_fim}</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Método pagamento</span><span style={{ textTransform:"capitalize" }}>{recibo.metodo_pagamento}</span></div>
+        {recibo.comprovativo_url && (
+          <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Comprovativo</span><a href={recibo.comprovativo_url} target="_blank" rel="noopener noreferrer" style={{ color:"#27ae60" }}>Ver ↗</a></div>
+        )}
+        <div style={{ borderTop:"1px dashed #e2dfda", margin:"0.5rem 0" }} />
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Aluguer</span><span>{recibo.valor_aluguer}€</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Higienização</span><span>{recibo.valor_higienizacao}€</span></div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Depósito</span><span>{recibo.valor_deposito}€</span></div>
+        <div style={{ borderTop:"1px dashed #e2dfda", margin:"0.5rem 0" }} />
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"1.1rem",fontWeight:600,padding:"0.5rem 0" }}><span>Total</span><span>{recibo.valor_total}€</span></div>
+        <div style={{ textAlign:"center",fontSize:"1.2rem",fontWeight:700,marginTop:"0.75rem",paddingTop:"0.75rem",borderTop:"2px dashed #e2dfda",color:recibo.estado==="pago"?"#27ae60":"#f39c12" }}>
+          {recibo.estado==="pago" ? "✓ Pago" : "⏳ Pendente"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- SEEWHOIS ---
+function SeeWhois() {
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resultado, setResultado] = useState(null);
+  const [erro, setErro] = useState("");
+  const [reciboAberto, setReciboAberto] = useState(null);
+  const [contextoRecibo, setContextoRecibo] = useState(null);
+
+  const pesquisar = async (termoForcado) => {
+    const termo = (termoForcado ?? query).trim();
+    if (!termo) return;
+    setLoading(true); setErro(""); setResultado(null);
+
+    const termoLower = termo.toLowerCase();
+    const { data: clientes, error } = await supabase
+      .from("clientes")
+      .select("*")
+      .or(`nome.ilike.%${termo}%,email.ilike.%${termo}%,telefone.ilike.%${termo}%,nif.ilike.%${termo}%,codigo_cliente.ilike.%${termo}%,numero_cc.ilike.%${termo}%`)
+      .limit(5);
+
+    if (error) { setErro(error.message); setLoading(false); return; }
+    if (!clientes || clientes.length === 0) { setErro("Nenhum cliente encontrado com esse termo."); setLoading(false); return; }
+
+    const cliente = clientes[0];
+
+    const { data: alugueres } = await supabase
+      .from("alugueres")
+      .select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, fotos, valor_peca))")
+      .eq("cliente_id", cliente.id)
+      .order("created_at", { ascending: false });
+
+    const { data: recibos } = await supabase
+      .from("recibos")
+      .select("*")
+      .eq("cliente_id", cliente.id)
+      .order("created_at", { ascending: false });
+
+    const { data: reservas } = await supabase
+      .from("reservas_espera")
+      .select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, fotos))")
+      .eq("cliente_id", cliente.id)
+      .order("created_at", { ascending: false });
+
+    const { data: codigos } = await supabase
+      .from("codigos_desconto")
+      .select("*")
+      .eq("cliente_id", cliente.id)
+      .order("created_at", { ascending: false });
+
+    const al = alugueres || [];
+    const completos = al.filter(a => ["devolvido", "devolvido_danificado"].includes(a.estado)).length;
+    const totalGasto = al.reduce((s, a) => s + (a.valor_aluguer || 0), 0);
+    const ativos = al.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado));
+    const nv = NIVEL(completos);
+
+    setResultado({
+      cliente, alugueres: al, recibos: recibos || [], reservas: reservas || [], codigos: codigos || [],
+      stats: { totalGasto, completos, totalAlugueres: al.filter(a => a.estado !== "cancelado").length, ativos: ativos.length, nivel: nv },
+      outrosClientes: clientes.slice(1),
+    });
+    setLoading(false);
+  };
+
+  const abrirRecibo = (recibo, aluguer) => {
+    setReciboAberto(recibo);
+    setContextoRecibo({ aluguer, peca: aluguer?.stock_tamanhos?.pecas, tamanho: aluguer?.stock_tamanhos?.tamanho });
+  };
+
+  return (
+    <>
+      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>SeeWhois</h1>
+      <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Pesquisa universal — quem é, o que pediu, o que pagou</p>
+
+      <div style={CARD}>
+        <div style={{ display:"flex",gap:"0.75rem" }}>
+          <input
+            style={{ ...INP, flex:1 }}
+            placeholder="Nome, email, telefone, NIF, código de cliente ou nº de CC..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && pesquisar()}
+            autoFocus
+          />
+          <button style={BTN("black")} onClick={() => pesquisar()} disabled={loading}>{loading ? "..." : "🔍 Pesquisar"}</button>
+        </div>
+        {erro && <p style={{ fontSize:"0.8rem",color:"#e74c3c",marginTop:"0.75rem" }}>{erro}</p>}
+      </div>
+
+      {resultado && (
+        <>
+          <div style={CARD}>
+            <p style={CARD_T}>Identidade</p>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1.5rem" }}>
+              <div>
+                <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:400 }}>{resultado.cliente.nome || "—"}</div>
+                <div style={{ fontSize:"0.78rem",color:"#c4748a",fontWeight:600,marginTop:"0.2rem" }}>{resultado.cliente.codigo_cliente || "—"}</div>
+              </div>
+              <span style={{ ...BADGE(""),background:resultado.stats.nivel.cor+"22",color:resultado.stats.nivel.cor,fontSize:"0.72rem",padding:"0.4rem 0.8rem" }}>{resultado.stats.nivel.icon} {resultado.stats.nivel.nome}</span>
+            </div>
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem" }}>
+              {[
+                ["Email", resultado.cliente.email],
+                ["Telefone", resultado.cliente.telefone || "—"],
+                ["NIF", resultado.cliente.nif || "—"],
+                ["Nº Cartão Cidadão", resultado.cliente.numero_cc || "—"],
+                ["Morada", [resultado.cliente.morada, resultado.cliente.numero_porta, resultado.cliente.andar].filter(Boolean).join(", ") || "—"],
+                ["Código postal", resultado.cliente.codigo_postal || "—"],
+                ["Cidade", resultado.cliente.cidade || "—"],
+                ["País", resultado.cliente.pais || "—"],
+                ["Membro desde", resultado.cliente.created_at ? new Date(resultado.cliente.created_at).toLocaleDateString("pt-PT") : "—"],
+                ["Perfil completo", resultado.cliente.perfil_completo ? "✓ Sim" : "⚠️ Não"],
+              ].map(([k, v]) => (
+                <div key={k} style={{ background:"#f8f8f6",padding:"0.85rem" }}>
+                  <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.25rem" }}>{k}</div>
+                  <div style={{ fontSize:"0.85rem",fontWeight:500,wordBreak:"break-word" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={COL4}>
+            {[
+              { val: resultado.stats.totalAlugueres, lbl: "Total alugueres" },
+              { val: resultado.stats.ativos, lbl: "Em curso", cor: "#1976d2" },
+              { val: `${resultado.stats.totalGasto.toFixed(0)}€`, lbl: "Total gasto", cor: "#c4748a" },
+              { val: `${resultado.stats.nivel.caucao}%`, lbl: "Caução exigida", cor: resultado.stats.nivel.cor },
+            ].map((s, i) => (
+              <div key={i} style={{ background:"#fff",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
+                <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
+                <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={CARD}>
+            <p style={CARD_T}>Histórico de alugueres ({resultado.alugueres.length})</p>
+            {resultado.alugueres.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem alugueres registados</p> : (
+              <div style={{ overflowX:"auto" }}>
+                <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                  <thead><tr>{["Peça","Tam.","Datas","Valor","Estado","Recibo"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {resultado.alugueres.map(a => {
+                      const peca = a.stock_tamanhos?.pecas;
+                      const reciboDoAluguer = resultado.recibos.find(r => r.aluguer_id === a.id);
+                      return (
+                        <tr key={a.id} style={{ background:"#fff" }}>
+                          <td style={TD}>
+                            <div style={{ display:"flex",gap:"0.5rem",alignItems:"center" }}>
+                              <div style={{ width:36,height:46,flexShrink:0,background:"#f0eeeb",overflow:"hidden" }}>
+                                {peca?.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }} />}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight:600 }}>{peca?.nome || "—"}</div>
+                                <div style={{ fontSize:"0.6rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia || "—"}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={TD}>{a.stock_tamanhos?.tamanho || "—"}</td>
+                          <td style={{ ...TD,whiteSpace:"nowrap",fontSize:"0.8rem" }}>{a.data_inicio} → {a.data_fim}</td>
+                          <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
+                          <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":["devolvido_danificado","cancelado","nao_devolvido"].includes(a.estado)?"red":"orange")}>{ESTADO_LABEL_PT[a.estado] || a.estado}</span></td>
+                          <td style={TD}>{reciboDoAluguer ? <button style={BTN("outline","sm")} onClick={() => abrirRecibo(reciboDoAluguer, a)}>🧾 Ver talão</button> : <span style={{ color:"#ccc",fontSize:"0.75rem" }}>—</span>}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem" }}>
+            <div style={CARD}>
+              <p style={CARD_T}>Reservas em espera ({resultado.reservas.filter(r => r.estado !== "expirado").length})</p>
+              {resultado.reservas.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem reservas</p> : resultado.reservas.map(r => (
+                <div key={r.id} style={{ display:"flex",justifyContent:"space-between",padding:"0.6rem 0",borderBottom:"1px solid #f8f8f6",fontSize:"0.82rem" }}>
+                  <span>{r.stock_tamanhos?.pecas?.nome || "—"} ({r.stock_tamanhos?.tamanho})</span>
+                  <span style={BADGE(r.estado==="notificado"?"green":r.estado==="expirado"?"red":"orange")}>{r.estado==="aguarda"?"A aguardar":r.estado==="notificado"?"Notificado":"Expirado"}</span>
+                </div>
+              ))}
+            </div>
+            <div style={CARD}>
+              <p style={CARD_T}>Códigos de desconto ({resultado.codigos.length})</p>
+              {resultado.codigos.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem códigos gerados</p> : resultado.codigos.map(c => (
+                <div key={c.id} style={{ display:"flex",justifyContent:"space-between",padding:"0.6rem 0",borderBottom:"1px solid #f8f8f6",fontSize:"0.82rem" }}>
+                  <span style={{ fontFamily:"monospace",fontWeight:600 }}>{c.codigo}</span>
+                  <span>{c.valor}€ — <span style={BADGE(c.estado==="ativo"?"green":"gray")}>{c.estado}</span></span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {resultado.outrosClientes.length > 0 && (
+            <div style={CARD}>
+              <p style={CARD_T}>Outros resultados parecidos</p>
+              {resultado.outrosClientes.map(c => (
+                <button key={c.id} style={{ ...BTN("outline","sm"), display:"block", marginBottom:"0.4rem", width:"fit-content" }} onClick={() => { setQuery(c.codigo_cliente || c.email); pesquisar(c.codigo_cliente || c.email); }}>
+                  {c.nome} — {c.codigo_cliente || c.email}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {reciboAberto && (
+        <ModalRecibo
+          recibo={reciboAberto}
+          aluguer={contextoRecibo?.aluguer}
+          peca={contextoRecibo?.peca}
+          tamanho={contextoRecibo?.tamanho}
+          onClose={() => { setReciboAberto(null); setContextoRecibo(null); }}
+        />
+      )}
+    </>
   );
 }
 
@@ -137,7 +390,8 @@ export default function Backoffice() {
       }
     }
     if (tab === "clientes") {
-      const { data } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });
+      if (error) console.error("Erro clientes:", error);
       if (data) setClientes(data);
     }
     if (tab === "reservas") {
@@ -145,7 +399,8 @@ export default function Backoffice() {
       if (data) setReservas(data);
     }
     if (tab === "campanhas") {
-      const { data } = await supabase.from("campanhas").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("campanhas").select("*").order("created_at", { ascending: false });
+      if (error) console.error("Erro campanhas:", error);
       if (data) setCampanhas(data);
     }
     if (tab === "landing") {
@@ -397,21 +652,23 @@ export default function Backoffice() {
                 <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300 }}>{stats.taxa_ocupacao}%</div>
                 <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Taxa de ocupação</div>
               </div>
-              <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #c4748a",cursor:"pointer" }} onClick={() => setTab("estatisticas")}>
-                <div style={{ fontSize:"1.5rem" }}>📊</div>
-                <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Ver Analytics & AI →</div>
+              <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #c4748a",cursor:"pointer" }} onClick={() => setTab("seewhois")}>
+                <div style={{ fontSize:"1.5rem" }}>🔍</div>
+                <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Pesquisar cliente (SeeWhois) →</div>
               </div>
             </div>
             <div style={CARD}>
               <p style={CARD_T}>Ações rápidas</p>
               <div style={ROW}>
-                {[["+ Adicionar peça","black","catalogo"],["Ver alugueres","rosa","alugueres"],["Ver clientes","outline","clientes"],["Ver reservas","outline","reservas"],["📊 Analytics","outline","estatisticas"]].map(([l,c,t]) => (
+                {[["🔍 SeeWhois","rosa","seewhois"],["+ Adicionar peça","black","catalogo"],["Ver alugueres","outline","alugueres"],["Ver clientes","outline","clientes"],["📊 Analytics","outline","estatisticas"]].map(([l,c,t]) => (
                   <button key={l} style={BTN(c)} onClick={() => setTab(t)}>{l}</button>
                 ))}
               </div>
             </div>
           </>
         )}
+
+        {tab === "seewhois" && <SeeWhois />}
 
         {tab === "catalogo" && (
           <>
@@ -688,6 +945,9 @@ export default function Backoffice() {
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Clientes</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{clientes.length} registados</p>
             <div style={CARD}>
+              {clientes.length === 0 ? (
+                <p style={{ color:"#888",fontSize:"0.85rem",padding:"1rem 0" }}>Nenhum cliente encontrado. Se sabes que existem clientes registados, verifica se há erro de RLS na tabela clientes (consola do navegador).</p>
+              ) : (
               <table style={{ width:"100%",borderCollapse:"collapse" }}>
                 <thead><tr>{["Cliente","Contacto","Cidade","Nível","Alugueres","Gasto","Caução",""].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                 <tbody>
@@ -709,12 +969,17 @@ export default function Backoffice() {
                         <td style={TD}><span style={BADGE("rosa")}>{total} pts</span></td>
                         <td style={TD}><strong>{gasto.toFixed(0)}€</strong></td>
                         <td style={{ ...TD,color:nv.cor,fontWeight:700 }}>{nv.caucao}%</td>
-                        <td style={TD}><button style={BTN("outline","sm")} onClick={()=>setClienteSel(clienteSel?.id===c.id?null:c)}>{clienteSel?.id===c.id?"Fechar":"Ver"}</button></td>
+                        <td style={TD}>
+                          <div style={{ display:"flex",gap:"0.4rem" }}>
+                            <button style={BTN("outline","sm")} onClick={()=>setClienteSel(clienteSel?.id===c.id?null:c)}>{clienteSel?.id===c.id?"Fechar":"Ver"}</button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              )}
             </div>
 
             {clienteSel && (
@@ -740,7 +1005,7 @@ export default function Backoffice() {
                           <td style={TD}>{a.stock_tamanhos?.tamanho||"—"}</td>
                           <td style={{ ...TD,whiteSpace:"nowrap",fontSize:"0.8rem" }}>{a.data_inicio} → {a.data_fim}</td>
                           <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
-                          <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":a.estado==="ativo"?"orange":"gray")}>{{pendente:"A aguardar pagamento",confirmado:"Pagamento confirmado",enviado:"A caminho",ativo:"A usar",em_verificacao:"Em inspeção",devolvido:"Concluído",devolvido_danificado:"Concluído — com danos",cancelado:"Cancelado"}[a.estado]||a.estado}</span></td>
+                          <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":a.estado==="ativo"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado] || a.estado}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -813,11 +1078,13 @@ export default function Backoffice() {
 
             <div style={CARD}>
               <p style={CARD_T}>{campanhas.length} campanhas</p>
+              {campanhas.length === 0 ? (
+                <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem campanhas criadas ainda. Usa o formulário acima para criar a primeira.</p>
+              ) : (
               <table style={{ width:"100%",borderCollapse:"collapse" }}>
                 <thead><tr>{["Título / Mensagem","Tipo","Código","Prob.","Validade","Estado","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                 <tbody>
-                  {campanhas.length===0?<tr><td colSpan={7} style={{ textAlign:"center",color:"#888",padding:"2rem",fontSize:"0.85rem" }}>Sem campanhas</td></tr>
-                    :campanhas.map(c=>(
+                  {campanhas.map(c=>(
                       <tr key={c.id} style={{ background:"#fff" }}>
                         <td style={TD}><div style={{ fontWeight:600 }}>{c.titulo}</div><div style={{ fontSize:"0.75rem",color:"#888",maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{c.mensagem}</div></td>
                         <td style={TD}><span style={BADGE(c.tipo==="cupao"?"rosa":"green")}>{c.tipo}</span></td>
@@ -835,6 +1102,7 @@ export default function Backoffice() {
                     ))}
                 </tbody>
               </table>
+              )}
             </div>
           </>
         )}
