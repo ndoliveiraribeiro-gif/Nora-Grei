@@ -29,6 +29,38 @@ const BADGE = (c) => ({ display: "inline-block", fontSize: "0.58rem", letterSpac
 const TH = { fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#888", fontWeight: 600, padding: "0.6rem 0.75rem", textAlign: "left", borderBottom: "2px solid #f0eeeb", whiteSpace: "nowrap" };
 const TD = { fontSize: "0.85rem", padding: "0.85rem 0.75rem", borderBottom: "1px solid #f8f8f8", verticalAlign: "middle" };
 
+const ETAPAS_ALUGUER = ["pendente", "confirmado", "enviado", "ativo", "em_verificacao", "devolvido"];
+const ETAPA_LABEL = { pendente: "Pago", confirmado: "Pago", enviado: "Enviado", ativo: "A usar", em_verificacao: "Verificação", devolvido: "Concluído" };
+
+function ProgressoAluguer({ estado }) {
+  const idx = ETAPAS_ALUGUER.indexOf(estado);
+  const isProblema = estado === "devolvido_danificado" || estado === "cancelado" || estado === "nao_devolvido";
+  if (isProblema) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+        <span style={{ fontSize: "0.95rem" }}>⚠️</span>
+        <span style={{ fontSize: "0.65rem", color: "#e74c3c", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          {estado === "devolvido_danificado" ? "Com danos" : estado === "cancelado" ? "Cancelado" : "Não devolvido"}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+        {ETAPAS_ALUGUER.map((etapa, i) => (
+          <div key={etapa} title={ETAPA_LABEL[etapa]} style={{
+            width: i === idx ? 22 : 14, height: 6, borderRadius: 3,
+            background: i <= idx ? "#080808" : "#e2dfda",
+            transition: "all 0.2s",
+          }} />
+        ))}
+      </div>
+      <div style={{ fontSize: "0.6rem", color: "#888", marginTop: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{ETAPA_LABEL[estado] || estado}</div>
+    </div>
+  );
+}
+
 export default function Backoffice() {
   const [logado, setLogado] = useState(false);
   const [senha, setSenha] = useState("");
@@ -42,7 +74,6 @@ export default function Backoffice() {
   const [uploadProgress, setUploadProgress] = useState("");
   const [criandoPeca, setCriandoPeca] = useState(false);
 
-  // EDIÇÃO DE PEÇA
   const [pecaEditando, setPecaEditando] = useState(null);
   const [editForm, setEditForm] = useState(PECA_VAZIA);
   const [editFotosNovas, setEditFotosNovas] = useState([]);
@@ -51,7 +82,6 @@ export default function Backoffice() {
   const [salvandoEdicao, setSalvandoEdicao] = useState(false);
   const [editTamanhos, setEditTamanhos] = useState([]);
 
-  // LANDING PAGE
   const [landingCfg, setLandingCfg] = useState({ video_landing_url: "", hero_peca_id: "", categoria_festa_peca_id: "", categoria_trabalho_peca_id: "", categoria_ferias_peca_id: "", categoria_jantar_peca_id: "" });
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [videoProgress, setVideoProgress] = useState("");
@@ -99,8 +129,8 @@ export default function Backoffice() {
       if (alErr) console.error("Erro alugueres:", alErr);
       if (al) {
         const alComDados = await Promise.all(al.map(async (a) => {
-          const { data: cl } = await supabase.from("clientes").select("nome, email, total_pecas_alugadas").eq("id", a.cliente_id).single();
-          const { data: st } = await supabase.from("stock_tamanhos").select("tamanho, pecas(nome, valor_peca)").eq("id", a.stock_tamanho_id).single();
+          const { data: cl } = await supabase.from("clientes").select("nome, email, telefone, total_pecas_alugadas, codigo_cliente, morada, numero_porta, andar, codigo_postal, cidade").eq("id", a.cliente_id).single();
+          const { data: st } = await supabase.from("stock_tamanhos").select("tamanho, pecas(nome, valor_peca, codigo_referencia, fotos)").eq("id", a.stock_tamanho_id).single();
           return { ...a, clientes: cl, stock_tamanhos: st };
         }));
         setAlugueres(alComDados);
@@ -111,7 +141,7 @@ export default function Backoffice() {
       if (data) setClientes(data);
     }
     if (tab === "reservas") {
-      const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome))").order("created_at", { ascending: false });
+      const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome, codigo_referencia, fotos))").order("created_at", { ascending: false });
       if (data) setReservas(data);
     }
     if (tab === "campanhas") {
@@ -182,7 +212,6 @@ export default function Backoffice() {
     carregarDados();
   };
 
-  // --- EDIÇÃO DE PEÇA ---
   const abrirEdicao = (p) => {
     setPecaEditando(p.id);
     setEditForm({
@@ -263,9 +292,9 @@ export default function Backoffice() {
     setTimeout(() => { fecharEdicao(); carregarDados(); }, 1000);
   };
 
-
   const atualizarEstado = async (id, estado) => { await supabase.from("alugueres").update({ estado }).eq("id", id); carregarDados(); };
   const confirmarDeposito = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
+  const marcarEnviado = async (id) => { await supabase.from("alugueres").update({ estado: "enviado", data_envio: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const confirmarRecepcao = async (id) => { await supabase.from("alugueres").update({ estado: "em_verificacao", data_recepcao: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const confirmarVerificacao = async (id, danificado=false) => { await supabase.from("alugueres").update({ estado: danificado?"devolvido_danificado":"devolvido", data_verificacao: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const libertarCaucao = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "libertado", caucao_libertada_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
@@ -279,7 +308,6 @@ export default function Backoffice() {
     carregarDados();
   };
 
-  // --- LANDING PAGE ---
   const uploadVideo = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -334,7 +362,6 @@ export default function Backoffice() {
     <div style={{ minHeight: "100vh", background: "#f5f5f3", fontFamily: "'Jost',sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 
-      {/* TOP NAV */}
       <div style={{ background: "#080808", color: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 2rem", display: "flex", alignItems: "center", gap: "0" }}>
           <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.1rem", fontWeight: 300, letterSpacing: "0.2em", textTransform: "uppercase", padding: "1rem 2rem 1rem 0", borderRight: "1px solid rgba(255,255,255,0.1)", marginRight: "1rem", whiteSpace: "nowrap" }}>Nora Grei</div>
@@ -351,10 +378,8 @@ export default function Backoffice() {
         </div>
       </div>
 
-      {/* CONTEÚDO */}
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "2rem" }}>
 
-        {/* DASHBOARD */}
         {tab === "dashboard" && (
           <>
             <h1 style={{ fontFamily: "'Cormorant',serif", fontSize: "2rem", fontWeight: 300, marginBottom: "0.25rem" }}>Dashboard</h1>
@@ -388,7 +413,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* CATÁLOGO */}
         {tab === "catalogo" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Catálogo</h1>
@@ -585,7 +609,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* ALUGUERES */}
         {tab === "alugueres" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Alugueres</h1>
@@ -593,30 +616,39 @@ export default function Backoffice() {
             <div style={CARD}>
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%",borderCollapse:"collapse" }}>
-                  <thead><tr>{["Cliente","Peça","Datas","Atraso","Valor","Depósito","Estado","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <thead><tr>{["Peça","Cliente","Progresso","Datas","Atraso","Valor","Depósito","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                   <tbody>
                     {alugueres.map(a => {
+                      const peca = a.stock_tamanhos?.pecas;
                       const nv = NIVEL(a.clientes?.total_pecas_alugadas||0);
                       const atraso = calcularAtraso(a.data_fim);
+                      const enderecoCompleto = [a.clientes?.morada, a.clientes?.numero_porta, a.clientes?.andar].filter(Boolean).join(", ");
                       return (
                         <tr key={a.id} style={{ background:"#fff" }}>
                           <td style={TD}>
+                            <div style={{ display:"flex",gap:"0.6rem",alignItems:"center" }}>
+                              <div style={{ width:44,height:56,flexShrink:0,background:"#f0eeeb",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                                {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{peca?.nome||"—"}</div>
+                                <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia||"—"}</div>
+                                <div style={{ fontSize:"0.72rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={TD}>
                             <div style={{ fontWeight:600 }}>{a.clientes?.nome||"—"}</div>
-                            <div style={{ fontSize:"0.75rem",color:"#888" }}>{a.clientes?.email}</div>
+                            <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600 }}>{a.clientes?.codigo_cliente||"—"}</div>
+                            <div style={{ fontSize:"0.72rem",color:"#888" }}>{a.clientes?.telefone||a.clientes?.email}</div>
+                            {enderecoCompleto && <div style={{ fontSize:"0.68rem",color:"#aaa",marginTop:"0.15rem" }}>📍 {enderecoCompleto}{a.clientes?.cidade?`, ${a.clientes.cidade}`:""}</div>}
                             <span style={{ ...BADGE(""),background:nv.cor+"22",color:nv.cor,marginTop:"0.2rem",display:"inline-block" }}>{nv.icon} {nv.nome}</span>
                           </td>
-                          <td style={TD}><div>{a.stock_tamanhos?.pecas?.nome||"—"}</div><div style={{ fontSize:"0.75rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div></td>
-                          <td style={{ ...TD,whiteSpace:"nowrap" }}>{a.data_inicio} → {a.data_fim}</td>
-                          <td style={TD}>{atraso>0?<span style={{ color:"#e74c3c",fontWeight:700 }}>+{atraso}d</span>:<span style={{ color:"#27ae60" }}>✓</span>}</td>
-                          <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
                           <td style={TD}>
-                                   <span style={BADGE(a.deposito_estado==="recebido"||a.deposito_estado==="libertado"?"green":"orange")}>{{recebido:"Recebido",pendente:"A aguardar",libertado:"Devolvido ao cliente"}[a.deposito_estado]||a.deposito_estado}</span>                 
-                            {a.deposito_estado==="pendente"&&<button style={{ ...BTN("rosa","sm"),display:"block",marginTop:"0.25rem" }} onClick={()=>confirmarDeposito(a.id)}>Confirmar</button>}
-                          </td>
-                          <td style={TD}>
-                            <select value={a.estado} onChange={e=>atualizarEstado(a.id,e.target.value)} style={{ fontSize:"0.65rem",padding:"0.35rem 0.5rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",cursor:"pointer" }}>
+                            <ProgressoAluguer estado={a.estado} />
+                            <select value={a.estado} onChange={e=>atualizarEstado(a.id,e.target.value)} style={{ fontSize:"0.6rem",padding:"0.3rem 0.4rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",cursor:"pointer",marginTop:"0.4rem" }}>
                               <option value="pendente">A aguardar pagamento</option>
-                              <option value="confirmado">Pagamento confirmado — a preparar envio</option>
+                              <option value="confirmado">Pago — a preparar envio</option>
                               <option value="enviado">A caminho</option>
                               <option value="ativo">A usar</option>
                               <option value="em_verificacao">Em inspeção</option>
@@ -626,9 +658,17 @@ export default function Backoffice() {
                               <option value="cancelado">Cancelado</option>
                             </select>
                           </td>
+                          <td style={{ ...TD,whiteSpace:"nowrap" }}>{a.data_inicio} → {a.data_fim}</td>
+                          <td style={TD}>{atraso>0?<span style={{ color:"#e74c3c",fontWeight:700 }}>+{atraso}d</span>:<span style={{ color:"#27ae60" }}>✓</span>}</td>
+                          <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
+                          <td style={TD}>
+                            <span style={BADGE(a.deposito_estado==="recebido"||a.deposito_estado==="libertado"?"green":"orange")}>{{recebido:"Recebido",pendente:"A aguardar",libertado:"Devolvido ao cliente"}[a.deposito_estado]||a.deposito_estado}</span>
+                            {a.deposito_estado==="pendente"&&<button style={{ ...BTN("rosa","sm"),display:"block",marginTop:"0.25rem" }} onClick={()=>confirmarDeposito(a.id)}>Confirmar</button>}
+                          </td>
                           <td style={TD}>
                             <div style={{ display:"flex",flexDirection:"column",gap:"0.3rem" }}>
-                              {a.estado==="ativo"&&<button style={BTN("rosa","sm")} onClick={()=>confirmarRecepcao(a.id)}>📦 Recebi</button>}
+                              {a.estado==="confirmado"&&<button style={BTN("rosa","sm")} onClick={()=>marcarEnviado(a.id)}>🚚 Enviar</button>}
+                              {a.estado==="ativo"&&<button style={BTN("rosa","sm")} onClick={()=>confirmarRecepcao(a.id)}>📦 Recebi devolução</button>}
                               {a.estado==="em_verificacao"&&<><button style={BTN("black","sm")} onClick={()=>confirmarVerificacao(a.id,false)}>✓ OK</button><button style={BTN("red","sm")} onClick={()=>confirmarVerificacao(a.id,true)}>✗ Dano</button></>}
                               {a.estado==="devolvido"&&a.deposito_estado!=="libertado"&&<button style={BTN("outline","sm")} onClick={()=>libertarCaucao(a.id)}>💰 Libertar</button>}
                             </div>
@@ -643,7 +683,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* CLIENTES */}
         {tab === "clientes" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Clientes</h1>
@@ -712,22 +751,32 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* RESERVAS */}
         {tab === "reservas" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Reservas em espera</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{reservas.length} pendentes</p>
             <div style={CARD}>
               <table style={{ width:"100%",borderCollapse:"collapse" }}>
-                <thead><tr>{["Cliente","Peça","Datas desejadas","Estado","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                <thead><tr>{["Peça","Cliente","Datas desejadas","Estado","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                 <tbody>
                   {reservas.length===0?<tr><td colSpan={5} style={{ textAlign:"center",color:"#888",padding:"2rem",fontSize:"0.85rem" }}>Sem reservas em espera</td></tr>
                     :reservas.map(r=>(
                       <tr key={r.id} style={{ background:"#fff" }}>
+                        <td style={TD}>
+                          <div style={{ display:"flex",gap:"0.6rem",alignItems:"center" }}>
+                            <div style={{ width:44,height:56,flexShrink:0,background:"#f0eeeb",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                              {r.stock_tamanhos?.pecas?.fotos?.[0] ? <img src={r.stock_tamanhos.pecas.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight:600 }}>{r.stock_tamanhos?.pecas?.nome||"—"}</div>
+                              <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia||"—"}</div>
+                              <div style={{ fontSize:"0.72rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div>
+                            </div>
+                          </div>
+                        </td>
                         <td style={TD}><div style={{ fontWeight:600 }}>{r.clientes?.nome||"—"}</div><div style={{ fontSize:"0.75rem",color:"#888" }}>{r.clientes?.email}</div></td>
-                        <td style={TD}><div>{r.stock_tamanhos?.pecas?.nome||"—"}</div><div style={{ fontSize:"0.75rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div></td>
                         <td style={{ ...TD,whiteSpace:"nowrap" }}>{r.data_inicio_desejada} → {r.data_fim_desejada}</td>
-                        <td style={TD}><span style={BADGE(r.estado==="aguarda"?"orange":"green")}>{r.estado}</span></td>
+                        <td style={TD}><span style={BADGE(r.estado==="aguarda"?"orange":"green")}>{r.estado==="aguarda"?"A aguardar":"Notificado"}</span></td>
                         <td style={TD}>{r.estado==="aguarda"&&<button style={BTN("rosa","sm")} onClick={async()=>{ await supabase.from("reservas_espera").update({estado:"notificado",notificado_em:new Date().toISOString()}).eq("id",r.id); carregarDados(); }}>Notificar</button>}</td>
                       </tr>
                     ))}
@@ -737,7 +786,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* CAMPANHAS */}
         {tab === "campanhas" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Campanhas</h1>
@@ -791,7 +839,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* LANDING PAGE */}
         {tab === "landing" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Landing Page</h1>
@@ -845,7 +892,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* ESTATÍSTICAS */}
         {tab === "estatisticas" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Estatísticas & AI</h1>
@@ -944,7 +990,6 @@ export default function Backoffice() {
           </>
         )}
 
-        {/* CONFIG */}
         {tab === "config" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Configurações</h1>
