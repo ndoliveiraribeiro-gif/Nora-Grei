@@ -17,6 +17,13 @@ const t = {
     erroMin: "A password deve ter pelo menos 6 caracteres.",
     sucesso: "Conta criada! Verifique o seu email para confirmar.",
     passos: ["Crie a sua conta em segundos", "Escolha a ocasião e a peça ideal", "Receba em casa, use, devolva"],
+    dataNasc: "Data de nascimento",
+    genero: "Género",
+    generoOpcoes: { vazio: "Prefiro não especificar", mulher: "Mulher", homem: "Homem", naoBinario: "Não-binário" },
+    pais: "País",
+    paisPlaceholder: "Selecionar país",
+    cidade: "Cidade",
+    cidadePlaceholder: "Lisboa, Porto, Paris...",
   },
   fr: {
     titulo: "Créer un compte",
@@ -32,6 +39,13 @@ const t = {
     erroMin: "Le mot de passe doit avoir au moins 6 caractères.",
     sucesso: "Compte créé ! Vérifiez votre email.",
     passos: ["Créez votre compte en quelques secondes", "Choisissez l'occasion et la pièce idéale", "Recevez, portez, retournez"],
+    dataNasc: "Date de naissance",
+    genero: "Genre",
+    generoOpcoes: { vazio: "Préfère ne pas préciser", mulher: "Femme", homem: "Homme", naoBinario: "Non-binaire" },
+    pais: "Pays",
+    paisPlaceholder: "Sélectionner le pays",
+    cidade: "Ville",
+    cidadePlaceholder: "Lisbonne, Paris...",
   },
   lt: {
     titulo: "Sukurti paskyrą",
@@ -47,6 +61,13 @@ const t = {
     erroMin: "Slaptažodis turi būti bent 6 simbolių.",
     sucesso: "Paskyra sukurta! Patikrinkite el. paštą.",
     passos: ["Sukurkite paskyrą per kelias sekundes", "Pasirinkite progą ir idealų drabužį", "Gaukite, dėvėkite, grąžinkite"],
+    dataNasc: "Gimimo data",
+    genero: "Lytis",
+    generoOpcoes: { vazio: "Nenoriu nurodyti", mulher: "Moteris", homem: "Vyras", naoBinario: "Nebinarinis" },
+    pais: "Šalis",
+    paisPlaceholder: "Pasirinkite šalį",
+    cidade: "Miestas",
+    cidadePlaceholder: "Vilnius, Kaunas...",
   },
 };
 
@@ -78,7 +99,6 @@ export default function Registar() {
       options: { data: { nome, telefone, data_nascimento: dataNasc, genero } }
     });
     if (error) { setErro(error.message); setLoading(false); return; }
-    // Criar registo na tabela clientes
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -186,23 +206,23 @@ export default function Registar() {
                   <label className="form-label">{i.email}</label>
                   <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="maria@email.com" />
                 </div>
-                  <div className="form-group">
-                  <label className="form-label">Data de nascimento</label>
+                <div className="form-group">
+                  <label className="form-label">{i.dataNasc}</label>
                   <input className="form-input" type="date" value={dataNasc} onChange={e => setDataNasc(e.target.value)} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Género</label>
+                  <label className="form-label">{i.genero}</label>
                   <select className="form-input" value={genero} onChange={e => setGenero(e.target.value)} style={{cursor:'pointer'}}>
-                    <option value="">Prefiro não especificar</option>
-                    <option value="Mulher">Mulher</option>
-                    <option value="Homem">Homem</option>
-                    <option value="Não-binário">Não-binário</option>
+                    <option value="">{i.generoOpcoes.vazio}</option>
+                    <option value="Mulher">{i.generoOpcoes.mulher}</option>
+                    <option value="Homem">{i.generoOpcoes.homem}</option>
+                    <option value="Não-binário">{i.generoOpcoes.naoBinario}</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">País</label>
+                  <label className="form-label">{i.pais}</label>
                   <select className="form-input" value={pais} onChange={e => setPais(e.target.value)} style={{cursor:'pointer'}}>
-                    <option value="">Selecionar país</option>
+                    <option value="">{i.paisPlaceholder}</option>
                     <option value="Portugal">🇵🇹 Portugal</option>
                     <option value="França">🇫🇷 França</option>
                     <option value="Lituânia">🇱🇹 Lituânia</option>
@@ -212,8 +232,8 @@ export default function Registar() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Cidade</label>
-                  <input className="form-input" type="text" value={cidade} onChange={e => setCidade(e.target.value)} placeholder="Lisboa, Porto, Paris..." />
+                  <label className="form-label">{i.cidade}</label>
+                  <input className="form-input" type="text" value={cidade} onChange={e => setCidade(e.target.value)} placeholder={i.cidadePlaceholder} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.password}</label>
