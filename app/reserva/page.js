@@ -34,6 +34,11 @@ const t = {
     resumoTitulo: "Resumo da reserva",
     rPeca: "Peça", rTamanho: "Tamanho", rDatas: "Datas", rEntrega: "Entrega",
     envioPostal: "Envio postal", presencial: "Presencial",
+    datasObrigatorias: "Por favor seleciona as datas desejadas",
+    tamanhoNaoEncontrado: "Tamanho não encontrado",
+    conflitoTitulo: "⚠️ Estas datas não estão disponíveis",
+    conflitoDesc: (inicio, fim) => `Já existe um aluguer marcado que ocupa a peça entre ${inicio} e ${fim} (inclui tempo de envio e higienização). Escolhe outro período.`,
+    aVerificar: "A verificar disponibilidade...",
   },
   fr: {
     titulo: "Réserver une pièce", subtitulo: "Quand cette pièce sera disponible, vous serez le premier à le savoir.",
@@ -48,6 +53,11 @@ const t = {
     resumoTitulo: "Récapitulatif de la réservation",
     rPeca: "Pièce", rTamanho: "Taille", rDatas: "Dates", rEntrega: "Livraison",
     envioPostal: "Envoi postal", presencial: "En personne",
+    datasObrigatorias: "Veuillez sélectionner les dates souhaitées",
+    tamanhoNaoEncontrado: "Taille non trouvée",
+    conflitoTitulo: "⚠️ Ces dates ne sont pas disponibles",
+    conflitoDesc: (inicio, fim) => `Une location existe déjà et occupe la pièce entre ${inicio} et ${fim} (inclut le temps de livraison et nettoyage). Choisissez une autre période.`,
+    aVerificar: "Vérification de la disponibilité...",
   },
   lt: {
     titulo: "Rezervuoti drabužį", subtitulo: "Kai šis drabužis bus prieinamas, būsite pirmasis sužinojęs.",
@@ -62,6 +72,11 @@ const t = {
     resumoTitulo: "Rezervacijos suvestinė",
     rPeca: "Drabužis", rTamanho: "Dydis", rDatas: "Datos", rEntrega: "Pristatymas",
     envioPostal: "Pristatymas paštu", presencial: "Asmeniškai",
+    datasObrigatorias: "Pasirinkite pageidaujamas datas",
+    tamanhoNaoEncontrado: "Dydis nerastas",
+    conflitoTitulo: "⚠️ Šios datos negalimos",
+    conflitoDesc: (inicio, fim) => `Jau yra nuoma, kuri užima drabužį nuo ${inicio} iki ${fim} (įskaitant pristatymo ir valymo laiką). Pasirinkite kitą laikotarpį.`,
+    aVerificar: "Tikrinamas prieinamumas...",
   },
 };
 
@@ -91,6 +106,19 @@ function Timer({ dataFim, label }) {
   );
 }
 
+// Janela real de ocupação de um aluguer: 1 dia antes (envio) + uso + 2 dias depois (retorno + higienização)
+function janelaOcupacao(dataInicio, dataFim) {
+  const inicio = new Date(dataInicio);
+  inicio.setDate(inicio.getDate() - 1);
+  const fim = new Date(dataFim);
+  fim.setDate(fim.getDate() + 2);
+  return { inicio, fim };
+}
+
+function formatarData(d) {
+  return d.toISOString().split("T")[0];
+}
+
 function ReservaContent() {
   const searchParams = useSearchParams();
   const pecaId = searchParams.get("peca");
@@ -109,6 +137,9 @@ function ReservaContent() {
   const [loading, setLoading] = useState(true);
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState("");
+  const [alugueresExistentes, setAlugueresExistentes] = useState([]);
+  const [conflito, setConflito] = useState(null);
+  const [verificandoConflito, setVerificandoConflito] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -117,6 +148,10 @@ function ReservaContent() {
     if (saved && t[saved]) setLang(saved);
     carregarDados();
   }, []);
+
+  useEffect(() => {
+    verificarConflitoDatas();
+  }, [dataInicio, dataFim, tamanho, alugueresExistentes]);
 
   const carregarDados = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -133,17 +168,17 @@ function ReservaContent() {
         setPeca({ ...p, categoria: p.categorias?.nome || "" });
         setStockTamanhos(p.stock_tamanhos || []);
 
-        // Buscar aluguer ativo para timer
         const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
         if (stockIds.length > 0) {
           const { data: al } = await supabase
             .from("alugueres")
-            .select("data_fim, data_disponivel_novamente")
+            .select("stock_tamanho_id, data_inicio, data_fim, data_disponivel_novamente")
             .in("stock_tamanho_id", stockIds)
             .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"])
-            .order("data_fim", { ascending: false })
-            .limit(1);
-          if (al?.[0]) {
+            .order("data_fim", { ascending: false });
+
+          if (al && al.length > 0) {
+            setAlugueresExistentes(al);
             const dataDisp = al[0].data_disponivel_novamente || al[0].data_fim;
             setDataFimAluguer(dataDisp);
           }
@@ -153,14 +188,41 @@ function ReservaContent() {
     setLoading(false);
   };
 
+  const verificarConflitoDatas = () => {
+    if (!dataInicio || !dataFim || !tamanho || alugueresExistentes.length === 0) { setConflito(null); return; }
+    setVerificandoConflito(true);
+
+    const stockItem = stockTamanhos.find(s => s.tamanho === tamanho);
+    if (!stockItem) { setConflito(null); setVerificandoConflito(false); return; }
+
+    const desejadoInicio = new Date(dataInicio);
+    const desejadoFim = new Date(dataFim);
+
+    const conflitante = alugueresExistentes
+      .filter(a => a.stock_tamanho_id === stockItem.id)
+      .find(a => {
+        const { inicio, fim } = janelaOcupacao(a.data_inicio, a.data_disponivel_novamente || a.data_fim);
+        return desejadoInicio <= fim && desejadoFim >= inicio;
+      });
+
+    if (conflitante) {
+      const { inicio, fim } = janelaOcupacao(conflitante.data_inicio, conflitante.data_disponivel_novamente || conflitante.data_fim);
+      setConflito({ inicio: formatarData(inicio), fim: formatarData(fim) });
+    } else {
+      setConflito(null);
+    }
+    setVerificandoConflito(false);
+  };
+
   const confirmarReserva = async () => {
     if (!tamanho) { setErro(i.selTamanho); return; }
-    if (!dataInicio || !dataFim) { setErro("Por favor seleciona as datas desejadas"); return; }
+    if (!dataInicio || !dataFim) { setErro(i.datasObrigatorias); return; }
+    if (conflito) { return; }
     if (!user) { window.location.href = `/entrar?redirect=/reserva?peca=${pecaId}`; return; }
 
     setLoading(true); setErro("");
     const stockItem = stockTamanhos.find(s => s.tamanho === tamanho);
-    if (!stockItem) { setErro("Tamanho não encontrado"); setLoading(false); return; }
+    if (!stockItem) { setErro(i.tamanhoNaoEncontrado); setLoading(false); return; }
 
     const { error } = await supabase.from("reservas_espera").insert({
       cliente_id: user.id,
@@ -222,6 +284,7 @@ function ReservaContent() {
         .lbl { display:block; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-600); margin-bottom:0.5rem; font-weight:500; }
         .inp { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; transition:border-color 0.2s; }
         .inp:focus { border-color:var(--black); }
+        .inp.erro-input { border-color:#c0392b; }
         .textarea { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; resize:vertical; min-height:80px; }
         .opts { display:flex; flex-direction:column; gap:0.75rem; }
         .opt { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; border:1.5px solid var(--grey-200); cursor:pointer; transition:all 0.2s; }
@@ -233,6 +296,9 @@ function ReservaContent() {
         .opt-desc { font-size:0.8rem; color:#5a5855; }
         .resumo { background:var(--white); padding:2rem; position:sticky; top:6rem; }
         .nota { background:#f0eeeb; padding:1rem 1.25rem; border-left:3px solid var(--rosa); font-size:0.88rem; color:var(--grey-600); line-height:1.7; margin-bottom:1.25rem; }
+        .conflito-box { background:#fff5f5; padding:1rem 1.25rem; border-left:3px solid #c0392b; margin-top:0.75rem; }
+        .conflito-titulo { font-size:0.85rem; font-weight:600; color:#c0392b; margin-bottom:0.3rem; }
+        .conflito-desc { font-size:0.8rem; color:#943126; line-height:1.5; }
         .btn { width:100%; padding:1.15rem; background:var(--rosa); color:var(--white); border:none; font-size:0.78rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; transition:background 0.2s; }
         .btn:hover { background:#a85c72; }
         .btn:disabled { opacity:0.6; cursor:not-allowed; }
@@ -299,13 +365,19 @@ function ReservaContent() {
             <div className="dates">
               <div>
                 <label className="lbl">{i.dataInicio}</label>
-                <input className="inp" type="date" min={hoje} value={dataInicio} onChange={e => setDataInicio(e.target.value)} />
+                <input className={`inp${conflito ? " erro-input" : ""}`} type="date" min={hoje} value={dataInicio} onChange={e => setDataInicio(e.target.value)} />
               </div>
               <div>
                 <label className="lbl">{i.dataFim}</label>
-                <input className="inp" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => setDataFim(e.target.value)} />
+                <input className={`inp${conflito ? " erro-input" : ""}`} type="date" min={dataInicio || hoje} value={dataFim} onChange={e => setDataFim(e.target.value)} />
               </div>
             </div>
+            {conflito && (
+              <div className="conflito-box">
+                <div className="conflito-titulo">{i.conflitoTitulo}</div>
+                <div className="conflito-desc">{i.conflitoDesc(conflito.inicio, conflito.fim)}</div>
+              </div>
+            )}
           </div>
 
           <div className="sec">
@@ -357,7 +429,7 @@ function ReservaContent() {
                 </div>
               )}
               {erro && <div className="erro">{erro}</div>}
-              <button className="btn" onClick={confirmarReserva} disabled={loading || !tamanho || !dataInicio || !dataFim}>
+              <button className="btn" onClick={confirmarReserva} disabled={loading || !tamanho || !dataInicio || !dataFim || !!conflito}>
                 {loading ? "..." : i.confirmar}
               </button>
             </>
