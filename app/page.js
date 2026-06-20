@@ -21,6 +21,68 @@ const T = {
     strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspecionadas", "Cancele quando quiser", "Moda consciente"],
     footer: { copy:"© 2026 Nora Grei. Todos os direitos reservados.", links:["Colecção","Como funciona","Contacto","Termos","Privacidade"] },
     bottomNav: { inicio:"Início", catalogo:"Colecção", pedidos:"Pedidos", perfil:"Perfil" },
+    quickAccess: [
+      { icon:"✦", label:"Ver colecção", desc:"Todas as peças" },
+      { icon:"◉", label: "Perfil", labelGuest: "Entrar", desc: "Pedidos e níveis", descGuest: "Cria conta" },
+      { icon:"◎", label:"Alugar agora", desc:"Desde 25€/dia" },
+      { icon:"↗", label:"Comprar", desc:"Loja Nora Grei" },
+    ],
+    missaoLabel: "A nossa missão",
+    videoEmBreve: "Vídeo em breve",
+  },
+  fr: {
+    nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
+    hero: { eyebrow: "Nouvelle collection — Printemps 2026", titulo: "Habillez l'extraordinaire.", sub: "Sans acheter.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche" },
+    video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
+    como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
+      { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves." },
+      { num: "02", titulo: "Recevez", desc: "Livré chez vous, propre et prêt à porter." },
+      { num: "03", titulo: "Portez", desc: "Vivez chaque moment avec style." },
+      { num: "04", titulo: "Retournez ou échangez", desc: "Renouvelez votre garde-robe sans accumuler." },
+    ]},
+    categorias: { label: "Pour chaque moment", titulo: "Le look parfait,", tituloSub: "pour chaque occasion.", lista: ["Festa", "Trabalho", "Férias", "Jantar"] },
+    porque: { label: "Notre mission", titulo: "Parce que la mode doit suivre votre vie,", tituloSub: "pas occuper votre placard.", pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode responsable."] },
+    numeros: [{ val:"1.000+",label:"Locations réalisées" },{ val:"200+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
+    sustentabilidade: { label:"Mode responsable", titulo:"Chaque pièce vit plusieurs histoires.", stats:[{ val:"70%",label:"Eau économisée vs achat" },{ val:"5×",label:"Réutilisations par pièce" },{ val:"60%",label:"Émissions réduites" }] },
+    cta: { titulo:"Votre garde-robe infinie", sub:"commence ici.", btn:"Explorer la collection", tag:"Mode exclusive. Sans excès." },
+    strip: ["Livraison gratuite", "Dépôt 100% remboursé", "Pièces inspectées", "Annulez à tout moment", "Mode responsable"],
+    footer: { copy:"© 2026 Nora Grei. Tous droits réservés.", links:["Collection","Comment ça marche","Contact","Conditions","Confidentialité"] },
+    bottomNav: { inicio:"Accueil", catalogo:"Collection", pedidos:"Commandes", perfil:"Profil" },
+    quickAccess: [
+      { icon:"✦", label:"Voir la collection", desc:"Toutes les pièces" },
+      { icon:"◉", label: "Profil", labelGuest: "Connexion", desc: "Commandes et niveaux", descGuest: "Créer un compte" },
+      { icon:"◎", label:"Louer maintenant", desc:"Dès 25€/jour" },
+      { icon:"↗", label:"Acheter", desc:"Boutique Nora Grei" },
+    ],
+    missaoLabel: "Notre mission",
+    videoEmBreve: "Vidéo bientôt disponible",
+  },
+  lt: {
+    nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
+    hero: { eyebrow: "Nauja kolekcija — 2026 pavasaris", titulo: "Apsirenkite išskirtinai.", sub: "Nepirkdami.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia" },
+    video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
+    como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
+      { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį." },
+      { num: "02", titulo: "Gaukite", desc: "Pristatome į namus, švarų ir paruoštą dėvėti." },
+      { num: "03", titulo: "Dėvėkite", desc: "Gyvenkite kiekvieną akimirką su savitu stiliumi." },
+      { num: "04", titulo: "Grąžinkite arba keiskite", desc: "Atnaujinkite spintą nekraudami daiktų." },
+    ]},
+    categorias: { label: "Kiekvienai akimirkai", titulo: "Tinkamas stilius,", tituloSub: "kiekvienai progai.", lista: ["Festa", "Trabalho", "Férias", "Jantar"] },
+    porque: { label: "Mūsų misija", titulo: "Nes mada turi atitikti jūsų gyvenimą,", tituloSub: "o ne užimti jūsų spintą.", pontos: ["Mažiau švaistymo.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."] },
+    numeros: [{ val:"1.000+",label:"Įvykdytų nuomų" },{ val:"200+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
+    sustentabilidade: { label:"Sąmoninga mada", titulo:"Kiekvienas drabužis turi kelias istorijas.", stats:[{ val:"70%",label:"Sutaupyto vandens vs pirkimas" },{ val:"5×",label:"Pakartotiniai naudojimai" },{ val:"60%",label:"Sumažintos emisijos" }] },
+    cta: { titulo:"Jūsų begalinė spinta", sub:"prasideda čia.", btn:"Naršyti kolekciją", tag:"Išskirtinė mada. Be perteklių." },
+    strip: ["Nemokamas pristatymas", "100% grąžinamas užstatas", "Patikrinti drabužiai", "Atšaukite bet kada", "Sąmoninga mada"],
+    footer: { copy:"© 2026 Nora Grei. Visos teisės saugomos.", links:["Kolekcija","Kaip tai veikia","Kontaktai","Sąlygos","Privatumas"] },
+    bottomNav: { inicio:"Pradžia", catalogo:"Kolekcija", pedidos:"Užsakymai", perfil:"Profilis" },
+    quickAccess: [
+      { icon:"✦", label:"Žiūrėti kolekciją", desc:"Visi drabužiai" },
+      { icon:"◉", label: "Profilis", labelGuest: "Prisijungti", desc: "Užsakymai ir lygiai", descGuest: "Sukurti paskyrą" },
+      { icon:"◎", label:"Nuomoti dabar", desc:"Nuo 25€/dieną" },
+      { icon:"↗", label:"Pirkti", desc:"Nora Grei parduotuvė" },
+    ],
+    missaoLabel: "Mūsų misija",
+    videoEmBreve: "Vaizdo įrašas greitai",
   },
 };
 
@@ -371,7 +433,7 @@ export default function Home() {
           <div className="video-wrap" style={{cursor:"default"}}>
             <div className="video-placeholder">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>
-              <span style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>Vídeo em breve</span>
+              <span style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>{t.videoEmBreve}</span>
             </div>
           </div>
         )}
@@ -386,18 +448,19 @@ export default function Home() {
       </div>
 
       <div className="quick-access">
-        {[
-          { href:"/catalogo", icon:"✦", label:"Ver colecção", desc:"Todas as peças" },
-          { href: userLogado ? "/perfil" : "/entrar", icon:"◉", label: userLogado ? "Perfil" : "Entrar", desc: userLogado ? "Pedidos e níveis" : "Cria conta" },
-          { href:"/catalogo", icon:"◎", label:"Alugar agora", desc:"Desde 25€/dia" },
-          { href:"https://www.noragrei.com", icon:"↗", label:"Comprar", desc:"Loja Nora Grei" },
-        ].map((item, i) => (
-          <a key={i} href={item.href} className="qa-item" target={item.href.indexOf("http") === 0 ? "_blank" : undefined} rel={item.href.indexOf("http") === 0 ? "noopener noreferrer" : undefined}>
-            <div className="qa-icon">{item.icon}</div>
-            <div className="qa-label">{item.label}</div>
-            <div className="qa-desc">{item.desc}</div>
-          </a>
-        ))}
+        {t.quickAccess.map((item, idx) => {
+          const hrefs = ["/catalogo", userLogado ? "/perfil" : "/entrar", "/catalogo", "https://www.noragrei.com"];
+          const href = hrefs[idx];
+          const label = idx === 1 ? (userLogado ? item.label : item.labelGuest) : item.label;
+          const desc = idx === 1 ? (userLogado ? item.desc : item.descGuest) : item.desc;
+          return (
+            <a key={idx} href={href} className="qa-item" target={href.indexOf("http") === 0 ? "_blank" : undefined} rel={href.indexOf("http") === 0 ? "noopener noreferrer" : undefined}>
+              <div className="qa-icon">{item.icon}</div>
+              <div className="qa-label">{label}</div>
+              <div className="qa-desc">{desc}</div>
+            </a>
+          );
+        })}
       </div>
 
       <section className="sec" style={{paddingBottom:0}}>
@@ -432,7 +495,7 @@ export default function Home() {
 
       <section className="porque">
         <div>
-          <p className="sec-label" style={{color:"var(--rosa)"}}>A nossa missão</p>
+          <p className="sec-label" style={{color:"var(--rosa)"}}>{t.missaoLabel}</p>
           <h2 className="porque-titulo">{t.porque.titulo}<em>{t.porque.tituloSub}</em></h2>
         </div>
         <div>
