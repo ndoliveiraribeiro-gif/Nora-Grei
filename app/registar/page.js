@@ -93,27 +93,36 @@ export default function Registar() {
     if (password.length < 6) { setErro(i.erroMin); return; }
     if (password !== confirmar) { setErro(i.erroPass); return; }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { nome, telefone, data_nascimento: dataNasc, genero } }
     });
     if (error) { setErro(error.message); setLoading(false); return; }
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from("clientes").upsert({
-          id: user.id,
-          email,
-          nome,
-          telefone,
-          data_nascimento: dataNasc || null,
-          genero: genero || null,
-          pais: pais || null,
-          cidade: cidade || null,
-        });
+
+    // Usar o user devolvido diretamente pelo signUp (getUser() pode falhar
+    // se a confirmação de email estiver ativa e a sessão ainda não existir)
+    const novoUser = signUpData?.user;
+    if (novoUser) {
+      const { error: erroClientes } = await supabase.from("clientes").upsert({
+        id: novoUser.id,
+        email,
+        nome,
+        telefone,
+        data_nascimento: dataNasc || null,
+        genero: genero || null,
+        pais: pais || null,
+        cidade: cidade || null,
+      });
+      if (erroClientes) {
+        console.error("Erro ao criar registo de cliente:", erroClientes);
+        setErro("Conta criada, mas houve um problema ao guardar o perfil. Contacta o suporte.");
+        setLoading(false);
+        return;
       }
-    } catch(e) {}
+    } else {
+      console.error("signUp não devolveu user — registo em clientes não foi criado");
+    }
     setSucesso(true);
     setLoading(false);
   };
