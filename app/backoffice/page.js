@@ -74,6 +74,9 @@ function ModalRecibo({ recibo, aluguer, peca, tamanho, onClose }) {
           <span style={{ fontSize:"0.68rem",color:"#888",fontFamily:"monospace" }}>{recibo.numero}</span>
         </div>
         <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Data</span><span>{new Date(recibo.created_at).toLocaleString("pt-PT")}</span></div>
+        {recibo.clientes?.codigo_cliente && (
+          <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Cliente</span><span style={{ fontFamily:"monospace",fontWeight:700,color:"#9c4d63" }}>{recibo.clientes.codigo_cliente}</span></div>
+        )}
         <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Peça</span><span>{peca?.nome || "—"}</span></div>
         <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Tamanho</span><span>{tamanho || "—"}</span></div>
         <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Datas</span><span>{aluguer?.data_inicio} → {aluguer?.data_fim}</span></div>
@@ -393,16 +396,25 @@ function Caixa() {
   const carregarCaixa = async () => {
     setLoading(true);
     const [recibosRes, alugueresRes, despesasRes] = await Promise.all([
-      supabase.from("recibos").select("*, clientes(nome)").eq("estado", "pago").order("created_at", { ascending: false }),
-      supabase.from("alugueres").select("id, valor_aluguer, deposito_valor, deposito_estado, caucao_libertada_em, clientes(nome)").eq("deposito_estado", "libertado").not("caucao_libertada_em", "is", null),
+      supabase.from("recibos").select("*, clientes(nome, codigo_cliente, nif)").eq("estado", "pago").order("created_at", { ascending: false }),
+      supabase.from("alugueres").select("id, valor_aluguer, deposito_valor, deposito_estado, caucao_libertada_em, clientes(nome, codigo_cliente)").eq("deposito_estado", "libertado").not("caucao_libertada_em", "is", null),
       supabase.from("despesas").select("*").order("data", { ascending: false }),
     ]);
 
     const entradas = (recibosRes.data || []).map(r => ({
-      tipo: "entrada", data: r.created_at, descricao: `Recibo ${r.numero} — ${r.clientes?.nome || "Cliente"}`, valor: r.valor_total, categoria: r.metodo_pagamento,
+      tipo: "entrada", data: r.created_at,
+      descricao: `Talão ${r.numero} — ${r.clientes?.nome || "Cliente"}`,
+      valor: r.valor_total, categoria: r.metodo_pagamento,
+      codigoCliente: r.clientes?.codigo_cliente || "—",
+      nif: r.clientes?.nif || "—",
+      numeroTalao: r.numero,
+      recibo: r,
     }));
     const saidasCaucao = (alugueresRes.data || []).map(a => ({
-      tipo: "saida", data: a.caucao_libertada_em, descricao: `Caução devolvida — ${a.clientes?.nome || "Cliente"}`, valor: a.deposito_valor || 0, categoria: "Caução",
+      tipo: "saida", data: a.caucao_libertada_em,
+      descricao: `Caução devolvida — ${a.clientes?.nome || "Cliente"}`,
+      valor: a.deposito_valor || 0, categoria: "Caução",
+      codigoCliente: a.clientes?.codigo_cliente || "—",
     }));
     const saidasDespesas = (despesasRes.data || []).map(d => ({
       tipo: "saida", data: d.data, descricao: d.descricao, valor: d.valor, categoria: d.categoria, id: d.id,
@@ -521,6 +533,7 @@ function Caixa() {
 
 function RowDia({ linha, onApagarDespesa }) {
   const [aberto, setAberto] = useState(false);
+  const [talaoAberto, setTalaoAberto] = useState(null);
   return (
     <>
       <tr style={{ background:"#fff",cursor:"pointer" }} onClick={() => setAberto(!aberto)}>
@@ -529,17 +542,30 @@ function RowDia({ linha, onApagarDespesa }) {
         <td style={{ ...TD,color:"#e74c3c",fontWeight:600 }}>-{linha.saidas.toFixed(0)}€</td>
         <td style={{ ...TD,fontWeight:600,color:linha.saldoDia>=0?"#27ae60":"#e74c3c" }}>{linha.saldoDia>=0?"+":""}{linha.saldoDia.toFixed(0)}€</td>
         <td style={{ ...TD,fontWeight:700 }}>{linha.saldoAcumulado.toFixed(0)}€</td>
-        <td style={TD}><span style={{ fontSize:"0.7rem",color:"#888" }}>{aberto?"▲":"▼"} {linha.itens.length} itens</span></td>
+        <td style={TD}><span style={{ fontSize:"0.7rem",color:"#3f3e3c" }}>{aberto?"▲":"▼"} {linha.itens.length} itens</span></td>
       </tr>
       {aberto && linha.itens.map((item, idx) => (
         <tr key={idx} style={{ background:"#f8f8f6" }}>
-          <td style={{ ...TD,paddingLeft:"2rem",fontSize:"0.78rem",color:"#888" }}>↳</td>
-          <td colSpan={2} style={{ ...TD,fontSize:"0.78rem" }}>{item.descricao} <span style={{ color:"#aaa" }}>({item.categoria})</span></td>
+          <td style={{ ...TD,paddingLeft:"2rem",fontSize:"0.78rem",color:"#3f3e3c" }}>↳ {item.codigoCliente && <span style={{ fontFamily:"monospace",fontWeight:700,color:"#9c4d63" }}>{item.codigoCliente}</span>}</td>
+          <td colSpan={2} style={{ ...TD,fontSize:"0.78rem" }}>
+            {item.descricao} <span style={{ color:"#888" }}>({item.categoria})</span>
+            {item.nif && item.nif !== "—" && <span style={{ color:"#888",marginLeft:"0.5rem" }}>NIF {item.nif}</span>}
+          </td>
           <td style={{ ...TD,fontSize:"0.78rem",color:item.tipo==="entrada"?"#27ae60":"#e74c3c",fontWeight:600 }}>{item.tipo==="entrada"?"+":"-"}{item.valor.toFixed(0)}€</td>
           <td style={TD}></td>
-          <td style={TD}>{item.id && <button onClick={(e) => { e.stopPropagation(); onApagarDespesa(item.id); }} style={{ ...BTN("red","sm") }}>Apagar</button>}</td>
+          <td style={TD}>
+            <div style={{ display:"flex",gap:"0.3rem" }}>
+              {item.recibo && <button onClick={(e) => { e.stopPropagation(); setTalaoAberto(item.recibo); }} style={{ ...BTN("outline","sm") }}>🧾 Talão</button>}
+              {item.id && <button onClick={(e) => { e.stopPropagation(); onApagarDespesa(item.id); }} style={{ ...BTN("red","sm") }}>Apagar</button>}
+            </div>
+          </td>
         </tr>
       ))}
+      {talaoAberto && (
+        <tr><td colSpan={6} style={{padding:0,border:"none"}}>
+          <ModalRecibo recibo={talaoAberto} aluguer={null} peca={null} tamanho={null} onClose={() => setTalaoAberto(null)} />
+        </td></tr>
+      )}
     </>
   );
 }
