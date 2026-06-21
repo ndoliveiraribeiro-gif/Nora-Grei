@@ -314,7 +314,49 @@ function SeeWhois() {
   );
 }
 
-// --- CAIXA / CONTABILIDADE ---
+const TRANSPORTADORAS = ["CTT Expresso", "DPD", "UPS", "DHL", "GLS", "Outra"];
+
+function ModalEnvio({ aluguer, onClose, onEnviado }) {
+  const [transportadora, setTransportadora] = useState(TRANSPORTADORAS[0]);
+  const [codigoRastreio, setCodigoRastreio] = useState("");
+  const [aGuardar, setAGuardar] = useState(false);
+
+  const confirmarEnvio = async () => {
+    setAGuardar(true);
+    const agora = new Date().toISOString();
+    await supabase.from("envios").insert({
+      aluguer_id: aluguer.id, transportadora, codigo_rastreio: codigoRastreio || null, data_envio: agora,
+    });
+    await supabase.from("alugueres").update({ estado: "enviado", data_envio: agora }).eq("id", aluguer.id);
+    setAGuardar(false);
+    onEnviado();
+  };
+
+  return (
+    <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={{ background:"#fff",width:"100%",maxWidth:420,padding:"2rem" }}>
+        <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.25rem" }}>Marcar como enviado</h2>
+        <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1.25rem" }}>{aluguer.stock_tamanhos?.pecas?.nome} — {aluguer.clientes?.nome}</p>
+        <div style={{ marginBottom:"1rem" }}>
+          <label style={LBL}>Transportadora</label>
+          <select style={INP} value={transportadora} onChange={e => setTransportadora(e.target.value)}>
+            {TRANSPORTADORAS.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div style={{ marginBottom:"1.5rem" }}>
+          <label style={LBL}>Código de rastreio (opcional)</label>
+          <input style={INP} value={codigoRastreio} onChange={e => setCodigoRastreio(e.target.value)} placeholder="PT123456789CT" />
+        </div>
+        <div style={{ display:"flex",gap:"0.75rem" }}>
+          <button style={{ ...BTN("black"),flex:1,opacity:aGuardar?0.6:1 }} onClick={confirmarEnvio} disabled={aGuardar}>{aGuardar?"A confirmar...":"Confirmar envio"}</button>
+          <button style={BTN("outline")} onClick={onClose}>Cancelar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 const CATEGORIAS_DESPESA = ["Compra de stock", "Manutenção", "Envio/Logística", "Marketing", "Higienização", "Outro"];
 
 function Caixa() {
@@ -509,6 +551,7 @@ export default function Backoffice() {
   const [pecasComFoto, setPecasComFoto] = useState([]);
 
   const [alugueres, setAlugueres] = useState([]);
+  const [aluguerParaEnviar, setAluguerParaEnviar] = useState(null);
   const [clientes, setClientes] = useState([]);
   const [clienteSel, setClienteSel] = useState(null);
   const [reservas, setReservas] = useState([]);
@@ -742,7 +785,7 @@ export default function Backoffice() {
 
   const atualizarEstado = async (id, estado) => { await supabase.from("alugueres").update({ estado }).eq("id", id); carregarDados(); };
   const confirmarDeposito = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
-  const marcarEnviado = async (id) => { await supabase.from("alugueres").update({ estado: "enviado", data_envio: new Date().toISOString() }).eq("id", id); carregarDados(); };
+  const marcarEnviado = (aluguer) => { setAluguerParaEnviar(aluguer); };
   const confirmarRecepcao = async (id) => { await supabase.from("alugueres").update({ estado: "em_verificacao", data_recepcao: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const confirmarVerificacao = async (id, danificado=false) => { await supabase.from("alugueres").update({ estado: danificado?"devolvido_danificado":"devolvido", data_verificacao: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const libertarCaucao = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "libertado", caucao_libertada_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
@@ -1119,7 +1162,7 @@ export default function Backoffice() {
                           </td>
                           <td style={TD}>
                             <div style={{ display:"flex",flexDirection:"column",gap:"0.3rem" }}>
-                              {a.estado==="confirmado"&&<button style={BTN("rosa","sm")} onClick={()=>marcarEnviado(a.id)}>🚚 Enviar</button>}
+                              {a.estado==="confirmado"&&<button style={BTN("rosa","sm")} onClick={()=>marcarEnviado(a)}>🚚 Enviar</button>}
                               {a.estado==="ativo"&&<button style={BTN("rosa","sm")} onClick={()=>confirmarRecepcao(a.id)}>📦 Recebi devolução</button>}
                               {a.estado==="em_verificacao"&&<><button style={BTN("black","sm")} onClick={()=>confirmarVerificacao(a.id,false)}>✓ OK</button><button style={BTN("red","sm")} onClick={()=>confirmarVerificacao(a.id,true)}>✗ Dano</button></>}
                               {a.estado==="devolvido"&&a.deposito_estado!=="libertado"&&<button style={BTN("outline","sm")} onClick={()=>libertarCaucao(a.id)}>💰 Libertar</button>}
@@ -1540,6 +1583,14 @@ export default function Backoffice() {
         )}
 
       </div>
+
+      {aluguerParaEnviar && (
+        <ModalEnvio
+          aluguer={aluguerParaEnviar}
+          onClose={() => setAluguerParaEnviar(null)}
+          onEnviado={() => { setAluguerParaEnviar(null); carregarDados(); }}
+        />
+      )}
     </div>
   );
 }
