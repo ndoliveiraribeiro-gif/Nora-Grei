@@ -314,6 +314,27 @@ function SeeWhois() {
   );
 }
 
+function TimerReservaBackoffice({ dataDisponivel }) {
+  const [tempo, setTempo] = useState("");
+  useEffect(() => {
+    if (!dataDisponivel) return;
+    const calc = () => {
+      const diff = new Date(dataDisponivel) - new Date();
+      if (diff <= 0) { setTempo(""); return; }
+      const dias = Math.floor(diff / 86400000);
+      const horas = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (dias > 0) setTempo(`${dias}d ${horas}h ${mins}m`);
+      else setTempo(`${horas}h ${mins}m`);
+    };
+    calc();
+    const iv = setInterval(calc, 30000);
+    return () => clearInterval(iv);
+  }, [dataDisponivel]);
+  if (!tempo) return null;
+  return <div style={{ fontSize:"0.68rem",color:"#b8860b",fontWeight:600,marginTop:"0.2rem" }}>Disponível em {tempo}</div>;
+}
+
 const TRANSPORTADORAS = ["CTT Expresso", "DPD", "UPS", "DHL", "GLS", "Outra"];
 
 function ModalEnvio({ aluguer, onClose, onEnviado }) {
@@ -606,8 +627,54 @@ export default function Backoffice() {
       if (data) setClientes(data);
     }
     if (tab === "reservas") {
-      const { data } = await supabase.from("reservas_espera").select("*, clientes(nome, email), stock_tamanhos(tamanho, pecas(nome, codigo_referencia, fotos))").order("created_at", { ascending: false });
-      if (data) setReservas(data);
+      const { data: res } = await supabase
+        .from("reservas_espera")
+        .select("*, clientes(nome, email, telefone), stock_tamanho_id, stock_tamanhos(id, tamanho, pecas(nome, codigo_referencia, fotos))")
+        .in("estado", ["aguarda", "notificado"])
+        .order("created_at", { ascending: false });
+
+      if (res && res.length > 0) {
+        const stockIds = [...new Set(res.map(r => r.stock_tamanho_id).filter(Boolean))];
+        const { data: alugueresAtivos } = await supabase
+          .from("alugueres")
+          .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
+          .in("stock_tamanho_id", stockIds)
+          .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+
+        const agora = new Date();
+        const resComDisponibilidade = [];
+        for (const r of res) {
+          const ocupantes = (alugueresAtivos || []).filter(a => a.stock_tamanho_id === r.stock_tamanho_id);
+          let dataDisponivel = null;
+          ocupantes.forEach(a => {
+            const dataDisp = a.data_disponivel_novamente
+              ? new Date(a.data_disponivel_novamente)
+              : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+            if (!dataDisponivel || dataDisp > dataDisponivel) dataDisponivel = dataDisp;
+          });
+          const disponivelAgora = !dataDisponivel || dataDisponivel <= agora;
+
+          // Auto-notificação: se já está disponível e ainda está em "aguarda", marca sozinho como notificado
+          if (disponivelAgora && r.estado === "aguarda") {
+            const prazo = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
+            const linkCheckout = `https://nora-grei.vercel.app/checkout?peca=${r.stock_tamanhos?.pecas ? r.stock_tamanho_id : ""}&tamanho=${r.stock_tamanho_id}`;
+            await supabase.from("reservas_espera").update({
+              estado: "notificado",
+              notificado_em: agora.toISOString(),
+              prazo_confirmacao: prazo.toISOString(),
+              link_checkout: linkCheckout,
+            }).eq("id", r.id);
+            r.estado = "notificado";
+            r.notificado_em = agora.toISOString();
+            r.prazo_confirmacao = prazo.toISOString();
+          }
+
+          resComDisponibilidade.push({ ...r, dataDisponivel: dataDisponivel ? dataDisponivel.toISOString() : null, disponivelAgora });
+        }
+        setReservas(resComDisponibilidade);
+      } else {
+        setReservas([]);
+      }
     }
     if (tab === "campanhas") {
       const { data, error } = await supabase.from("campanhas").select("*").order("created_at", { ascending: false });
@@ -1257,10 +1324,10 @@ export default function Backoffice() {
         {tab === "reservas" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Reservas em espera</h1>
-            <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{reservas.length} pendentes</p>
+            <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{reservas.length} pendentes — deteção e notificação automáticas</p>
             <div style={CARD}>
               <table style={{ width:"100%",borderCollapse:"collapse" }}>
-                <thead><tr>{["Peça","Cliente","Datas desejadas","Estado","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                <thead><tr>{["Peça","Cliente","Datas desejadas","Disponibilidade","Estado"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                 <tbody>
                   {reservas.length===0?<tr><td colSpan={5} style={{ textAlign:"center",color:"#888",padding:"2rem",fontSize:"0.85rem" }}>Sem reservas em espera</td></tr>
                     :reservas.map(r=>(
@@ -1277,10 +1344,25 @@ export default function Backoffice() {
                             </div>
                           </div>
                         </td>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{r.clientes?.nome||"—"}</div><div style={{ fontSize:"0.75rem",color:"#888" }}>{r.clientes?.email}</div></td>
+                        <td style={TD}>
+                          <div style={{ fontWeight:600 }}>{r.clientes?.nome||"—"}</div>
+                          <div style={{ fontSize:"0.75rem",color:"#888" }}>{r.clientes?.email}</div>
+                          {r.clientes?.telefone && <div style={{ fontSize:"0.72rem",color:"#aaa" }}>{r.clientes.telefone}</div>}
+                        </td>
                         <td style={{ ...TD,whiteSpace:"nowrap" }}>{r.data_inicio_desejada} → {r.data_fim_desejada}</td>
-                        <td style={TD}><span style={BADGE(r.estado==="aguarda"?"orange":"green")}>{r.estado==="aguarda"?"A aguardar":"Notificado"}</span></td>
-                        <td style={TD}>{r.estado==="aguarda"&&<button style={BTN("rosa","sm")} onClick={async()=>{ await supabase.from("reservas_espera").update({estado:"notificado",notificado_em:new Date().toISOString()}).eq("id",r.id); carregarDados(); }}>Notificar</button>}</td>
+                        <td style={TD}>
+                          {r.disponivelAgora ? (
+                            <span style={{ fontSize:"0.7rem",color:"#27ae60",fontWeight:700 }}>✓ Disponível agora</span>
+                          ) : (
+                            <TimerReservaBackoffice dataDisponivel={r.dataDisponivel} />
+                          )}
+                        </td>
+                        <td style={TD}>
+                          <span style={BADGE(r.estado==="aguarda"?"orange":"green")}>{r.estado==="aguarda"?"A aguardar":"Notificado automaticamente"}</span>
+                          {r.estado==="notificado" && r.prazo_confirmacao && (
+                            <div style={{ fontSize:"0.62rem",color:"#888",marginTop:"0.2rem" }}>Prazo: {new Date(r.prazo_confirmacao).toLocaleString("pt-PT")}</div>
+                          )}
+                        </td>
                       </tr>
                     ))}
                 </tbody>
