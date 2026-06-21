@@ -542,7 +542,7 @@ export default function Perfil() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g6:#3f3e3c;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
+        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g6:#2b2a28;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
         body{background:var(--g1);font-family:var(--sans);font-size:17px;-webkit-font-smoothing:antialiased}
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
@@ -553,7 +553,7 @@ export default function Perfil() {
         .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover}
         .avatar-ph{width:96px;height:96px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--g6)}
         .avatar-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--black);color:var(--white);border:2px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem}
-        .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:400;line-height:1.1;margin-bottom:0.3rem}
+        .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.1;margin-bottom:0.3rem;color:var(--black)}
         .hero-email{font-size:0.92rem;color:var(--g6)}
         .alerta-perfil{background:#fff8e1;border-left:3px solid #b8860b;padding:1.25rem 1.5rem}
         .alerta-perfil-titulo{font-size:0.85rem;font-weight:700;color:#6b4500;margin-bottom:0.3rem}
@@ -563,14 +563,13 @@ export default function Perfil() {
         .alerta-reserva-desc{font-size:0.8rem;color:#175c2e;line-height:1.5;margin-bottom:1rem}
         .nivel-card{background:var(--white);padding:2rem 2.5rem}
         .nivel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-        .nivel-badge{display:inline-flex;align-items:center;gap:0.6rem;padding:0.4rem 1rem;font-size:0.82rem;font-weight:600}
-        .nivel-sigla{width:28px;height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;letter-spacing:0.02em;color:#fff}
+        .nivel-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.45rem 1rem;font-size:0.85rem;font-weight:700;border:1.5px solid currentColor}
         .nivel-barra{height:6px;background:var(--g2);border-radius:3px;overflow:hidden}
         .nivel-barra-fill{height:100%;border-radius:3px;transition:width 0.8s ease}
         .nivel-info{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--g6);margin-top:0.4rem}
         .nivel-beneficios{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--g1)}
         .beneficio{text-align:center;padding:1rem}
-        .beneficio-sigla{width:32px;height:32px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff;margin:0 auto 0.5rem}
+        .beneficio-sigla{font-family:var(--serif);font-size:1.1rem;font-weight:500;margin-bottom:0.3rem}
         .beneficio-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6)}
         .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--g2)}
         .stat{background:var(--white);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:background 0.2s}
@@ -666,8 +665,8 @@ export default function Perfil() {
           <div className="nivel-top">
             <div>
               <div style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
-              <div className="nivel-badge" style={{background: nv.cor+'1a', color: nv.cor}}>
-                <span className="nivel-sigla" style={{background:nv.cor}}>{nv.sigla}</span><span style={{fontWeight:700}}>{nv.nome}</span>
+              <div className="nivel-badge" style={{color: nv.cor}}>
+                <span style={{fontWeight:700}}>{nv.nome}</span>
               </div>
             </div>
             <div style={{textAlign:'right'}}>
@@ -685,8 +684,8 @@ export default function Perfil() {
           <div className="nivel-beneficios">
             {NIVEIS_TABELA.map(nivel => (
               <div key={nivel.sigla} className="beneficio">
-                <div className="beneficio-sigla" style={{background:nivel.cor}}>{nivel.sigla}</div>
-                <div className="beneficio-label">{nivel.nome} · {nivel.caucao}</div>
+                <div className="beneficio-sigla" style={{color:nivel.cor}}>{nivel.nome}</div>
+                <div className="beneficio-label">Caução {nivel.caucao}</div>
               </div>
             ))}
           </div>
