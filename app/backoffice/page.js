@@ -1065,12 +1065,23 @@ export default function Backoffice() {
                 <div style={CARD}>
                   <p style={CARD_T}>Em curso agora ({stats.alugueresAtivos.length})</p>
                   <table style={{ width:"100%",borderCollapse:"collapse" }}>
-                    <thead><tr>{["Cód. Cliente","Peça / Ref.","Estado","Dias restantes","Valor"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                    <thead><tr>{["Cód. Cliente","Peça / Ref.","Estado","Entrega / Devolução","Valor"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
                     <tbody>
                       {stats.alugueresAtivos.map(a => {
                         const diasRestantes = Math.ceil((new Date(a.data_fim) - new Date()) / 86400000);
                         const emAtraso = diasRestantes < 0;
                         const urgente = diasRestantes === 0 || ((new Date(a.data_fim) - new Date()) / 3600000) <= 6;
+
+                        // Timer entrega: 24h desde data_envio
+                        const dataEnvio = a.envios?.[0]?.data_envio;
+                        const prazoEntrega = dataEnvio ? new Date(new Date(dataEnvio).getTime() + 24*60*60*1000) : null;
+                        const horasEntrega = prazoEntrega ? Math.max(0, Math.floor((prazoEntrega - new Date()) / 3600000)) : null;
+                        const minsEntrega = prazoEntrega ? Math.max(0, Math.floor(((prazoEntrega - new Date()) % 3600000) / 60000)) : null;
+
+                        // Timer devolução: a partir de data_confirmacao_recepcao
+                        const horasRestantesDev = Math.floor((new Date(a.data_fim) - new Date()) / 3600000);
+                        const minsRestantesDev = Math.floor(((new Date(a.data_fim) - new Date()) % 3600000) / 60000);
+
                         return (
                           <tr key={a.id} style={{ background: emAtraso ? "#fff8e1" : urgente ? "#fff5f5" : "#fff" }}>
                             <td style={TD}><span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a" }}>{a.clientes?.codigo_cliente || "—"}</span></td>
@@ -1080,8 +1091,23 @@ export default function Backoffice() {
                               <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
                             </td>
                             <td style={TD}><span style={BADGE(a.estado==="ativo"?"green":a.estado==="enviado"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado]||a.estado}</span></td>
-                            <td style={{ ...TD,fontWeight:700,color:emAtraso?"#e74c3c":urgente?"#b8860b":"#27ae60" }}>
-                              {emAtraso ? `+${Math.abs(diasRestantes)}d atraso` : diasRestantes === 0 ? "Termina hoje" : `${diasRestantes}d`}
+                            <td style={TD}>
+                              {a.estado === "enviado" && prazoEntrega && (
+                                <div style={{ color:"#1565c0",fontWeight:700,fontSize:"0.82rem" }}>
+                                  🚚 {horasEntrega > 0 ? `Chega em ${horasEntrega}h ${minsEntrega}m` : "A chegar a qualquer momento"}
+                                </div>
+                              )}
+                              {a.estado === "ativo" && (
+                                <div style={{ color:emAtraso?"#e74c3c":urgente?"#b8860b":"#27ae60",fontWeight:700,fontSize:"0.82rem" }}>
+                                  {emAtraso 
+                                    ? `⚠ +${Math.abs(diasRestantes)}d atraso` 
+                                    : urgente 
+                                    ? `⏰ ${horasRestantesDev}h ${minsRestantesDev}m para devolver`
+                                    : `↩ Devolver em ${diasRestantes}d`}
+                                </div>
+                              )}
+                              {a.estado === "confirmado" && <div style={{ color:"#6b3fa0",fontSize:"0.82rem" }}>A preparar envio</div>}
+                              {a.estado === "pendente" && <div style={{ color:"#b8860b",fontSize:"0.82rem" }}>A aguardar pagamento</div>}
                             </td>
                             <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
                           </tr>
