@@ -648,9 +648,15 @@ export default function Backoffice() {
       }
     }
     if (tab === "clientes") {
-      const { data, error } = await supabase.from("clientes").select("*, alugueres(id, estado, created_at, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos)))").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("clientes").select("*").order("created_at", { ascending: false });
       if (error) console.error("Erro clientes:", error);
-      if (data) setClientes(data);
+      if (data) {
+        const clientesComAlugueres = await Promise.all(data.map(async (c) => {
+          const { data: al } = await supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim").eq("cliente_id", c.id);
+          return { ...c, alugueres: al || [] };
+        }));
+        setClientes(clientesComAlugueres);
+      }
     }
     if (tab === "reservas") {
       const { data: res } = await supabase
@@ -1294,7 +1300,7 @@ export default function Backoffice() {
                         <td style={TD}><div style={{ fontSize:"0.82rem" }}>{c.telefone||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.nif?"NIF: "+c.nif:""}</div></td>
                         <td style={TD}>{c.cidade||"—"}</td>
                         <td style={TD}>
-                          <span style={{ ...BADGE(""),background:nv.cor+"22",color:nv.cor }}>{nv.icon} {nv.nome}</span>
+                          <span style={{ ...BADGE(""),background:nv.cor+"22",color:nv.cor }}>{nv.nome}</span>
                           <div style={{ fontSize:"0.68rem",color:"#888",marginTop:"0.2rem" }}>{comp<5?`${5-comp}→Prata`:comp<10?`${10-comp}→Ouro`:comp<20?`${20-comp}→Platina`:"Platina ✓"}</div>
                         </td>
                         <td style={TD}><span style={BADGE("rosa")}>{total} pts</span></td>
@@ -1306,6 +1312,7 @@ export default function Backoffice() {
                           </div>
                         </td>
                       </tr>
+
                     );
                   })}
                 </tbody>
