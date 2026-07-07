@@ -574,7 +574,7 @@ export default function Perfil() {
         .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--g2)}
         .stat{background:var(--white);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:background 0.2s}
         .stat:hover{background:var(--g1)}
-        .stat-val{font-family:var(--serif);font-size:2rem;font-weight:300;margin-bottom:0.4rem}
+        .stat-val{font-family:var(--serif);font-size:2rem;font-weight:600;margin-bottom:0.4rem;color:#080808}
         .stat-label{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6)}
         .pontos-card{background:var(--white);padding:2rem 2.5rem}
         .pontos-circles{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap}
