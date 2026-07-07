@@ -12,7 +12,7 @@ const TRADUCOES = {
     verCatalogo: "Explorar catálogo", devolucao: "Devolução prevista", tamanho: "Tamanho",
     estado: { ativo:"A usar", enviado:"A caminho", confirmado:"Pagamento confirmado — a preparar envio", pendente:"A aguardar pagamento", devolvido:"Concluído", cancelado:"Cancelado", em_verificacao:"Em inspeção", devolvido_danificado:"Concluído — com danos" },
     reservaEspera: "A aguardar disponibilidade", dataDesejada: "Datas desejadas", loading: "A carregar...", voltar: "← Início",
-    entregaEm: "Entrega prevista em", entregaPrazo: "3-5 dias úteis",
+    entregaEm: "Entrega prevista em", entregaPrazo: "Até 24 horas",
     comprarPeca: "Comprar esta peça",
     codigoDesconto: "Código de desconto",
     copiado: "Copiado!",
@@ -31,7 +31,7 @@ const TRADUCOES = {
     verCatalogo: "Explorer le catalogue", devolucao: "Retour prévu", tamanho: "Taille",
     estado: { ativo:"Actif", enviado:"Envoyé", confirmado:"Confirmé", pendente:"En attente", devolvido:"Retourné", cancelado:"Annulé", em_verificacao:"En vérification", devolvido_danificado:"Retourné endommagé" },
     reservaEspera: "En attente de disponibilité", dataDesejada: "Dates souhaitées", loading: "Chargement...", voltar: "← Accueil",
-    entregaEm: "Livraison prévue dans", entregaPrazo: "3-5 jours ouvrés",
+    entregaEm: "Livraison prévue dans", entregaPrazo: "sous 24 heures",
     comprarPeca: "Acheter cette pièce",
     codigoDesconto: "Code de réduction",
     copiado: "Copié!",
@@ -50,7 +50,7 @@ const TRADUCOES = {
     verCatalogo: "Naršyti katalogą", devolucao: "Planuojamas grąžinimas", tamanho: "Dydis",
     estado: { ativo:"Aktyvus", enviado:"Išsiųstas", confirmado:"Patvirtintas", pendente:"Laukiama", devolvido:"Grąžintas", cancelado:"Atšauktas", em_verificacao:"Tikrinama", devolvido_danificado:"Grąžintas su žala" },
     reservaEspera: "Laukiama prieinamumo", dataDesejada: "Pageidaujamos datos", loading: "Kraunama...", voltar: "← Pradžia",
-    entregaEm: "Pristatymas per", entregaPrazo: "3-5 darbo dienas",
+    entregaEm: "Pristatymas per", entregaPrazo: "iki 24 valandų",
     comprarPeca: "Pirkti šį drabužį",
     codigoDesconto: "Nuolaidos kodas",
     copiado: "Nukopijuota!",
@@ -64,13 +64,32 @@ const TRADUCOES = {
   },
 };
 
-function TimerEntrega({ i }) {
+function TimerEntrega({ i, dataEnvio }) {
+  const [tempo, setTempo] = useState("");
+  useEffect(() => {
+    if (!dataEnvio) return;
+    const calc = () => {
+      const envio = new Date(dataEnvio);
+      const prazo = new Date(envio.getTime() + 24 * 60 * 60 * 1000);
+      const diff = prazo - new Date();
+      if (diff <= 0) { setTempo(""); return; }
+      const horas = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      setTempo(`${horas}h ${mins}m`);
+    };
+    calc();
+    const iv = setInterval(calc, 30000);
+    return () => clearInterval(iv);
+  }, [dataEnvio]);
+
   return (
     <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#e3f2fd',padding:'0.6rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #1976d2'}}>
       <span style={{fontSize:'1rem'}}>🚚</span>
       <div>
         <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'#1976d2',fontWeight:600}}>{i.timerEntrega}</div>
-        <div style={{fontSize:'0.72rem',color:'#1565c0'}}>{i.entregaEm} {i.entregaPrazo}</div>
+        <div style={{fontSize:'0.72rem',color:'#1565c0'}}>
+          {tempo ? <>{i.entregaEm} <strong>{tempo}</strong></> : "A chegar a qualquer momento"}
+        </div>
       </div>
     </div>
   );
@@ -163,7 +182,7 @@ function PedidosContent() {
 
     const { data: alugueres } = await supabase
       .from("alugueres")
-      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos, preco_aluguer_dia, valor_peca))")
+      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos, preco_aluguer_dia, valor_peca)), envios(transportadora, codigo_rastreio, data_envio)")
       .eq("cliente_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -228,10 +247,18 @@ function PedidosContent() {
           </div>
           <div style={{flex:1}}>
             <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:400,color:'#080808',marginBottom:'0.25rem'}}>{peca?.nome||"Peça"}</p>
-            <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.35rem'}}>{i.tamanho}: {a.stock_tamanhos?.tamanho} · {a.valor_aluguer}€</p>
-            <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem'}}>{a.data_inicio} → {a.data_fim}</p>
+            <p style={{fontSize:'0.78rem', color:'#2b2a28',marginBottom:'0.35rem'}}>{i.tamanho}: {a.stock_tamanhos?.tamanho} · {a.valor_aluguer}€</p>
+            <p style={{fontSize:'0.78rem',color:'#2b2a28',marginBottom:'0.5rem'}}>{a.data_inicio} → {a.data_fim}</p>
             {estadoBadge(a.estado)}
-            {a.estado === "enviado" && <TimerEntrega i={i} />}
+            {a.estado === "enviado" && <TimerEntrega i={i} dataEnvio={a.envios?.[0]?.data_envio} />}
+   
+              {a.estado === "enviado" && a.envios?.[0]?.codigo_rastreio && (
+                <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#f0eeeb',padding:'0.5rem 0.75rem',marginTop:'0.4rem',borderLeft:'3px solid #080808'}}>
+                  <span style={{fontSize:'0.68rem',color:'#3f3e3c'}}>Rastreio:</span>
+                  <span style={{fontSize:'0.78rem',fontWeight:700,fontFamily:'monospace',color:'#080808'}}>{a.envios[0].codigo_rastreio}</span>
+                  <span style={{fontSize:'0.65rem',color:'#888'}}>({a.envios[0].transportadora})</span>
+                </div>
+              )}
             {a.estado === "ativo" && a.data_fim && (
               <p style={{fontSize:'0.75rem',color:'#c4748a',marginTop:'0.5rem',fontWeight:500}}>↩ {i.devolucao}: <strong>{a.data_fim}</strong></p>
             )}
