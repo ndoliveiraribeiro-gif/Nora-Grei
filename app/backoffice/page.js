@@ -622,7 +622,7 @@ export default function Backoffice() {
       const { data: stock } = await supabase.from("stock_tamanhos").select("quantidade_total");
       if (al) {
         const agora = new Date(), inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
-        const ativos = al.filter(a => a.estado === "ativo").length;
+        const ativos = al.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado)).length;
         const totalStock = stock?.reduce((s, t) => s + t.quantidade_total, 0) || 1;
         setStats({ alugueres_ativos: ativos, devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length, receita_mes: al.filter(a => a.created_at >= inicioMes).reduce((s, a) => s + (a.valor_aluguer || 0), 0), clientes_total: 0, reservas_espera: res?.length || 0, taxa_ocupacao: Math.round((ativos / totalStock) * 100) });
       }
