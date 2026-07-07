@@ -627,7 +627,19 @@ export default function Backoffice() {
         setStats({ alugueres_ativos: ativos, devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length, receita_mes: al.filter(a => a.created_at >= inicioMes).reduce((s, a) => s + (a.valor_aluguer || 0), 0), clientes_total: 0, reservas_espera: res?.length || 0, taxa_ocupacao: Math.round((ativos / totalStock) * 100) });
       }
       const { count } = await supabase.from("clientes").select("id", { count: "exact" });
-      setStats(prev => ({ ...prev, clientes_total: count || 0 }));
+      const { data: alRaw } = await supabase
+        .from("alugueres")
+        .select("id, estado, data_fim, data_inicio, valor_aluguer, cliente_id, stock_tamanho_id")
+        .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]);
+
+      let alugueresAtivos = [];
+      for (const a of (alRaw || [])) {
+        const { data: cl } = await supabase.from("clientes").select("nome, codigo_cliente").eq("id", a.cliente_id).maybeSingle();
+        const { data: st } = await supabase.from("stock_tamanhos").select("tamanho, pecas(nome, codigo_referencia)").eq("id", a.stock_tamanho_id).maybeSingle();
+        const { data: env } = await supabase.from("envios").select("data_envio").eq("aluguer_id", a.id).maybeSingle();
+        alugueresAtivos.push({ ...a, clientes: cl, stock_tamanhos: st, envios: env ? [env] : [] });
+      }
+      setStats(prev => ({ ...prev, clientes_total: count || 0, alugueresAtivos }));
     }
     if (tab === "catalogo") {
       const { data: p } = await supabase.from("pecas").select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)").order("created_at", { ascending: false });
@@ -652,7 +664,7 @@ export default function Backoffice() {
       if (error) console.error("Erro clientes:", error);
       if (data) {
         const clientesComAlugueres = await Promise.all(data.map(async (c) => {
-          const { data: al } = await supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim").eq("cliente_id", c.id);
+          const { data: al } = await supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim, stock_tamanhos(tamanho, pecas(nome, fotos))").eq("cliente_id", c.id);
           return { ...c, alugueres: al || [] };
         }));
         setClientes(clientesComAlugueres);
@@ -1000,6 +1012,86 @@ export default function Backoffice() {
                 ))}
               </div>
             </div>
+
+            {/* OPERACIONAL EM TEMPO REAL */}
+            {stats.alugueresAtivos && stats.alugueresAtivos.length > 0 && (
+              <>
+                {/* Alertas críticos */}
+                {stats.alugueresAtivos.filter(a => {
+                  const horasRestantes = (new Date(a.data_fim) - new Date()) / 3600000;
+                  return horasRestantes <= 6 && horasRestantes > 0;
+                }).length > 0 && (
+                  <div style={{ background:"#fff5f5",border:"2px solid #e74c3c",padding:"1.25rem 1.5rem",marginBottom:"1rem" }}>
+                    <p style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#e74c3c",fontWeight:700,marginBottom:"0.75rem" }}>⚠ Termina em menos de 6 horas</p>
+                    {stats.alugueresAtivos.filter(a => {
+                      const h = (new Date(a.data_fim) - new Date()) / 3600000;
+                      return h <= 6 && h > 0;
+                    }).map(a => (
+                      <div key={a.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid #ffd5d5",fontSize:"0.85rem" }}>
+                        <div>
+                          <span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a",marginRight:"0.5rem" }}>{a.clientes?.codigo_cliente}</span>
+                          <span style={{ fontWeight:600 }}>{a.stock_tamanhos?.pecas?.nome}</span>
+                          <span style={{ color:"#888",marginLeft:"0.5rem",fontSize:"0.72rem" }}>{a.stock_tamanhos?.pecas?.codigo_referencia}</span>
+                        </div>
+                        <span style={{ color:"#e74c3c",fontWeight:700,fontSize:"0.82rem" }}>
+                          {Math.max(0, Math.floor((new Date(a.data_fim) - new Date()) / 3600000))}h restantes
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Atrasos */}
+                {stats.alugueresAtivos.filter(a => new Date(a.data_fim) < new Date() && a.estado === "ativo").length > 0 && (
+                  <div style={{ background:"#fff8e1",border:"2px solid #f39c12",padding:"1.25rem 1.5rem",marginBottom:"1rem" }}>
+                    <p style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#b8860b",fontWeight:700,marginBottom:"0.75rem" }}>🕐 Em atraso — dias extra a contar</p>
+                    {stats.alugueresAtivos.filter(a => new Date(a.data_fim) < new Date() && a.estado === "ativo").map(a => {
+                      const diasAtraso = Math.floor((new Date() - new Date(a.data_fim)) / 86400000);
+                      return (
+                        <div key={a.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid #ffeaa0",fontSize:"0.85rem" }}>
+                          <div>
+                            <span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a",marginRight:"0.5rem" }}>{a.clientes?.codigo_cliente}</span>
+                            <span style={{ fontWeight:600 }}>{a.stock_tamanhos?.pecas?.nome}</span>
+                            <span style={{ color:"#888",marginLeft:"0.5rem",fontSize:"0.72rem" }}>{a.stock_tamanhos?.pecas?.codigo_referencia}</span>
+                          </div>
+                          <span style={{ color:"#b8860b",fontWeight:700,fontSize:"0.82rem" }}>+{diasAtraso} dia{diasAtraso !== 1 ? "s" : ""} atraso</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Todos os alugueres ativos */}
+                <div style={CARD}>
+                  <p style={CARD_T}>Em curso agora ({stats.alugueresAtivos.length})</p>
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead><tr>{["Cód. Cliente","Peça / Ref.","Estado","Dias restantes","Valor"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {stats.alugueresAtivos.map(a => {
+                        const diasRestantes = Math.ceil((new Date(a.data_fim) - new Date()) / 86400000);
+                        const emAtraso = diasRestantes < 0;
+                        const urgente = diasRestantes === 0 || ((new Date(a.data_fim) - new Date()) / 3600000) <= 6;
+                        return (
+                          <tr key={a.id} style={{ background: emAtraso ? "#fff8e1" : urgente ? "#fff5f5" : "#fff" }}>
+                            <td style={TD}><span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a" }}>{a.clientes?.codigo_cliente || "—"}</span></td>
+                            <td style={TD}>
+                              <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{a.stock_tamanhos?.pecas?.nome || "—"}</div>
+                              <div style={{ fontSize:"0.65rem",color:"#c4748a",fontFamily:"monospace" }}>{a.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
+                              <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
+                            </td>
+                            <td style={TD}><span style={BADGE(a.estado==="ativo"?"green":a.estado==="enviado"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado]||a.estado}</span></td>
+                            <td style={{ ...TD,fontWeight:700,color:emAtraso?"#e74c3c":urgente?"#b8860b":"#27ae60" }}>
+                              {emAtraso ? `+${Math.abs(diasRestantes)}d atraso` : diasRestantes === 0 ? "Termina hoje" : `${diasRestantes}d`}
+                            </td>
+                            <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </>
         )}
 
