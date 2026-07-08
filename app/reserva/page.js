@@ -123,13 +123,15 @@ function ReservaContent() {
   const searchParams = useSearchParams();
   const pecaId = searchParams.get("peca");
   const tamanhoParam = searchParams.get("tamanho");
+  const tamanhoNomeParam = searchParams.get("tamanhoNome");
 
   const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
   const [peca, setPeca] = useState(null);
   const [stockTamanhos, setStockTamanhos] = useState([]);
   const [dataFimAluguer, setDataFimAluguer] = useState(null);
-  const [tamanho, setTamanho] = useState(tamanhoParam || "");
+  const [tamanho, setTamanho] = useState(tamanhoNomeParam || "");
+  const [tamanhoIdParam] = useState(tamanhoParam || "");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   const [entrega, setEntrega] = useState("envio");

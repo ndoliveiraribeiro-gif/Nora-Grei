@@ -300,7 +300,7 @@ export default function PecaDetalhe() {
                     <div key={s.id} className="tam-wrap">
                       <button className="tam-btn sem-stock" disabled>{s.tamanho}</button>
                       {dataStr && <span className="tam-data">{t.livreEm} {dataStr}</span>}
-                      <a href={`/reserva?peca=${id}&tamanho=${s.id}`} className="tam-reservar">{t.reservarTamanho}</a>
+                      <a href={`/reserva?peca=${id}&tamanhoNome=${s.tamanho}`} className="tam-reservar">{t.reservarTamanho}</a>
                     </div>
                   );
                 })}
