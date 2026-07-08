@@ -990,12 +990,61 @@ export default function Backoffice() {
         {tab === "dashboard" && (
           <>
             <h1 style={{ fontFamily: "'Cormorant',serif", fontSize: "2rem", fontWeight: 300, marginBottom: "0.25rem" }}>Dashboard</h1>
-            <p style={{ fontSize: "0.82rem", color: "#888", marginBottom: "2rem" }}>Resumo do negócio em tempo real</p>
-            <div style={COL4}>
-              {[{val:stats.alugueres_ativos,lbl:"Alugueres ativos",cor:"#c4748a"},{val:`${Number(stats.receita_mes).toFixed(0)}€`,lbl:"Receita este mês"},{val:stats.clientes_total,lbl:"Clientes total"},{val:stats.reservas_espera,lbl:"Reservas em espera"}].map((s,i) => (
-                <div key={i} style={{ background:"#fff",padding:"1.5rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
-                  <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:300,color:s.cor||"#080808",lineHeight:1 }}>{s.val}</div>
-                  <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>{s.lbl}</div>
+            <p style={{ fontSize: "0.82rem", color: "#3f3e3c", marginBottom: "1.5rem" }}>
+              {new Date().toLocaleDateString("pt-PT", { weekday:"long", day:"numeric", month:"long", year:"numeric" })}
+            </p>
+
+            {/* ALERTAS CRITICOS DO DIA */}
+            {(() => {
+              const atrasos = (stats.alugueresAtivos||[]).filter(a => new Date(a.data_fim) < new Date() && a.estado === "ativo");
+              const urgentes = (stats.alugueresAtivos||[]).filter(a => {
+                const h = (new Date(a.data_fim) - new Date()) / 3600000;
+                return h <= 6 && h > 0 && a.estado === "ativo";
+              });
+              if (atrasos.length === 0 && urgentes.length === 0) return null;
+              return (
+                <div style={{ background:"#fff5f5",border:"2px solid #e74c3c",padding:"1rem 1.5rem",marginBottom:"1.5rem",display:"flex",alignItems:"center",gap:"1rem",flexWrap:"wrap" }}>
+                  <span style={{ fontSize:"1.5rem" }}>🚨</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontWeight:700,color:"#e74c3c",fontSize:"0.85rem",marginBottom:"0.25rem" }}>Ação imediata necessária</div>
+                    {atrasos.length > 0 && <div style={{ fontSize:"0.78rem",color:"#c0392b" }}>{atrasos.length} aluguer(es) em atraso — dias extra a contar</div>}
+                    {urgentes.length > 0 && <div style={{ fontSize:"0.78rem",color:"#c0392b" }}>{urgentes.length} aluguer(es) terminam em menos de 6 horas</div>}
+                  </div>
+                  <button style={BTN("red","sm")} onClick={() => setTab("alugueres")}>Ver alugueres →</button>
+                </div>
+              );
+            })()}
+
+            {/* KPIs PRINCIPAIS */}
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1rem" }}>
+              {[
+                { val: stats.alugueres_ativos, lbl: "Em curso agora", cor: "#c4748a", sub: `${(stats.alugueresAtivos||[]).filter(a=>a.estado==="enviado").length} a caminho` },
+                { val: `${Number(stats.receita_mes).toFixed(0)}€`, lbl: "Receita este mês", cor: "#1e7e3e", sub: `${new Date().toLocaleDateString("pt-PT",{month:"long"})}` },
+                { val: stats.clientes_total, lbl: "Clientes", cor: "#1565c0", sub: `${stats.reservas_espera} reserva(s) em espera` },
+                { val: `${stats.taxa_ocupacao}%`, lbl: "Ocupação", cor: stats.taxa_ocupacao > 70 ? "#1e7e3e" : stats.taxa_ocupacao > 30 ? "#b8860b" : "#e74c3c", sub: "do stock total" },
+              ].map((s,idx) => (
+                <div key={idx} style={{ background:"#fff",padding:"1.5rem" }}>
+                  <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#3f3e3c",marginBottom:"0.4rem" }}>{s.lbl}</div>
+                  <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:400,color:s.cor,lineHeight:1,marginBottom:"0.3rem" }}>{s.val}</div>
+                  <div style={{ fontSize:"0.68rem",color:"#888" }}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* KPIs SECUNDARIOS */}
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1.5rem" }}>
+              {[
+                { val: (stats.alugueresAtivos||[]).filter(a=>a.estado==="enviado").length, lbl: "Entregas pendentes", icon: "🚚" },
+                { val: (stats.alugueresAtivos||[]).filter(a=>new Date(a.data_fim)<new Date()&&a.estado==="ativo").length, lbl: "Em atraso", icon: "⚠️", cor: "#e74c3c" },
+                { val: (stats.alugueresAtivos||[]).filter(a=>a.estado==="em_verificacao").length, lbl: "Em verificação", icon: "🔍" },
+                { val: stats.reservas_espera, lbl: "Reservas à espera", icon: "📋", cor: stats.reservas_espera > 0 ? "#b8860b" : undefined },
+              ].map((s,idx) => (
+                <div key={idx} style={{ background:"#f8f8f6",padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:"0.75rem" }}>
+                  <span style={{ fontSize:"1.4rem" }}>{s.icon}</span>
+                  <div>
+                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:400,color:s.cor||"#080808",lineHeight:1 }}>{s.val}</div>
+                    <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#3f3e3c",marginTop:"0.2rem" }}>{s.lbl}</div>
+                  </div>
                 </div>
               ))}
             </div>
