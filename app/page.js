@@ -318,7 +318,7 @@ export default function Home() {
         .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
 
         @media(min-width:769px){
-          .hero{flex-direction:row;padding-top:80px;min-height:82vh}
+          .hero{flex-direction:row;padding-top:80px;min-height:100vh}
           .hero-bg{display:none}
           .hero-overlay{display:none}
           .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:5rem 4rem 5rem 6rem}
@@ -427,7 +427,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="video-sec">
+      {videoUrl && <section className="video-sec">
         <div className="video-header">
           <p className="video-label">{t.video.label}</p>
           <h2 className="video-titulo">{t.video.titulo}</h2>
@@ -445,7 +445,7 @@ export default function Home() {
             </div>
           </div>
         )}
-      </section>
+      </section>}
 
       <div className="strip">
         <div className="strip-track">
