@@ -33,9 +33,9 @@ function Timer({ dataFim, lang }) {
 }
 
 const TRADUCOES = {
-  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei" },
-  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei" },
-  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei" },
+  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei", livreEm:"livre em", reservarTamanho:"reservar" },
+  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei", livreEm:"libre le", reservarTamanho:"réserver" },
+  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei", livreEm:"laisva", reservarTamanho:"rezervuoti" },
 };
 
 export default function PecaDetalhe() {
@@ -48,8 +48,8 @@ export default function PecaDetalhe() {
   const [lang, setLang] = useState("pt");
   const [userLogado, setUserLogado] = useState(null);
   const [dataFimTimer, setDataFimTimer] = useState(null);
-  const [pecaIndisponivel, setPecaIndisponivel] = useState(false);
   const [partilhado, setPartilhado] = useState(false);
+  const [datasPorTamanho, setDatasPorTamanho] = useState({});
   const [avaliacoesPeca, setAvaliacoesPeca] = useState([]);
 
   useEffect(() => {
@@ -57,16 +57,6 @@ export default function PecaDetalhe() {
     if (saved && TRADUCOES[saved]) setLang(saved);
     carregarPeca();
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(data.session.user); });
-    // Buscar avaliações da peça via alugueres
-    supabase.from("avaliacoes")
-      .select("nota_cliente_empresa, comentario_cliente, created_at, clientes(nome), alugueres(stock_tamanhos(pecas(id)))")
-      .not("nota_cliente_empresa", "is", null)
-      .order("created_at", { ascending: false })
-      .then(({ data: avs }) => {
-        if (!avs) return;
-        const filtradas = avs.filter(av => av.alugueres?.stock_tamanhos?.pecas?.id === id);
-        setAvaliacoesPeca(filtradas);
-      });
   }, [id]);
 
   const carregarPeca = async () => {
@@ -79,33 +69,49 @@ export default function PecaDetalhe() {
 
     if (data) {
       setPeca(data);
-      const disponivel = data.stock_tamanhos?.find(s => s.quantidade_disponivel > 0);
-      if (disponivel) setTamanhoSelecionado(disponivel.id);
+      // Selecionar primeiro tamanho disponível
+      const primDisponivel = data.stock_tamanhos?.find(s => s.quantidade_disponivel > 0);
+      if (primDisponivel) setTamanhoSelecionado(primDisponivel.id);
 
+      // Buscar alugueres ativos para calcular datas de disponibilidade por tamanho
       const stockIds = data.stock_tamanhos?.map(s => s.id) || [];
       if (stockIds.length > 0) {
-        const { data: alugueresEmCurso } = await supabase
+        const { data: alugueresAtivos } = await supabase
           .from("alugueres")
-          .select("data_fim, data_disponivel_novamente, estado")
+          .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
           .in("stock_tamanho_id", stockIds)
           .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
 
-        if (alugueresEmCurso && alugueresEmCurso.length > 0) {
-          const agora = new Date();
+        if (alugueresAtivos && alugueresAtivos.length > 0) {
+          const mapa = {};
           let dataMaisDistante = null;
-          alugueresEmCurso.forEach(a => {
+          alugueresAtivos.forEach(a => {
             const dataDisp = a.data_disponivel_novamente
               ? new Date(a.data_disponivel_novamente)
               : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
-            if (dataDisp > agora && (!dataMaisDistante || dataDisp > dataMaisDistante)) {
+            // Mapa por tamanho
+            if (!mapa[a.stock_tamanho_id] || dataDisp > mapa[a.stock_tamanho_id]) {
+              mapa[a.stock_tamanho_id] = dataDisp;
+            }
+            // Data mais distante global para o timer
+            if (!dataMaisDistante || dataDisp > dataMaisDistante) {
               dataMaisDistante = dataDisp;
             }
           });
-          if (dataMaisDistante) {
-            setDataFimTimer(dataMaisDistante.toISOString());
-            setPecaIndisponivel(true);
-          }
+          setDatasPorTamanho(mapa);
+          if (dataMaisDistante) setDataFimTimer(dataMaisDistante.toISOString());
         }
+      }
+
+      // Buscar avaliações desta peça
+      const { data: avs } = await supabase
+        .from("avaliacoes")
+        .select("nota_cliente_empresa, comentario_cliente, created_at, clientes(nome), alugueres(stock_tamanhos(pecas(id)))")
+        .not("nota_cliente_empresa", "is", null)
+        .order("created_at", { ascending: false });
+      if (avs) {
+        const filtradas = avs.filter(av => av.alugueres?.stock_tamanhos?.pecas?.id === id);
+        setAvaliacoesPeca(filtradas);
       }
     }
     setLoading(false);
@@ -125,7 +131,6 @@ export default function PecaDetalhe() {
     const links = {
       whatsapp: `https://wa.me/?text=${texto}%20${url}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-      instagram: `https://www.instagram.com/`,
       link: null,
     };
     if (rede === "link") {
@@ -186,11 +191,15 @@ export default function PecaDetalhe() {
         .badge-estado{display:inline-block;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.75rem;margin-bottom:1.25rem}
         .secao{margin-bottom:1.75rem}
         .secao-label{font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:#5a5855;margin-bottom:0.75rem}
-        .tamanhos-grid{display:flex;gap:0.5rem;flex-wrap:wrap}
+        .tamanhos-grid{display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-start}
+        .tam-wrap{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
         .tam-btn{padding:0.5rem 1rem;font-size:0.72rem;letter-spacing:0.1em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s}
         .tam-btn:hover{border-color:var(--black)}
         .tam-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
-        .tam-btn.sem-stock{opacity:0.35;cursor:not-allowed;text-decoration:line-through}
+        .tam-btn.sem-stock{opacity:0.4;cursor:not-allowed;text-decoration:line-through}
+        .tam-data{font-size:0.54rem;color:var(--rosa);letter-spacing:0.08em;text-transform:uppercase}
+        .tam-reservar{font-size:0.54rem;color:#5a5855;letter-spacing:0.08em;text-transform:uppercase;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans);padding:0}
+        .tam-reservar:hover{color:var(--black)}
         .ocasioes-wrap{display:flex;gap:0.4rem;flex-wrap:wrap}
         .ocasiao-tag{font-size:0.62rem;letter-spacing:0.1em;padding:0.3rem 0.65rem;background:var(--g1);color:#5a5855;border:1px solid var(--g2)}
         .sep{border:none;border-top:1px solid var(--g2);margin:1.5rem 0}
@@ -278,13 +287,23 @@ export default function PecaDetalhe() {
               <p className="secao-label">{t.tamanho}</p>
               <div className="tamanhos-grid">
                 {tamanhosDisponiveis.map(s => (
-                  <button key={s.id} className={`tam-btn${tamanhoSelecionado === s.id ? " active" : ""}`} onClick={() => setTamanhoSelecionado(s.id)}>
-                    {s.tamanho}
-                  </button>
+                  <div key={s.id} className="tam-wrap">
+                    <button className={`tam-btn${tamanhoSelecionado === s.id ? " active" : ""}`} onClick={() => setTamanhoSelecionado(s.id)}>
+                      {s.tamanho}
+                    </button>
+                  </div>
                 ))}
-                {tamanhosSemStock.map(s => (
-                  <button key={s.id} className="tam-btn sem-stock" disabled>{s.tamanho}</button>
-                ))}
+                {tamanhosSemStock.map(s => {
+                  const dataDisp = datasPorTamanho[s.id];
+                  const dataStr = dataDisp ? dataDisp.toLocaleDateString("pt-PT", { day:"numeric", month:"short" }) : null;
+                  return (
+                    <div key={s.id} className="tam-wrap">
+                      <button className="tam-btn sem-stock" disabled>{s.tamanho}</button>
+                      {dataStr && <span className="tam-data">{t.livreEm} {dataStr}</span>}
+                      <a href={`/reserva?peca=${id}&tamanho=${s.id}`} className="tam-reservar">{t.reservarTamanho}</a>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -304,21 +323,13 @@ export default function PecaDetalhe() {
             <p className="deposito-desc">{t.depositoDesc}</p>
           </div>
 
-          {(() => {
-            const tamSel = peca.stock_tamanhos?.find(s => s.id === tamanhoSelecionado);
-            const tamDisponivel = tamSel && tamSel.quantidade_disponivel > 0;
-            return tamDisponivel ? (
-              <button className="btn-alugar" onClick={irParaCheckout}>
-                {t.alugar}
-              </button>
-            ) : tamanhoSelecionado ? (
-              <a href={`/reserva?peca=${id}&tamanho=${tamanhoSelecionado}`} className="btn-reservar">
-                {t.reservar}
-              </a>
-            ) : (
-              <button className="btn-alugar" disabled>{t.semTamanho}</button>
-            );
-          })()}
+          {disponivel ? (
+            <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
+              {tamanhoSelecionado ? t.alugar : t.semTamanho}
+            </button>
+          ) : (
+            <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
+          )}
 
           <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="btn-comprar">
             {t.comprar} — noragrei.com ↗
@@ -347,7 +358,7 @@ export default function PecaDetalhe() {
             <button className="partilha-btn" onClick={() => partilhar("facebook")} title="Facebook">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             </button>
-            <a className="partilha-btn" href={`https://www.instagram.com/`} target="_blank" rel="noopener noreferrer" title="Instagram">
+            <a className="partilha-btn" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" title="Instagram">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
             </a>
             <button className="partilha-btn" onClick={() => partilhar("link")} title="Copiar link">
