@@ -6,8 +6,19 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata = {
-  title: "Nora Grei — Rent or Buy",
-  description: "Alugue peças únicas da Nora Grei para qualquer ocasião.",
+  title: "Nora Grei",
+  description: "Aluga ou compra peças exclusivas de moda.",
+  manifest: "/manifest.json",
+  themeColor: "#a8a8ac",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Nora Grei",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {

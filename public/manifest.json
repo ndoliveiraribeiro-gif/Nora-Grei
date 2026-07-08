@@ -1,0 +1,24 @@
+{
+  "name": "Nora Grei",
+  "short_name": "Nora Grei",
+  "description": "Aluga ou compra peças exclusivas de moda.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f7f5",
+  "theme_color": "#a8a8ac",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
