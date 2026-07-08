@@ -58,21 +58,14 @@ export default function PecaDetalhe() {
     carregarPeca();
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(data.session.user); });
     // Buscar avaliações da peça via alugueres
-    supabase.from("alugueres")
-      .select("id, stock_tamanhos(pecas(id))")
-      .then(async ({ data: als }) => {
-        if (!als) return;
-        const idsAluguer = als
-          .filter(a => a.stock_tamanhos?.pecas?.id === id)
-          .map(a => a.id);
-        if (idsAluguer.length === 0) return;
-        const { data: avs } = await supabase.from("avaliacoes")
-          .select("nota_cliente_empresa, comentario_cliente, created_at, clientes(nome)")
-          .in("aluguer_id", idsAluguer)
-          .not("nota_cliente_empresa", "is", null)
-          .order("created_at", { ascending: false })
-          .limit(10);
-        if (avs) setAvaliacoesPeca(avs);
+    supabase.from("avaliacoes")
+      .select("nota_cliente_empresa, comentario_cliente, created_at, clientes(nome), alugueres(stock_tamanhos(pecas(id)))")
+      .not("nota_cliente_empresa", "is", null)
+      .order("created_at", { ascending: false })
+      .then(({ data: avs }) => {
+        if (!avs) return;
+        const filtradas = avs.filter(av => av.alugueres?.stock_tamanhos?.pecas?.id === id);
+        setAvaliacoesPeca(filtradas);
       });
   }, [id]);
 
