@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 const TXT = {
   pt: {
     semNotificacoes: "Sem notificações por agora.",
+    seiHorasTitulo: "Devolução em 6 horas",
+    seisHorasMsg: (nome, horas) => `O teu aluguer de "${nome}" termina em ${horas}h. Prepara a devolução — envia a peça hoje para evitar dias extra.`,
     ultimoDiaTitulo: "Último dia de uso",
     ultimoDiaMsg: (nome) => `Amanhã é o último dia de uso de "${nome}". Prepara-te para enviar a devolução — tens 24h após o fim do aluguer.`,
     atrasoTitulo: "Devolução em atraso",
@@ -13,6 +15,8 @@ const TXT = {
   },
   fr: {
     semNotificacoes: "Aucune notification pour le moment.",
+    seiHorasTitulo: "Retour dans 6 heures",
+    seisHorasMsg: (nome, horas) => `Votre location de "${nome}" se termine dans ${horas}h. Préparez le retour — envoyez la pièce aujourd'hui pour éviter des jours supplémentaires.`,
     ultimoDiaTitulo: "Dernier jour d'utilisation",
     ultimoDiaMsg: (nome) => `Demain est le dernier jour d'utilisation de "${nome}". Préparez le retour — vous avez 24h après la fin de la location.`,
     atrasoTitulo: "Retour en retard",
@@ -21,6 +25,8 @@ const TXT = {
   },
   lt: {
     semNotificacoes: "Kol kas nėra pranešimų.",
+    seiHorasTitulo: "Grąžinimas per 6 valandas",
+    seisHorasMsg: (nome, horas) => `Jūsų "${nome}" nuoma baigiasi per ${horas}h. Pasiruoškite grąžinimui — išsiųskite šiandien, kad išvengtumėte papildomų dienų.`,
     ultimoDiaTitulo: "Paskutinė naudojimo diena",
     ultimoDiaMsg: (nome) => `Rytoj yra paskutinė "${nome}" naudojimo diena. Pasiruoškite grąžinimui — turite 24h po nuomos pabaigos.`,
     atrasoTitulo: "Vėluojantis grąžinimas",
@@ -61,16 +67,23 @@ export default function NotificationBell({ lang = "pt" }) {
     if (!alugueres || alugueres.length === 0) return;
 
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const hojeZero = new Date(hoje);
+    hojeZero.setHours(0, 0, 0, 0);
 
     for (const a of alugueres) {
       const nome = a.stock_tamanhos?.pecas?.nome || "a peça";
       const dataFim = new Date(a.data_fim);
-      dataFim.setHours(0, 0, 0, 0);
-      const diffDias = Math.round((dataFim - hoje) / 86400000);
-
+      dataFim.setHours(23, 59, 59, 0); // fim do dia
+      const dataFimZero = new Date(a.data_fim);
+      dataFimZero.setHours(0, 0, 0, 0);
+      const diffDias = Math.round((dataFimZero - hojeZero) / 86400000);
+      const horasRestantes = (dataFim - hoje) / 3600000;
       let tipo = null, titulo = null, mensagem = null;
-      if (diffDias === 1) {
+      if (horasRestantes <= 6 && horasRestantes > 0) {
+        tipo = "seis_horas";
+        titulo = i.seiHorasTitulo;
+        mensagem = i.seisHorasMsg(nome, Math.floor(horasRestantes));
+      } else if (diffDias === 1) {
         tipo = "ultimo_dia";
         titulo = i.ultimoDiaTitulo;
         mensagem = i.ultimoDiaMsg(nome);
