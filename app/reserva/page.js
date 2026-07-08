@@ -281,7 +281,7 @@ function ReservaContent() {
         .tam { width:52px; height:52px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.85rem; cursor:pointer; font-family:var(--sans); transition:all 0.2s; color:var(--black); }
         .tam:hover { border-color:var(--black); }
         .tam.on { background:var(--black); color:var(--white); border-color:var(--black); }
-        .tam.esgotado { color:var(--grey-200); cursor:not-allowed; text-decoration:line-through; background:var(--grey-100); }
+        .tam.esgotado { color:#c4748a; cursor:pointer; border-color:#c4748a; background:var(--white); }
         .dates { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
         .lbl { display:block; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grey-600); margin-bottom:0.5rem; font-weight:500; }
         .inp { width:100%; padding:0.9rem 1rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:1rem; font-family:var(--sans); color:var(--black); outline:none; transition:border-color 0.2s; }
