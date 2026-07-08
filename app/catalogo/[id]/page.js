@@ -33,9 +33,9 @@ function Timer({ dataFim, lang }) {
 }
 
 const TRADUCOES = {
-  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo" },
-  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue" },
-  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą" },
+  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei" },
+  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei" },
+  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei" },
 };
 
 export default function PecaDetalhe() {
@@ -50,12 +50,30 @@ export default function PecaDetalhe() {
   const [dataFimTimer, setDataFimTimer] = useState(null);
   const [pecaIndisponivel, setPecaIndisponivel] = useState(false);
   const [partilhado, setPartilhado] = useState(false);
+  const [avaliacoesPeca, setAvaliacoesPeca] = useState([]);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && TRADUCOES[saved]) setLang(saved);
     carregarPeca();
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(data.session.user); });
+    // Buscar avaliações da peça via alugueres
+    supabase.from("alugueres")
+      .select("id, stock_tamanhos(pecas(id))")
+      .then(async ({ data: als }) => {
+        if (!als) return;
+        const idsAluguer = als
+          .filter(a => a.stock_tamanhos?.pecas?.id === id)
+          .map(a => a.id);
+        if (idsAluguer.length === 0) return;
+        const { data: avs } = await supabase.from("avaliacoes")
+          .select("nota_cliente_empresa, comentario_cliente, created_at, clientes(nome)")
+          .in("aluguer_id", idsAluguer)
+          .not("nota_cliente_empresa", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        if (avs) setAvaliacoesPeca(avs);
+      });
   }, [id]);
 
   const carregarPeca = async () => {
@@ -334,6 +352,32 @@ export default function PecaDetalhe() {
             <button className="partilha-btn" onClick={() => partilhar("link")} title="Copiar link">
               {partilhado ? "✓" : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
             </button>
+          </div>
+
+          {/* AVALIAÇÕES */}
+          <div style={{marginTop:'2rem',paddingTop:'1.5rem',borderTop:'1px solid var(--g2)'}}>
+            <p style={{fontSize:'0.6rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'#5a5855',marginBottom:'1rem',fontWeight:600}}>{t.avaliacoes}</p>
+            {avaliacoesPeca.length === 0 ? (
+              <p style={{fontSize:'0.85rem',color:'#9c9894',fontStyle:'italic'}}>{t.semAvaliacoes}</p>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
+                {avaliacoesPeca.map((av, idx) => (
+                  <div key={idx} style={{padding:'1rem',background:'var(--g1)',borderLeft:'3px solid #c4748a'}}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'0.4rem'}}>
+                      <div style={{display:'flex',gap:'0.15rem'}}>
+                        {[1,2,3,4,5].map(s => (
+                          <span key={s} style={{fontSize:'1rem',color:s <= av.nota_cliente_empresa ? '#c4748a' : '#e2dfda'}}>★</span>
+                        ))}
+                      </div>
+                      <span style={{fontSize:'0.65rem',color:'#9c9894'}}>{av.clientes?.nome || t.anonimo}</span>
+                    </div>
+                    {av.comentario_cliente && (
+                      <p style={{fontSize:'0.85rem',color:'#3f3e3c',fontStyle:'italic',lineHeight:1.6}}>"{av.comentario_cliente}"</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <a href="/catalogo" style={{display:'block',textAlign:'center',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#5a5855',marginTop:'2rem',textDecoration:'none',paddingTop:'1rem',borderTop:'1px solid var(--g2)'}}>
