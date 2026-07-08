@@ -77,10 +77,13 @@ export default function PecaCard({ peca, lang = "pt" }) {
             <p style={{fontSize:'0.55rem',letterSpacing:'0.22em',textTransform:'uppercase',color:'#aaa89f',fontFamily:"'Jost',sans-serif",fontWeight:400,marginBottom:'0.3rem'}}>{peca.categoria}</p>
           )}
           <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.2rem',fontWeight:300,lineHeight:1.2,marginBottom:'0.4rem'}}>{peca.nome}</h3>
-          {peca.tamanhos && peca.tamanhos.length > 0 && (
+          {((peca.tamanhos && peca.tamanhos.length > 0) || (peca.tamanhosSemStock && peca.tamanhosSemStock.length > 0)) && (
             <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap',marginBottom:'0.5rem'}}>
-              {peca.tamanhos.map(t => (
+              {peca.tamanhos && peca.tamanhos.map(t => (
                 <span key={t} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #e2dfda',padding:'0.2rem 0.5rem',color:'#6b6960',fontFamily:"'Jost',sans-serif",fontWeight:400}}>{t}</span>
+              ))}
+              {peca.tamanhosSemStock && peca.tamanhosSemStock.map(s => (
+                <a key={s.id} href={`/reserva?peca=${peca.id}&tamanho=${s.id}`} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #e2dfda',padding:'0.2rem 0.5rem',color:'#c4748a',fontFamily:"'Jost',sans-serif",fontWeight:400,textDecoration:'none',textDecorationLine:'line-through',opacity:0.7}} title="Reservar">{s.tamanho} ↗</a>
               ))}
             </div>
           )}

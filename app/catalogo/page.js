@@ -87,6 +87,7 @@ export default function Catalogo() {
             ...p,
             categoria: p.categorias?.nome || "",
             tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
+            tamanhosSemStock: p.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0).map(s => ({ tamanho: s.tamanho, id: s.id })) || [],
             data_fim: dataFimFinal,
             estado: (temStock && !indisponivel) ? "disponivel" : "indisponivel",
           };
