@@ -127,7 +127,12 @@ export default function Entrar() {
               <span className="form-link-text">{i.registar}</span>
               <a href="/registar" className="form-link">{i.link}</a>
             </div>
-            <a href="#" className="form-link-small">{i.esquecer}</a>
+            <a href="#" className="form-link-small" onClick={async (e) => {
+              e.preventDefault();
+              if (!email) { alert("Introduz o teu email primeiro."); return; }
+              await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/reset-password" });
+              alert("Email enviado! Verifica a tua caixa de entrada.");
+            }}>{i.esquecer}</a>
           </div>
         </div>
       </div>
