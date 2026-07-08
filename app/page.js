@@ -189,7 +189,7 @@ export default function Home() {
         :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g4:#5a5855;--rosa:#c4748a;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',Arial,sans-serif}
         html{scroll-behavior:smooth}
         body{background:var(--white);color:var(--black);font-family:var(--sans);font-size:17px;font-weight:400;line-height:1.7;-webkit-font-smoothing:antialiased}
-        @media(max-width:768px){body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}}
+        @media(max-width:768px){body{padding-bottom:72px}}
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 4rem;transition:all 0.3s;background:rgba(248,247,245,0.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
         .nav.scrolled{padding:0.75rem 4rem;box-shadow:0 2px 20px rgba(0,0,0,0.06)}
         .logo{display:flex;flex-direction:column;text-decoration:none;color:var(--black)}
@@ -209,7 +209,7 @@ export default function Home() {
         .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}
         .nb-f:hover{background:#2a2926}
 
-        .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:calc(72px + env(safe-area-inset-top))}
+        .hero{min-height:90svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:brightness(0.55)}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.2) 0%,rgba(8,8,8,0.65) 60%,rgba(8,8,8,0.85) 100%);z-index:1}
