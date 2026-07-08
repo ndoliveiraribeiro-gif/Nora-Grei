@@ -83,7 +83,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
                 <span key={t} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #e2dfda',padding:'0.2rem 0.5rem',color:'#6b6960',fontFamily:"'Jost',sans-serif",fontWeight:400}}>{t}</span>
               ))}
               {peca.tamanhosSemStock && peca.tamanhosSemStock.map(s => (
-                <a key={s.id} href={`/reserva?peca=${peca.id}&tamanho=${s.id}`} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #e2dfda',padding:'0.2rem 0.5rem',color:'#c4748a',fontFamily:"'Jost',sans-serif",fontWeight:400,textDecoration:'none',textDecorationLine:'line-through',opacity:0.7}} title="Reservar">{s.tamanho} ↗</a>
+                <a key={s.id} href={`/reserva?peca=${peca.id}&tamanho=${s.id}`} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #c4748a',padding:'0.2rem 0.5rem',color:'#c4748a',fontFamily:"'Jost',sans-serif",fontWeight:400,textDecoration:'none'}} title="Reservar">{s.tamanho} · Garanta a peça para o dia que precisa. Reserve →</a>
               ))}
             </div>
           )}
