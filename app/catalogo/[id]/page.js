@@ -304,13 +304,21 @@ export default function PecaDetalhe() {
             <p className="deposito-desc">{t.depositoDesc}</p>
           </div>
 
-          {disponivel ? (
-            <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
-              {tamanhoSelecionado ? t.alugar : t.semTamanho}
-            </button>
-          ) : (
-            <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
-          )}
+          {(() => {
+            const tamSel = peca.stock_tamanhos?.find(s => s.id === tamanhoSelecionado);
+            const tamDisponivel = tamSel && tamSel.quantidade_disponivel > 0;
+            return tamDisponivel ? (
+              <button className="btn-alugar" onClick={irParaCheckout}>
+                {t.alugar}
+              </button>
+            ) : tamanhoSelecionado ? (
+              <a href={`/reserva?peca=${id}&tamanho=${tamanhoSelecionado}`} className="btn-reservar">
+                {t.reservar}
+              </a>
+            ) : (
+              <button className="btn-alugar" disabled>{t.semTamanho}</button>
+            );
+          })()}
 
           <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="btn-comprar">
             {t.comprar} — noragrei.com ↗
