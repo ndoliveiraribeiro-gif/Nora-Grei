@@ -619,12 +619,17 @@ export default function Backoffice() {
     if (tab === "dashboard") {
       const { data: al } = await supabase.from("alugueres").select("estado, valor_aluguer, created_at");
       const { data: res } = await supabase.from("reservas_espera").select("id").eq("estado", "aguarda");
+      const { data: resCompletas } = await supabase
+        .from("reservas_espera")
+        .select("id, estado, data_inicio_desejada, data_fim_desejada, stock_tamanho_id, clientes(nome, codigo_cliente), stock_tamanhos(tamanho, pecas(nome, codigo_referencia))")
+        .in("estado", ["aguarda", "notificado"])
+        .order("created_at", { ascending: false });
       const { data: stock } = await supabase.from("stock_tamanhos").select("quantidade_total");
       if (al) {
         const agora = new Date(), inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
         const ativos = al.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado)).length;
         const totalStock = stock?.reduce((s, t) => s + t.quantidade_total, 0) || 1;
-        setStats({ alugueres_ativos: ativos, devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length, receita_mes: al.filter(a => a.created_at >= inicioMes).reduce((s, a) => s + (a.valor_aluguer || 0), 0), clientes_total: 0, reservas_espera: res?.length || 0, taxa_ocupacao: Math.round((ativos / totalStock) * 100) });
+        setStats({ alugueres_ativos: ativos, devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length, receita_mes: al.filter(a => a.created_at >= inicioMes).reduce((s, a) => s + (a.valor_aluguer || 0), 0), clientes_total: 0, reservas_espera: res?.length || 0, taxa_ocupacao: Math.round((ativos / totalStock) * 100), reservasAtivas: resCompletas || [] });
       }
       const { count } = await supabase.from("clientes").select("id", { count: "exact" });
       const { data: alRaw } = await supabase
@@ -1012,6 +1017,39 @@ export default function Backoffice() {
                 ))}
               </div>
             </div>
+
+            {/* RESERVAS EM ESPERA */}
+            {stats.reservasAtivas && stats.reservasAtivas.length > 0 && (
+              <div style={CARD}>
+                <p style={CARD_T}>Reservas em espera ({stats.reservasAtivas.length})</p>
+                <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                  <thead><tr>{["Cód. Cliente","Peça / Ref.","Datas desejadas","Estado","Disponibilidade"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    {stats.reservasAtivas.filter(r => r.estado === "aguarda").map(r => {
+                      return (
+                        <tr key={r.id} style={{ background:"#fff" }}>
+                          <td style={TD}><span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a" }}>{r.clientes?.codigo_cliente || "—"}</span></td>
+                          <td style={TD}>
+                            <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{r.stock_tamanhos?.pecas?.nome || "—"}</div>
+                            <div style={{ fontSize:"0.65rem",color:"#c4748a",fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
+                            <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div>
+                          </td>
+                          <td style={{ ...TD,fontSize:"0.82rem",whiteSpace:"nowrap" }}>{r.data_inicio_desejada} → {r.data_fim_desejada}</td>
+                          <td style={TD}><span style={BADGE(r.estado==="notificado"?"green":"orange")}>{r.estado==="notificado"?"Notificado":"A aguardar"}</span></td>
+                          <td style={TD}>
+                            {r.estado==="notificado" ? (
+                              <span style={{ color:"#27ae60",fontWeight:700,fontSize:"0.82rem" }}>✓ Disponível</span>
+                            ) : (
+                              <span style={{ color:"#b8860b",fontSize:"0.82rem" }}>A aguardar libertação</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {/* OPERACIONAL EM TEMPO REAL */}
             {stats.alugueresAtivos && stats.alugueresAtivos.length > 0 && (
