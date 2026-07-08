@@ -89,7 +89,7 @@ export default function Catalogo() {
             tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
             tamanhosSemStock: p.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0).map(s => ({ tamanho: s.tamanho, id: s.id })) || [],
             data_fim: dataFimFinal,
-            estado: (temStock && !indisponivel) ? "disponivel" : "indisponivel",
+            estado: temStock ? "disponivel" : "indisponivel",
           };
         });
         setPecas(formatadas);
