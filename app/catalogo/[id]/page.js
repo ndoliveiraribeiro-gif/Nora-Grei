@@ -151,9 +151,9 @@ export default function PecaDetalhe() {
   );
 
   const fotos = peca.fotos?.filter(f => f)?.length > 0 ? peca.fotos.filter(f => f) : [null];
-  const tamanhosDisponiveis = pecaIndisponivel ? [] : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || []);
-  const tamanhosSemStock = pecaIndisponivel ? (peca.stock_tamanhos || []) : (peca.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0) || []);
-  const disponivel = !pecaIndisponivel && peca.estado === "disponivel" && tamanhosDisponiveis.length > 0;
+  const tamanhosDisponiveis = peca.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || [];
+  const tamanhosSemStock = peca.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0) || [];
+  const disponivel = tamanhosDisponiveis.length > 0;
 
   return (
     <>
