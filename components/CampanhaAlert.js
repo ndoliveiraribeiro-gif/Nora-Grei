@@ -195,7 +195,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
           <div className="ng-campanha-acoes">
             {campanha.codigo && (
               <button className={`ng-campanha-copiar${copiado ? " ok" : ""}`} onClick={copiar}>
-                {copiado ? "✓ Copiado" : "Copiar código"}
+                {copiado ? (lang === "fr" ? "✓ Copié" : lang === "lt" ? "✓ Nukopijuota" : "✓ Copiado") : (lang === "fr" ? "Copier le code" : lang === "lt" ? "Kopijuoti kodą" : "Copiar código")}
               </button>
             )}
             {campanha.url_destino && (
@@ -205,7 +205,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
                 rel="noopener noreferrer"
                 style={{ fontSize: "0.6rem", color: "rgba(248,247,245,0.4)", textDecoration: "none", letterSpacing: "0.05em" }}
               >
-                Ver loja ↗
+                {lang === "fr" ? "Voir la boutique ↗" : lang === "lt" ? "Žiūrėti parduotuvę ↗" : "Ver loja ↗"}
               </a>
             )}
             <button className="ng-campanha-fechar" onClick={fechar} aria-label="Fechar">✕</button>
