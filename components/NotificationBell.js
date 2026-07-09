@@ -103,7 +103,7 @@ export default function NotificationBell({ lang = "pt" }) {
 
       if (!existente) {
         await supabase.from("notificacoes_cliente").insert({
-          cliente_id, aluguer_id: a.id, tipo, titulo, mensagem, lida: false,
+          cliente_id, aluguer_id: a.id, tipo, titulo: tipo, mensagem: nome, lida: false,
         });
       }
     }
@@ -154,9 +154,14 @@ export default function NotificationBell({ lang = "pt" }) {
               {notificacoes.map(n => (
                 <div key={n.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: n.lida ? "#fff" : "#fff8e1" }}>
                   <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.25rem" }}>
-                    {n.tipo === "atraso" ? "🚨 " : "⏰ "}{n.titulo}
+                    {n.tipo === "atraso" ? "🚨 " : "⏰ "}
+                    {n.tipo === "atraso" ? i.atrasoTitulo : n.tipo === "ultimo_dia" ? i.ultimoDiaTitulo : i.seiHorasTitulo}
                   </div>
-                  <div style={{ fontSize: "0.75rem", color: "#3f3e3c", lineHeight: 1.5 }}>{n.mensagem}</div>
+                  <div style={{ fontSize: "0.75rem", color: "#3f3e3c", lineHeight: 1.5 }}>
+                    {n.tipo === "atraso" ? i.atrasoMsg(n.mensagem, Math.abs(Math.round((new Date(n.created_at) - new Date()) / 86400000)))
+                      : n.tipo === "ultimo_dia" ? i.ultimoDiaMsg(n.mensagem)
+                      : i.seisHorasMsg(n.mensagem, 6)}
+                  </div>
                   <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.4rem" }}>
                     {new Date(n.created_at).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}
                   </div>
