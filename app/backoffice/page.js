@@ -748,7 +748,7 @@ export default function Backoffice() {
 
   const carregarEstatisticas = async () => {
     const [alRes, pecasRes, clientesRes, reservasRes, recibosRes] = await Promise.all([
-      supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))), clientes(nome, email, cidade)"),
+      supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim, created_at, cliente_id, stock_tamanho_id, stock_tamanhos(tamanho, peca_id, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))), clientes(nome, email, cidade)"),
       supabase.from("pecas").select("*, categorias(nome), stock_tamanhos(quantidade_total, quantidade_disponivel)"),
       supabase.from("clientes").select("*, alugueres(id, estado, valor_aluguer, created_at)"),
       supabase.from("reservas_espera").select("*, stock_tamanhos(pecas(nome))"),
