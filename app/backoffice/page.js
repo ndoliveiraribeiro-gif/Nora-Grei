@@ -794,9 +794,9 @@ export default function Backoffice() {
     setAiChat(prev => [...prev, { role: "user", content: pergunta }]);
     const ctx = `És consultor de negócios de moda e aluguer de roupa de luxo. Dados Nora Grei: Total alugueres:${estatisticas.totalAlugueres}, Receita:${estatisticas.totalReceita.toFixed(0)}€, LTV:${estatisticas.ltv.toFixed(0)}€, Cancelamentos:${estatisticas.taxaCancelamento}%, Churn:${estatisticas.churn}. Clientes ativos:${estatisticas.clientesMaisAtivos.map(c=>`${c.nome}(${c.alugueresTotal}x)`).join(",")}. Categorias:${Object.entries(estatisticas.catCount).map(([k,v])=>`${k}:${v}`).join(",")}. Responde em português, conciso e útil.`;
     try {
-      const resp = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1000, system: ctx, messages: [{ role: "user", content: pergunta }] }) });
+      const resp = await fetch("/api/ai-consultant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pergunta, contexto: ctx, historico: aiChat }) });
       const data = await resp.json();
-      setAiChat(prev => [...prev, { role: "assistant", content: data.content?.[0]?.text || "Erro." }]);
+      setAiChat(prev => [...prev, { role: "assistant", content: data.resposta || data.error || "Erro." }]);
     } catch { setAiChat(prev => [...prev, { role: "assistant", content: "Erro de ligação." }]); }
     setAiLoading(false);
     setTimeout(() => chatRef.current?.scrollTo({ top: 99999, behavior: "smooth" }), 100);
