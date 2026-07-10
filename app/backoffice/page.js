@@ -899,11 +899,29 @@ export default function Backoffice() {
     setTimeout(() => { fecharEdicao(); carregarDados(); }, 1000);
   };
 
-  const atualizarEstado = async (id, estado) => { await supabase.from("alugueres").update({ estado }).eq("id", id); carregarDados(); };
+  const atualizarEstado = async (id, estado) => {
+  const extra = {};
+  if (["devolvido","devolvido_danificado"].includes(estado)) {
+    extra.data_devolucao_real = new Date().toISOString();
+    extra.data_disponivel_novamente = new Date(Date.now() + 3*24*60*60*1000).toISOString();
+  }
+  await supabase.from("alugueres").update({ estado, ...extra }).eq("id", id);
+  carregarDados();
+};
   const confirmarDeposito = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const marcarEnviado = (aluguer) => { setAluguerParaEnviar(aluguer); };
   const confirmarRecepcao = async (id) => { await supabase.from("alugueres").update({ estado: "em_verificacao", data_recepcao: new Date().toISOString() }).eq("id", id); carregarDados(); };
-  const confirmarVerificacao = async (id, danificado=false) => { await supabase.from("alugueres").update({ estado: danificado?"devolvido_danificado":"devolvido", data_verificacao: new Date().toISOString() }).eq("id", id); carregarDados(); };
+  const confirmarVerificacao = async (id, danificado=false) => {
+  const agora = new Date().toISOString();
+  const dispData = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  await supabase.from("alugueres").update({
+    estado: danificado ? "devolvido_danificado" : "devolvido",
+    data_verificacao: agora,
+    data_devolucao_real: agora,
+    data_disponivel_novamente: dispData,
+  }).eq("id", id);
+  carregarDados();
+};
   const libertarCaucao = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "libertado", caucao_libertada_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const calcularAtraso = (dataFim) => { if (!dataFim) return 0; const diff = Math.floor((new Date()-new Date(dataFim))/86400000); return diff>0?diff:0; };
 
