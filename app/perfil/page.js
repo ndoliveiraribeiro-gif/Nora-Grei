@@ -260,6 +260,7 @@ const t = {
     nome: "Nome completo", email: "Email", telefone: "Telefone",
     dataNascimento: "Data de nascimento", genero: "Género",
     generosOpcoes: ["Mulher", "Homem", "Prefiro não especificar"],
+    comoTeVes: "Como te vês hoje?", comoTeVesOpcoes: ["Administrativa / Escritório","Saúde e cuidados","Educação","Restauração e hotelaria","Diversão e vida noturna","Criativo / Arte / Moda","Gestão e negócios","Tecnologia","Comércio e retalho","Estudante","Empreendedora","Em trânsito","Prefiro não partilhar"],
     nif: "NIF", nifPlaceholder: "123 456 789",
     numeroCC: "Número de Cartão de Cidadão", numeroCCPlaceholder: "12345678 9 ZZ0",
     localizacao: "Localização", cidade: "Cidade", pais: "País",
@@ -308,13 +309,13 @@ const t = {
     verTalao: "Ver talão",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
     pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento",
-    avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", avaliacaoJaFeita: "Já avaliaste este aluguer.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
     nome: "Nom complet", email: "Email", telefone: "Téléphone",
     dataNascimento: "Date de naissance", genero: "Genre",
     generosOpcoes: ["Femme", "Homme", "Préfère ne pas préciser"],
+    comoTeVes: "Comment vous voyez-vous aujourd'hui?", comoTeVesOpcoes: ["Administrative / Bureau","Santé et soins","Éducation","Restauration et hôtellerie","Divertissement et vie nocturne","Créatif / Art / Mode","Gestion et affaires","Technologie","Commerce et vente","Étudiante","Entrepreneuse","En transition","Je préfère ne pas partager"],
     nif: "NIF (numéro fiscal)", nifPlaceholder: "123 456 789",
     numeroCC: "Numéro de carte d'identité", numeroCCPlaceholder: "12345678 9 ZZ0",
     localizacao: "Localisation", cidade: "Ville", pais: "Pays",
@@ -363,13 +364,13 @@ const t = {
     verTalao: "Voir le reçu",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
     pago: "✓ Payé", aguardarPagamento: "En attente de paiement",
-    avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", avaliacaoJaFeita: "Vous avez déjà évalué cette location.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer l'évaluation", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Vous n'avez pas encore de locations terminées à évaluer.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
     nome: "Vardas, pavardė", email: "El. paštas", telefone: "Telefonas",
     dataNascimento: "Gimimo data", genero: "Lytis",
     generosOpcoes: ["Moteris", "Vyras", "Nenoriu nurodyti"],
+    comoTeVes: "Kaip šiandien save matote?", comoTeVesOpcoes: ["Administracinė / Biuras","Sveikata ir priežiūra","Švietimas","Restoranai ir viešbučiai","Pramogos ir naktinis gyvenimas","Kūryba / Menas / Mada","Vadyba ir verslas","Technologijos","Prekyba ir mažmeninė","Studentė","Verslininkė","Pereinamajame etape","Nenoriu dalintis"],
     nif: "Mokesčių mokėtojo kodas", nifPlaceholder: "123 456 789",
     numeroCC: "Asmens kodas / dokumento numeris", numeroCCPlaceholder: "12345678 9 ZZ0",
     localizacao: "Vieta", cidade: "Miestas", pais: "Šalis",
@@ -418,99 +419,14 @@ const t = {
     verTalao: "Žiūrėti kvitą",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
     pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo",
-    avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas! Ačiū.", avaliacaoJaFeita: "Jau įvertinote šią nuomą.", comentarioPlaceholder: "Palikite komentarą (neprivaloma)...", enviarAvaliacao: "Siųsti atsiliepimą", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar neturite užbaigtų nuomų.",
   },
 };
-
-function StarRating({ value, onChange, readonly }) {
-  return (
-    <div style={{display:'flex',gap:'0.25rem'}}>
-      {[1,2,3,4,5].map(star => (
-        <button key={star} type="button" onClick={() => !readonly && onChange && onChange(star)}
-          style={{background:'none',border:'none',cursor:readonly?'default':'pointer',padding:'0.1rem',fontSize:'1.6rem',color:star <= value ? '#c4748a' : '#e2dfda',transition:'color 0.15s',lineHeight:1}}>
-          ★
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function CartaoAvaliacao({ aluguer, i }) {
-  const peca = aluguer.stock_tamanhos?.pecas;
-  const [avaliacao, setAvaliacao] = useState(null);
-  const [nota, setNota] = useState(0);
-  const [comentario, setComentario] = useState('');
-  const [enviado, setEnviado] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    supabase.from('avaliacoes').select('*').eq('aluguer_id', aluguer.id).maybeSingle().then(({ data }) => {
-      if (data) { setAvaliacao(data); setNota(data.nota_cliente_empresa || 0); setEnviado(true); }
-    });
-  }, [aluguer.id]);
-
-  const enviar = async () => {
-    if (nota === 0) return;
-    setLoading(true);
-    await supabase.from('avaliacoes').upsert({
-      aluguer_id: aluguer.id,
-      cliente_id: aluguer.cliente_id,
-      nota_cliente_empresa: nota,
-      comentario_cliente: comentario || null,
-    }, { onConflict: 'aluguer_id' });
-    setEnviado(true);
-    setLoading(false);
-  };
-
-  return (
-    <div style={{background:'var(--white)',padding:'1.25rem 1.5rem',marginBottom:'1px',borderLeft:'3px solid ' + (enviado ? '#c4748a' : 'var(--g2)')}}>
-      <div style={{display:'flex',gap:'1rem',alignItems:'flex-start'}}>
-        <div style={{width:48,height:60,flexShrink:0,background:'var(--g1)',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
-          {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
-        </div>
-        <div style={{flex:1}}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,marginBottom:'0.5rem'}}>{peca?.nome || '—'}</div>
-          <div style={{fontSize:'0.72rem',color:'var(--g6)',marginBottom:'0.75rem'}}>{aluguer.data_inicio} → {aluguer.data_fim}</div>
-          {enviado ? (
-            <>
-              <div style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.3rem'}}>{i.tuaAvaliacao}</div>
-              <StarRating value={nota} readonly />
-              {avaliacao?.comentario_cliente && <p style={{fontSize:'0.82rem',color:'var(--g6)',marginTop:'0.4rem',fontStyle:'italic'}}>"{avaliacao.comentario_cliente}"</p>}
-              {avaliacao?.nota_empresa_cliente && (
-                <div style={{marginTop:'1rem',paddingTop:'0.75rem',borderTop:'1px solid var(--g1)'}}>
-                  <div style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#c4748a',marginBottom:'0.3rem'}}>{i.avaliacaoEmpresa}</div>
-                  <StarRating value={avaliacao.nota_empresa_cliente} readonly />
-                  {avaliacao.comentario_empresa && <p style={{fontSize:'0.82rem',color:'var(--g6)',marginTop:'0.4rem',fontStyle:'italic'}}>"{avaliacao.comentario_empresa}"</p>}
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <div style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.5rem'}}>{i.avaliarExperiencia}</div>
-              <StarRating value={nota} onChange={setNota} />
-              {nota > 0 && (
-                <>
-                  <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder={i.comentarioPlaceholder}
-                    style={{width:'100%',marginTop:'0.75rem',padding:'0.75rem',border:'1.5px solid var(--g2)',background:'var(--white)',fontFamily:"'Jost',sans-serif",fontSize:'0.85rem',color:'var(--black)',resize:'vertical',minHeight:'80px',outline:'none'}} />
-                  <button onClick={enviar} disabled={loading}
-                    style={{marginTop:'0.5rem',padding:'0.6rem 1.5rem',background:'var(--black)',color:'var(--white)',border:'none',fontSize:'0.65rem',letterSpacing:'0.15em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif",fontWeight:500}}>
-                    {loading ? '...' : i.enviarAvaliacao}
-                  </button>
-                </>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const CAMPOS_OBRIGATORIOS = ["nome", "telefone", "morada", "numero_porta", "codigo_postal", "cidade", "nif", "numero_cc"];
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
-  const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
+  const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
   const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
@@ -535,7 +451,7 @@ export default function Perfil() {
 
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
-      setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
+      setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
     }
 
     const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
@@ -584,7 +500,7 @@ export default function Perfil() {
   const guardarPerfil = async () => {
     if (!user) return;
     const perfilCompleto = CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
-    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto });
+    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 3000);
   };
@@ -842,6 +758,12 @@ export default function Perfil() {
             <div className="fg"><label className="lbl">{i.email}</label><input className="inp" value={user?.email||""} disabled /></div>
             <div className="fg"><label className="lbl">{i.telefone} *</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
             <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>
+            <div className="fg"><label className="lbl">{i.comoTeVes}</label>
+              <select className="inp" value={perfil.profissao} onChange={e => set("profissao", e.target.value)}>
+                <option value="">— Selecionar —</option>
+                {i.comoTeVesOpcoes.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
             <div className="fg"><label className="lbl">{i.genero}</label>
               <select className="inp" value={perfil.genero} onChange={e => set("genero", e.target.value)}>
                 <option value="">—</option>
@@ -902,15 +824,6 @@ export default function Perfil() {
             </>
           )}
         </div>
-
-        {alugueresHistorico.filter(a => a.estado === 'devolvido').length > 0 && (
-          <div className="card" style={{padding:0,overflow:'hidden'}}>
-            <p className="card-t" style={{padding:'2rem 2.5rem 1.5rem',border:'none',marginBottom:0}}>{i.avaliacoes}</p>
-            {alugueresHistorico.filter(a => a.estado === 'devolvido').map(a => (
-              <CartaoAvaliacao key={a.id} aluguer={a} i={i} />
-            ))}
-          </div>
-        )}
 
         <div style={{textAlign:'center',padding:'1rem 0 2rem'}}>
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
