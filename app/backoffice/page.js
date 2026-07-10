@@ -603,7 +603,7 @@ export default function Backoffice() {
   const [clienteSel, setClienteSel] = useState(null);
   const [reservas, setReservas] = useState([]);
   const [campanhas, setCampanhas] = useState([]);
-  const [novaCampanha, setNovaCampanha] = useState({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
+  const [novaCampanha, setNovaCampanha] = useState({ titulo: "", titulo_fr: "", titulo_lt: "", mensagem: "", mensagem_fr: "", mensagem_lt: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
   const [estatisticas, setEstatisticas] = useState(null);
   const [aiChat, setAiChat] = useState([]);
   const [aiPergunta, setAiPergunta] = useState("");
@@ -1616,7 +1616,7 @@ export default function Backoffice() {
             <div style={CARD}>
               <p style={CARD_T}>Nova campanha</p>
               <div style={COL2}>
-                <div><label style={LBL}>Título *</label><input style={INP} value={novaCampanha.titulo} onChange={e=>setNovaCampanha(p=>({...p,titulo:e.target.value}))} placeholder="É o teu dia de sorte!" /></div>
+                <div><label style={LBL}>Título * (PT)</label><input style={INP} value={novaCampanha.titulo} onChange={e=>setNovaCampanha(p=>({...p,titulo:e.target.value}))} placeholder="É o teu dia de sorte!" /></div>
                 <div><label style={LBL}>Tipo</label>
                   <select style={INP} value={novaCampanha.tipo} onChange={e=>setNovaCampanha(p=>({...p,tipo:e.target.value}))}>
                     <option value="cupao">Cupão de desconto</option>
@@ -1624,7 +1624,11 @@ export default function Backoffice() {
                     <option value="oferta">Oferta especial</option>
                   </select>
                 </div>
-                <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem *</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={novaCampanha.mensagem} onChange={e=>setNovaCampanha(p=>({...p,mensagem:e.target.value}))} /></div>
+                <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem * (PT)</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={novaCampanha.mensagem} onChange={e=>setNovaCampanha(p=>({...p,mensagem:e.target.value}))} /></div>
+                <div><label style={LBL}>Título FR</label><input style={INP} value={novaCampanha.titulo_fr} onChange={e=>setNovaCampanha(p=>({...p,titulo_fr:e.target.value}))} placeholder="C'est votre jour de chance!" /></div>
+                <div><label style={LBL}>Título LT</label><input style={INP} value={novaCampanha.titulo_lt} onChange={e=>setNovaCampanha(p=>({...p,titulo_lt:e.target.value}))} placeholder="Tai jūsų laimės diena!" /></div>
+                <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem FR</label><textarea style={{ ...INP,resize:"vertical",minHeight:"60px" }} value={novaCampanha.mensagem_fr} onChange={e=>setNovaCampanha(p=>({...p,mensagem_fr:e.target.value}))} /></div>
+                <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem LT</label><textarea style={{ ...INP,resize:"vertical",minHeight:"60px" }} value={novaCampanha.mensagem_lt} onChange={e=>setNovaCampanha(p=>({...p,mensagem_lt:e.target.value}))} /></div>
                 <div><label style={LBL}>Código desconto</label><input style={INP} value={novaCampanha.codigo} onChange={e=>setNovaCampanha(p=>({...p,codigo:e.target.value}))} placeholder="NORA15" /></div>
                 <div><label style={LBL}>Descrição desconto</label><input style={INP} value={novaCampanha.desconto} onChange={e=>setNovaCampanha(p=>({...p,desconto:e.target.value}))} placeholder="15% em toda a loja" /></div>
                 <div><label style={LBL}>Probabilidade (%)</label><input style={INP} type="number" min="1" max="100" value={novaCampanha.probabilidade} onChange={e=>setNovaCampanha(p=>({...p,probabilidade:e.target.value}))} /></div>

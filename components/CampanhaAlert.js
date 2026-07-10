@@ -179,9 +179,13 @@ export default function CampanhaAlert({ lang = "pt" }) {
             <div className="ng-campanha-surpresa">
               {lang === "fr" ? "Surprise pour vous" : lang === "lt" ? "Staigmena jums" : "Surpresa para si"}
             </div>
-            <div className="ng-campanha-titulo">{campanha.titulo}</div>
-            {campanha.mensagem && (
-              <div className="ng-campanha-msg">{campanha.mensagem}</div>
+            <div className="ng-campanha-titulo">
+              {lang === "fr" && campanha.titulo_fr ? campanha.titulo_fr : lang === "lt" && campanha.titulo_lt ? campanha.titulo_lt : campanha.titulo}
+            </div>
+            {(campanha.mensagem || campanha.mensagem_fr || campanha.mensagem_lt) && (
+              <div className="ng-campanha-msg">
+                {lang === "fr" && campanha.mensagem_fr ? campanha.mensagem_fr : lang === "lt" && campanha.mensagem_lt ? campanha.mensagem_lt : campanha.mensagem}
+              </div>
             )}
             {campanha.codigo && (
               <div className="ng-campanha-codigo">{campanha.codigo}</div>
@@ -195,7 +199,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
           <div className="ng-campanha-acoes">
             {campanha.codigo && (
               <button className={`ng-campanha-copiar${copiado ? " ok" : ""}`} onClick={copiar}>
-                {copiado ? (lang === "fr" ? "✓ Copié" : lang === "lt" ? "✓ Nukopijuota" : "✓ Copiado") : (lang === "fr" ? "Copier le code" : lang === "lt" ? "Kopijuoti kodą" : "Copiar código")}
+                {copiado ? "✓ Copiado" : "Copiar código"}
               </button>
             )}
             {campanha.url_destino && (
@@ -205,7 +209,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
                 rel="noopener noreferrer"
                 style={{ fontSize: "0.6rem", color: "rgba(248,247,245,0.4)", textDecoration: "none", letterSpacing: "0.05em" }}
               >
-                {lang === "fr" ? "Voir la boutique ↗" : lang === "lt" ? "Žiūrėti parduotuvę ↗" : "Ver loja ↗"}
+                Ver loja ↗
               </a>
             )}
             <button className="ng-campanha-fechar" onClick={fechar} aria-label="Fechar">✕</button>
