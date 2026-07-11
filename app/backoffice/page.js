@@ -313,25 +313,6 @@ function SeeWhois() {
           onClose={() => { setReciboAberto(null); setContextoRecibo(null); }}
         />
       )}
-    <>
-      {modalAvaliacao && (
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
-          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
-            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
-            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
-              {[1,2,3,4,5].map(s => (
-                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
-              ))}
-            </div>
-            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
-            <div style={{display:"flex",gap:"0.75rem"}}>
-              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
-              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -546,25 +527,6 @@ function Caixa() {
           </div>
         )}
       </div>
-    <>
-      {modalAvaliacao && (
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
-          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
-            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
-            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
-              {[1,2,3,4,5].map(s => (
-                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
-              ))}
-            </div>
-            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
-            <div style={{display:"flex",gap:"0.75rem"}}>
-              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
-              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -603,25 +565,6 @@ function RowDia({ linha, onApagarDespesa }) {
         <tr><td colSpan={6} style={{padding:0,border:"none"}}>
           <ModalRecibo recibo={talaoAberto} aluguer={null} peca={null} tamanho={null} onClose={() => setTalaoAberto(null)} />
         </td></tr>
-      )}
-    <>
-      {modalAvaliacao && (
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
-          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
-            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
-            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
-              {[1,2,3,4,5].map(s => (
-                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
-              ))}
-            </div>
-            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
-            <div style={{display:"flex",gap:"0.75rem"}}>
-              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
-              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );
@@ -991,7 +934,7 @@ export default function Backoffice() {
   const confirmarRecepcao = async (id) => { await supabase.from("alugueres").update({ estado: "em_verificacao", data_recepcao: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const confirmarVerificacao = async (id, danificado=false, info=null) => {
     const agora = new Date().toISOString();
-    const dispData = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+    const dispData = new Date(Date.now() + 3*24*60*60*1000).toISOString();
     await supabase.from("alugueres").update({
       estado: danificado ? "devolvido_danificado" : "devolvido",
       data_verificacao: agora,
@@ -2011,6 +1954,24 @@ export default function Backoffice() {
           onClose={() => setAluguerParaEnviar(null)}
           onEnviado={() => { setAluguerParaEnviar(null); carregarDados(); }}
         />
+      )}
+      {modalAvaliacao && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
+            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
+              {[1,2,3,4,5].map(s => (
+                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
+              ))}
+            </div>
+            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
+            <div style={{display:"flex",gap:"0.75rem"}}>
+              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
+              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
