@@ -313,6 +313,25 @@ function SeeWhois() {
           onClose={() => { setReciboAberto(null); setContextoRecibo(null); }}
         />
       )}
+    <>
+      {modalAvaliacao && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
+            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
+              {[1,2,3,4,5].map(s => (
+                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
+              ))}
+            </div>
+            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
+            <div style={{display:"flex",gap:"0.75rem"}}>
+              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
+              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -527,6 +546,25 @@ function Caixa() {
           </div>
         )}
       </div>
+    <>
+      {modalAvaliacao && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
+            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
+              {[1,2,3,4,5].map(s => (
+                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
+              ))}
+            </div>
+            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
+            <div style={{display:"flex",gap:"0.75rem"}}>
+              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
+              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -566,6 +604,25 @@ function RowDia({ linha, onApagarDespesa }) {
           <ModalRecibo recibo={talaoAberto} aluguer={null} peca={null} tamanho={null} onClose={() => setTalaoAberto(null)} />
         </td></tr>
       )}
+    <>
+      {modalAvaliacao && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
+            <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
+              {[1,2,3,4,5].map(s => (
+                <button key={s} onClick={()=>setNotaEmpresa(s)} style={{fontSize:"1.8rem",background:"none",border:"none",cursor:"pointer",color:s<=notaEmpresa?"#c4748a":"#e2dfda"}}>★</button>
+              ))}
+            </div>
+            <textarea value={comentarioEmpresa} onChange={e=>setComentarioEmpresa(e.target.value)} placeholder="Nota interna (opcional)..." style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.85rem",resize:"vertical",minHeight:"80px",outline:"none",marginBottom:"1rem"}} />
+            <div style={{display:"flex",gap:"0.75rem"}}>
+              <button onClick={guardarAvaliacaoEmpresa} disabled={notaEmpresa===0} style={{flex:1,padding:"0.85rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:notaEmpresa===0?"not-allowed":"pointer",opacity:notaEmpresa===0?0.5:1,fontFamily:"'Jost',sans-serif"}}>Guardar</button>
+              <button onClick={()=>setModalAvaliacao(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid #e2dfda",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>Saltar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -599,6 +656,9 @@ export default function Backoffice() {
 
   const [alugueres, setAlugueres] = useState([]);
   const [aluguerParaEnviar, setAluguerParaEnviar] = useState(null);
+  const [modalAvaliacao, setModalAvaliacao] = useState(null);
+  const [notaEmpresa, setNotaEmpresa] = useState(0);
+  const [comentarioEmpresa, setComentarioEmpresa] = useState("");
   const [clientes, setClientes] = useState([]);
   const [clienteSel, setClienteSel] = useState(null);
   const [reservas, setReservas] = useState([]);
@@ -916,20 +976,31 @@ export default function Backoffice() {
     }
     carregarDados();
   };
+  const guardarAvaliacaoEmpresa = async () => {
+    if (!modalAvaliacao || notaEmpresa === 0) return;
+    await supabase.from("avaliacoes").upsert({
+      aluguer_id: modalAvaliacao.aluguer_id,
+      cliente_id: modalAvaliacao.cliente_id,
+      nota_empresa_cliente: notaEmpresa,
+      comentario_empresa: comentarioEmpresa || null,
+    }, { onConflict: "aluguer_id" });
+    setModalAvaliacao(null);
+  };
   const confirmarDeposito = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "recebido", deposito_confirmado_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const marcarEnviado = (aluguer) => { setAluguerParaEnviar(aluguer); };
   const confirmarRecepcao = async (id) => { await supabase.from("alugueres").update({ estado: "em_verificacao", data_recepcao: new Date().toISOString() }).eq("id", id); carregarDados(); };
-  const confirmarVerificacao = async (id, danificado=false) => {
-  const agora = new Date().toISOString();
-  const dispData = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
-  await supabase.from("alugueres").update({
-    estado: danificado ? "devolvido_danificado" : "devolvido",
-    data_verificacao: agora,
-    data_devolucao_real: agora,
-    data_disponivel_novamente: dispData,
-  }).eq("id", id);
-  carregarDados();
-};
+  const confirmarVerificacao = async (id, danificado=false, info=null) => {
+    const agora = new Date().toISOString();
+    const dispData = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from("alugueres").update({
+      estado: danificado ? "devolvido_danificado" : "devolvido",
+      data_verificacao: agora,
+      data_devolucao_real: agora,
+      data_disponivel_novamente: dispData,
+    }).eq("id", id);
+    carregarDados();
+    if (info) { setNotaEmpresa(0); setComentarioEmpresa(""); setModalAvaliacao({ aluguer_id: id, ...info }); }
+  };
   const libertarCaucao = async (id) => { await supabase.from("alugueres").update({ deposito_estado: "libertado", caucao_libertada_em: new Date().toISOString() }).eq("id", id); carregarDados(); };
   const calcularAtraso = (dataFim) => { if (!dataFim) return 0; const diff = Math.floor((new Date()-new Date(dataFim))/86400000); return diff>0?diff:0; };
 
@@ -1494,7 +1565,7 @@ export default function Backoffice() {
                             <div style={{ display:"flex",flexDirection:"column",gap:"0.3rem" }}>
                               {a.estado==="confirmado"&&<button style={BTN("rosa","sm")} onClick={()=>marcarEnviado(a)}>🚚 Enviar</button>}
                               {a.estado==="ativo"&&<button style={BTN("rosa","sm")} onClick={()=>confirmarRecepcao(a.id)}>📦 Recebi devolução</button>}
-                              {a.estado==="em_verificacao"&&<><button style={BTN("black","sm")} onClick={()=>confirmarVerificacao(a.id,false)}>✓ OK</button><button style={BTN("red","sm")} onClick={()=>confirmarVerificacao(a.id,true)}>✗ Dano</button></>}
+                              {a.estado==="em_verificacao"&&<><button style={BTN("black","sm")} onClick={()=>confirmarVerificacao(a.id,false,{cliente_id:a.cliente_id,cliente_nome:a.clientes?.nome||"Cliente"})}>✓ OK</button><button style={BTN("red","sm")} onClick={()=>confirmarVerificacao(a.id,true,{cliente_id:a.cliente_id,cliente_nome:a.clientes?.nome||"Cliente"})}>✗ Dano</button></>}
                               {a.estado==="devolvido"&&a.deposito_estado!=="libertado"&&<button style={BTN("outline","sm")} onClick={()=>libertarCaucao(a.id)}>💰 Libertar</button>}
                             </div>
                           </td>
