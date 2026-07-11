@@ -308,7 +308,7 @@ const t = {
     reservaPrazoTempo: "Tempo restante para confirmar:",
     verTalao: "Ver talão",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -363,7 +363,7 @@ const t = {
     reservaPrazoTempo: "Temps restant pour confirmer :",
     verTalao: "Voir le reçu",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -418,9 +418,90 @@ const t = {
     reservaPrazoTempo: "Laikas patvirtinti:",
     verTalao: "Žiūrėti kvitą",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.",
   },
 };
+
+function StarRating({ value, onChange, readonly }) {
+  return (
+    <div style={{display:"flex",gap:"0.25rem"}}>
+      {[1,2,3,4,5].map(star => (
+        <button key={star} type="button" onClick={() => !readonly && onChange && onChange(star)}
+          style={{background:"none",border:"none",cursor:readonly?"default":"pointer",padding:"0.1rem",fontSize:"1.6rem",color:star <= value ? "#c4748a" : "#e2dfda",transition:"color 0.15s",lineHeight:1}}>
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CartaoAvaliacao({ aluguer, i }) {
+  const peca = aluguer.stock_tamanhos?.pecas;
+  const [avaliacao, setAvaliacao] = useState(null);
+  const [nota, setNota] = useState(0);
+  const [comentario, setComentario] = useState("");
+  const [enviado, setEnviado] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.from("avaliacoes").select("*").eq("aluguer_id", aluguer.id).maybeSingle().then(({ data }) => {
+      if (data) { setAvaliacao(data); setNota(data.nota_cliente_empresa || 0); setEnviado(true); }
+    });
+  }, [aluguer.id]);
+
+  const enviar = async () => {
+    if (nota === 0) return;
+    setLoading(true);
+    await supabase.from("avaliacoes").upsert({
+      aluguer_id: aluguer.id, cliente_id: aluguer.cliente_id,
+      nota_cliente_empresa: nota, comentario_cliente: comentario || null,
+    }, { onConflict: "aluguer_id" });
+    setEnviado(true); setLoading(false);
+  };
+
+  return (
+    <div style={{background:"var(--white)",padding:"1.25rem 1.5rem",marginBottom:"1px",borderLeft:"3px solid " + (enviado ? "#c4748a" : "var(--g2)")}}>
+      <div style={{display:"flex",gap:"1rem",alignItems:"flex-start"}}>
+        <div style={{width:48,height:60,flexShrink:0,background:"var(--g1)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"serif",fontSize:"1.3rem",color:"rgba(0,0,0,0.15)",fontStyle:"italic"}}>NG</span>}
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontFamily:"serif",fontSize:"1.1rem",fontWeight:400,marginBottom:"0.5rem"}}>{peca?.nome || "—"}</div>
+          <div style={{fontSize:"0.72rem",color:"var(--g6)",marginBottom:"0.75rem"}}>{aluguer.data_inicio} → {aluguer.data_fim}</div>
+          {enviado ? (
+            <>
+              <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.3rem"}}>{i.tuaAvaliacao}</div>
+              <StarRating value={nota} readonly />
+              {avaliacao?.comentario_cliente && <p style={{fontSize:"0.82rem",color:"var(--g6)",marginTop:"0.4rem",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
+              {avaliacao?.nota_empresa_cliente && (
+                <div style={{marginTop:"1rem",paddingTop:"0.75rem",borderTop:"1px solid var(--g1)"}}>
+                  <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
+                  <StarRating value={avaliacao.nota_empresa_cliente} readonly />
+                  {avaliacao.comentario_empresa && <p style={{fontSize:"0.82rem",color:"var(--g6)",marginTop:"0.4rem",fontStyle:"italic"}}>"{avaliacao.comentario_empresa}"</p>}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.5rem"}}>{i.avaliarExperiencia}</div>
+              <StarRating value={nota} onChange={setNota} />
+              {nota > 0 && (
+                <>
+                  <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder={i.comentarioPlaceholder}
+                    style={{width:"100%",marginTop:"0.75rem",padding:"0.75rem",border:"1.5px solid var(--g2)",background:"var(--white)",fontFamily:"sans-serif",fontSize:"0.85rem",color:"var(--black)",resize:"vertical",minHeight:"80px",outline:"none"}} />
+                  <button onClick={enviar} disabled={loading}
+                    style={{marginTop:"0.5rem",padding:"0.6rem 1.5rem",background:"var(--black)",color:"var(--white)",border:"none",fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontWeight:500}}>
+                    {loading ? "..." : i.enviarAvaliacao}
+                  </button>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const CAMPOS_OBRIGATORIOS = ["nome", "telefone", "morada", "numero_porta", "codigo_postal", "cidade", "nif", "numero_cc"];
 
@@ -825,6 +906,14 @@ export default function Perfil() {
           )}
         </div>
 
+        {alugueresHistorico.filter(a => a.estado === "devolvido" || a.estado === "devolvido_danificado").length > 0 && (
+          <div className="card" style={{padding:0,overflow:"hidden"}}>
+            <p className="card-t" style={{padding:"2rem 2.5rem 1.5rem",border:"none",marginBottom:0}}>{i.avaliacoes}</p>
+            {alugueresHistorico.filter(a => a.estado === "devolvido" || a.estado === "devolvido_danificado").map(a => (
+              <CartaoAvaliacao key={a.id} aluguer={a} i={i} />
+            ))}
+          </div>
+        )}
         <div style={{textAlign:'center',padding:'1rem 0 2rem'}}>
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
         </div>
