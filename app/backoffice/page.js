@@ -747,18 +747,23 @@ export default function Backoffice() {
   };
 
   const carregarEstatisticas = async () => {
-    const [alRes, pecasRes, clientesRes, reservasRes, recibosRes] = await Promise.all([
-      supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim, created_at, cliente_id, stock_tamanho_id, stock_tamanhos(tamanho, peca_id, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))), clientes(nome, email, cidade)"),
-      supabase.from("pecas").select("*, categorias(nome), stock_tamanhos(quantidade_total, quantidade_disponivel)"),
-      supabase.from("clientes").select("*, alugueres(id, estado, valor_aluguer, created_at)"),
-      supabase.from("reservas_espera").select("*, stock_tamanhos(pecas(nome))"),
-      supabase.from("recibos").select("*, clientes(nome, email)"),
+    const [alRes, stRes, pecasRes, clientesRes, reservasRes, recibosRes] = await Promise.all([
+      supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim, created_at, cliente_id, stock_tamanho_id"),
+      supabase.from("stock_tamanhos").select("id, tamanho, peca_id, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))"),
+      supabase.from("pecas").select("id, nome, valor_peca, preco_aluguer_dia, categorias(nome), stock_tamanhos(quantidade_total, quantidade_disponivel)"),
+      supabase.from("clientes").select("id, nome, email, cidade, codigo_postal, data_nascimento, profissao, alugueres(id, estado, valor_aluguer, created_at)"),
+      supabase.from("reservas_espera").select("id, stock_tamanho_id, stock_tamanhos(peca_id, pecas(nome))"),
+      supabase.from("recibos").select("id, estado, valor_total, metodo_pagamento, comprovativo_url, created_at, clientes(nome, email)"),
     ]);
-    const al = alRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [], recibos = recibosRes.data || [];
-    const roiPecas = pl.map(p => { const ap = al.filter(a => a.stock_tamanhos?.pecas?.id === p.id); const rec = ap.reduce((s, a) => s + (a.valor_aluguer || 0), 0); return { ...p, receitaGerada: rec, vezesAlugada: ap.length, roi: p.valor_peca > 0 ? ((rec/p.valor_peca)*100).toFixed(0) : 0, danificada: ap.filter(a => a.estado === "devolvido_danificado").length }; }).sort((a,b) => b.vezesAlugada - a.vezesAlugada);
+    const al = alRes.data || [], st = stRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [], recibos = recibosRes.data || [];
+    const stMap = {}; st.forEach(s => { stMap[s.id] = s; });
+    const clMap = {}; cl.forEach(c => { clMap[c.id] = c; });
+    const alE = al.map(a => ({ ...a, peca: stMap[a.stock_tamanho_id]?.pecas || null, tamanho: stMap[a.stock_tamanho_id]?.tamanho || null, cliente: clMap[a.cliente_id] || null }));
+    const alAtivos = alE.filter(a => a.estado !== "cancelado");
+    const roiPecas = pl.map(p => { const ap = alAtivos.filter(a => a.peca?.id === p.id); const rec = ap.reduce((s, a) => s + (a.valor_aluguer || 0), 0); return { ...p, receitaGerada: rec, vezesAlugada: ap.length, roi: p.valor_peca > 0 ? ((rec/p.valor_peca)*100).toFixed(0) : 0, danificada: ap.filter(a => a.estado === "devolvido_danificado").length }; }).sort((a,b) => b.vezesAlugada - a.vezesAlugada);
     const pecasEspera = {}; rl.forEach(r => { const n = r.stock_tamanhos?.pecas?.nome || "—"; pecasEspera[n] = (pecasEspera[n]||0)+1; });
-    const cidades = {}; al.forEach(a => { const c = a.clientes?.cidade || "Desconhecida"; cidades[c] = (cidades[c]||0)+1; });
-    const catCount = {}; al.forEach(a => { const c = a.stock_tamanhos?.pecas?.categorias?.nome || "Outro"; catCount[c] = (catCount[c]||0)+1; });
+    const cidades = {}; alAtivos.forEach(a => { const c = a.cliente?.cidade || "Desconhecida"; if(c) cidades[c] = (cidades[c]||0)+1; });
+    const catCount = {}; alAtivos.forEach(a => { const c = a.peca?.categorias?.nome || "Outro"; catCount[c] = (catCount[c]||0)+1; });
     const clNivel = cl.map(c => { const comp = (c.alugueres||[]).filter(a => ["devolvido","devolvido_danificado"].includes(a.estado)).length; const tot = (c.alugueres||[]).filter(a => a.estado !== "cancelado").length; const gasto = (c.alugueres||[]).reduce((s,a) => s+(a.valor_aluguer||0),0); return { ...c, alugueresTotal: tot, alugueresCompletos: comp, totalGasto: gasto, nivel: NIVEL(comp) }; });
     const ltv = clNivel.reduce((s,c) => s+c.totalGasto,0) / (clNivel.length||1);
 
@@ -785,7 +790,7 @@ export default function Backoffice() {
       .filter(r => r.estado !== "pago" && r.comprovativo_url)
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.alugueresTotal-a.alugueresTotal).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: al.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: al.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", pecaMenosAlugada: [...roiPecas].reverse()[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length });
+    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.totalGasto-a.totalGasto).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: alAtivos.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: alAtivos.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length });
   };
 
   const perguntarAI = async () => {
@@ -899,7 +904,7 @@ export default function Backoffice() {
     setTimeout(() => { fecharEdicao(); carregarDados(); }, 1000);
   };
 
-const atualizarEstado = async (id, estado) => {
+  const atualizarEstado = async (id, estado) => {
     if (["devolvido","devolvido_danificado"].includes(estado)) {
       await supabase.from("alugueres").update({
         estado: estado,
