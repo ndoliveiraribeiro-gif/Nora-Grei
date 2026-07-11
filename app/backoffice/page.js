@@ -793,7 +793,26 @@ export default function Backoffice() {
       .filter(r => r.estado !== "pago" && r.comprovativo_url)
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.totalGasto-a.totalGasto).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: alAtivos.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: alAtivos.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length });
+    // Métricas de logística
+    const devolvidos = alE.filter(a => (a.estado === "devolvido" || a.estado === "devolvido_danificado") && a.data_devolucao_real && a.data_fim);
+    const atrasos = devolvidos.map(a => (new Date(a.data_devolucao_real).setHours(0,0,0,0) - new Date(a.data_fim).setHours(0,0,0,0)) / 86400000).filter(d => d >= 0);
+    const mediaAtraso = atrasos.length > 0 ? (atrasos.reduce((s,d) => s+d, 0) / atrasos.length).toFixed(1) : 0;
+    const medianaAtraso = atrasos.length > 0 ? (() => { const s = [...atrasos].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : ((s[m-1]+s[m])/2).toFixed(1); })() : 0;
+    const ciclos = alE.filter(a => a.data_disponivel_novamente && a.data_inicio).map(a => (new Date(a.data_disponivel_novamente).setHours(0,0,0,0) - new Date(a.data_inicio).setHours(0,0,0,0)) / 86400000).filter(d => d > 0);
+    const mediaCiclo = ciclos.length > 0 ? (ciclos.reduce((s,d)=>s+d,0)/ciclos.length).toFixed(1) : 0;
+    const rotacoesMes = mediaCiclo > 0 ? (30 / parseFloat(mediaCiclo)).toFixed(1) : 0;
+
+    // Pareto 80-20
+    const totalRec = alAtivos.reduce((s,a) => s+(a.valor_aluguer||0), 0);
+    const pecasOrdenadas = [...roiPecas].sort((a,b) => b.receitaGerada - a.receitaGerada);
+    let acum = 0; let pareto20Pecas = 0;
+    for (const p of pecasOrdenadas) { acum += p.receitaGerada; pareto20Pecas++; if (acum >= totalRec * 0.8) break; }
+    const clientesOrdenados = [...clNivel].sort((a,b) => b.totalGasto - a.totalGasto);
+    acum = 0; let pareto20Clientes = 0;
+    const totalGastoClientes = clNivel.reduce((s,c) => s+c.totalGasto, 0);
+    for (const c of clientesOrdenados) { acum += c.totalGasto; pareto20Clientes++; if (acum >= totalGastoClientes * 0.8) break; }
+
+    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.totalGasto-a.totalGasto).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: alAtivos.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: alAtivos.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length, mediaAtraso, medianaAtraso, mediaCiclo, rotacoesMes, pareto20Pecas, pareto20Clientes, totalPecas: pecasOrdenadas.length, totalClientes: clNivel.length });
   };
 
   const perguntarAI = async () => {
@@ -1819,6 +1838,57 @@ export default function Backoffice() {
                     </table>
                   </div>
                 </div>
+                <div style={{ ...CARD,marginTop:"1rem" }}>
+                  <p style={CARD_T}>Logística & Rotação de Stock</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem",marginBottom:"1rem" }}>
+                    {[
+                      { val: `${estatisticas.mediaAtraso} dias`, lbl: "Atraso médio", cor: parseFloat(estatisticas.mediaAtraso) > 2 ? "#e74c3c" : "#27ae60" },
+                      { val: `${estatisticas.medianaAtraso} dias`, lbl: "Mediana atraso", cor: "#f39c12" },
+                      { val: `${estatisticas.mediaCiclo} dias`, lbl: "Ciclo médio peça", cor: "#080808" },
+                      { val: `${estatisticas.rotacoesMes}x`, lbl: "Rotações/mês", cor: "#c4748a" },
+                    ].map((s,i) => (
+                      <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
+                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize:"0.75rem",color:"#888",fontStyle:"italic" }}>Baseado em {estatisticas.roiPecas?.filter(p=>p.vezesAlugada>0).length || 0} peças com histórico de devolução.</p>
+                </div>
+
+                <div style={{ ...CARD,marginTop:"1rem" }}>
+                  <p style={CARD_T}>Análise 80-20 (Pareto)</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem" }}>
+                    <div style={{ background:"#fff8f0",padding:"1.5rem",borderLeft:"4px solid #c4748a" }}>
+                      <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Peças que geram 80% receita</div>
+                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"#c4748a" }}>{estatisticas.pareto20Pecas}</div>
+                      <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalPecas} peças totais ({estatisticas.totalPecas > 0 ? Math.round(estatisticas.pareto20Pecas/estatisticas.totalPecas*100) : 0}%)</div>
+                    </div>
+                    <div style={{ background:"#f0f8ff",padding:"1.5rem",borderLeft:"4px solid #080808" }}>
+                      <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Clientes que geram 80% receita</div>
+                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"#080808" }}>{estatisticas.pareto20Clientes}</div>
+                      <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalClientes} clientes totais ({estatisticas.totalClientes > 0 ? Math.round(estatisticas.pareto20Clientes/estatisticas.totalClientes*100) : 0}%)</div>
+                    </div>
+                  </div>
+                  <div style={{ marginTop:"1rem" }}>
+                    <p style={{ fontSize:"0.75rem",color:"#888",marginBottom:"0.75rem" }}>Top peças por receita:</p>
+                    {estatisticas.roiPecas?.slice(0,5).map((p,i) => {
+                      const pct = estatisticas.totalReceita > 0 ? (p.receitaGerada/estatisticas.totalReceita*100).toFixed(1) : 0;
+                      return (
+                        <div key={p.id} style={{ display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.5rem" }}>
+                          <span style={{ fontSize:"0.7rem",color:"#888",width:"1.5rem" }}>#{i+1}</span>
+                          <span style={{ fontSize:"0.85rem",flex:1 }}>{p.nome}</span>
+                          <span style={{ fontSize:"0.8rem",color:"#c4748a",fontWeight:600 }}>{p.receitaGerada.toFixed(0)}€</span>
+                          <span style={{ fontSize:"0.7rem",color:"#888" }}>{pct}%</span>
+                          <div style={{ width:80,height:6,background:"#f0eeeb",borderRadius:3 }}>
+                            <div style={{ height:"100%",width:`${pct}%`,background:"#c4748a",borderRadius:3 }}/>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div style={{ ...CARD,marginTop:"1rem" }}>
                   <p style={CARD_T}>Pagamentos & Recibos ({estatisticas.totalRecibos} talões)</p>
                   <div style={COL4}>
