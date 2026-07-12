@@ -7,6 +7,7 @@ const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false
 const StyleConsultant = dynamic(() => import("@/components/StyleConsultant"), { ssr: false });
 const BottomNav = dynamic(() => import("@/components/BottomNav"), { ssr: false });
 const CampanhaAlert = dynamic(() => import("@/components/CampanhaAlert"), { ssr: false });
+const PWAInstallBanner = dynamic(() => import("@/components/PWAInstallBanner"), { ssr: false });
 
 export default function ClientWidgets() {
   const [lang, setLang] = useState("pt");
@@ -28,6 +29,7 @@ export default function ClientWidgets() {
       <StyleConsultant lang={lang} />
       <BottomNav />
       <CampanhaAlert lang={lang} />
+      <PWAInstallBanner lang={lang} />
     </>
   );
 }
