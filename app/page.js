@@ -130,7 +130,7 @@ export default function Home() {
 
     const { data: todasPecas } = await supabase
       .from("pecas")
-      .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque")
+      .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position")
       .not("fotos", "is", null);
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
@@ -211,7 +211,7 @@ export default function Home() {
 
         .hero{min-height:90svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
-        .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.55)}
+        .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55)}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.2) 0%,rgba(8,8,8,0.65) 60%,rgba(8,8,8,0.85) 100%);z-index:1}
         .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
         .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
@@ -330,7 +330,7 @@ export default function Home() {
           .hero-cta2{color:var(--g4);border-color:var(--g2);max-width:none;flex:0}
           .hero-cta2:hover{color:var(--black);border-color:var(--black)}
           .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%}
-          .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform 6s ease}
+          .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease}
           .hero-right-desktop:hover img{transform:scale(1.03)}
           .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
           .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
@@ -405,7 +405,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="hero">
+      <section className="hero" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
         <div className="hero-bg"><img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt="" /></div>
         <div className="hero-overlay" />
         <div className="hero-content">

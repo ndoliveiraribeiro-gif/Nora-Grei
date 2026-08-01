@@ -8,7 +8,7 @@ const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
 const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
 const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
-const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
+const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
 const NIVEL = (n) => {
   if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 0, cor: "#6c5ce7" };
@@ -832,7 +832,7 @@ export default function Backoffice() {
   const criarPeca = async () => {
     if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) { alert("Nome e preço são obrigatórios"); return; }
     setCriandoPeca(true); setUploadProgress("A criar peça...");
-    const { data: pc, error } = await supabase.from("pecas").insert({ nome: novaPeca.nome, categoria_id: novaPeca.categoria_id||null, preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia), preco_avulso: parseFloat(novaPeca.preco_avulso)||null, valor_peca: parseFloat(novaPeca.valor_peca)||0, descricao: novaPeca.descricao, material: novaPeca.material, origem: novaPeca.origem, destaque: novaPeca.destaque, ocasioes: novaPeca.ocasioes, estado: "disponivel" }).select().single();
+    const { data: pc, error } = await supabase.from("pecas").insert({ nome: novaPeca.nome, categoria_id: novaPeca.categoria_id||null, preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia), preco_avulso: parseFloat(novaPeca.preco_avulso)||null, valor_peca: parseFloat(novaPeca.valor_peca)||0, descricao: novaPeca.descricao, material: novaPeca.material, origem: novaPeca.origem, destaque: novaPeca.destaque, hero_position: novaPeca.hero_position||"center top", ocasioes: novaPeca.ocasioes, estado: "disponivel" }).select().single();
     if (error) { setUploadProgress("❌ " + error.message); setCriandoPeca(false); return; }
     for (const t of novaPeca.tamanhos) { if (t.tamanho) await supabase.from("stock_tamanhos").insert({ peca_id: pc.id, tamanho: t.tamanho, quantidade_total: parseInt(t.quantidade_total)||1, quantidade_disponivel: parseInt(t.quantidade_total)||1 }); }
     if (fotosUpload.length > 0) {
@@ -853,7 +853,7 @@ export default function Backoffice() {
       preco_aluguer_dia: p.preco_aluguer_dia || "", preco_avulso: p.preco_avulso || "",
       valor_peca: p.valor_peca || "", descricao: p.descricao || "",
       material: p.material || "", origem: p.origem || "Portugal",
-      destaque: !!p.destaque, ocasioes: p.ocasioes || [],
+      destaque: !!p.destaque, hero_position: p.hero_position||"center top", ocasioes: p.ocasioes || [],
     });
     setEditTamanhos((p.stock_tamanhos || []).map(s => ({ id: s.id, tamanho: s.tamanho, quantidade_total: s.quantidade_total, quantidade_disponivel: s.quantidade_disponivel })));
     setEditFotosExistentes(p.fotos || []);
@@ -898,7 +898,7 @@ export default function Backoffice() {
       preco_avulso: parseFloat(editForm.preco_avulso) || null,
       valor_peca: parseFloat(editForm.valor_peca) || 0,
       descricao: editForm.descricao, material: editForm.material, origem: editForm.origem,
-      destaque: editForm.destaque, ocasioes: editForm.ocasioes,
+      destaque: editForm.destaque, hero_position: editForm.hero_position||"center top", ocasioes: editForm.ocasioes,
       fotos: fotosFinais,
     }).eq("id", pecaEditando);
 
@@ -1392,6 +1392,17 @@ export default function Backoffice() {
                     <div style={{ display:"flex",alignItems:"center",gap:"0.5rem",paddingTop:"1.5rem" }}>
                       <input type="checkbox" id="editdest" checked={editForm.destaque} onChange={e => setEditForm(f=>({...f,destaque:e.target.checked}))} />
                       <label htmlFor="editdest" style={{ ...LBL,marginBottom:0 }}>Em destaque</label>
+                    </div>
+                    <div style={{ gridColumn:"1/-1" }}>
+                      <label style={LBL}>Posição da foto no hero da landing</label>
+                      <select style={INP} value={editForm.hero_position||"center top"} onChange={e => setEditForm(f=>({...f,hero_position:e.target.value}))}>
+                        <option value="center top">Topo (cabeça visível)</option>
+                        <option value="center center">Centro</option>
+                        <option value="center bottom">Base (pés visíveis)</option>
+                        <option value="top center">Topo centrado</option>
+                        <option value="20% center">Ligeiramente acima</option>
+                        <option value="80% center">Ligeiramente abaixo</option>
+                      </select>
                     </div>
                     <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Descrição</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={editForm.descricao} onChange={e => setEditForm(f=>({...f,descricao:e.target.value}))} /></div>
                   </div>
