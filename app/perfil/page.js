@@ -308,7 +308,7 @@ const t = {
     reservaPrazoTempo: "Tempo restante para confirmar:",
     verTalao: "Ver talão",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -363,7 +363,7 @@ const t = {
     reservaPrazoTempo: "Temps restant pour confirmer :",
     verTalao: "Voir le reçu",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -418,7 +418,7 @@ const t = {
     reservaPrazoTempo: "Laikas patvirtinti:",
     verTalao: "Žiūrėti kvitą",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.",
   },
 };
 
@@ -517,12 +517,29 @@ export default function Perfil() {
   const [detectandoLoc, setDetectandoLoc] = useState(false);
   const [locDetectada, setLocDetectada] = useState(false);
   const [lang, setLang] = useState("pt");
+  const [showPassword, setShowPassword] = useState(false);
+  const [novaPass, setNovaPass] = useState("");
+  const [confirmarPass, setConfirmarPass] = useState("");
+  const [passMsg, setPassMsg] = useState("");
+  const [passMsgTipo, setPassMsgTipo] = useState("");
+  const [passLoading, setPassLoading] = useState(false);
+  const [reclamacoes, setReclamacoes] = useState([]);
+  const [showNovaReclamacao, setShowNovaReclamacao] = useState(false);
+  const [novaRec, setNovaRec] = useState({ assunto: "", mensagem: "", aluguer_id: "" });
+  const [recMsg, setRecMsg] = useState("");
+  const [recLoading, setRecLoading] = useState(false);
   const fileRef = useRef();
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && t[saved]) setLang(saved);
     carregarPerfil();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        const { data: recs } = await supabase.from("reclamacoes").select("*").eq("cliente_id", session.user.id).order("created_at", { ascending: false });
+        if (recs) setReclamacoes(recs);
+      }
+    });
   }, []);
 
   const carregarPerfil = async () => {
@@ -600,6 +617,37 @@ export default function Perfil() {
   };
 
   const sair = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
+
+  const mudarPassword = async () => {
+    setPassMsg("");
+    if (novaPass.length < 6) { setPassMsg(i.passwordMin); setPassMsgTipo("erro"); return; }
+    if (novaPass !== confirmarPass) { setPassMsg(i.passwordMatch); setPassMsgTipo("erro"); return; }
+    setPassLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: novaPass });
+    if (error) { setPassMsg(i.passwordErro); setPassMsgTipo("erro"); }
+    else { setPassMsg(i.passwordOk); setPassMsgTipo("ok"); setNovaPass(""); setConfirmarPass(""); setTimeout(() => setShowPassword(false), 2000); }
+    setPassLoading(false);
+  };
+
+  const enviarReclamacao = async () => {
+    if (!novaRec.assunto || !novaRec.mensagem) return;
+    setRecLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: cli } = await supabase.from("clientes").select("id").eq("id", session.user.id).single();
+    await supabase.from("reclamacoes").insert({
+      cliente_id: cli.id,
+      aluguer_id: novaRec.aluguer_id || null,
+      assunto: novaRec.assunto,
+      mensagem: novaRec.mensagem,
+    });
+    setRecMsg(i.reclamacaoEnviada);
+    setNovaRec({ assunto: "", mensagem: "", aluguer_id: "" });
+    setShowNovaReclamacao(false);
+    const { data: recs } = await supabase.from("reclamacoes").select("*").eq("cliente_id", cli.id).order("created_at", { ascending: false });
+    if (recs) setReclamacoes(recs);
+    setRecLoading(false);
+    setTimeout(() => setRecMsg(""), 4000);
+  };
   const set = (k, v) => setPerfil(prev => ({ ...prev, [k]: v }));
   const i = t[lang] || t.pt;
   const estadoInfo = ESTADO_INFO[lang] || ESTADO_INFO.pt;
@@ -914,6 +962,64 @@ export default function Perfil() {
             ))}
           </div>
         )}
+        <div className="card">
+          <p className="card-t" style={{cursor:"pointer",userSelect:"none"}} onClick={() => { setShowPassword(!showPassword); setPassMsg(""); }}>
+            {i.mudarPassword} {showPassword ? "▲" : "▼"}
+          </p>
+          {showPassword && (
+            <div style={{padding:"0 0 1rem"}}>
+              <div className="fg"><label className="lbl">{i.novaPassword}</label>
+                <input className="inp" type="password" value={novaPass} onChange={e=>setNovaPass(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
+              </div>
+              <div className="fg"><label className="lbl">{i.confirmarPassword}</label>
+                <input className="inp" type="password" value={confirmarPass} onChange={e=>setConfirmarPass(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
+              </div>
+              {passMsg && <p style={{fontSize:"0.85rem",color:passMsgTipo==="ok"?"#27ae60":"#e74c3c",margin:"0.5rem 0 1rem",fontWeight:500}}>{passMsg}</p>}
+              <button className="btn-guardar" onClick={mudarPassword} disabled={passLoading} style={{opacity:passLoading?0.6:1}}>
+                {passLoading ? "..." : i.guardarPassword}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="card">
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={() => setShowNovaReclamacao(!showNovaReclamacao)}>
+            <p className="card-t" style={{border:"none",marginBottom:0}}>{i.reclamacoes}</p>
+            <span style={{fontSize:"0.8rem",color:"#c4748a",fontWeight:500}}>+ {i.novaReclamacao}</span>
+          </div>
+          {recMsg && <p style={{fontSize:"0.85rem",color:"#27ae60",padding:"0.5rem 0",fontWeight:500}}>{recMsg}</p>}
+          {showNovaReclamacao && (
+            <div style={{padding:"1rem 0"}}>
+              <div className="fg">
+                <label className="lbl">{i.assunto}</label>
+                <input className="inp" value={novaRec.assunto} onChange={e=>setNovaRec(r=>({...r,assunto:e.target.value}))} placeholder={i.assuntoPlaceholder} />
+              </div>
+              <div className="fg">
+                <label className="lbl">{i.mensagem}</label>
+                <textarea className="inp" value={novaRec.mensagem} onChange={e=>setNovaRec(r=>({...r,mensagem:e.target.value}))} placeholder={i.mensagemPlaceholder} style={{resize:"vertical",minHeight:"100px"}} />
+              </div>
+              <button className="btn-guardar" onClick={enviarReclamacao} disabled={recLoading||!novaRec.assunto||!novaRec.mensagem} style={{opacity:recLoading?0.6:1}}>
+                {recLoading ? "..." : i.enviarReclamacao}
+              </button>
+            </div>
+          )}
+          {reclamacoes.length > 0 && (
+            <div style={{marginTop:"1rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+              {reclamacoes.map(r => (
+                <div key={r.id} style={{padding:"0.75rem 1rem",background:"var(--g1)",borderLeft:`3px solid ${r.estado==="resolvida"?"#27ae60":"#f39c12"}`}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.3rem"}}>
+                    <span style={{fontSize:"0.82rem",fontWeight:500}}>{r.assunto}</span>
+                    <span style={{fontSize:"0.62rem",letterSpacing:"0.1em",textTransform:"uppercase",color:r.estado==="resolvida"?"#27ae60":"#f39c12"}}>{r.estado==="resolvida"?i.reclamacaoResolvida:i.reclamacaoPendente}</span>
+                  </div>
+                  <p style={{fontSize:"0.78rem",color:"var(--g4)"}}>{r.mensagem}</p>
+                  {r.resposta && <p style={{fontSize:"0.78rem",color:"#080808",marginTop:"0.5rem",fontStyle:"italic",borderTop:"1px solid var(--g2)",paddingTop:"0.5rem"}}>↳ {r.resposta}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+          {reclamacoes.length === 0 && !showNovaReclamacao && <p style={{fontSize:"0.8rem",color:"var(--g4)",paddingTop:"0.5rem"}}>{i.semReclamacoes}</p>}
+        </div>
+
         <div style={{textAlign:'center',padding:'1rem 0 2rem'}}>
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
         </div>
