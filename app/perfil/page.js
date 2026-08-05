@@ -526,6 +526,9 @@ export default function Perfil() {
   const [showNovaPeca, setShowNovaPeca] = useState(false);
   const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
+  const [fotosLojista, setFotosLojista] = useState([]);
+  const [uploadProgressLoja, setUploadProgressLoja] = useState("");
+  const fotosLojistaRef = typeof window !== "undefined" ? { current: null } : { current: null };
   const [lojaIban, setLojaIban] = useState("");
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [showPassword, setShowPassword] = useState(false);
@@ -647,6 +650,7 @@ export default function Perfil() {
   const guardarNovaPeca = async () => {
     if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) return;
     setNovaPecaLoading(true);
+    setUploadProgressLoja("A criar peça...");
     const { data: { session } } = await supabase.auth.getSession();
     const { data: peca } = await supabase.from("pecas_lojista").insert({
       cliente_id: session.user.id,
@@ -663,11 +667,25 @@ export default function Perfil() {
       for (const t of novaPeca.tamanhos) {
         await supabase.from("stock_lojista").insert({ peca_id: peca.id, tamanho: t.tamanho, quantidade_total: t.quantidade, quantidade_disponivel: t.quantidade });
       }
+      if (fotosLojista.length > 0) {
+        const urls = [];
+        for (const foto of fotosLojista) {
+          const ext = foto.name.split(".").pop();
+          const path = `${peca.id}/${Date.now()}.${ext}`;
+          setUploadProgressLoja(`A fazer upload de ${foto.name}...`);
+          const { error: upErr } = await supabase.storage.from("pecas_lojista").upload(path, foto, { upsert: true });
+          if (!upErr) { const { data } = supabase.storage.from("pecas_lojista").getPublicUrl(path); urls.push(data.publicUrl); }
+        }
+        if (urls.length > 0) { await supabase.from("pecas_lojista").update({ fotos: urls }).eq("id", peca.id); }
+      }
+      setUploadProgressLoja("✓ Peça adicionada!");
       const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", session.user.id).order("created_at", { ascending: false });
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
     setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+    setFotosLojista([]);
+    setUploadProgressLoja("");
     setNovaPecaLoading(false);
   };
 
@@ -1140,6 +1158,11 @@ export default function Perfil() {
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
           <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>
             <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>{lang==="fr"?"Nouvelle pièce":lang==="lt"?"Naujas drabužis":"Nova peça"}</h3>
+            <div className="fg">
+              <label className="lbl">{lang==="fr"?"Photos":lang==="lt"?"Nuotraukos":"Fotos"}</label>
+              <input type="file" accept="image/*" multiple onChange={e=>setFotosLojista(Array.from(e.target.files))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",width:"100%",fontFamily:"var(--sans)",fontSize:"0.82rem"}} />
+              {fotosLojista.length > 0 && <div style={{display:"flex",gap:"0.5rem",marginTop:"0.5rem",flexWrap:"wrap"}}>{fotosLojista.map((f,i)=><span key={i} style={{fontSize:"0.7rem",color:"var(--g4)",background:"var(--g1)",padding:"0.2rem 0.5rem"}}>{f.name}</span>)}</div>}
+            </div>
             <div className="fg"><label className="lbl">Nome *</label><input className="inp" value={novaPeca.nome} onChange={e=>setNovaPeca(p=>({...p,nome:e.target.value}))} placeholder="Ex: Vestido de festa azul" /></div>
             <div className="fg"><label className="lbl">Descrição</label><textarea className="inp" value={novaPeca.descricao} onChange={e=>setNovaPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"80px"}} /></div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
@@ -1171,8 +1194,9 @@ export default function Perfil() {
               ))}
               <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
             </div>
+            {uploadProgressLoja && <p style={{fontSize:"0.82rem",color:"var(--g4)",margin:"0.5rem 0",fontStyle:"italic"}}>{uploadProgressLoja}</p>}
             <div style={{display:"flex",gap:"0.75rem",marginTop:"1rem"}}>
-              <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||!novaPeca.preco_aluguer_dia||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||!novaPeca.preco_aluguer_dia)?0.5:1}}>{novaPecaLoading?"...":(lang==="fr"?"Ajouter la pièce":lang==="lt"?"Pridėti drabužį":"Adicionar peça")}</button>
+              <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||!novaPeca.preco_aluguer_dia||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||!novaPeca.preco_aluguer_dia)?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
               <button onClick={()=>setShowNovaPeca(false)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
           </div>
