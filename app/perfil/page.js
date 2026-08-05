@@ -517,6 +517,14 @@ export default function Perfil() {
   const [detectandoLoc, setDetectandoLoc] = useState(false);
   const [locDetectada, setLocDetectada] = useState(false);
   const [lang, setLang] = useState("pt");
+  const [modoLojista, setModoLojista] = useState(false);
+  const [tabAtiva, setTabAtiva] = useState("perfil");
+  const [pecasLoja, setPecasLoja] = useState([]);
+  const [alugueresLoja, setAlugueresLoja] = useState([]);
+  const [diasTeste, setDiasTeste] = useState(180);
+  const [tabLoja, setTabLoja] = useState("dashboard");
+  const [lojaIban, setLojaIban] = useState("");
+  const [lojaEstado, setLojaEstado] = useState("inativo");
   const [showPassword, setShowPassword] = useState(false);
   const [novaPass, setNovaPass] = useState("");
   const [confirmarPass, setConfirmarPass] = useState("");
@@ -550,6 +558,21 @@ export default function Perfil() {
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
       setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
+      if (c.modo_lojista) {
+        setModoLojista(true);
+        setLojaEstado(c.lojista_estado||"teste");
+        setLojaIban(c.lojista_iban||"");
+        if (c.lojista_desde) {
+          const diasPassados = Math.floor((new Date() - new Date(c.lojista_desde)) / 86400000);
+          setDiasTeste(Math.max(0, 180 - diasPassados));
+        }
+        const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", user.id).order("created_at", { ascending: false });
+        if (ps) setPecasLoja(ps);
+        if (ps && ps.length > 0) {
+          const { data: als } = await supabase.from("alugueres").select("*, clientes(nome, cidade)").in("peca_lojista_id", ps.map(p => p.id)).order("created_at", { ascending: false });
+          if (als) setAlugueresLoja(als);
+        }
+      }
     }
 
     const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
@@ -765,7 +788,15 @@ export default function Perfil() {
 
       <div className="page">
 
-        <div className="hero">
+        {modoLojista && (
+          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem"}}>
+            {[{id:"perfil",label:"O meu perfil"},{id:"loja",label:"A minha loja"}].map(t => (
+              <button key={t.id} onClick={() => setTabAtiva(t.id)} style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===t.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===t.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px"}}>{t.label}</button>
+            ))}
+          </div>
+        )}
+
+        <div className="hero" style={{display:tabAtiva==="loja"?"none":"block"}}>
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
             <button className="avatar-btn" onClick={() => fileRef.current?.click()}>{uploadingFoto?"...":"+"}</button>
@@ -1024,6 +1055,54 @@ export default function Perfil() {
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
         </div>
       </div>
+
+        {modoLojista && tabAtiva === "loja" && (
+          <div style={{padding:"1rem 0"}}>
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
+              {["Dashboard","Peças","Alugueres","Liquidações"].map((s,idx) => (
+                <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
+              ))}
+            </div>
+            {tabLoja === "dashboard" && (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"0.75rem"}}>
+                {[{val:pecasLoja.length,lbl:"Peças"},{val:alugueresLoja.filter(a=>["ativo","enviado"].includes(a.estado)).length,lbl:"Alugueres ativos"},{val:alugueresLoja.filter(a=>a.estado!=="cancelado").reduce((s,a)=>s+(a.valor_aluguer||0),0).toFixed(0)+"€",lbl:"Receita total"},{val:diasTeste+" dias",lbl:"Teste restante"}].map((k,idx)=>(
+                  <div key={idx} style={{background:"var(--white)",padding:"1.25rem",borderTop:"3px solid var(--rosa)"}}>
+                    <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:"var(--rosa)"}}>{k.val}</div>
+                    <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.3rem"}}>{k.lbl}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tabLoja === "pecas" && (
+              <div className="card" style={{padding:0}}>
+                {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>(
+                  <div key={p.id} style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center",borderBottom:"1px solid var(--g1)"}}>
+                    {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
+                    <div style={{flex:1}}><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{p.nome}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia}€/dia</div></div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tabLoja === "alugueres" && (
+              <div className="card" style={{padding:0}}>
+                {alugueresLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem alugueres.</p> : alugueresLoja.map(a=>(
+                  <div key={a.id} style={{padding:"1rem 1.5rem",display:"flex",justifyContent:"space-between",borderBottom:"1px solid var(--g1)"}}>
+                    <div><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{a.clientes?.nome||"—"}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{a.data_inicio} → {a.data_fim}</div></div>
+                    <div style={{textAlign:"right"}}><div style={{fontFamily:"var(--serif)",fontSize:"1.1rem",color:"var(--rosa)"}}>{(a.valor_aluguer||0).toFixed(2)}€</div><span style={{fontSize:"0.6rem",color:"var(--g4)"}}>{a.estado}</span></div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tabLoja === "liquidacoes" && (
+              <div className="card">
+                {alugueresLoja.filter(a=>a.estado==="devolvido").map(a=>{
+                  const liq=(a.valor_aluguer||0)-(a.valor_aluguer||0)*0.1-0.40;
+                  return <div key={a.id} style={{display:"flex",justifyContent:"space-between",padding:"0.75rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}><span>{a.clientes?.nome||"—"}</span><span style={{color:"#27ae60"}}>{liq.toFixed(2)}€</span></div>;
+                })}
+              </div>
+            )}
+          </div>
+        )}
     </>
   );
 }
