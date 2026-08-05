@@ -32,7 +32,7 @@ export default function LojaPublica() {
   const carregarLoja = async () => {
     setLoading(true);
     // Buscar lojista pelo código
-    const { data: cli } = await supabase.from("clientes").select("id, nome, cidade, pais, codigo, lojista_estado").eq("codigo", codigo).maybeSingle();
+    const { data: cli } = await supabase.from("clientes").select("id, nome, cidade, pais, codigo, lojista_estado").eq("codigo_cliente", codigo).maybeSingle();
     if (!cli || !cli.lojista_estado) { setLoading(false); return; }
     setLojista(cli);
 

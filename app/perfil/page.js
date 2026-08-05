@@ -662,7 +662,7 @@ export default function Perfil() {
       material: novaPeca.material||null,
       ocasioes: novaPeca.ocasioes,
       estado: "disponivel",
-      codigo_referencia: `${cliente?.codigo || "NG"}-${String(pecasLoja.length + 1).padStart(3, "0")}`,
+      codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(pecasLoja.length + 1).padStart(3, "0")}`,
     }).select().single();
     if (peca) {
       for (const t of novaPeca.tamanhos) {
