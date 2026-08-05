@@ -796,7 +796,7 @@ export default function Perfil() {
           </div>
         )}
 
-        <div className="hero" style={{display:tabAtiva==="loja"?"none":"block"}}>
+        <div className="hero" style={{display:modoLojista && tabAtiva==="loja"?"none":"block"}}>
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
             <button className="avatar-btn" onClick={() => fileRef.current?.click()}>{uploadingFoto?"...":"+"}</button>
