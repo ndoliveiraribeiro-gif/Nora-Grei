@@ -523,6 +523,9 @@ export default function Perfil() {
   const [alugueresLoja, setAlugueresLoja] = useState([]);
   const [diasTeste, setDiasTeste] = useState(180);
   const [tabLoja, setTabLoja] = useState("dashboard");
+  const [showNovaPeca, setShowNovaPeca] = useState(false);
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+  const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [lojaIban, setLojaIban] = useState("");
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [showPassword, setShowPassword] = useState(false);
@@ -640,6 +643,33 @@ export default function Perfil() {
   };
 
   const sair = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
+
+  const guardarNovaPeca = async () => {
+    if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) return;
+    setNovaPecaLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: peca } = await supabase.from("pecas_lojista").insert({
+      cliente_id: session.user.id,
+      nome: novaPeca.nome,
+      descricao: novaPeca.descricao||null,
+      preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia),
+      preco_venda: novaPeca.preco_venda ? parseFloat(novaPeca.preco_venda) : null,
+      valor_peca: novaPeca.valor_peca ? parseFloat(novaPeca.valor_peca) : null,
+      material: novaPeca.material||null,
+      ocasioes: novaPeca.ocasioes,
+      estado: "disponivel",
+    }).select().single();
+    if (peca) {
+      for (const t of novaPeca.tamanhos) {
+        await supabase.from("stock_lojista").insert({ peca_id: peca.id, tamanho: t.tamanho, quantidade_total: t.quantidade, quantidade_disponivel: t.quantidade });
+      }
+      const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", session.user.id).order("created_at", { ascending: false });
+      if (ps) setPecasLoja(ps);
+    }
+    setShowNovaPeca(false);
+    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+    setNovaPecaLoading(false);
+  };
 
   const mudarPassword = async () => {
     setPassMsg("");
@@ -1077,6 +1107,7 @@ export default function Perfil() {
             )}
             {tabLoja === "pecas" && (
               <div className="card" style={{padding:0}}>
+                <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
                 {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>(
                   <div key={p.id} style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center",borderBottom:"1px solid var(--g1)"}}>
                     {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
@@ -1105,6 +1136,48 @@ export default function Perfil() {
             )}
           </div>
         )}
+      {showNovaPeca && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>
+            <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>Nova peça</h3>
+            <div className="fg"><label className="lbl">Nome *</label><input className="inp" value={novaPeca.nome} onChange={e=>setNovaPeca(p=>({...p,nome:e.target.value}))} placeholder="Ex: Vestido de festa azul" /></div>
+            <div className="fg"><label className="lbl">Descrição</label><textarea className="inp" value={novaPeca.descricao} onChange={e=>setNovaPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"80px"}} /></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              <div className="fg"><label className="lbl">Preço aluguer/dia (€) *</label><input className="inp" type="number" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="25" /></div>
+              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" value={novaPeca.preco_venda} onChange={e=>setNovaPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              <div className="fg"><label className="lbl">Valor da peça (€)</label><input className="inp" type="number" value={novaPeca.valor_peca} onChange={e=>setNovaPeca(p=>({...p,valor_peca:e.target.value}))} placeholder="200" /></div>
+              <div className="fg"><label className="lbl">Material</label><input className="inp" value={novaPeca.material} onChange={e=>setNovaPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+            </div>
+            <div className="fg">
+              <label className="lbl">Ocasiões</label>
+              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
+                {["Festa","Trabalho","Férias","Jantar","Dia a dia","Casamento","Gala"].map(oc => (
+                  <button key={oc} type="button" onClick={() => setNovaPeca(p=>({...p,ocasioes:p.ocasioes.includes(oc)?p.ocasioes.filter(x=>x!==oc):[...p.ocasioes,oc]}))} style={{padding:"0.3rem 0.75rem",fontSize:"0.7rem",border:"1.5px solid",borderColor:novaPeca.ocasioes.includes(oc)?"var(--black)":"var(--g2)",background:novaPeca.ocasioes.includes(oc)?"var(--black)":"transparent",color:novaPeca.ocasioes.includes(oc)?"#fff":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)"}}>{oc}</button>
+                ))}
+              </div>
+            </div>
+            <div className="fg">
+              <label className="lbl">Tamanhos</label>
+              {novaPeca.tamanhos.map((t,idx) => (
+                <div key={idx} style={{display:"flex",gap:"0.5rem",marginBottom:"0.5rem",alignItems:"center"}}>
+                  <select value={t.tamanho} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,tamanho:e.target.value}:x)}))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)",flex:1}}>
+                    {["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46"].map(s=><option key={s}>{s}</option>)}
+                  </select>
+                  <input type="number" value={t.quantidade} min={1} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,quantidade:parseInt(e.target.value)||1}:x)}))} style={{width:"70px",padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)"}} />
+                  {novaPeca.tamanhos.length > 1 && <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.filter((_,i)=>i!==idx)}))} style={{background:"none",border:"none",color:"#e74c3c",cursor:"pointer",fontSize:"1rem"}}>✕</button>}
+                </div>
+              ))}
+              <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
+            </div>
+            <div style={{display:"flex",gap:"0.75rem",marginTop:"1rem"}}>
+              <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||!novaPeca.preco_aluguer_dia||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||!novaPeca.preco_aluguer_dia)?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
+              <button onClick={()=>setShowNovaPeca(false)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
