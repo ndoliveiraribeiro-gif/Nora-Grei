@@ -33,8 +33,8 @@ export default function LojaPublica() {
     setLoading(true);
     // Buscar lojista pelo código
     const { data: cli } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais, lojista_estado, modo_lojista").eq("codigo_cliente", codigo).maybeSingle();
-    if (!cli || !cli.lojista_estado) { setLoading(false); return; }
-    setLojista(cli);
+    if (!cli) { setLoading(false); return; }
+    setLojista(cli)
 
     // Buscar peças da loja
     const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(tamanho, quantidade_disponivel)").eq("cliente_id", cli.id).eq("estado", "disponivel").order("created_at", { ascending: false });
