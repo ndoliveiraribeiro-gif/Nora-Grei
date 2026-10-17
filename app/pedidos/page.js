@@ -198,7 +198,9 @@ const METODOS_PAG_USADA = {
   ],
 };
 
-function BotaoComprarPeca({ aluguer, i, lang }) {
+const COMISSAO = 0.20;
+
+function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = null }) {
   const [fase, setFase] = useState("botao"); // botao | modal | escolher_pag | pagamento_usada | voucher_nova
   const [metodoPag, setMetodoPag] = useState("mb");
   const [loading, setLoading] = useState(false);
@@ -242,6 +244,9 @@ function BotaoComprarPeca({ aluguer, i, lang }) {
       mb_referencia: metodoPag === "mb" ? ref : null,
       mb_montante: metodoPag === "mb" ? totalUsada : null,
       mb_validade: metodoPag === "mb" ? validade : null,
+      lojista_id: isLojista ? lojista_id : null,
+      valor_lojista: isLojista ? PRECO_USADA * (1 - COMISSAO) : null,
+      comissao_plataforma: isLojista ? PRECO_USADA * COMISSAO : null,
     }).select().single();
 
     if (nova) setCompra(nova);
@@ -688,6 +693,11 @@ function PedidosContent() {
             )}
           </div>
         </div>
+
+        {/* COMPRAR USADA — após devolução (apenas devolvido, não danificado) */}
+        {a.estado === "devolvido" && (
+          <BotaoComprarPeca aluguer={a} i={0} lang={lang} isLojista={true} lojista_id={a.lojista_id} />
+        )}
 
         {/* AVALIAÇÃO — após devolução */}
         {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && (
