@@ -6,7 +6,9 @@ const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
 const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", config: "Config" };
+const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", config: "⚙️" };
+const TABS_PRIMARIOS = ["dashboard", "alugueres", "catalogo", "feed", "caixa"];
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
@@ -1630,15 +1632,46 @@ export default function Backoffice() {
     <div style={{ minHeight: "100vh", background: "#f5f5f3", fontFamily: "'Jost',sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 
+      <style>{`
+        @media (max-width: 768px) {
+          .bo-nav-desktop { display: none !important; }
+          .bo-nav-mobile { display: flex !important; }
+          .bo-content { padding: 1rem !important; }
+          .bo-bottom-bar { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+          .bo-nav-desktop { display: flex !important; }
+          .bo-nav-mobile { display: none !important; }
+          .bo-content { padding: 2rem !important; }
+          .bo-bottom-bar { display: none !important; }
+        }
+        .bo-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #080808; border-top: 1px solid rgba(255,255,255,0.1); z-index: 200; justify-content: space-around; align-items: stretch; padding: 0; }
+        .bo-bottom-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.25rem 0.5rem; border: none; background: none; color: rgba(255,255,255,0.5); cursor: pointer; font-family: 'Jost',sans-serif; gap: 0.2rem; border-top: 2px solid transparent; }
+        .bo-bottom-btn.active { color: #fff; border-top-color: #c4748a; }
+        .bo-bottom-btn span.icon { font-size: 1.2rem; line-height: 1; }
+        .bo-bottom-btn span.lbl { font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; }
+        .bo-tab-select { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.45rem 0.75rem; font-family: 'Jost',sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; cursor: pointer; flex: 1; }
+        .bo-tab-select option { background: #080808; color: #fff; }
+      `}</style>
+
+      {/* NAV DESKTOP */}
       <div style={{ background: "#080808", color: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 2rem", display: "flex", alignItems: "center", gap: "0" }}>
           <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.1rem", fontWeight: 300, letterSpacing: "0.2em", textTransform: "uppercase", padding: "1rem 2rem 1rem 0", borderRight: "1px solid rgba(255,255,255,0.1)", marginRight: "1rem", whiteSpace: "nowrap" }}>Nora Grei</div>
-          <div style={{ display: "flex", overflowX: "auto", gap: 0 }}>
+          {/* Desktop: tabs horizontais */}
+          <div className="bo-nav-desktop" style={{ flex: 1, overflowX: "auto", gap: 0 }}>
             {TABS.map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{ padding: "1rem 1.25rem", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab===t?"#fff":"rgba(255,255,255,0.5)", background: tab===t?"rgba(255,255,255,0.1)":"none", border: "none", borderBottom: tab===t?"2px solid #c4748a":"2px solid transparent", cursor: "pointer", fontFamily: "'Jost',sans-serif", whiteSpace: "nowrap", transition: "all 0.2s" }}>
+              <button key={t} onClick={() => setTab(t)} style={{ padding: "1rem 1.1rem", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: tab===t?"#fff":"rgba(255,255,255,0.5)", background: tab===t?"rgba(255,255,255,0.1)":"none", border: "none", borderBottom: tab===t?"2px solid #c4748a":"2px solid transparent", cursor: "pointer", fontFamily: "'Jost',sans-serif", whiteSpace: "nowrap", transition: "all 0.2s" }}>
                 {TAB_LABELS[t]}
               </button>
             ))}
+          </div>
+          {/* Mobile: dropdown select */}
+          <div className="bo-nav-mobile" style={{ flex: 1, alignItems: "center", gap: "0.5rem", padding: "0.6rem 0" }}>
+            <span style={{ fontSize: "1.1rem" }}>{TAB_ICONS[tab]}</span>
+            <select className="bo-tab-select" value={tab} onChange={e => setTab(e.target.value)}>
+              {TABS.map(t => <option key={t} value={t}>{TAB_ICONS[t]} {TAB_LABELS[t]}</option>)}
+            </select>
           </div>
           <div style={{ marginLeft: "auto", paddingLeft: "1rem" }}>
             <button onClick={() => setLogado(false)} style={{ fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", fontFamily: "'Jost',sans-serif" }}>Sair</button>
@@ -1646,7 +1679,25 @@ export default function Backoffice() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "2rem" }}>
+      {/* BOTTOM BAR MOBILE — 5 tabs principais */}
+      <div className="bo-bottom-bar">
+        {TABS_PRIMARIOS.map(t => (
+          <button key={t} className={`bo-bottom-btn${tab===t?" active":""}`} onClick={() => setTab(t)}>
+            <span className="icon">{TAB_ICONS[t]}</span>
+            <span className="lbl">{TAB_LABELS[t]}</span>
+          </button>
+        ))}
+        <button className={`bo-bottom-btn${!TABS_PRIMARIOS.includes(tab)?" active":""}`} onClick={() => {
+          const outros = TABS.filter(t => !TABS_PRIMARIOS.includes(t));
+          const idx = outros.indexOf(tab);
+          setTab(outros[(idx + 1) % outros.length]);
+        }}>
+          <span className="icon">⋯</span>
+          <span className="lbl">Mais</span>
+        </button>
+      </div>
+
+      <div className="bo-content" style={{ maxWidth: 1400, margin: "0 auto", paddingBottom: "5rem" }}>
 
         {tab === "dashboard" && (
           <>
