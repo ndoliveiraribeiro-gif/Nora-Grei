@@ -177,41 +177,74 @@ function useCountdown(dataAlvo) {
 const PORTES = 6.90;
 const PRECO_USADA = 200;
 
-function BotaoComprarPeca({ aluguer, i }) {
-  const [fase, setFase] = useState("botao"); // botao | modal | pagamento_usada | voucher_nova
+const METODOS_PAG_USADA = {
+  pt: [
+    { id: "mb", label: "Referência MB", desc: "Paga em qualquer ATM ou app bancária", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Confirmação imediata", auto: true },
+    { id: "cartao", label: "Cartão crédito/débito", desc: "Confirmação imediata", auto: true },
+    { id: "transferencia", label: "Transferência bancária", desc: "Confirmamos em até 1 dia útil", auto: false },
+  ],
+  fr: [
+    { id: "mb", label: "Référence MB", desc: "Payez dans n'importe quel ATM ou app bancaire", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Confirmation immédiate", auto: true },
+    { id: "cartao", label: "Carte crédit/débit", desc: "Confirmation immédiate", auto: true },
+    { id: "transferencia", label: "Virement bancaire", desc: "Confirmé sous 1 jour ouvré", auto: false },
+  ],
+  lt: [
+    { id: "mb", label: "MB nuoroda", desc: "Mokėkite bet kuriame bankomate ar banko programėlėje", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Patvirtinama iš karto", auto: true },
+    { id: "cartao", label: "Kredito/debeto kortelė", desc: "Patvirtinama iš karto", auto: true },
+    { id: "transferencia", label: "Bankinis pervedimas", desc: "Patvirtinsime per 1 darbo dieną", auto: false },
+  ],
+};
+
+function BotaoComprarPeca({ aluguer, i, lang }) {
+  const [fase, setFase] = useState("botao"); // botao | modal | escolher_pag | pagamento_usada | voucher_nova
+  const [metodoPag, setMetodoPag] = useState("mb");
   const [loading, setLoading] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [codigo, setCodigo] = useState(null);
-  const [referencia, setReferencia] = useState(null);
+  const [compra, setCompra] = useState(null);
+  // Cartão
+  const [dadosCartao, setDadosCartao] = useState({ numero: "", nome: "", validade: "", cvc: "" });
+  // MBWay
+  const [telMbway, setTelMbway] = useState("");
+  // Transferência
+  const [comprovativo, setComprovativo] = useState(null);
 
   const totalUsada = PRECO_USADA + PORTES;
+  const metodos = METODOS_PAG_USADA[lang] || METODOS_PAG_USADA.pt;
+  const metodoSel = metodos.find(m => m.id === metodoPag);
 
-  // Gerar referência MB simulada (em produção integrar Easypay/Stripe/SIBS)
-  const gerarReferenciaUsada = async () => {
+  const confirmarPagamento = async () => {
+    if (metodoPag === "cartao" && (!dadosCartao.numero || !dadosCartao.nome || !dadosCartao.validade || !dadosCartao.cvc)) return;
+    if (metodoPag === "mbway" && !telMbway) return;
+    if (metodoPag === "transferencia" && !comprovativo) return;
+
     setLoading(true);
-    // Verificar se já existe compra pendente
     const { data: existente } = await supabase
-      .from("compras_usadas")
-      .select("*").eq("aluguer_id", aluguer.id).maybeSingle();
-    if (existente) { setReferencia(existente); setFase("pagamento_usada"); setLoading(false); return; }
+      .from("compras_usadas").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    if (existente) { setCompra(existente); setFase("pagamento_usada"); setLoading(false); return; }
 
     const entidade = "21666";
     const ref = Math.floor(100000000 + Math.random() * 900000000).toString();
     const validade = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const automatico = metodoSel?.auto || false;
 
     const { data: nova } = await supabase.from("compras_usadas").insert({
       aluguer_id: aluguer.id,
       cliente_id: aluguer.cliente_id,
       peca_id: aluguer.stock_tamanhos?.pecas?.id || null,
       valor: totalUsada,
-      estado: "aguarda_pagamento",
-      mb_entidade: entidade,
-      mb_referencia: ref,
-      mb_montante: totalUsada,
-      mb_validade: validade,
+      estado: automatico ? "pago" : "aguarda_pagamento",
+      metodo_pagamento: metodoPag,
+      mb_entidade: metodoPag === "mb" ? entidade : null,
+      mb_referencia: metodoPag === "mb" ? ref : null,
+      mb_montante: metodoPag === "mb" ? totalUsada : null,
+      mb_validade: metodoPag === "mb" ? validade : null,
     }).select().single();
 
-    if (nova) { setReferencia(nova); }
+    if (nova) setCompra(nova);
     setFase("pagamento_usada");
     setLoading(false);
   };
@@ -237,6 +270,26 @@ function BotaoComprarPeca({ aluguer, i }) {
     setTimeout(() => setCopiado(false), 2000);
   };
 
+  const sty = {
+    sec: { fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
+    opt: (on) => ({ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.85rem 1rem',border:`1.5px solid ${on?'#080808':'#e2dfda'}`,background:on?'#f0eeeb':'#fff',cursor:'pointer',marginBottom:'0.5rem' }),
+    radio: (on) => ({ width:16,height:16,borderRadius:'50%',border:`2px solid ${on?'#080808':'#ccc'}`,background:on?'#080808':'transparent',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center' }),
+    radioDot: { width:6,height:6,borderRadius:'50%',background:'#fff' },
+    badge: (auto) => ({ fontSize:'0.5rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
+    inp: { width:'100%',padding:'0.7rem 0.9rem',border:'1.5px solid #e2dfda',background:'#fff',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',color:'#080808',outline:'none',marginBottom:'0.5rem' },
+    row2: { display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:'0.5rem' },
+    ibanBox: { background:'#f0eeeb',padding:'1rem',marginBottom:'0.75rem' },
+    ibanLabel: { fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
+    ibanVal: { fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
+    aviso: { fontSize:'0.72rem',color:'#946200',background:'#fff8e1',padding:'0.75rem 1rem',borderLeft:'3px solid #f39c12',lineHeight:1.5,marginTop:'0.5rem' },
+    uploadBox: { display:'block',padding:'0.85rem',border:'2px dashed #e2dfda',background:'#f0eeeb',cursor:'pointer',textAlign:'center',fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem' },
+    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
+    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
+    mbRow: { display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb' },
+    mbLabel: { fontSize:'0.68rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase' },
+    mbVal: { fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808' },
+  };
+
   if (fase === "botao") return (
     <button onClick={() => setFase("modal")}
       style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
@@ -246,7 +299,7 @@ function BotaoComprarPeca({ aluguer, i }) {
 
   if (fase === "modal") return (
     <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
-      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'1rem'}}>{i.comprarModal}</p>
+      <p style={{...sty.sec,color:'#c4748a'}}>{i.comprarModal}</p>
 
       {/* OPÇÃO A — Usada */}
       <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
@@ -256,12 +309,13 @@ function BotaoComprarPeca({ aluguer, i }) {
             <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarUsadaDesc}</p>
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',fontWeight:300,color:'#080808'}}>{i.comprarUsadaPreco}</p>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#080808'}}>200€</p>
+            <p style={{fontSize:'0.65rem',color:'#888'}}>+ {PORTES.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
           </div>
         </div>
-        <button onClick={gerarReferenciaUsada} disabled={loading}
-          style={{width:'100%',padding:'0.65rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500,marginTop:'0.5rem'}}>
-          {loading ? "..." : i.pagarReferencia}
+        <button onClick={() => setFase("escolher_pag")}
+          style={{...sty.btnPrimary,marginTop:'0.5rem'}}>
+          {i.pagarReferencia}
         </button>
       </div>
 
@@ -273,52 +327,150 @@ function BotaoComprarPeca({ aluguer, i }) {
             <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarNovaDesc}</p>
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',fontWeight:300,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
           </div>
         </div>
         <button onClick={gerarVoucherNova} disabled={loading}
-          style={{width:'100%',padding:'0.65rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500,marginTop:'0.5rem'}}>
+          style={{...sty.btnPrimary,background:'#c4748a',marginTop:'0.5rem'}}>
           {loading ? "..." : i.irParaLoja}
         </button>
       </div>
 
-      <button onClick={() => setFase("botao")}
-        style={{width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>
-        {i.cancelar}
+      <button onClick={() => setFase("botao")} style={sty.btnSecondary}>{i.cancelar}</button>
+    </div>
+  );
+
+  if (fase === "escolher_pag") return (
+    <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
+      <p style={{...sty.sec,color:'#080808'}}>
+        {lang === "fr" ? "Méthode de paiement" : lang === "lt" ? "Mokėjimo būdas" : "Método de pagamento"}
+      </p>
+
+      {/* Resumo do valor */}
+      <div style={{background:'#fff',padding:'0.75rem 1rem',marginBottom:'1rem',border:'1px solid #e2dfda'}}>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.82rem',color:'#5a5855',marginBottom:'0.3rem'}}>
+          <span>{i.comprarUsada}</span><span>200€</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.82rem',color:'#5a5855',marginBottom:'0.3rem'}}>
+          <span>{i.portesEnvio}</span><span>{PORTES.toFixed(2).replace('.',',')}€</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'1rem',fontWeight:600,color:'#080808',paddingTop:'0.4rem',borderTop:'1px solid #f0eeeb'}}>
+          <span>{i.totalUsada}</span><span>{totalUsada.toFixed(2).replace('.',',')}€</span>
+        </div>
+      </div>
+
+      {/* Opções de pagamento */}
+      {metodos.map(m => (
+        <div key={m.id} style={sty.opt(metodoPag === m.id)} onClick={() => setMetodoPag(m.id)}>
+          <div style={sty.radio(metodoPag === m.id)}>
+            {metodoPag === m.id && <div style={sty.radioDot} />}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'0.9rem',fontWeight:500,color:'#080808',display:'flex',alignItems:'center'}}>
+              {m.label}
+              <span style={sty.badge(m.auto)}>{m.auto ? (lang==="fr"?"Immédiat":lang==="lt"?"Iš karto":"Imediato") : (lang==="fr"?"Manuel":lang==="lt"?"Rankinis":"Manual")}</span>
+            </div>
+            <div style={{fontSize:'0.75rem',color:'#5a5855'}}>{m.desc}</div>
+          </div>
+        </div>
+      ))}
+
+      {/* Formulários por método */}
+      {metodoPag === "mb" && (
+        <div style={{background:'#f0eeeb',padding:'1rem',marginTop:'0.75rem'}}>
+          <p style={{...sty.ibanLabel,marginBottom:'0.25rem'}}>{lang==="fr"?"Référence générée après confirmation":lang==="lt"?"Nuoroda bus sugeneruota po patvirtinimo":"Referência gerada após confirmação"}</p>
+          <p style={{fontSize:'0.72rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
+        </div>
+      )}
+      {metodoPag === "mbway" && (
+        <div style={{marginTop:'0.75rem'}}>
+          <p style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>
+            {lang==="fr"?"Numéro de téléphone MB Way":lang==="lt"?"MB Way telefono numeris":"Número de telefone MB Way"}
+          </p>
+          <input style={sty.inp} placeholder="+351 912 345 678" value={telMbway} onChange={e => setTelMbway(e.target.value)} />
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {lang==="fr"?"Simulation de paiement.":lang==="lt"?"Mokėjimo simuliacija.":"Pagamento simulado."}</p>
+        </div>
+      )}
+      {metodoPag === "cartao" && (
+        <div style={{marginTop:'0.75rem',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
+          <input style={sty.inp} placeholder="1234 5678 9012 3456"
+            value={dadosCartao.numero}
+            onChange={e => { const v=e.target.value.replace(/\D/g,"").slice(0,16).replace(/(\d{4})(?=\d)/g,"$1 ").trim(); setDadosCartao(d=>({...d,numero:v})); }}
+            maxLength={19} />
+          <input style={sty.inp} placeholder="NOME NO CARTÃO"
+            value={dadosCartao.nome}
+            onChange={e => setDadosCartao(d=>({...d,nome:e.target.value.toUpperCase()}))} />
+          <div style={sty.row2}>
+            <input style={{...sty.inp,marginBottom:0}} placeholder="MM/AA"
+              value={dadosCartao.validade}
+              onChange={e => { const l=e.target.value.replace(/\D/g,"").slice(0,4); setDadosCartao(d=>({...d,validade:l.length>=3?l.slice(0,2)+"/"+l.slice(2):l})); }}
+              maxLength={5} />
+            <input style={{...sty.inp,marginBottom:0}} placeholder="CVC"
+              value={dadosCartao.cvc}
+              onChange={e => setDadosCartao(d=>({...d,cvc:e.target.value.replace(/\D/g,"").slice(0,3)}))}
+              maxLength={3} />
+          </div>
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {lang==="fr"?"Simulation de paiement.":lang==="lt"?"Mokėjimo simuliacija.":"Pagamento simulado."}</p>
+        </div>
+      )}
+      {metodoPag === "transferencia" && (
+        <div style={{marginTop:'0.75rem'}}>
+          <div style={sty.ibanBox}>
+            <p style={sty.ibanLabel}>IBAN Nora Grei</p>
+            <p style={sty.ibanVal}>PT50 0000 0000 0000 0000 0000 0</p>
+            <p style={sty.ibanLabel}>{lang==="fr"?"Montant à virer":lang==="lt"?"Suma pervedimui":i.totalUsada}</p>
+            <p style={sty.ibanVal}>{totalUsada.toFixed(2).replace('.',',')}€</p>
+            <p style={sty.ibanLabel}>{lang==="fr"?"Référence":lang==="lt"?"Nuoroda":i.referencia}</p>
+            <p style={sty.ibanVal}>{lang==="fr"?"Votre nom complet":lang==="lt"?"Jūsų vardas ir pavardė":"O teu nome completo"}</p>
+          </div>
+          <label style={sty.uploadBox}>
+            <input type="file" accept="image/*,.pdf" style={{display:'none'}} onChange={e => setComprovativo(e.target.files?.[0]||null)} />
+            {comprovativo
+              ? <span style={{color:'#27ae60',fontWeight:500}}>✓ {comprovativo.name}</span>
+              : <span>{lang==="fr"?"📎 Joindre le justificatif":lang==="lt"?"📎 Pridėti įrodymą":"📎 Anexar comprovativo"}</span>
+            }
+          </label>
+          <p style={sty.aviso}>{lang==="fr"?"Votre commande sera réservée 24h en attendant confirmation.":lang==="lt"?"Jūsų užsakymas bus rezervuotas 24h, kol patvirtinsime.":"O pedido fica reservado 24h até confirmarmos o comprovativo."}</p>
+        </div>
+      )}
+
+      <button onClick={confirmarPagamento} disabled={loading} style={{...sty.btnPrimary,marginTop:'1rem'}}>
+        {loading ? "..." : (lang==="fr"?"Confirmer l'achat":lang==="lt"?"Patvirtinti pirkimą":"Confirmar compra")}
       </button>
+      <button onClick={() => setFase("modal")} style={sty.btnSecondary}>{i.cancelar}</button>
     </div>
   );
 
   if (fase === "pagamento_usada") return (
     <div style={{marginTop:'0.75rem',background:'#f0eeeb',border:'1px solid #e2dfda',padding:'1.25rem'}}>
-      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#080808',fontWeight:600,marginBottom:'1rem'}}>{i.referenciaGerada}</p>
-      <div style={{background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
-        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
-          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.entidade}</span>
-          <span style={{fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808'}}>{referencia?.mb_entidade || "21666"}</span>
-        </div>
-        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
-          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.referencia}</span>
-          <span style={{fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808',letterSpacing:'0.1em'}}>{referencia?.mb_referencia || "—"}</span>
-        </div>
-        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
-          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.portesEnvio}</span>
-          <span style={{fontSize:'0.82rem',color:'#5a5855'}}>{i.portesValor}</span>
-        </div>
-        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
-          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.montante}</span>
-          <span style={{fontSize:'1rem',fontWeight:700,color:'#080808'}}>{referencia?.mb_montante ?? totalUsada}€</span>
-        </div>
-        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0'}}>
-          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.validadeRef}</span>
-          <span style={{fontSize:'0.82rem',color:'#5a5855'}}>{referencia?.mb_validade || "—"}</span>
-        </div>
-      </div>
-      <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem',lineHeight:1.5}}>{i.pecaEnviada}</p>
-      <button onClick={() => copiar(`${referencia?.mb_entidade} ${referencia?.mb_referencia}`)}
-        style={{width:'100%',padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
-        {copiado ? i.copiado : "📋 Copiar dados MB"}
-      </button>
+      {compra?.metodo_pagamento === "mb" ? (
+        <>
+          <p style={{...sty.sec,color:'#080808'}}>{i.referenciaGerada}</p>
+          <div style={{background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.entidade}</span><span style={sty.mbVal}>{compra?.mb_entidade}</span></div>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.referencia}</span><span style={{...sty.mbVal,letterSpacing:'0.1em'}}>{compra?.mb_referencia}</span></div>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.montante}</span><span style={{...sty.mbVal,fontSize:'1rem'}}>{compra?.mb_montante}€</span></div>
+            <div style={{...sty.mbRow,borderBottom:'none'}}><span style={sty.mbLabel}>{i.validadeRef}</span><span style={{fontSize:'0.82rem',color:'#5a5855'}}>{compra?.mb_validade}</span></div>
+          </div>
+          <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem',lineHeight:1.5}}>{i.pecaEnviada}</p>
+          <button onClick={() => copiar(`${compra?.mb_entidade} ${compra?.mb_referencia}`)}
+            style={{...sty.btnPrimary,background:copiado?'#27ae60':'#080808'}}>
+            {copiado ? i.copiado : "📋 Copiar dados MB"}
+          </button>
+        </>
+      ) : (
+        <>
+          <div style={{textAlign:'center',padding:'1.5rem 0'}}>
+            <div style={{fontSize:'2.5rem',marginBottom:'0.75rem'}}>{compra?.metodo_pagamento === "transferencia" ? "⏳" : "✅"}</div>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,color:'#080808',marginBottom:'0.5rem'}}>
+              {compra?.metodo_pagamento === "transferencia"
+                ? (lang==="fr"?"En attente de confirmation":lang==="lt"?"Laukiama patvirtinimo":"A aguardar confirmação")
+                : (lang==="fr"?"Paiement confirmé !":lang==="lt"?"Mokėjimas patvirtintas !":"Pagamento confirmado!")}
+            </p>
+            <p style={{fontSize:'0.78rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 
@@ -449,7 +601,7 @@ function PedidosContent() {
             )}
           </div>
         </div>
-        {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} />}
+        {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} lang={lang} />}
       </div>
     );
   };
