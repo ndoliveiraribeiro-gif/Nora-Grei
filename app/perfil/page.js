@@ -635,6 +635,7 @@ export default function Perfil() {
   const [lang, setLang] = useState("pt");
   const [modoLojista, setModoLojista] = useState(false);
   const [tabAtiva, setTabAtiva] = useState("perfil");
+  const [naoLidasMsg, setNaoLidasMsg] = useState(0);
   const [pecasLoja, setPecasLoja] = useState([]);
   const [alugueresLoja, setAlugueresLoja] = useState([]);
   const [diasTeste, setDiasTeste] = useState(180);
@@ -725,6 +726,13 @@ export default function Perfil() {
       .gt("prazo_confirmacao", agora)
       .order("notificado_em", { ascending: false });
     if (resDisponiveis) setReservasDisponiveis(resDisponiveis);
+
+    // Não lidas de mensagens (cliente id = user.id neste projecto)
+    const eLojistaLocal = !!(c && c.modo_lojista);
+    const campoNL = eLojistaLocal ? "nao_lidas_lojista" : "nao_lidas_cliente";
+    const campoId = eLojistaLocal ? "lojista_id" : "cliente_id";
+    const { data: convNL } = await supabase.from("conversas").select(campoNL).eq(campoId, user.id);
+    if (convNL) setNaoLidasMsg(convNL.reduce((s, cv) => s + (cv[campoNL] || 0), 0));
 
     setLoading(false);
   };
@@ -996,6 +1004,20 @@ export default function Perfil() {
             {[{id:"perfil",label:"O meu perfil"},{id:"loja",label:"A minha loja"}].map(t => (
               <button key={t.id} onClick={() => setTabAtiva(t.id)} style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===t.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===t.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px"}}>{t.label}</button>
             ))}
+            <a href="/mensagens" style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+              Mensagens
+              {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
+            </a>
+          </div>
+        )}
+
+        {!modoLojista && (
+          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem"}}>
+            <span style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid #c4748a",color:"#c4748a",fontFamily:"var(--sans)",marginBottom:"-2px"}}>O meu perfil</span>
+            <a href="/mensagens" style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+              Mensagens
+              {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
+            </a>
           </div>
         )}
 

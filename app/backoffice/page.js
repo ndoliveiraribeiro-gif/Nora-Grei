@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "landing", "estatisticas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
@@ -570,6 +570,123 @@ function RowDia({ linha, onApagarDespesa }) {
   );
 }
 
+function MensagensBackoffice() {
+  const [conversas, setConversas] = useState([]);
+  const [convAtiva, setConvAtiva] = useState(null);
+  const [mensagens, setMensagens] = useState([]);
+  const [texto, setTexto] = useState("");
+  const [loading, setLoading] = useState(true);
+  const chatRef = useRef(null);
+  const subRef = useRef(null);
+
+  useEffect(() => { carregarConversas(); }, []);
+
+  const carregarConversas = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("conversas")
+      .select(`id, assunto, ultima_mensagem_em, nao_lidas_lojista, nao_lidas_cliente,
+        cliente:cliente_id(id, nome, email),
+        lojista:lojista_id(id, nome),
+        aluguer:aluguer_lojista_id(id, referencia)`)
+      .order("ultima_mensagem_em", { ascending: false, nullsFirst: false });
+    setConversas(data || []);
+    setLoading(false);
+  };
+
+  const abrirConversa = async (conv) => {
+    setConvAtiva(conv);
+    if (subRef.current) supabase.removeChannel(subRef.current);
+    const { data } = await supabase.from("mensagens_conversa").select("*").eq("conversa_id", conv.id).order("created_at", { ascending: true });
+    setMensagens(data || []);
+    const ch = supabase.channel(`bo-chat-${conv.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensagens_conversa", filter: `conversa_id=eq.${conv.id}` }, (p) => {
+        setMensagens(prev => [...prev, p.new]);
+      }).subscribe();
+    subRef.current = ch;
+  };
+
+  useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [mensagens]);
+
+  const enviar = async () => {
+    if (!texto.trim() || !convAtiva) return;
+    const c = convAtiva;
+    const msg = texto.trim();
+    setTexto("");
+    await supabase.from("mensagens_conversa").insert({ conversa_id: c.id, remetente_id: c.lojista.id, conteudo: msg });
+  };
+
+  const CARD_S = { background:"#fff",borderRadius:2,border:"1px solid #e2dfda",overflow:"hidden" };
+
+  return (
+    <>
+      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Mensagens</h1>
+      <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Conversas entre lojistas e clientes</p>
+      <div style={{ display:"flex",gap:"1.5rem",height:"65vh" }}>
+        {/* Lista */}
+        <div style={{ ...CARD_S, width:320, minWidth:280, display:"flex", flexDirection:"column" }}>
+          <div style={{ padding:"1rem",borderBottom:"1px solid #f0eeeb",fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888" }}>
+            {loading ? "..." : `${conversas.length} conversa${conversas.length!==1?"s":""}`}
+          </div>
+          <div style={{ overflowY:"auto",flex:1 }}>
+            {conversas.map(conv => (
+              <div key={conv.id} onClick={() => abrirConversa(conv)}
+                style={{ padding:"0.85rem 1rem",borderBottom:"1px solid #f0eeeb",cursor:"pointer",background:convAtiva?.id===conv.id?"#f0eeeb":"#fff",transition:"background 0.15s" }}>
+                <div style={{ fontSize:"0.82rem",fontWeight:500,marginBottom:"0.15rem" }}>{conv.cliente?.nome || "—"} ↔ {conv.lojista?.nome || "—"}</div>
+                <div style={{ fontSize:"0.68rem",color:"#888" }}>
+                  {conv.aluguer?.referencia ? `Ref. ${conv.aluguer.referencia}` : conv.assunto || "—"}
+                </div>
+                <div style={{ display:"flex",justifyContent:"space-between",marginTop:"0.25rem",alignItems:"center" }}>
+                  <span style={{ fontSize:"0.6rem",color:"#aaa" }}>{conv.ultima_mensagem_em ? new Date(conv.ultima_mensagem_em).toLocaleDateString("pt-PT") : ""}</span>
+                  {(conv.nao_lidas_lojista > 0 || conv.nao_lidas_cliente > 0) && (
+                    <span style={{ background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:10 }}>
+                      {conv.nao_lidas_lojista + conv.nao_lidas_cliente}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {!loading && conversas.length === 0 && <div style={{ padding:"2rem",textAlign:"center",color:"#aaa",fontSize:"0.78rem" }}>Sem conversas ainda</div>}
+          </div>
+        </div>
+        {/* Chat */}
+        <div style={{ ...CARD_S, flex:1, display:"flex", flexDirection:"column" }}>
+          {!convAtiva ? (
+            <div style={{ display:"flex",alignItems:"center",justifyContent:"center",height:"100%",color:"#aaa",fontSize:"0.78rem" }}>Selecciona uma conversa</div>
+          ) : (
+            <>
+              <div style={{ padding:"1rem",borderBottom:"1px solid #f0eeeb" }}>
+                <div style={{ fontSize:"0.85rem",fontWeight:500 }}>{convAtiva.cliente?.nome} ↔ {convAtiva.lojista?.nome}</div>
+                <div style={{ fontSize:"0.68rem",color:"#888" }}>{convAtiva.cliente?.email}</div>
+              </div>
+              <div ref={chatRef} style={{ flex:1,overflowY:"auto",padding:"1rem",display:"flex",flexDirection:"column",gap:"0.5rem" }}>
+                {mensagens.map(m => {
+                  const eLojista = m.remetente_id === convAtiva.lojista?.id;
+                  return (
+                    <div key={m.id} style={{ display:"flex",flexDirection:"column",alignSelf:eLojista?"flex-end":"flex-start",maxWidth:"70%" }}>
+                      <div style={{ padding:"0.6rem 0.85rem",background:eLojista?"#080808":"#f0eeeb",color:eLojista?"#fff":"#080808",fontSize:"0.82rem",lineHeight:1.4,wordBreak:"break-word" }}>
+                        {m.conteudo}
+                      </div>
+                      <span style={{ fontSize:"0.58rem",color:"#aaa",marginTop:"0.2rem",alignSelf:eLojista?"flex-end":"flex-start" }}>
+                        {eLojista?"Lojista":"Cliente"} · {new Date(m.created_at).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ padding:"0.75rem",borderTop:"1px solid #f0eeeb",display:"flex",gap:"0.5rem" }}>
+                <input value={texto} onChange={e=>setTexto(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();}}}
+                  placeholder="Responder como lojista..."
+                  style={{ flex:1,padding:"0.6rem 0.85rem",border:"1px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",outline:"none" }} />
+                <button onClick={enviar} style={{ padding:"0.6rem 1rem",background:"#080808",color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Jost',sans-serif",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase" }}>Enviar</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default function Backoffice() {
   const [logado, setLogado] = useState(false);
@@ -1873,6 +1990,10 @@ export default function Backoffice() {
               )}
             </div>
           </>
+        )}
+
+        {tab === "mensagens" && (
+          <MensagensBackoffice />
         )}
 
         {tab === "landing" && (
