@@ -1287,8 +1287,8 @@ export default function Perfil() {
           <div style={{padding:"1rem 0"}}>
             <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
-                {["Dashboard","Peças","Alugueres","Liquidações","Avaliações"].map((s,idx) => (
-                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
+                {["Dashboard","Peças","Alugueres","Liquidações","Avaliações","Estatísticas"].map((s,idx) => (
+                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
                 ))}
               </div>
               {codigoLoja && (
@@ -1468,6 +1468,118 @@ export default function Perfil() {
             {tabLoja === "avaliacoes" && (
               <div className="card" style={{padding:"1.5rem"}}>
                 <AvaliacoesLojista alugueresLoja={alugueresLoja} clienteId={clienteData?.id} />
+              </div>
+            )}
+            {tabLoja === "estatisticas" && (
+              <div>
+                {(() => {
+                  const concluidos = alugueresLoja.filter(a => !["cancelado","pendente"].includes(a.estado));
+                  // Receita por mês (últimos 6 meses)
+                  const agora = new Date();
+                  const meses = Array.from({length:6}, (_,i) => {
+                    const d = new Date(agora.getFullYear(), agora.getMonth()-i, 1);
+                    return { key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`, label: d.toLocaleDateString("pt-PT",{month:"short",year:"numeric"}) };
+                  }).reverse();
+                  const receitaMes = meses.map(m => ({
+                    ...m,
+                    val: concluidos.filter(a => (a.data_inicio||"").startsWith(m.key)).reduce((s,a)=>s+(a.valor_aluguer||0)*0.9,0)
+                  }));
+                  const maxReceita = Math.max(...receitaMes.map(m=>m.val), 1);
+                  // Pareto por peça
+                  const receitaPorPeca = {};
+                  const alugsPorPeca = {};
+                  concluidos.forEach(a => {
+                    const nome = a.pecas_lojista?.nome || "Sem nome";
+                    const id = a.peca_lojista_id || nome;
+                    receitaPorPeca[id] = (receitaPorPeca[id]||0) + (a.valor_aluguer||0)*0.9;
+                    alugsPorPeca[id] = (alugsPorPeca[id]||{nome, total:0, alugs:0});
+                    alugsPorPeca[id].nome = nome;
+                    alugsPorPeca[id].total = receitaPorPeca[id];
+                    alugsPorPeca[id].alugs = (alugsPorPeca[id].alugs||0)+1;
+                  });
+                  const rankPecas = Object.values(alugsPorPeca).sort((a,b)=>b.total-a.total);
+                  const totalGeral = rankPecas.reduce((s,p)=>s+p.total,0)||1;
+                  // Breakeven por peça
+                  const diasMedios = 3;
+                  const pecasComBreak = pecasLoja.map(p => {
+                    const id = p.id;
+                    const alugsFeitos = alugsPorPeca[id]?.alugs||0;
+                    const receitaGerada = (alugsPorPeca[id]?.total||0)/0.9; // bruto
+                    const valorPeca = p.valor_peca||0;
+                    const precoDia = p.preco_aluguer_dia||0;
+                    const receitaNecessaria = valorPeca;
+                    const pct = valorPeca>0 ? Math.min(100, Math.round(receitaGerada/valorPeca*100)) : 0;
+                    const alugsNecessarios = precoDia>0 ? Math.ceil((valorPeca - receitaGerada)/(precoDia*diasMedios)) : null;
+                    return { ...p, alugsFeitos, receitaGerada, pct, alugsNecessarios };
+                  }).sort((a,b)=>b.pct-a.pct);
+
+                  return (<>
+                    {/* Receita por mês */}
+                    <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                      <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Receita líquida — últimos 6 meses</p>
+                      <div style={{display:"flex",alignItems:"flex-end",gap:"0.5rem",height:120}}>
+                        {receitaMes.map(m=>(
+                          <div key={m.key} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:"0.3rem"}}>
+                            <div style={{fontSize:"0.62rem",color:"#c4748a",fontWeight:600}}>{m.val>0?`${m.val.toFixed(0)}€`:""}</div>
+                            <div style={{width:"100%",background:"#c4748a",height:`${Math.round((m.val/maxReceita)*80)+4}px`,minHeight:4,transition:"height 0.3s"}}/>
+                            <div style={{fontSize:"0.55rem",color:"#aaa",textAlign:"center",letterSpacing:"0.05em"}}>{m.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Breakeven por peça */}
+                    <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                      <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Breakeven por peça</p>
+                      {pecasComBreak.length===0 && <p style={{color:"#aaa",fontSize:"0.85rem"}}>Sem peças ainda.</p>}
+                      {pecasComBreak.map(p=>(
+                        <div key={p.id} style={{marginBottom:"1.25rem"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.35rem",gap:"0.5rem",flexWrap:"wrap"}}>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"0.95rem"}}>{p.nome}</span>
+                            <span style={{fontSize:"0.68rem",color:p.pct>=100?"#27ae60":"#c4748a",fontWeight:600}}>
+                              {p.pct>=100 ? "✓ Breakeven atingido" : p.alugsNecessarios ? `~${p.alugsNecessarios} alug. para breakeven` : "—"}
+                            </span>
+                          </div>
+                          <div style={{height:8,background:"#f0eeeb",borderRadius:0,overflow:"hidden"}}>
+                            <div style={{height:"100%",width:`${p.pct}%`,background:p.pct>=100?"#27ae60":"#c4748a",transition:"width 0.4s"}}/>
+                          </div>
+                          <div style={{display:"flex",justifyContent:"space-between",marginTop:"0.25rem"}}>
+                            <span style={{fontSize:"0.62rem",color:"#aaa"}}>{p.receitaGerada.toFixed(0)}€ gerados</span>
+                            <span style={{fontSize:"0.62rem",color:"#aaa"}}>{p.valor_peca?`objetivo ${p.valor_peca}€`:"valor peça não definido"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pareto */}
+                    {rankPecas.length>0 && (
+                      <div className="card" style={{padding:"1.5rem"}}>
+                        <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Pareto — top peças por receita</p>
+                        {rankPecas.map((p,i)=>{
+                          const pctAcum = rankPecas.slice(0,i+1).reduce((s,x)=>s+x.total,0)/totalGeral*100;
+                          return (
+                            <div key={i} style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.75rem"}}>
+                              <span style={{fontSize:"0.72rem",fontWeight:700,color:i<3?"#c4748a":"#aaa",width:16,flexShrink:0}}>#{i+1}</span>
+                              <div style={{flex:1}}>
+                                <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.2rem"}}>
+                                  <span style={{fontSize:"0.82rem",fontFamily:"var(--serif)"}}>{p.nome}</span>
+                                  <span style={{fontSize:"0.75rem",fontWeight:600,color:"#c4748a"}}>{p.total.toFixed(0)}€</span>
+                                </div>
+                                <div style={{height:5,background:"#f0eeeb"}}>
+                                  <div style={{height:"100%",width:`${p.total/totalGeral*100}%`,background:i<3?"#c4748a":"#d4c4ca"}}/>
+                                </div>
+                              </div>
+                              <span style={{fontSize:"0.6rem",color:"#aaa",width:36,flexShrink:0,textAlign:"right"}}>{p.alugs}x</span>
+                            </div>
+                          );
+                        })}
+                        <p style={{fontSize:"0.65rem",color:"#aaa",marginTop:"1rem",borderTop:"1px solid var(--g1)",paddingTop:"0.75rem"}}>
+                          {rankPecas.length>=3 ? `As top 3 peças geram ${(rankPecas.slice(0,3).reduce((s,p)=>s+p.total,0)/totalGeral*100).toFixed(0)}% da receita total.` : ""}
+                        </p>
+                      </div>
+                    )}
+                  </>);
+                })()}
               </div>
             )}
           </div>
