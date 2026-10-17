@@ -589,6 +589,7 @@ export default function Home() {
         </a>
         <ul className="nav-links">
           <li><a href="/catalogo">{t.nav.catalogo}</a></li>
+          <li><a href="/feed">Feed</a></li>
           <li><a href="#como">{t.nav.comoFunciona}</a></li>
         </ul>
         <div className="nav-right">

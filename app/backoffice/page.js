@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "landing", "estatisticas", "config"];
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "config"];
 const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
@@ -587,6 +587,112 @@ function RowDia({ linha, onApagarDespesa }) {
         </td></tr>
       )}
     </>
+  );
+}
+
+function FeedBackoffice() {
+  const [posts, setPosts] = useState([]);
+  const [boosts, setBoosts] = useState([]);
+  const [vista, setVista] = useState("pendentes"); // pendentes | publicados | boosts
+
+  useEffect(() => { carregarFeed(); }, [vista]);
+
+  const carregarFeed = async () => {
+    if (vista === "boosts") {
+      const { data } = await supabase.from("boost_pagamentos").select("*, feed_posts(titulo, estado), clientes(nome)").order("created_at", { ascending: false });
+      setBoosts(data || []);
+    } else {
+      const estado = vista === "pendentes" ? "pendente" : "publicado";
+      const { data } = await supabase.from("feed_posts").select("*, clientes(nome)").eq("estado", estado).order("created_at", { ascending: false });
+      setPosts(data || []);
+    }
+  };
+
+  const aprovar = async (id) => {
+    await supabase.from("feed_posts").update({ estado: "publicado", publicado_em: new Date().toISOString() }).eq("id", id);
+    setPosts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const rejeitar = async (id) => {
+    await supabase.from("feed_posts").update({ estado: "rejeitado" }).eq("id", id);
+    setPosts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const confirmarBoost = async (b) => {
+    await supabase.from("boost_pagamentos").update({ estado: "pago" }).eq("id", b.id);
+    const fim = new Date(); fim.setDate(fim.getDate() + b.dias);
+    await supabase.from("feed_posts").update({ boosted: true, boost_inicio: new Date().toISOString(), boost_fim: fim.toISOString(), boost_valor: b.valor, boost_pago: true }).eq("id", b.post_id);
+    setBoosts(prev => prev.map(x => x.id === b.id ? { ...x, estado: "pago" } : x));
+  };
+
+  const BTN = (c="dark",s="md") => ({ background: c==="dark"?"#1a1a1a":c==="green"?"#27ae60":c==="red"?"#e74c3c":"#fff", color: c==="outline"?"#1a1a1a":"#fff", border: c==="outline"?"1.5px solid #1a1a1a":"none", padding: s==="sm"?"0.35rem 0.75rem":"0.5rem 1rem", borderRadius:"6px", fontSize:"0.75rem", fontWeight:600, cursor:"pointer", fontFamily:"'Jost',sans-serif" });
+  const TD = { padding:"0.65rem 0.75rem", borderBottom:"1px solid #f0eeeb", fontSize:"0.8rem", verticalAlign:"middle" };
+
+  return (
+    <div>
+      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Feed</h1>
+      <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1.5rem" }}>Moderar posts e gerir boosts pagos</p>
+      <div style={{ display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap" }}>
+        {["pendentes","publicados","boosts"].map(v => (
+          <button key={v} onClick={() => setVista(v)} style={{ ...BTN(vista===v?"dark":"outline","sm"), textTransform:"capitalize" }}>{v}</button>
+        ))}
+        <a href="/feed" target="_blank" style={{ ...BTN("outline","sm"), textDecoration:"none", marginLeft:"auto" }}>Ver feed público ↗</a>
+      </div>
+
+      {vista !== "boosts" ? (
+        posts.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem posts {vista}.</p> : (
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", background:"#fff", borderRadius:"10px", overflow:"hidden" }}>
+              <thead><tr style={{ background:"#f7f5f2" }}>
+                {["Foto","Título","Lojista","Tipo","Data","Ações"].map(h => <th key={h} style={{ ...TD, fontWeight:600, fontSize:"0.7rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"#5a5855" }}>{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {posts.map(p => (
+                  <tr key={p.id}>
+                    <td style={TD}>{p.fotos?.[0] && <img src={p.fotos[0]} style={{ width:44,height:44,objectFit:"cover",borderRadius:6 }} />}</td>
+                    <td style={TD}><strong>{p.titulo}</strong><br/><span style={{ fontSize:"0.72rem",color:"#888" }}>{(p.descricao||"").slice(0,50)}{p.descricao?.length>50?"...":""}</span></td>
+                    <td style={TD}>{p.clientes?.nome || "—"}</td>
+                    <td style={TD}><span style={{ background:"#f0eeeb",padding:"0.2rem 0.5rem",borderRadius:10,fontSize:"0.68rem" }}>{p.tipo}</span></td>
+                    <td style={TD}>{new Date(p.created_at).toLocaleDateString("pt-PT")}</td>
+                    <td style={TD}>
+                      {vista === "pendentes" && <div style={{ display:"flex",gap:"0.4rem" }}>
+                        <button style={BTN("green","sm")} onClick={() => aprovar(p.id)}>✓ Aprovar</button>
+                        <button style={BTN("red","sm")} onClick={() => rejeitar(p.id)}>✕ Rejeitar</button>
+                      </div>}
+                      {vista === "publicados" && <div style={{ display:"flex",gap:"0.4rem" }}>
+                        <button style={BTN("red","sm")} onClick={() => rejeitar(p.id)}>Despublicar</button>
+                      </div>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      ) : (
+        boosts.length === 0 ? <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem pedidos de boost.</p> : (
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", background:"#fff", borderRadius:"10px", overflow:"hidden" }}>
+              <thead><tr style={{ background:"#f7f5f2" }}>
+                {["Post","Lojista","Valor","Dias","Estado","Ação"].map(h => <th key={h} style={{ ...TD, fontWeight:600, fontSize:"0.7rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"#5a5855" }}>{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {boosts.map(b => (
+                  <tr key={b.id}>
+                    <td style={TD}>{b.feed_posts?.titulo || "—"}</td>
+                    <td style={TD}>{b.clientes?.nome || "—"}</td>
+                    <td style={TD}><strong>{b.valor}€</strong></td>
+                    <td style={TD}>{b.dias} dias</td>
+                    <td style={TD}><span style={{ background: b.estado==="pago"?"#e8f5e9":b.estado==="cancelado"?"#ffeaea":"#fff9e6", color: b.estado==="pago"?"#27ae60":b.estado==="cancelado"?"#e74c3c":"#c4a882", padding:"0.2rem 0.5rem", borderRadius:10, fontSize:"0.68rem", fontWeight:600 }}>{b.estado}</span></td>
+                    <td style={TD}>{b.estado === "pendente" && <button style={BTN("green","sm")} onClick={() => confirmarBoost(b)}>✓ Confirmar pagamento</button>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      )}
+    </div>
   );
 }
 
@@ -2393,6 +2499,10 @@ export default function Backoffice() {
 
         {tab === "afiliados" && (
           <AfiliadosTab />
+        )}
+
+        {tab === "feed" && (
+          <FeedBackoffice />
         )}
 
         {tab === "landing" && (
