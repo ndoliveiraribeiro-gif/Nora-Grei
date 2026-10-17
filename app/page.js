@@ -32,6 +32,7 @@ const T = {
     logoTag: "Alugar ou Comprar",
     catNomes: { Festa: "Festa", Trabalho: "Trabalho", "Férias": "Férias", Jantar: "Jantar" },
     cupao: { texto: "Oferta de boas-vindas — 15% de desconto em noragrei.com", copiar: "Copiar código", copiado: "Copiado ✓" },
+    destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
   },
   fr: {
     nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
@@ -62,6 +63,7 @@ const T = {
     logoTag: "Louer ou Acheter",
     catNomes: { Festa: "Soirée", Trabalho: "Travail", "Férias": "Vacances", Jantar: "Dîner" },
     cupao: { texto: "Offre de bienvenue — 15% de réduction sur noragrei.com", copiar: "Copier le code", copiado: "Copié ✓" },
+    destaque: { label: "Sélection de la semaine", verTodas: "Voir toute la collection", alugar: "Louer", reservar: "Indisponible — Réserver", dispEm: "Disponible dans" },
   },
   lt: {
     nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
@@ -92,6 +94,7 @@ const T = {
     logoTag: "Nuomoti ar Pirkti",
     catNomes: { Festa: "Vakarėlis", Trabalho: "Darbas", "Férias": "Atostogos", Jantar: "Vakarienė" },
     cupao: { texto: "Sveikiname — 15% nuolaida noragrei.com", copiar: "Kopijuoti kodą", copiado: "Nukopijuota ✓" },
+    destaque: { label: "Savaitės atranka", verTodas: "Žiūrėti visą kolekciją", alugar: "Nuomoti", reservar: "Neprieinama — Rezervuoti", dispEm: "Prieinama po" },
   },
 };
 
@@ -105,6 +108,7 @@ export default function Home() {
   const [categoriaFotos, setCategoriaFotos] = useState({});
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [pecasDestaque, setPecasDestaque] = useState([]);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -130,7 +134,7 @@ export default function Home() {
 
     const { data: todasPecas } = await supabase
       .from("pecas")
-      .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position")
+      .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)")
       .not("fotos", "is", null);
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
@@ -173,6 +177,43 @@ export default function Home() {
         if (!mapa[oc] && restantes[idx]) { mapa[oc] = restantes[idx].fotos[0]; idx++; }
       });
       setCategoriaFotos(mapa);
+
+      // Peças em destaque: primeiro as marcadas como destaque, depois as mais recentes
+      const comFoto = todasPecas.filter(function (p) { return p.fotos && p.fotos[0]; });
+      const destaque = comFoto.filter(function (p) { return p.destaque; });
+      const resto = comFoto.filter(function (p) { return !p.destaque; });
+      const seleccionadas = [...destaque, ...resto].slice(0, 6);
+
+      // Verificar disponibilidade com alugueres activos
+      if (seleccionadas.length > 0) {
+        const stockIds = seleccionadas.flatMap(function (p) { return (p.stock_tamanhos || []).map(function (s) { return s.id; }); });
+        const { data: alAtivos } = stockIds.length > 0 ? await supabase
+          .from("alugueres")
+          .select("stock_tamanho_id, data_fim, data_disponivel_novamente")
+          .in("stock_tamanho_id", stockIds)
+          .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]) : { data: [] };
+
+        const agora = new Date();
+        const pecasFormatadas = seleccionadas.map(function (p) {
+          const ids = (p.stock_tamanhos || []).map(function (s) { return s.id; });
+          const aluguerAtivo = (alAtivos || [])
+            .filter(function (a) { return ids.includes(a.stock_tamanho_id); })
+            .sort(function (a, b) { return new Date(b.data_fim) - new Date(a.data_fim); })[0];
+
+          let dataFim = null;
+          let disponivel = (p.stock_tamanhos || []).some(function (s) { return s.quantidade_disponivel > 0; });
+
+          if (aluguerAtivo) {
+            const dataDisp = aluguerAtivo.data_disponivel_novamente
+              ? new Date(aluguerAtivo.data_disponivel_novamente)
+              : new Date(new Date(aluguerAtivo.data_fim).getTime() + 3 * 86400000);
+            if (dataDisp > agora) { dataFim = dataDisp.toISOString(); disponivel = false; }
+          }
+
+          return { ...p, disponivel, dataFim, categoria: p.categorias?.nome || "" };
+        });
+        setPecasDestaque(pecasFormatadas);
+      }
     }
   };
 
@@ -360,6 +401,19 @@ export default function Home() {
           .sec{padding:6rem 5rem}
           .nav{padding:1.25rem 4rem}
         }
+
+        .destaque-sec{padding:3rem 1.5rem 4rem;background:var(--white)}
+        .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
+        .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
+        .destaque-ver{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:2px;transition:color 0.2s,border-color 0.2s}
+        .destaque-ver:hover{color:var(--black);border-color:var(--black)}
+        .destaque-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
+        @media(min-width:600px){.destaque-grid{grid-template-columns:repeat(2,1fr);gap:1rem}}
+        @media(min-width:769px){
+          .destaque-sec{padding:4rem 4rem 5rem}
+          .destaque-grid{grid-template-columns:repeat(3,1fr);gap:1.25rem}
+        }
+        @media(min-width:1200px){.destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}}
         @media(max-width:768px){
           .bnav{display:block}
           .hero-right-desktop{display:none}
@@ -492,6 +546,70 @@ export default function Home() {
           </a>
         ))}
       </div>
+
+      {pecasDestaque.length > 0 && (
+        <section className="destaque-sec">
+          <div className="destaque-header">
+            <p className="destaque-label">{t.destaque.label}</p>
+            <a href="/catalogo" className="destaque-ver">{t.destaque.verTodas} →</a>
+          </div>
+          <div className="destaque-grid">
+            {pecasDestaque.map((peca) => {
+              const dispEstado = peca.disponivel !== false;
+              return (
+                <div key={peca.id} style={{display:"flex",flexDirection:"column",background:"#f8f7f5",position:"relative",borderRadius:"2px",overflow:"hidden"}}>
+                  <a href={`/catalogo/${peca.id}`} style={{textDecoration:"none",color:"inherit",display:"block",position:"relative"}}>
+                    <div style={{aspectRatio:"3/4",background:"#e8e5e0",overflow:"hidden",position:"relative"}}>
+                      {peca.fotos && peca.fotos[0] ? (
+                        <img src={peca.fotos[0]} alt={peca.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
+                      ) : (
+                        <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                          <span style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span>
+                        </div>
+                      )}
+                      {!dispEstado && (
+                        <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
+                          {t.destaque.reservar.split("—")[0].trim()}
+                        </div>
+                      )}
+                      {!dispEstado && peca.dataFim && (() => {
+                        const diff = new Date(peca.dataFim) - new Date();
+                        if (diff <= 0) return null;
+                        const dias = Math.floor(diff / 86400000);
+                        const horas = Math.floor((diff % 86400000) / 3600000);
+                        const tempo = dias > 0 ? `${dias}d ${horas}h` : `${horas}h`;
+                        return (
+                          <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(8,8,8,0.72)",backdropFilter:"blur(4px)",padding:"0.45rem 0.75rem",display:"flex",alignItems:"center",gap:"0.4rem",zIndex:3}}>
+                            <div style={{width:5,height:5,borderRadius:"50%",background:"#f39c12",flexShrink:0}} />
+                            <span style={{fontFamily:"var(--sans)",fontSize:"0.55rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"rgba(255,255,255,0.9)"}}>{t.destaque.dispEm} <strong>{tempo}</strong></span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
+                      {peca.categoria && <p style={{fontSize:"0.48rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
+                      <h3 style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.3rem",color:"#080808"}}>{peca.nome}</h3>
+                      <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
+                        <span style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:300,color:"#080808"}}>{peca.preco_aluguer_dia}€</span>
+                        <span style={{fontFamily:"var(--sans)",fontSize:"0.55rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+                      </div>
+                    </div>
+                  </a>
+                  {dispEstado ? (
+                    <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>
+                      {t.destaque.alugar}
+                    </a>
+                  ) : (
+                    <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>
+                      {t.destaque.reservar}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="sec" id="como" style={{background:"var(--white)"}}>
         <p className="sec-label">{t.como.label}</p>
