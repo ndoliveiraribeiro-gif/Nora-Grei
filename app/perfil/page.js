@@ -638,6 +638,7 @@ export default function Perfil() {
   const [pecasLoja, setPecasLoja] = useState([]);
   const [alugueresLoja, setAlugueresLoja] = useState([]);
   const [diasTeste, setDiasTeste] = useState(180);
+  const [codigoLoja, setCodigoLoja] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
   const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
@@ -688,6 +689,7 @@ export default function Perfil() {
       if (c.modo_lojista) {
         setModoLojista(true);
         setLojaEstado(c.lojista_estado||"teste");
+        if (c.codigo_cliente) setCodigoLoja(c.codigo_cliente);
         setLojaIban(c.lojista_iban||"");
         if (c.lojista_desde) {
           const diasPassados = Math.floor((new Date() - new Date(c.lojista_desde)) / 86400000);
@@ -1261,10 +1263,18 @@ export default function Perfil() {
 
         {modoLojista && tabAtiva === "loja" && (
           <div style={{padding:"1rem 0"}}>
-            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
-              {["Dashboard","Peças","Alugueres","Liquidações","Avaliações"].map((s,idx) => (
-                <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
-              ))}
+            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
+                {["Dashboard","Peças","Alugueres","Liquidações","Avaliações"].map((s,idx) => (
+                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
+                ))}
+              </div>
+              {codigoLoja && (
+                <a href={`/loja/${codigoLoja}`} target="_blank" rel="noopener noreferrer"
+                  style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:500,whiteSpace:"nowrap"}}>
+                  Ver loja pública ↗
+                </a>
+              )}
             </div>
             {tabLoja === "dashboard" && (
               <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"0.75rem"}}>
