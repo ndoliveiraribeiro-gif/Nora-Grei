@@ -761,9 +761,28 @@ function CheckoutContent() {
             <div className="sec" style={{ padding: "1rem 1.5rem" }}>
               <div className="nivel-box">
                 <span style={{ fontSize: "1.2rem" }}>{nv.icon}</span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 500, fontSize: "0.88rem" }}>{i.nivel} {nv.nome}</div>
                   <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.nome === "Platina" ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
+                  {/* Progresso até próximo nível */}
+                  {nv.nome !== "Platina" && (() => {
+                    const proxLimite = nv.nome === "Bronze" ? 5 : nv.nome === "Prata" ? 10 : 20;
+                    const proxNome   = nv.nome === "Bronze" ? "Prata 🥈" : nv.nome === "Prata" ? "Ouro 🥇" : "Platina 💎";
+                    const faltam = proxLimite - totalAlugueres;
+                    const pct = Math.min(100, (totalAlugueres / proxLimite) * 100);
+                    return (
+                      <div style={{ marginTop: "0.5rem" }}>
+                        <div style={{ fontSize: "0.65rem", color: "#888", marginBottom: "0.2rem" }}>
+                          {lang === "fr" ? `${faltam} location${faltam !== 1 ? "s" : ""} pour ${proxNome}`
+                           : lang === "lt" ? `Dar ${faltam} iki ${proxNome}`
+                           : `Faltam ${faltam} para ${proxNome}`}
+                        </div>
+                        <div style={{ height: "3px", background: "#e2dfda", borderRadius: "2px", overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${pct}%`, background: nv.cor, borderRadius: "2px", transition: "width 0.4s" }} />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               {temGratis ? <div className="gratis-box">{i.gratis}</div> : pontos > 0 ? <div className="pontos-box">{i.pontos(pontos)}</div> : null}

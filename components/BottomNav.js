@@ -9,14 +9,15 @@ const supabase = createClient(
 );
 
 const t = {
-  pt: { inicio: "Início", catalogo: "Catálogo", pedidos: "Pedidos", perfil: "Perfil" },
-  fr: { inicio: "Accueil", catalogo: "Catalogue", pedidos: "Commandes", perfil: "Profil" },
-  lt: { inicio: "Pradžia", catalogo: "Katalogas", pedidos: "Užsakymai", perfil: "Profilis" },
+  pt: { inicio: "Início", catalogo: "Catálogo", cesto: "Cesto", pedidos: "Pedidos", perfil: "Perfil" },
+  fr: { inicio: "Accueil", catalogo: "Catalogue", cesto: "Panier", pedidos: "Commandes", perfil: "Profil" },
+  lt: { inicio: "Pradžia", catalogo: "Katalogas", cesto: "Krepšelis", pedidos: "Užsakymai", perfil: "Profilis" },
 };
 
 export default function BottomNav() {
   const [userLogado, setUserLogado] = useState(false);
   const [lang, setLang] = useState("pt");
+  const [cestoCont, setCestoCont] = useState(0);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -25,6 +26,17 @@ export default function BottomNav() {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setUserLogado(true);
     });
+
+    // Ler contador do cesto
+    const lerCesto = () => {
+      try {
+        const c = JSON.parse(localStorage.getItem("ng_cesto") || "[]");
+        setCestoCont(c.length);
+      } catch (_) { setCestoCont(0); }
+    };
+    lerCesto();
+    window.addEventListener("cesto-atualizado", lerCesto);
+    return () => window.removeEventListener("cesto-atualizado", lerCesto);
   }, []);
 
   const i = t[lang] || t.pt;
@@ -42,6 +54,13 @@ export default function BottomNav() {
         <rect x="14" y="3" width="7" height="7" rx="1"/>
         <rect x="3" y="14" width="7" height="7" rx="1"/>
         <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    )},
+    { href: "/cesto", label: i.cesto, badge: cestoCont, icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
       </svg>
     )},
     { href: userLogado ? "/pedidos" : "/entrar", label: i.pedidos, icon: (
@@ -106,6 +125,25 @@ export default function BottomNav() {
           background: #080808;
           margin-top: 2px;
         }
+        .bn-icon-wrap {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .bn-badge {
+          position: absolute;
+          top: -5px; right: -8px;
+          background: #c4748a;
+          color: #fff;
+          font-size: 0.5rem;
+          font-family: 'Jost', sans-serif;
+          font-weight: 600;
+          width: 15px; height: 15px;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          line-height: 1;
+        }
         @media (max-width: 768px) {
           .bn-wrap { display: block; }
         }
@@ -115,7 +153,10 @@ export default function BottomNav() {
         <div className="bn-inner">
           {items.map((item, idx) => (
             <a key={idx} href={item.href} className={`bn-item${isActive(item.href) ? " active" : ""}`}>
-              {item.icon}
+              <div className="bn-icon-wrap">
+                {item.icon}
+                {item.badge > 0 && <span className="bn-badge">{item.badge > 9 ? "9+" : item.badge}</span>}
+              </div>
               <span className="bn-label">{item.label}</span>
               {isActive(item.href) && <div className="bn-dot"></div>}
             </a>

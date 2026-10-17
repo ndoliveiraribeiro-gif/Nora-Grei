@@ -59,6 +59,31 @@ export default function PecaLojaPage() {
     window.location.href = `/loja/${codigo}/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`;
   };
 
+  const adicionarAoCesto = () => {
+    if (!tamanhoSelecionado) return;
+    const stockSel = peca?.stock_lojista?.find(s => s.id === tamanhoSelecionado);
+    let cesto = [];
+    try { cesto = JSON.parse(localStorage.getItem("ng_cesto") || "[]"); } catch (_) {}
+    const jaExiste = cesto.some(i => i.pecaId === id && i.tamanhoNome === (stockSel?.tamanho || tamanhoSelecionado));
+    if (!jaExiste) {
+      cesto.push({
+        pecaId: id,
+        stockId: tamanhoSelecionado,
+        tamanhoNome: stockSel?.tamanho || tamanhoSelecionado,
+        pecaNome: peca?.nome,
+        precoDia: peca?.preco_aluguer_dia,
+        valorPeca: peca?.valor_peca,
+        fotos: peca?.fotos,
+        dataInicio: null,
+        dataFim: null,
+        lojaCodigo: codigo,
+      });
+      localStorage.setItem("ng_cesto", JSON.stringify(cesto));
+      window.dispatchEvent(new Event("cesto-atualizado"));
+    }
+    window.location.href = "/cesto";
+  };
+
   const partilharLoja = async () => {
     const url = `${window.location.origin}/loja/${codigo}`;
     try { await navigator.share({ title: lojista?.nome, url }); }
@@ -197,6 +222,15 @@ export default function PecaLojaPage() {
             >
               {peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
             </button>
+            {peca.tipo !== "comprar" && (
+              <button
+                className="btn-cesto"
+                onClick={adicionarAoCesto}
+                disabled={!tamanhoSelecionado}
+              >
+                🛍 Adicionar ao cesto
+              </button>
+            )}
           )}
 
           {/* Botões de partilha */}
@@ -281,6 +315,9 @@ const ESTILOS = `
   .btn-checkout{width:100%;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background 0.2s;margin-bottom:2rem}
   .btn-checkout:hover{background:#2a2926}
   .btn-checkout:disabled{opacity:0.5;cursor:not-allowed}
+  .btn-cesto{width:100%;padding:1rem;background:transparent;color:var(--black);border:1.5px solid var(--black);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem;margin-bottom:1.5rem}
+  .btn-cesto:hover{background:var(--g1)}
+  .btn-cesto:disabled{opacity:0.4;cursor:not-allowed}
   .esgotado-bloco{margin-bottom:2rem}
   .timer-bloco{background:var(--g1);border:1px solid var(--g2);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
   .timer-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;font-weight:500}

@@ -3,6 +3,24 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+const TAXA_SINISTRO = 0.03;
+const FATOR_SEGURANCA = 1.5;
+const CAUCAO_PISO = 0.08;
+
+const NIVEL = (n) => {
+  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
+  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12" };
+  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6" };
+  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32" };
+};
+
+const calcularCaucao = (valorPeca, caucaoPct) => {
+  const r = valorPeca * TAXA_SINISTRO * FATOR_SEGURANCA;
+  const n = valorPeca * caucaoPct / 100;
+  const p = valorPeca * CAUCAO_PISO;
+  return Math.round(Math.max(r, n, p));
+};
+
 function Timer({ dataFim, lang }) {
   const [tempo, setTempo] = useState("");
   const labels = { pt: "Disponível em", fr: "Disponible dans", lt: "Prieinama po" };
@@ -52,12 +70,19 @@ export default function PecaDetalhe() {
   const [datasPorTamanho, setDatasPorTamanho] = useState({});
   const [avaliacoesPeca, setAvaliacoesPeca] = useState([]);
   const [contactando, setContactando] = useState(false);
+  const [totalAlugueres, setTotalAlugueres] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && TRADUCOES[saved]) setLang(saved);
     carregarPeca();
-    supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(data.session.user); });
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setUserLogado(data.session.user);
+        supabase.from("clientes").select("total_pecas_alugadas").eq("id", data.session.user.id).single()
+          .then(({ data: cli }) => { if (cli) setTotalAlugueres(cli.total_pecas_alugadas || 0); });
+      }
+    });
   }, [id]);
 
   const carregarPeca = async () => {
@@ -461,8 +486,24 @@ export default function PecaDetalhe() {
 
           <div className="deposito-box">
             <p className="secao-label">{t.deposito}</p>
-            <p className="deposito-val">{peca.valor_peca}€</p>
-            <p className="deposito-desc">{t.depositoDesc}</p>
+            {peca.valor_peca > 0 ? (() => {
+              const nv = NIVEL(totalAlugueres);
+              const caucaoValor = calcularCaucao(peca.valor_peca, nv.caucao);
+              const caucaoSemNivel = calcularCaucao(peca.valor_peca, 100);
+              const temDesconto = caucaoValor < caucaoSemNivel;
+              return (
+                <>
+                  <p className="deposito-val">{caucaoValor}€ <span style={{ fontSize: "0.72rem", fontFamily: "var(--sans)", fontWeight: 300, color: nv.cor }}>{nv.icon} {nv.nome}</span></p>
+                  {temDesconto && <p style={{ fontSize: "0.72rem", color: "#95a5a6", textDecoration: "line-through" }}>{caucaoSemNivel}€ sem nível</p>}
+                  <p className="deposito-desc">{t.depositoDesc}</p>
+                </>
+              );
+            })() : (
+              <>
+                <p className="deposito-val">{peca.valor_peca || "—"}€</p>
+                <p className="deposito-desc">{t.depositoDesc}</p>
+              </>
+            )}
           </div>
 
           {disponivel ? (
