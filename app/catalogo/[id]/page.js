@@ -70,8 +70,8 @@ export default function PecaDetalhe() {
     if (data) {
       setPeca(data);
       // Selecionar primeiro tamanho disponível
-      const primDisponivel = data.stock_tamanhos?.find(s => s.quantidade_disponivel > 0);
-      if (primDisponivel) setTamanhoSelecionado(primDisponivel.id);
+      const disponiveis = data.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0) || [];
+      if (disponiveis.length > 0) setTamanhoSelecionado(disponiveis[0].id);
 
       // Buscar alugueres ativos para calcular datas de disponibilidade por tamanho
       const stockIds = data.stock_tamanhos?.map(s => s.id) || [];
