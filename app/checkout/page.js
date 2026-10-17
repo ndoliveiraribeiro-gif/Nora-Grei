@@ -415,6 +415,7 @@ function CheckoutContent() {
   const [erro, setErro] = useState("");
   const [erroCampo, setErroCampo] = useState("");
   const [recibo, setRecibo] = useState(null);
+  const [ocasiao, setOcasiao] = useState("");
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -659,6 +660,7 @@ function CheckoutContent() {
         deposito_modalidade: deposito,
         deposito_estado: depositoEstadoInicial,
         ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
+        ...(ocasiao ? { ocasiao } : {}),
       }).select().single();
       if (error) throw error;
 
@@ -906,6 +908,20 @@ function CheckoutContent() {
               </>
             )}
           </div>
+        </div>
+
+        {/* OCASIÃO DO ALUGUER */}
+        <div className="resumo" style={{ marginBottom:"1rem" }}>
+          <p className="sec-t" style={{ fontSize:"0.7rem",letterSpacing:"0.12em" }}>Para que ocasião?</p>
+          <div style={{ display:"flex",flexWrap:"wrap",gap:"0.4rem",marginTop:"0.5rem" }}>
+            {["🎉 Festa","💼 Trabalho","💍 Casamento","🥂 Jantar","🎭 Cerimónia","🍹 Cocktail","✨ Gala","👗 Dia a dia","🏖 Praia","✈️ Férias"].map(op => (
+              <button key={op} type="button" onClick={() => setOcasiao(prev => prev === op ? "" : op)}
+                style={{ padding:"0.35rem 0.75rem",fontSize:"0.72rem",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em",border:`1.5px solid ${ocasiao===op?"#c4748a":"#e2dfda"}`,background:ocasiao===op?"#c4748a":"#fff",color:ocasiao===op?"#fff":"#3f3e3c",cursor:"pointer",borderRadius:20,transition:"all 0.15s" }}>
+                {op}
+              </button>
+            ))}
+          </div>
+          <p style={{ fontSize:"0.62rem",color:"#aaa",marginTop:"0.4rem" }}>Opcional · Ajuda-nos a ter peças certas para as ocasiões certas</p>
         </div>
 
         <div className="resumo">

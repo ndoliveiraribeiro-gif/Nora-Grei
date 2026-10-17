@@ -385,12 +385,14 @@ function ModalEnvio({ aluguer, onClose, onEnviado }) {
 
 
 const CATEGORIAS_DESPESA = ["Compra de stock", "Manutenção", "Envio/Logística", "Marketing", "Higienização", "Outro"];
+const CATEGORIAS_FIXAS = ["Renda", "Salários", "Subscrições", "Software", "Seguros", "Contabilidade", "Outro fixo"];
+const CATEGORIAS_VARIAVEIS = ["Compra de stock", "Envio/Logística", "Higienização", "Marketing campanha", "Embalagem", "Reparação peça", "Outro variável"];
 
 function Caixa() {
   const [movimentos, setMovimentos] = useState([]);
   const [despesas, setDespesas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [novaDespesa, setNovaDespesa] = useState({ descricao: "", categoria: CATEGORIAS_DESPESA[0], valor: "", data: new Date().toISOString().split("T")[0] });
+  const [novaDespesa, setNovaDespesa] = useState({ descricao: "", tipo_custo: "variavel", categoria: CATEGORIAS_VARIAVEIS[0], valor: "", data: new Date().toISOString().split("T")[0] });
   const [aGuardar, setAGuardar] = useState(false);
   const [mesFiltro, setMesFiltro] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
 
@@ -421,7 +423,7 @@ function Caixa() {
       codigoCliente: a.clientes?.codigo_cliente || "—",
     }));
     const saidasDespesas = (despesasRes.data || []).map(d => ({
-      tipo: "saida", data: d.data, descricao: d.descricao, valor: d.valor, categoria: d.categoria, id: d.id,
+      tipo: "saida", data: d.data, descricao: d.descricao, valor: d.valor, categoria: d.categoria, tipo_custo: d.tipo_custo || "variavel", id: d.id,
     }));
 
     const todos = [...entradas, ...saidasCaucao, ...saidasDespesas].sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -435,11 +437,11 @@ function Caixa() {
     setAGuardar(true);
     const { error } = await supabase.from("despesas").insert({
       descricao: novaDespesa.descricao, categoria: novaDespesa.categoria,
-      valor: parseFloat(novaDespesa.valor), data: novaDespesa.data,
+      valor: parseFloat(novaDespesa.valor), data: novaDespesa.data, tipo_custo: novaDespesa.tipo_custo,
     });
     setAGuardar(false);
     if (error) { alert("Erro: " + error.message); return; }
-    setNovaDespesa({ descricao: "", categoria: CATEGORIAS_DESPESA[0], valor: "", data: new Date().toISOString().split("T")[0] });
+    setNovaDespesa({ descricao: "", tipo_custo: "variavel", categoria: CATEGORIAS_VARIAVEIS[0], valor: "", data: new Date().toISOString().split("T")[0] });
     carregarCaixa();
   };
 
@@ -501,11 +503,23 @@ function Caixa() {
 
       <div style={CARD}>
         <p style={CARD_T}>Registar nova despesa</p>
+        {/* Toggle fixo / variável */}
+        <div style={{ display:"flex",gap:"0.5rem",marginBottom:"1rem" }}>
+          {[["fixo","🏠 Custo fixo","#3f3e3c"],["variavel","📦 Custo variável","#9c4d63"]].map(([val,lbl,cor]) => (
+            <button key={val} onClick={() => setNovaDespesa(p=>({ ...p, tipo_custo:val, categoria: val==="fixo"?CATEGORIAS_FIXAS[0]:CATEGORIAS_VARIAVEIS[0] }))}
+              style={{ padding:"0.4rem 1rem",fontSize:"0.75rem",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em",border:`1.5px solid ${novaDespesa.tipo_custo===val?cor:"#e2dfda"}`,background:novaDespesa.tipo_custo===val?cor:"#fff",color:novaDespesa.tipo_custo===val?"#fff":"#888",cursor:"pointer",borderRadius:2,transition:"all 0.15s" }}>
+              {lbl}
+            </button>
+          ))}
+          <span style={{ fontSize:"0.72rem",color:"#aaa",alignSelf:"center",marginLeft:"0.5rem" }}>
+            {novaDespesa.tipo_custo==="fixo" ? "Renda, salários, subscrições — recorrente independente do volume" : "Envios, stock, higienização — varia com o nº de alugueres"}
+          </span>
+        </div>
         <div style={COL4}>
-          <div style={{ gridColumn:"span 2" }}><label style={LBL}>Descrição *</label><input style={INP} value={novaDespesa.descricao} onChange={e => setNovaDespesa(p=>({...p,descricao:e.target.value}))} placeholder="Compra de 5 vestidos novos" /></div>
+          <div style={{ gridColumn:"span 2" }}><label style={LBL}>Descrição *</label><input style={INP} value={novaDespesa.descricao} onChange={e => setNovaDespesa(p=>({...p,descricao:e.target.value}))} placeholder={novaDespesa.tipo_custo==="fixo"?"Ex: Renda do armazém Março":"Ex: Envio expresso 5 peças"} /></div>
           <div><label style={LBL}>Categoria</label>
             <select style={INP} value={novaDespesa.categoria} onChange={e => setNovaDespesa(p=>({...p,categoria:e.target.value}))}>
-              {CATEGORIAS_DESPESA.map(c => <option key={c} value={c}>{c}</option>)}
+              {(novaDespesa.tipo_custo==="fixo" ? CATEGORIAS_FIXAS : CATEGORIAS_VARIAVEIS).map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div><label style={LBL}>Valor (€) *</label><input style={INP} type="number" value={novaDespesa.valor} onChange={e => setNovaDespesa(p=>({...p,valor:e.target.value}))} placeholder="120" /></div>
@@ -555,6 +569,7 @@ function RowDia({ linha, onApagarDespesa }) {
             {item.descricao} <span style={{ color:"#888" }}>({item.categoria})</span>
             {item.nif && item.nif !== "—" && <span style={{ color:"#888",marginLeft:"0.5rem" }}>NIF {item.nif}</span>}
             {item.desconto_cesto && <span style={{ marginLeft:"0.5rem",fontSize:"0.62rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem",borderRadius:2,fontWeight:600 }}>🛍 {item.desconto_cesto.startsWith("opcao_a") ? "Cesto " + item.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "Cesto desc. caução"}</span>}
+            {item.tipo === "saida" && item.id && <span style={{ marginLeft:"0.5rem",fontSize:"0.6rem",padding:"0.1rem 0.35rem",borderRadius:2,fontWeight:600,background:item.tipo_custo==="fixo"?"#f0f4ff":"#fff8f0",color:item.tipo_custo==="fixo"?"#3f5fa3":"#8a5a00" }}>{item.tipo_custo==="fixo"?"🏠 Fixo":"📦 Variável"}</span>}
           </td>
           <td style={{ ...TD,fontSize:"0.78rem",color:item.tipo==="entrada"?"#27ae60":"#e74c3c",fontWeight:600 }}>{item.tipo==="entrada"?"+":"-"}{item.valor.toFixed(0)}€</td>
           <td style={TD}></td>
@@ -1003,19 +1018,23 @@ export default function Backoffice() {
       const recMes = recibos.filter(r => r.estado==="pago" && r.created_at?.slice(0,7)===key).reduce((s,r)=>(s+(r.valor_aluguer||0)+(r.valor_higienizacao||0)),0);
       const alMes = alAtivos.filter(a => a.created_at?.slice(0,7)===key).length;
       const despMes = despesas.filter(d2 => d2.data?.slice(0,7)===key).reduce((s,d2)=>s+(d2.valor||0),0);
-      return { key, label, receita: recMes, alugueres: alMes, despesas: despMes, lucro: recMes - despMes };
+      const despFixasMes = despesas.filter(d2 => d2.data?.slice(0,7)===key && d2.tipo_custo==="fixo").reduce((s,d2)=>s+(d2.valor||0),0);
+      const despVarMes = despesas.filter(d2 => d2.data?.slice(0,7)===key && d2.tipo_custo!=="fixo").reduce((s,d2)=>s+(d2.valor||0),0);
+      return { key, label, receita: recMes, alugueres: alMes, despesas: despMes, despFixas: despFixasMes, despVarProd: despVarMes, lucro: recMes - despMes };
     });
 
-    // Breakeven mensal
-    // Receita média mensal real (últimos 3 meses com recibos pagos)
+    // Breakeven mensal — separar fixos de variáveis
     const receitaMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.receita,0)/3;
     const despesasMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.despesas,0)/3;
-    // Custo diário médio = despesas/30
+    const despesasFixasMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.despFixas,0)/3;
+    const despesasVarMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.despVarProd,0)/3;
+    // Breakeven teórico: apenas os custos fixos (os variáveis já saem com cada aluguer)
     const custoDiario = despesasMedia3M / 30;
-    // Receita diária média = receita/30
     const receitaDiaria = receitaMedia3M / 30;
-    // Dia do breakeven: quanto do mês até igualar custos fixos
-    const diaBreakeven = custoDiario > 0 && receitaDiaria > 0 ? Math.ceil(despesasMedia3M / receitaDiaria) : null;
+    // Se há separação fixo/variável: breakeven = dia em que receita >= custos fixos mensais
+    const temSeparacao = despesasFixasMedia3M > 0 || despesasVarMedia3M > 0;
+    const baseCustoBreakeven = temSeparacao ? despesasFixasMedia3M : despesasMedia3M;
+    const diaBreakeven = custoDiario > 0 && receitaDiaria > 0 ? Math.ceil(baseCustoBreakeven / receitaDiaria) : null;
     // Margem operacional
     const margemOp = receitaMedia3M > 0 ? ((receitaMedia3M - despesasMedia3M) / receitaMedia3M * 100).toFixed(1) : 0;
     // Receita total dos recibos pagos (mais precisa que soma de alugueres)
@@ -1040,7 +1059,8 @@ export default function Backoffice() {
       // Tendência
       tendenciaMensal,
       // Breakeven
-      receitaMedia3M, despesasMedia3M, custoDiario, receitaDiaria, diaBreakeven, margemOp,
+      receitaMedia3M, despesasMedia3M, despesasFixasMedia3M, despesasVarMedia3M, temSeparacao,
+      custoDiario, receitaDiaria, diaBreakeven, margemOp,
     });
   };
 
@@ -2382,8 +2402,15 @@ export default function Backoffice() {
                           <span>Dia 1</span><span>Dia 15</span><span>Dia 30</span>
                         </div>
                         <p style={{ fontSize:"0.72rem",color:"#888",marginTop:"0.75rem" }}>
-                          Receita diária média: <strong>{Number(estatisticas.receitaDiaria||0).toFixed(0)}€/dia</strong> · Custo diário: <strong>{Number(estatisticas.custoDiario||0).toFixed(0)}€/dia</strong>
+                          Receita diária média: <strong>{Number(estatisticas.receitaDiaria||0).toFixed(0)}€/dia</strong> · Custo diário total: <strong>{Number(estatisticas.custoDiario||0).toFixed(0)}€/dia</strong>
                         </p>
+                        {estatisticas.temSeparacao && (
+                          <div style={{ display:"flex",gap:"0.5rem",marginTop:"0.4rem",flexWrap:"wrap" }}>
+                            <span style={{ fontSize:"0.65rem",padding:"0.15rem 0.5rem",background:"#f0f4ff",color:"#3f5fa3",borderRadius:2 }}>🏠 Fixos: <strong>{Number(estatisticas.despesasFixasMedia3M||0).toFixed(0)}€/mês</strong></span>
+                            <span style={{ fontSize:"0.65rem",padding:"0.15rem 0.5rem",background:"#fff8f0",color:"#8a5a00",borderRadius:2 }}>📦 Variáveis: <strong>{Number(estatisticas.despesasVarMedia3M||0).toFixed(0)}€/mês</strong></span>
+                            <span style={{ fontSize:"0.65rem",color:"#aaa",alignSelf:"center" }}>Breakeven calculado sobre custos fixos</span>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <p style={{ fontSize:"0.82rem",color:"#888" }}>Regista despesas na Caixa para calcular o breakeven.</p>
