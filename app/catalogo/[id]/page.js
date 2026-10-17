@@ -33,9 +33,9 @@ function Timer({ dataFim, lang }) {
 }
 
 const TRADUCOES = {
-  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei", livreEm:"livre em", reservarTamanho:"reservar" },
-  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei", livreEm:"libre le", reservarTamanho:"réserver" },
-  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei", livreEm:"laisva", reservarTamanho:"rezervuoti" },
+  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei", livreEm:"livre em", reservarTamanho:"reservar", contactar:"Falar com a lojista", contactarLoading:"A abrir chat...", contactarEntrar:"Entra para contactar" },
+  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei", livreEm:"libre le", reservarTamanho:"réserver", contactar:"Contacter la boutique", contactarLoading:"Ouverture...", contactarEntrar:"Connectez-vous pour contacter" },
+  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei", livreEm:"laisva", reservarTamanho:"rezervuoti", contactar:"Susisiekti su parduotuve", contactarLoading:"Atidaroma...", contactarEntrar:"Prisijunkite norėdami susisiekti" },
 };
 
 export default function PecaDetalhe() {
@@ -51,6 +51,7 @@ export default function PecaDetalhe() {
   const [partilhado, setPartilhado] = useState(false);
   const [datasPorTamanho, setDatasPorTamanho] = useState({});
   const [avaliacoesPeca, setAvaliacoesPeca] = useState([]);
+  const [contactando, setContactando] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -63,7 +64,7 @@ export default function PecaDetalhe() {
     setLoading(true);
     const { data } = await supabase
       .from("pecas")
-      .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
+      .select("*, lojista_id, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
       .eq("id", id)
       .single();
 
@@ -123,6 +124,48 @@ export default function PecaDetalhe() {
     if (!tamanhoSelecionado) return;
     if (!userLogado) { router.push("/entrar"); return; }
     router.push(`/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`);
+  };
+
+  const contactarLojista = async () => {
+    if (!userLogado) { router.push("/entrar"); return; }
+    setContactando(true);
+    try {
+      // Determinar o lojista: usa lojista_id da peça se existir, senão busca o admin (modo_lojista)
+      let lojistaId = peca?.lojista_id || null;
+      if (!lojistaId) {
+        const { data: lojista } = await supabase
+          .from("clientes")
+          .select("id")
+          .eq("modo_lojista", true)
+          .limit(1)
+          .single();
+        lojistaId = lojista?.id;
+      }
+      if (!lojistaId) { setContactando(false); return; }
+      if (lojistaId === userLogado.id) { setContactando(false); return; } // não contactar a si próprio
+
+      // Verificar se já existe uma conversa entre este cliente e este lojista
+      const { data: existente } = await supabase
+        .from("conversas")
+        .select("id")
+        .eq("cliente_id", userLogado.id)
+        .eq("lojista_id", lojistaId)
+        .maybeSingle();
+
+      if (!existente) {
+        // Criar nova conversa
+        await supabase.from("conversas").insert({
+          cliente_id: userLogado.id,
+          lojista_id: lojistaId,
+          assunto: peca.nome,
+        });
+      }
+
+      router.push("/mensagens");
+    } catch (err) {
+      console.error("Erro ao criar conversa:", err);
+      setContactando(false);
+    }
   };
 
   const partilhar = (rede) => {
@@ -215,6 +258,9 @@ export default function PecaDetalhe() {
         .btn-reservar:hover{border-color:var(--black)}
         .btn-comprar{width:100%;padding:1rem;background:var(--rosa);color:var(--white);border:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:block;text-align:center;transition:background 0.2s}
         .btn-comprar:hover{background:#a85c72}
+        .btn-contactar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;margin-top:0.75rem}
+        .btn-contactar:hover{background:var(--black);color:var(--white)}
+        .btn-contactar:disabled{opacity:0.5;cursor:not-allowed}
         .descricao{font-size:0.92rem;line-height:1.7;color:#3a3835}
         .partilha{display:flex;gap:0.5rem;align-items:center;margin-top:1.5rem}
         .partilha-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;margin-right:0.25rem}
@@ -272,6 +318,16 @@ export default function PecaDetalhe() {
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;
             text-decoration:none;
+            padding:0 0.85rem;
+            flex-shrink:0;
+          }
+          .sticky-btn-contactar{
+            min-height:48px;min-width:48px;
+            background:var(--white);color:var(--black);
+            border:1.5px solid var(--black);
+            font-family:'Jost',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;
+            cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
             padding:0 0.85rem;
             flex-shrink:0;
           }
@@ -384,6 +440,15 @@ export default function PecaDetalhe() {
             {t.comprar} — noragrei.com ↗
           </a>
 
+          <button
+            className="btn-contactar"
+            onClick={contactarLojista}
+            disabled={contactando}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            {contactando ? t.contactarLoading : (userLogado ? t.contactar : t.contactarEntrar)}
+          </button>
+
           <hr className="sep" />
 
           {peca.descricao && (
@@ -466,6 +531,14 @@ export default function PecaDetalhe() {
             {t.reservar}
           </a>
         )}
+        <button
+          className="sticky-btn-contactar"
+          onClick={contactarLojista}
+          disabled={contactando}
+          title={t.contactar}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </button>
         <a
           href="https://www.noragrei.com"
           target="_blank"
