@@ -526,6 +526,11 @@ export default function Perfil() {
   const [showNovaPeca, setShowNovaPeca] = useState(false);
   const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
+  const [editarPeca, setEditarPeca] = useState(null);
+  const [editarLoading, setEditarLoading] = useState(false);
+  const [modalEnvio, setModalEnvio] = useState(null); // aluguer a marcar como enviado
+  const [trackingInfo, setTrackingInfo] = useState({ transportadora: "", numero: "" });
+  const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
   const [fotosLojista, setFotosLojista] = useState([]);
   const [uploadProgressLoja, setUploadProgressLoja] = useState("");
   const fotosLojistaRef = typeof window !== "undefined" ? { current: null } : { current: null };
@@ -575,7 +580,7 @@ export default function Perfil() {
         const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", user.id).order("created_at", { ascending: false });
         if (ps) setPecasLoja(ps);
         if (ps && ps.length > 0) {
-          const { data: als } = await supabase.from("alugueres").select("*, clientes(nome, cidade)").in("peca_lojista_id", ps.map(p => p.id)).order("created_at", { ascending: false });
+          const { data: als } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone, cidade), pecas_lojista(nome, fotos, preco_aluguer_dia), stock_lojista(tamanho)").eq("lojista_id", user.id).order("created_at", { ascending: false });
           if (als) setAlugueresLoja(als);
         }
       }
@@ -688,6 +693,37 @@ export default function Perfil() {
     setFotosLojista([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
+  };
+
+  const guardarEdicaoPeca = async () => {
+    if (!editarPeca || !editarPeca.nome) return;
+    setEditarLoading(true);
+    await supabase.from("pecas_lojista").update({
+      nome: editarPeca.nome,
+      descricao: editarPeca.descricao || null,
+      preco_aluguer_dia: editarPeca.preco_aluguer_dia ? parseFloat(editarPeca.preco_aluguer_dia) : null,
+      preco_venda: editarPeca.preco_venda ? parseFloat(editarPeca.preco_venda) : null,
+      valor_peca: editarPeca.valor_peca ? parseFloat(editarPeca.valor_peca) : null,
+      material: editarPeca.material || null,
+      ocasioes: editarPeca.ocasioes || [],
+    }).eq("id", editarPeca.id);
+    // reload peças
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", session.user.id).order("created_at", { ascending: false });
+      if (ps) setPecasLoja(ps);
+    }
+    setEditarPeca(null);
+    setEditarLoading(false);
+  };
+
+  const atualizarEstadoAluguer = async (id, novoEstado, extras = {}) => {
+    await supabase.from("alugueres_lojista").update({ estado: novoEstado, ...extras }).eq("id", id);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: als } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone, cidade), pecas_lojista(nome, fotos, preco_aluguer_dia), stock_lojista(tamanho)").eq("lojista_id", session.user.id).order("created_at", { ascending: false });
+      if (als) setAlugueresLoja(als);
+    }
   };
 
   const mudarPassword = async () => {
@@ -1130,19 +1166,57 @@ export default function Perfil() {
                 {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>(
                   <div key={p.id} style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center",borderBottom:"1px solid var(--g1)"}}>
                     {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
-                    <div style={{flex:1}}><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{p.nome}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia}€/dia</div></div>
+                    <div style={{flex:1}}><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{p.nome}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia ? `${p.preco_aluguer_dia}€/dia` : "—"}{p.preco_venda ? ` · ${p.preco_venda}€ venda` : ""}</div></div>
+                    <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
                   </div>
                 ))}
               </div>
             )}
             {tabLoja === "alugueres" && (
               <div className="card" style={{padding:0}}>
-                {alugueresLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem alugueres.</p> : alugueresLoja.map(a=>(
-                  <div key={a.id} style={{padding:"1rem 1.5rem",display:"flex",justifyContent:"space-between",borderBottom:"1px solid var(--g1)"}}>
-                    <div><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{a.clientes?.nome||"—"}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{a.data_inicio} → {a.data_fim}</div></div>
-                    <div style={{textAlign:"right"}}><div style={{fontFamily:"var(--serif)",fontSize:"1.1rem",color:"var(--rosa)"}}>{(a.valor_aluguer||0).toFixed(2)}€</div><span style={{fontSize:"0.6rem",color:"var(--g4)"}}>{a.estado}</span></div>
+                {alugueresLoja.length === 0 ? (
+                  <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem alugueres.</p>
+                ) : alugueresLoja.map(a => {
+                  const estadoCor = {pendente:"#f39c12",confirmado:"#2980b9",enviado:"#8e44ad",ativo:"#27ae60",em_devolucao:"#e67e22",devolvido:"var(--g4)",devolvido_danificado:"#e74c3c",cancelado:"var(--g4)"}[a.estado]||"var(--g4)";
+                  const estadoLabel = {pendente:"Pendente",confirmado:"Confirmado",enviado:"Enviado",ativo:"Ativo",em_devolucao:"Em devolução",devolvido:"Devolvido",devolvido_danificado:"Danificado",cancelado:"Cancelado"}[a.estado]||a.estado;
+                  return (
+                  <div key={a.id} style={{padding:"1.25rem 1.5rem",borderBottom:"1px solid var(--g1)"}}>
+                    <div style={{display:"flex",gap:"1rem",alignItems:"flex-start"}}>
+                      {a.pecas_lojista?.fotos?.[0] ? <img src={a.pecas_lojista.fotos[0]} style={{width:44,height:56,objectFit:"cover",flexShrink:0}} alt=""/> : <div style={{width:44,height:56,background:"var(--g1)",flexShrink:0}}/>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:"0.5rem",flexWrap:"wrap"}}>
+                          <div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{a.pecas_lojista?.nome||"—"}</div>
+                          <span style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.2rem 0.6rem",background:estadoCor,color:"#fff",whiteSpace:"nowrap"}}>{estadoLabel}</span>
+                        </div>
+                        <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>
+                          {a.clientes?.nome} · {a.stock_lojista?.tamanho||"—"} · {a.data_inicio} → {a.data_fim}
+                        </div>
+                        <div style={{fontSize:"0.82rem",fontFamily:"var(--serif)",color:"var(--rosa)",marginTop:"0.25rem"}}>
+                          {(a.valor_aluguer||0).toFixed(2)}€ {a.deposito_valor ? `+ ${(a.deposito_valor||0).toFixed(2)}€ dep.` : ""}
+                        </div>
+                        {a.tracking_numero && <div style={{fontSize:"0.7rem",color:"var(--g4)",marginTop:"0.2rem"}}>📦 {a.tracking_transportadora} {a.tracking_numero}</div>}
+                      </div>
+                    </div>
+                    {/* Ações por estado */}
+                    <div style={{display:"flex",gap:"0.5rem",marginTop:"0.85rem",flexWrap:"wrap"}}>
+                      {a.estado === "pendente" && <>
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"confirmado")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>✓ Confirmar</button>
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"cancelado")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"var(--sans)"}}>✕ Recusar</button>
+                      </>}
+                      {a.estado === "confirmado" && <>
+                        <button onClick={()=>{setModalEnvio(a);setTrackingInfo({transportadora:"",numero:""});}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#8e44ad",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>📦 Marcar enviado</button>
+                      </>}
+                      {(a.estado === "enviado" || a.estado === "ativo") && <>
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"em_devolucao")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e67e22",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>↩ Devolução iniciada</button>
+                        {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>✉ Contactar</a>}
+                      </>}
+                      {a.estado === "em_devolucao" && <>
+                        <button onClick={()=>setModalVerificar(a)} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>🔍 Verificar peça</button>
+                      </>}
+                    </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             {tabLoja === "liquidacoes" && (
@@ -1155,6 +1229,64 @@ export default function Perfil() {
             )}
           </div>
         )}
+      {modalEnvio && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,marginBottom:"1rem"}}>Marcar como enviado</h3>
+            <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"1.5rem"}}>{modalEnvio.pecas_lojista?.nome} → {modalEnvio.clientes?.nome}</p>
+            <div className="fg"><label className="lbl">Transportadora</label><input className="inp" value={trackingInfo.transportadora} onChange={e=>setTrackingInfo(t=>({...t,transportadora:e.target.value}))} placeholder="CTT, DHL, FEDEX..." /></div>
+            <div className="fg"><label className="lbl">Nº de tracking</label><input className="inp" value={trackingInfo.numero} onChange={e=>setTrackingInfo(t=>({...t,numero:e.target.value}))} placeholder="PT123456789" /></div>
+            <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
+              <button onClick={async()=>{await atualizarEstadoAluguer(modalEnvio.id,"enviado",{tracking_transportadora:trackingInfo.transportadora||null,tracking_numero:trackingInfo.numero||null});setModalEnvio(null);}} style={{flex:1,padding:"0.85rem",background:"#8e44ad",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Confirmar envio</button>
+              <button onClick={()=>setModalEnvio(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {modalVerificar && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
+            <h3 style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,marginBottom:"1rem"}}>Verificar devolução</h3>
+            <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"0.5rem"}}>{modalVerificar.pecas_lojista?.nome} · {modalVerificar.clientes?.nome}</p>
+            <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.5rem"}}>Inspeciona a peça e regista o estado:</p>
+            <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+              <button onClick={async()=>{await atualizarEstadoAluguer(modalVerificar.id,"devolvido",{deposito_estado:"a_devolver",data_verificacao:new Date().toISOString()});setModalVerificar(null);}} style={{padding:"1rem",background:"#27ae60",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>✓ Peça em bom estado</button>
+              <button onClick={async()=>{await atualizarEstadoAluguer(modalVerificar.id,"devolvido_danificado",{deposito_estado:"em_disputa",data_verificacao:new Date().toISOString()});setModalVerificar(null);}} style={{padding:"1rem",background:"#e74c3c",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>✕ Peça danificada</button>
+              <button onClick={()=>setModalVerificar(null)} style={{padding:"0.75rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+            </div>
+            <p style={{fontSize:"0.7rem",color:"var(--g4)",marginTop:"1.25rem",lineHeight:1.5}}>Após confirmação, a Nora Grei processa: devolução do depósito ao cliente (peça OK) ou abertura de disputa (peça danificada). O teu pagamento é transferido nos 10 dias úteis seguintes, deduzida a comissão Nora Grei.</p>
+          </div>
+        </div>
+      )}
+      {editarPeca && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>
+            <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>Editar peça</h3>
+            <div className="fg"><label className="lbl">Nome *</label><input className="inp" value={editarPeca.nome||""} onChange={e=>setEditarPeca(p=>({...p,nome:e.target.value}))} /></div>
+            <div className="fg"><label className="lbl">Descrição</label><textarea className="inp" value={editarPeca.descricao||""} onChange={e=>setEditarPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"80px"}} /></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              <div className="fg"><label className="lbl">Preço aluguer/dia (€)</label><input className="inp" type="number" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="25" /></div>
+              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" value={editarPeca.preco_venda||""} onChange={e=>setEditarPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              <div className="fg"><label className="lbl">Valor da peça (€)</label><input className="inp" type="number" value={editarPeca.valor_peca||""} onChange={e=>setEditarPeca(p=>({...p,valor_peca:e.target.value}))} placeholder="200" /></div>
+              <div className="fg"><label className="lbl">Material</label><input className="inp" value={editarPeca.material||""} onChange={e=>setEditarPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+            </div>
+            <div className="fg">
+              <label className="lbl">Ocasiões</label>
+              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
+                {["Festa","Trabalho","Férias","Jantar","Dia a dia","Casamento","Gala"].map(oc => (
+                  <button key={oc} type="button" onClick={()=>setEditarPeca(p=>({...p,ocasioes:(p.ocasioes||[]).includes(oc)?(p.ocasioes||[]).filter(x=>x!==oc):[...(p.ocasioes||[]),oc]}))} style={{padding:"0.3rem 0.75rem",fontSize:"0.7rem",border:"1.5px solid",borderColor:(editarPeca.ocasioes||[]).includes(oc)?"var(--black)":"var(--g2)",background:(editarPeca.ocasioes||[]).includes(oc)?"var(--black)":"transparent",color:(editarPeca.ocasioes||[]).includes(oc)?"#fff":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)"}}>{oc}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{display:"flex",gap:"0.75rem",marginTop:"1.5rem"}}>
+              <button onClick={guardarEdicaoPeca} disabled={!editarPeca.nome||editarLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:!editarPeca.nome?0.5:1}}>{editarLoading?"...":"Guardar"}</button>
+              <button onClick={()=>setEditarPeca(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showNovaPeca && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
           <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>

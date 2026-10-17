@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-const TABS = ["dashboard", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };
-const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", clientes: "◉", reservas: "◌", campanhas: "✉", config: "⚙" };
+const TABS = ["dashboard", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };
+const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", lojistas: "◫", clientes: "◉", reservas: "◌", campanhas: "✉", config: "⚙" };
 
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
@@ -31,6 +31,10 @@ export default function Admin() {
 
   // CLIENTES
   const [clientes, setClientes] = useState([]);
+
+  // LOJISTAS
+  const [alugueresLojista, setAlugueresLojista] = useState([]);
+  const [subTabLojistas, setSubTabLojistas] = useState("depositos");
 
   // RESERVAS
   const [reservas, setReservas] = useState([]);
@@ -125,6 +129,10 @@ export default function Admin() {
         .order("data_fim", { ascending: true })
         .limit(100);
       if (data) setAlugueres(data);
+    }
+    if (tab === "lojistas") {
+      const { data } = await supabase.from("alugueres_lojista").select("*, clientes!alugueres_lojista_cliente_id_fkey(nome, email, telefone), lojista:clientes!alugueres_lojista_lojista_id_fkey(nome, email, codigo_cliente), pecas_lojista(nome, preco_aluguer_dia)").order("created_at", { ascending: false });
+      if (data) setAlugueresLojista(data);
     }
     if (tab === "clientes") {
       const { data } = await supabase.from("clientes").select("*").order("created_at", { ascending: false });
@@ -754,6 +762,75 @@ export default function Admin() {
               </div>
             </>
           )}
+
+          {/* ── LOJISTAS ── */}
+          {tab === "lojistas" && (() => {
+            const depositos = alugueresLojista.filter(a => a.deposito_estado === "a_devolver");
+            const disputas = alugueresLojista.filter(a => a.deposito_estado === "em_disputa");
+            const pagamentos = alugueresLojista.filter(a => a.estado === "devolvido" && !a.liquidado_em);
+            const COMISSAO = 0.10;
+            return (
+            <>
+              <div className="ad-header">
+                <h1 className="ad-titulo">Lojistas</h1>
+                <p className="ad-subtitulo">Gestão de depósitos, pagamentos e disputas</p>
+              </div>
+              {/* sub-tabs */}
+              <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
+                {[["depositos",`Depósitos a devolver (${depositos.length})`],["pagamentos",`Pagamentos pendentes (${pagamentos.length})`],["disputas",`Disputas (${disputas.length})`],["todos","Todos os alugueres"]].map(([k,l])=>(
+                  <button key={k} onClick={()=>setSubTabLojistas(k)} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1rem",border:"1.5px solid",borderColor:subTabLojistas===k?"#080808":"#e2dfda",background:subTabLojistas===k?"#080808":"transparent",color:subTabLojistas===k?"#fff":"#5a5855",cursor:"pointer",fontFamily:"inherit"}}>{l}</button>
+                ))}
+              </div>
+              {/* lista */}
+              {(()=>{
+                const lista = subTabLojistas==="depositos" ? depositos : subTabLojistas==="pagamentos" ? pagamentos : subTabLojistas==="disputas" ? disputas : alugueresLojista;
+                if (lista.length === 0) return <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"#888"}}>Nenhum registo.</p>;
+                return (
+                  <div style={{display:"flex",flexDirection:"column",gap:"0"}}>
+                    {lista.map(a => {
+                      const estadoCor = {pendente:"#f39c12",confirmado:"#2980b9",enviado:"#8e44ad",ativo:"#27ae60",em_devolucao:"#e67e22",devolvido:"#888",devolvido_danificado:"#e74c3c",cancelado:"#888"}[a.estado]||"#888";
+                      const liquidacao = ((a.valor_aluguer||0) * (1 - COMISSAO)).toFixed(2);
+                      return (
+                        <div key={a.id} style={{padding:"1.25rem 1.5rem",borderBottom:"1px solid #f0eeeb",background:"#fff"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:"1rem",flexWrap:"wrap"}}>
+                            <div>
+                              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1rem",marginBottom:"0.2rem"}}>{a.pecas_lojista?.nome||"—"}</div>
+                              <div style={{fontSize:"0.72rem",color:"#5a5855"}}>
+                                <strong>Lojista:</strong> {a.lojista?.nome} ({a.lojista?.codigo_cliente}) · <strong>Cliente:</strong> {a.clientes?.nome}
+                              </div>
+                              <div style={{fontSize:"0.72rem",color:"#5a5855"}}>{a.data_inicio} → {a.data_fim} · Aluguer: {(a.valor_aluguer||0).toFixed(2)}€ · Depósito: {(a.deposito_valor||0).toFixed(2)}€</div>
+                              {a.data_verificacao && <div style={{fontSize:"0.68rem",color:"#888"}}>Verificado em {new Date(a.data_verificacao).toLocaleDateString("pt-PT")}</div>}
+                            </div>
+                            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"0.4rem"}}>
+                              <span style={{fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:estadoCor,color:"#fff"}}>{a.estado}</span>
+                              <span style={{fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:a.deposito_estado==="a_devolver"?"#27ae60":a.deposito_estado==="em_disputa"?"#e74c3c":a.deposito_estado==="devolvido"?"#888":"#f39c12",color:"#fff"}}>dep: {a.deposito_estado||"—"}</span>
+                            </div>
+                          </div>
+                          {/* ações admin */}
+                          <div style={{display:"flex",gap:"0.5rem",marginTop:"0.85rem",flexWrap:"wrap"}}>
+                            {a.deposito_estado === "a_devolver" && (
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido",deposito_devolvido_em:new Date().toISOString()}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>✓ Confirmar devolução depósito</button>
+                            )}
+                            {a.estado === "devolvido" && !a.liquidado_em && (
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({liquidado_em:new Date().toISOString(),valor_liquidacao:parseFloat(liquidacao)}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#2980b9",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>💶 Pagar lojista {liquidacao}€</button>
+                            )}
+                            {a.liquidado_em && <span style={{fontSize:"0.65rem",color:"#27ae60"}}>✓ Pago em {new Date(a.liquidado_em).toLocaleDateString("pt-PT")} · {a.valor_liquidacao?.toFixed(2)}€</span>}
+                            {a.deposito_estado === "em_disputa" && <>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"retido_lojista"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>Reter (lojista)</button>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"inherit"}}>Devolver ao cliente</button>
+                            </>}
+                            {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Cliente</a>}
+                            {a.lojista?.email && <a href={`mailto:${a.lojista.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Lojista</a>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </>
+            );
+          })()}
 
           {/* ── CLIENTES ── */}
           {tab === "clientes" && (
