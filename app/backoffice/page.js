@@ -748,7 +748,7 @@ export default function Backoffice() {
       const { data: pcf } = await supabase.from("pecas").select("id, nome, fotos");
       if (pcf) setPecasComFoto(pcf.filter(p => p.fotos?.length > 0));
     }
-    if (tab === "lojistas") {
+    if (tab === "dashboard" || tab === "lojistas") {
       const { data: al } = await supabase
         .from("alugueres_lojista")
         .select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)")
@@ -1273,6 +1273,52 @@ export default function Backoffice() {
                 </div>
               </>
             )}
+
+            {/* PERFORMANCE LOJISTAS */}
+            {(() => {
+              if (!alugueresLojista || alugueresLojista.length === 0) return null;
+              const porLojista = {};
+              alugueresLojista.forEach(a => {
+                const id = a.lojista_id;
+                const nome = a.clientes?.nome || "—";
+                if (!porLojista[id]) porLojista[id] = { nome, total: 0, disputas: 0, receitaTotal: 0, liquidado: 0, aReceber: 0 };
+                porLojista[id].total++;
+                if (a.deposito_estado === "em_disputa") porLojista[id].disputas++;
+                if (a.estado === "devolvido" && !a.liquidado_em) porLojista[id].aReceber += (a.valor_aluguer || 0) * 0.9;
+                if (a.liquidado_em) porLojista[id].liquidado += (a.valor_liquidacao || 0);
+                porLojista[id].receitaTotal += (a.valor_aluguer || 0);
+              });
+              const lista = Object.values(porLojista).sort((a, b) => b.receitaTotal - a.receitaTotal);
+              return (
+                <div style={CARD}>
+                  <p style={CARD_T}>Performance Lojistas</p>
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead>
+                      <tr>{["Lojista","Alugueres","Receita total","A receber","Já pago","Disputas","Estado"].map(h => <th key={h} style={TH}>{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {lista.map((l, i) => {
+                        const cor = l.disputas > 0 ? "red" : l.aReceber > 0 ? "orange" : "green";
+                        return (
+                          <tr key={i} style={{ background:"#fff",borderBottom:"1px solid #f0eeeb" }}>
+                            <td style={{ ...TD,fontWeight:600 }}>{l.nome}</td>
+                            <td style={TD}>{l.total}</td>
+                            <td style={TD}>{l.receitaTotal.toFixed(0)}€</td>
+                            <td style={{ ...TD,color:l.aReceber>0?"#c4748a":"#888",fontWeight:l.aReceber>0?600:400 }}>{l.aReceber>0?`${l.aReceber.toFixed(2)}€`:"—"}</td>
+                            <td style={{ ...TD,color:"#27ae60" }}>{l.liquidado>0?`${l.liquidado.toFixed(2)}€`:"—"}</td>
+                            <td style={TD}>{l.disputas>0?<span style={BADGE("red")}>{l.disputas} disputa{l.disputas>1?"s":""}</span>:<span style={{color:"#888",fontSize:"0.78rem"}}>—</span>}</td>
+                            <td style={TD}><span style={BADGE(cor)}>{cor==="green"?"✓ OK":cor==="orange"?"Pag. pendente":"Em disputa"}</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div style={{ marginTop:"0.75rem",textAlign:"right" }}>
+                    <button style={BTN("outline","sm")} onClick={() => setTab("lojistas")}>Gerir lojistas →</button>
+                  </div>
+                </div>
+              );
+            })()}
           </>
         )}
 

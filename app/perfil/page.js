@@ -1220,11 +1220,93 @@ export default function Perfil() {
               </div>
             )}
             {tabLoja === "liquidacoes" && (
-              <div className="card">
-                {alugueresLoja.filter(a=>a.estado==="devolvido").map(a=>{
-                  const liq=(a.valor_aluguer||0)-(a.valor_aluguer||0)*0.1-0.40;
-                  return <div key={a.id} style={{display:"flex",justifyContent:"space-between",padding:"0.75rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}><span>{a.clientes?.nome||"—"}</span><span style={{color:"#27ae60"}}>{liq.toFixed(2)}€</span></div>;
-                })}
+              <div className="card" style={{padding:"1.5rem"}}>
+                {/* RESUMO FINANCEIRO */}
+                {(() => {
+                  const aReceber = alugueresLoja.filter(a => a.estado === "devolvido" && !a.liquidado_em);
+                  const recebido = alugueresLoja.filter(a => a.liquidado_em);
+                  const totalAReceber = aReceber.reduce((s,a) => s + (a.valor_aluguer||0)*0.9, 0);
+                  const totalRecebido = recebido.reduce((s,a) => s + (a.valor_liquidacao||0), 0);
+                  const depositosDevolvidosCliente = alugueresLoja.filter(a => a.deposito_estado === "devolvido");
+                  const depositosCativos = alugueresLoja.filter(a => ["em_disputa","retido_lojista"].includes(a.deposito_estado));
+                  const depositosAtivos = alugueresLoja.filter(a => ["pendente","confirmado","enviado","ativo","em_devolucao"].includes(a.estado) && a.deposito_estado === "recebido");
+                  return (
+                    <>
+                      {/* KPIs */}
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1.5rem"}}>
+                        {[
+                          {val:`${totalAReceber.toFixed(2)}€`,lbl:"A receber",cor:"#c4748a",nota:"Peças devolvidas OK, pagamento pendente"},
+                          {val:`${totalRecebido.toFixed(2)}€`,lbl:"Já recebido",cor:"#27ae60",nota:"Transferências processadas pela Nora Grei"},
+                          {val:depositosAtivos.length,lbl:"Depósitos em curso",cor:"#f39c12",nota:"Alugueres ainda ativos"},
+                          {val:depositosCativos.length,lbl:"Depósitos cativos",cor:"#e74c3c",nota:"Em disputa ou retidos por danos"},
+                        ].map((k,i) => (
+                          <div key={i} style={{background:"#fff",padding:"1rem"}}>
+                            <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{k.lbl}</div>
+                            <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:k.cor,lineHeight:1}}>{k.val}</div>
+                            <div style={{fontSize:"0.65rem",color:"#aaa",marginTop:"0.25rem"}}>{k.nota}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* A RECEBER */}
+                      {aReceber.length > 0 && (
+                        <div style={{marginBottom:"1.5rem"}}>
+                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>A receber (nos próximos 10 dias úteis)</p>
+                          {aReceber.map(a => (
+                            <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}>
+                              <div>
+                                <span style={{fontWeight:500}}>{a.pecas_lojista?.nome||"—"}</span>
+                                <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
+                                {a.data_verificacao && <div style={{fontSize:"0.68rem",color:"#888"}}>Verificado em {new Date(a.data_verificacao).toLocaleDateString("pt-PT")}</div>}
+                              </div>
+                              <span style={{color:"#c4748a",fontWeight:600}}>{((a.valor_aluguer||0)*0.9).toFixed(2)}€</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* JÁ RECEBIDO */}
+                      {recebido.length > 0 && (
+                        <div style={{marginBottom:"1.5rem"}}>
+                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#27ae60",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Já recebido</p>
+                          {recebido.map(a => (
+                            <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}>
+                              <div>
+                                <span style={{fontWeight:500}}>{a.pecas_lojista?.nome||"—"}</span>
+                                <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
+                                {a.liquidado_em && <div style={{fontSize:"0.68rem",color:"#888"}}>Pago em {new Date(a.liquidado_em).toLocaleDateString("pt-PT")}</div>}
+                              </div>
+                              <span style={{color:"#27ae60",fontWeight:600}}>{(a.valor_liquidacao||0).toFixed(2)}€</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* DEPÓSITOS CATIVOS */}
+                      {depositosCativos.length > 0 && (
+                        <div style={{marginBottom:"1rem"}}>
+                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#e74c3c",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Depósitos cativos / em disputa</p>
+                          {depositosCativos.map(a => (
+                            <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem",background:"#fff5f5",margin:"0 -0.5rem",padding:"0.6rem 0.5rem"}}>
+                              <div>
+                                <span style={{fontWeight:500}}>{a.pecas_lojista?.nome||"—"}</span>
+                                <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
+                                <div style={{fontSize:"0.68rem",color:"#e74c3c",marginTop:"0.1rem"}}>{a.deposito_estado==="em_disputa"?"Em análise pela Nora Grei":"Depósito retido — danos confirmados"}</div>
+                              </div>
+                              <span style={{display:"inline-block",fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",fontWeight:600,background:"#fff5f5",color:"#e74c3c"}}>{a.deposito_estado}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {aReceber.length === 0 && recebido.length === 0 && depositosCativos.length === 0 && (
+                        <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não há movimentos financeiros.</p>
+                      )}
+
+                      <p style={{fontSize:"0.68rem",color:"#aaa",marginTop:"1rem",lineHeight:1.6}}>Comissão Nora Grei: 10% sobre o valor de aluguer. Pagamentos processados até 10 dias úteis após verificação da peça.</p>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
