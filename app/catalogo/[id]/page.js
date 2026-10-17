@@ -591,6 +591,31 @@ export default function PecaDetalhe() {
 
           <hr className="sep" />
 
+          {/* BANNER CONSELHO STYLIST */}
+          {(() => {
+            const conselho = peca.conselho_stylist || (() => {
+              const cat = peca.categorias?.nome || "";
+              const mat = peca.material || "";
+              const ocs = peca.ocasioes || [];
+              const ocsPt = ocs.slice(0,2).join(" e ");
+              if (ocs.includes("Casamento") || ocs.includes("Gala")) return `Perfeita para ocasiões formais. ${mat ? `O ${mat.toLowerCase()} garante elegância e conforto durante toda a cerimónia.` : "Ideal para cerimónias e eventos de gala."}`;
+              if (ocs.includes("Praia") || ocs.includes("Férias")) return `Uma escolha leve e descontraída para ${ocsPt.toLowerCase()}. ${mat ? `O ${mat.toLowerCase()} é ideal para dias quentes.` : ""}`;
+              if (ocs.includes("Trabalho")) return `Sofisticada e versátil para o dia a dia profissional. ${mat ? `Em ${mat.toLowerCase()}, mantém-se impecável ao longo do dia.` : ""}`;
+              if (ocs.includes("Festa") || ocs.includes("Cocktail")) return `Uma escolha infalível para ${ocsPt.toLowerCase()}. ${mat ? `O ${mat.toLowerCase()} cria um look sofisticado sem esforço.` : "Vai destacar-se pela elegância."}`;
+              if (ocsPt) return `Ideal para ${ocsPt.toLowerCase()}. ${mat ? `Em ${mat.toLowerCase()}, confortável e elegante.` : "Uma peça versátil para várias ocasiões."}`;
+              return `Uma peça cuidadosamente selecionada pela Nora Grei. ${mat ? `Em ${mat.toLowerCase()}, com um toque de sofisticação.` : ""}`;
+            })();
+            return conselho ? (
+              <div style={{ background:"#f9f6f2", borderLeft:"3px solid #c4748a", padding:"0.85rem 1rem", marginBottom:"1.25rem", display:"flex", gap:"0.75rem", alignItems:"flex-start" }}>
+                <span style={{ fontSize:"1.1rem", flexShrink:0 }}>✨</span>
+                <div>
+                  <p style={{ fontSize:"0.58rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#c4748a", fontWeight:600, marginBottom:"0.3rem", fontFamily:"var(--sans)" }}>Nota da stylist</p>
+                  <p style={{ fontSize:"0.85rem", color:"#3f3e3c", lineHeight:1.55, margin:0, fontFamily:"var(--sans)" }}>{conselho}</p>
+                </div>
+              </div>
+            ) : null;
+          })()}
+
           {peca.descricao && (
             <div className="secao">
               <p className="secao-label">{t.descricao}</p>
@@ -697,14 +722,6 @@ export default function PecaDetalhe() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Chat
         </button>
-        <a
-          href="https://www.noragrei.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="sticky-btn-comprar"
-        >
-          Comprar
-        </a>
       </div>
     </>
   );

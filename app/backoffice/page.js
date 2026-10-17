@@ -2040,6 +2040,7 @@ export default function Backoffice() {
                   <label htmlFor="dest" style={{ ...LBL,marginBottom:0 }}>Em destaque</label>
                 </div>
                 <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Descrição</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={novaPeca.descricao} onChange={e => setNovaPeca(p=>({...p,descricao:e.target.value}))} /></div>
+                <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Nota da stylist <span style={{fontWeight:400,color:"#aaa",textTransform:"none",letterSpacing:0}}>(opcional — se vazio, gerado automaticamente com base nas ocasiões)</span></label><textarea style={{ ...INP,resize:"vertical",minHeight:"70px" }} value={novaPeca.conselho_stylist||""} onChange={e => setNovaPeca(p=>({...p,conselho_stylist:e.target.value}))} placeholder="Ex: Perfeita para casamentos de verão ao ar livre — já usada por 3 noivas na Nora Grei" /></div>
               </div>
 
               <div style={{ marginBottom:"1.25rem" }}>
@@ -2149,6 +2150,7 @@ export default function Backoffice() {
                       </select>
                     </div>
                     <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Descrição</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={editForm.descricao} onChange={e => setEditForm(f=>({...f,descricao:e.target.value}))} /></div>
+                    <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Nota da stylist <span style={{fontWeight:400,color:"#aaa",textTransform:"none",letterSpacing:0}}>(opcional — se vazio, gerado automaticamente)</span></label><textarea style={{ ...INP,resize:"vertical",minHeight:"70px" }} value={editForm.conselho_stylist||""} onChange={e => setEditForm(f=>({...f,conselho_stylist:e.target.value}))} placeholder="Ex: Perfeita para casamentos de verão ao ar livre — já usada por 3 noivas na Nora Grei" /></div>
                   </div>
 
                   <div style={{ marginTop:"1.25rem",marginBottom:"1.25rem" }}>
