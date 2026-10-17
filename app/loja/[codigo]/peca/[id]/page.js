@@ -11,6 +11,7 @@ export default function PecaLojaPage() {
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [loading, setLoading] = useState(true);
   const [partilhado, setPartilhado] = useState(false);
+  const [dataFimTimer, setDataFimTimer] = useState(null);
 
   useEffect(() => {
     if (codigo && id) carregarDados();
@@ -33,6 +34,22 @@ export default function PecaLojaPage() {
       setPeca(data);
       const disponivel = data.stock_lojista?.find(s => s.quantidade_disponivel > 0);
       if (disponivel) setTamanhoSelecionado(disponivel.id);
+
+      // Buscar data_fim do aluguer ativo para mostrar timer
+      const stockIds = (data.stock_lojista || []).map(s => s.id);
+      if (stockIds.length > 0) {
+        const { data: alug } = await supabase
+          .from("alugueres_lojista")
+          .select("data_fim, data_disponivel_novamente")
+          .in("stock_lojista_id", stockIds)
+          .eq("estado", "ativo")
+          .order("data_fim", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (alug) {
+          setDataFimTimer(alug.data_disponivel_novamente || alug.data_fim);
+        }
+      }
     }
     setLoading(false);
   };
@@ -55,6 +72,26 @@ export default function PecaLojaPage() {
   };
 
   const stockDisponivel = peca?.stock_lojista?.filter(s => s.quantidade_disponivel > 0) || [];
+
+  function Timer({ dataFim }) {
+    const [tempo, setTempo] = useState("");
+    useEffect(() => {
+      if (!dataFim) return;
+      const calc = () => {
+        const diff = new Date(dataFim) - new Date();
+        if (diff <= 0) { setTempo("Disponível em breve"); return; }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        setTempo(d > 0 ? `${d}d ${h}h ${m}m` : `${h}h ${m}m ${s}s`);
+      };
+      calc();
+      const iv = setInterval(calc, 1000);
+      return () => clearInterval(iv);
+    }, [dataFim]);
+    return <span className="timer-count">{tempo}</span>;
+  }
 
   if (loading) return (
     <>
@@ -137,13 +174,30 @@ export default function PecaLojaPage() {
             </div>
           )}
 
-          <button
-            className="btn-checkout"
-            onClick={irParaCheckout}
-            disabled={!tamanhoSelecionado || stockDisponivel.length === 0}
-          >
-            {stockDisponivel.length === 0 ? "Esgotado" : peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
-          </button>
+          {stockDisponivel.length === 0 ? (
+            <div className="esgotado-bloco">
+              {dataFimTimer && (
+                <div className="timer-bloco">
+                  <p className="timer-label">Disponível em</p>
+                  <Timer dataFim={dataFimTimer} />
+                </div>
+              )}
+              <a
+                href={`/reserva?peca=${id}&loja=${codigo}`}
+                className="btn-reservar-disponivel"
+              >
+                Garantir reserva quando disponível
+              </a>
+            </div>
+          ) : (
+            <button
+              className="btn-checkout"
+              onClick={irParaCheckout}
+              disabled={!tamanhoSelecionado}
+            >
+              {peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
+            </button>
+          )}
 
           {/* Botões de partilha */}
           <div className="partilha-sec">
@@ -227,6 +281,12 @@ const ESTILOS = `
   .btn-checkout{width:100%;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background 0.2s;margin-bottom:2rem}
   .btn-checkout:hover{background:#2a2926}
   .btn-checkout:disabled{opacity:0.5;cursor:not-allowed}
+  .esgotado-bloco{margin-bottom:2rem}
+  .timer-bloco{background:var(--g1);border:1px solid var(--g2);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+  .timer-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;font-weight:500}
+  .timer-count{font-family:var(--serif);font-size:1.5rem;font-weight:300;color:var(--black);letter-spacing:0.05em}
+  .btn-reservar-disponivel{display:block;width:100%;padding:1.2rem;background:transparent;color:var(--black);border:1.5px solid var(--black);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center;text-decoration:none}
+  .btn-reservar-disponivel:hover{background:var(--black);color:var(--white)}
   .partilha-sec{border-top:1px solid var(--g2);padding-top:1.5rem;margin-bottom:1.5rem}
   .partilha-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:#5a5855;margin-bottom:0.75rem;font-weight:500}
   .partilha-btns{display:flex;gap:0.75rem;flex-wrap:wrap}

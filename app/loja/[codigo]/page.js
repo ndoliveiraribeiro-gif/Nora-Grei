@@ -19,6 +19,7 @@ export default function LojaPublica() {
   const { codigo } = useParams();
   const [lang, setLang] = useState("pt");
   const [lojista, setLojista] = useState(null);
+  const [timers, setTimers] = useState({});
   const [pecas, setPecas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("todos");
@@ -36,8 +37,34 @@ export default function LojaPublica() {
     const { data: cli } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais").eq("codigo_cliente", codigo).maybeSingle();
     if (!cli) { setLoading(false); return; }
     setLojista(cli);
-    const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(tamanho, quantidade_disponivel)").eq("cliente_id", cli.id).eq("estado", "disponivel").order("created_at", { ascending: false });
+    const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(id, tamanho, quantidade_disponivel)").eq("cliente_id", cli.id).eq("estado", "disponivel").order("created_at", { ascending: false });
     setPecas(ps || []);
+
+    // Buscar timers para peças esgotadas
+    if (ps && ps.length > 0) {
+      const stockIds = ps.flatMap(p => (p.stock_lojista || []).map(s => s.id));
+      if (stockIds.length > 0) {
+        const { data: alugAtivos } = await supabase
+          .from("alugueres_lojista")
+          .select("stock_lojista_id, data_fim, data_disponivel_novamente, pecas_lojista_id")
+          .in("stock_lojista_id", stockIds)
+          .eq("estado", "ativo")
+          .order("data_fim", { ascending: false });
+        if (alugAtivos) {
+          // Mapear por peca id → data_fim mais distante
+          const timerMap = {};
+          for (const p of ps) {
+            const stockIds_p = (p.stock_lojista || []).map(s => s.id);
+            const alugsDaPeca = alugAtivos.filter(a => stockIds_p.includes(a.stock_lojista_id));
+            if (alugsDaPeca.length > 0) {
+              const maisRecente = alugsDaPeca[0];
+              timerMap[p.id] = maisRecente.data_disponivel_novamente || maisRecente.data_fim;
+            }
+          }
+          setTimers(timerMap);
+        }
+      }
+    }
 
     // Média de avaliações do lojista
     const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista").eq("lojista_id", cli.id).not("nota_cliente_lojista","is",null);
@@ -49,6 +76,25 @@ export default function LojaPublica() {
 
     setLoading(false);
   };
+
+  function MiniTimer({ dataFim }) {
+    const [tempo, setTempo] = useState("");
+    useEffect(() => {
+      if (!dataFim) return;
+      const calc = () => {
+        const diff = new Date(dataFim) - new Date();
+        if (diff <= 0) { setTempo("em breve"); return; }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        setTempo(d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`);
+      };
+      calc();
+      const iv = setInterval(calc, 60000);
+      return () => clearInterval(iv);
+    }, [dataFim]);
+    return <span className="tag tag-timer">⏱ {tempo}</span>;
+  }
 
   const t = T[lang] || T.pt;
   const pecasFiltradas = filtro === "alugar" ? pecas.filter(p => p.preco_aluguer_dia) : filtro === "comprar" ? pecas.filter(p => p.preco_venda) : pecas;
@@ -93,6 +139,7 @@ export default function LojaPublica() {
         .peca-tags{display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap}
         .tag{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.2rem 0.5rem;background:var(--g1);color:var(--g4)}
         .tag-rosa{background:#fce4ec;color:var(--rosa)}
+        .tag-timer{background:#fff8e1;color:#b8860b;font-variant-numeric:tabular-nums}
         .sem-pecas{text-align:center;padding:5rem 2rem;font-size:0.85rem;color:var(--g4)}
       `}</style>
 
@@ -149,7 +196,11 @@ export default function LojaPublica() {
                 <div className="peca-tags">
                   {p.preco_aluguer_dia && <span className="tag tag-rosa">{t.alugar}</span>}
                   {p.preco_venda && <span className="tag">{t.comprar}</span>}
-                  {p.stock_lojista?.every(s => s.quantidade_disponivel === 0) && <span className="tag">{t.indisponivel}</span>}
+                  {p.stock_lojista?.every(s => s.quantidade_disponivel === 0) && (
+                    timers[p.id]
+                      ? <MiniTimer dataFim={timers[p.id]} />
+                      : <span className="tag">{t.indisponivel}</span>
+                  )}
                 </div>
               </div>
             </a>
