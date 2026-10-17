@@ -108,6 +108,7 @@ export default function Home() {
   const [cupaoCopiado, setCupaoCopiado] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [heroPeca, setHeroPeca] = useState(null);
+  const [heroCarregado, setHeroCarregado] = useState(false);
   const [categoriaFotos, setCategoriaFotos] = useState({});
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
@@ -185,9 +186,10 @@ export default function Home() {
   };
 
   const aplicarHeroAutomatico = (todasPecas) => {
-    const destaque = todasPecas.find(function (p) { return p.destaque && p.fotos && p.fotos[0]; });
+    const comFotoReal = todasPecas.filter(function (p) { return p.fotos && p.fotos.filter(Boolean).length > 0; });
+    const destaque = comFotoReal.find(function (p) { return p.destaque; });
     if (destaque) { setHeroPeca(destaque); return; }
-    if (todasPecas[0] && todasPecas[0].fotos && todasPecas[0].fotos[0]) setHeroPeca(todasPecas[0]);
+    if (comFotoReal[0]) setHeroPeca(comFotoReal[0]);
   };
 
   const carregarConteudo = async () => {
@@ -197,11 +199,12 @@ export default function Home() {
     const { data: todasPecas } = await supabase
       .from("pecas")
       .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)")
-      .not("fotos", "is", null);
+      .not("fotos", "is", null)
+      .neq("fotos", "{}"); // excluir arrays vazios
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
       const escolhida = todasPecas.find(function (p) { return p.id === cfg.hero_peca_id; });
-      if (escolhida && escolhida.fotos && escolhida.fotos[0]) {
+      if (escolhida && escolhida.fotos && escolhida.fotos.filter(Boolean).length > 0) {
         setHeroPeca(escolhida);
       } else {
         aplicarHeroAutomatico(todasPecas);
@@ -209,6 +212,7 @@ export default function Home() {
     } else if (todasPecas) {
       aplicarHeroAutomatico(todasPecas);
     }
+    setHeroCarregado(true);
 
     if (todasPecas) {
       const mapa = {};
@@ -314,7 +318,8 @@ export default function Home() {
 
         .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
-        .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55)}
+        .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55);transition:opacity 1s ease;opacity:0}
+        .hero-bg img.visivel{opacity:1}
         .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center center}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.15) 0%,rgba(8,8,8,0.45) 50%,rgba(8,8,8,0.82) 100%);z-index:1}
         .hero-sound{position:absolute;bottom:2rem;right:1.5rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
@@ -427,7 +432,8 @@ export default function Home() {
           .hero-cta2{color:var(--g4);border-color:var(--g2);max-width:none;flex:0}
           .hero-cta2:hover{color:var(--black);border-color:var(--black)}
           .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%;background:linear-gradient(135deg,#1a0a10 0%,#2d1520 40%,#0d0d0d 100%)}
-          .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease}
+          .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease,opacity 1s ease;opacity:0}
+          .hero-right-desktop img.visivel{opacity:1}
           .hero-right-desktop:hover img{transform:scale(1.03)}
           .hero-right-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
           .hero-right-placeholder-logo{font-family:var(--serif);font-size:clamp(3rem,6vw,5rem);font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.12)}
@@ -580,8 +586,8 @@ export default function Home() {
         <div className="hero-bg">
           {videoUrl
             ? <video src={videoUrl} autoPlay muted loop playsInline ref={el => { if (el) el.play().catch(()=>{}); }} />
-            : (heroPeca && heroPeca.fotos && heroPeca.fotos[0])
-              ? <img src={heroPeca.fotos[0]} alt="" />
+            : (heroPeca && heroPeca.fotos && heroPeca.fotos.filter(Boolean)[0])
+              ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt="" className={heroCarregado ? "visivel" : ""} />
               : null
           }
         </div>
@@ -603,8 +609,8 @@ export default function Home() {
         )}
         {!videoUrl && (
           <div className="hero-right-desktop">
-            {heroPeca && heroPeca.fotos && heroPeca.fotos[0]
-              ? <img src={heroPeca.fotos[0]} alt={heroPeca.nome || "Nora Grei"} />
+            {heroPeca && heroPeca.fotos && heroPeca.fotos.filter(Boolean)[0]
+              ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt={heroPeca.nome || "Nora Grei"} className={heroCarregado ? "visivel" : ""} />
               : <div className="hero-right-placeholder"><span className="hero-right-placeholder-logo">Nora Grei</span><span className="hero-right-placeholder-tag">Alugar ou Comprar</span></div>
             }
             <div className="hero-caption">
