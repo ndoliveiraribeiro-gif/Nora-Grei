@@ -123,23 +123,26 @@ export default function Home() {
     if (saved && T[saved]) setLang(saved); else setLang("pt");
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     carregarCampanha();
+    carregarConteudo();
 
-    // PWA install prompt
-    const jaInstalado = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-    if (jaInstalado) { setPwaInstalado(true); return; }
-    const jaDispensou = localStorage.getItem("ng_pwa_dismiss");
-    if (jaDispensou) return;
-    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (isIos) {
-      setTimeout(() => setPwaBanner("ios"), 5000);
-    } else {
-      const handler = (e) => { e.preventDefault(); setPwaPrompt(e); setTimeout(() => setPwaBanner("android"), 4000); };
-      window.addEventListener("beforeinstallprompt", handler);
-      return () => window.removeEventListener("beforeinstallprompt", handler);
-    }
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
-    carregarConteudo();
+
+    // PWA install prompt (não bloqueia o resto)
+    const jaInstalado = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    if (!jaInstalado) {
+      const jaDispensou = localStorage.getItem("ng_pwa_dismiss");
+      if (!jaDispensou) {
+        const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIos) {
+          setTimeout(() => setPwaBanner("ios"), 5000);
+        } else {
+          const handler = (e) => { e.preventDefault(); setPwaPrompt(e); setTimeout(() => setPwaBanner("android"), 4000); };
+          window.addEventListener("beforeinstallprompt", handler);
+        }
+      }
+    }
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
