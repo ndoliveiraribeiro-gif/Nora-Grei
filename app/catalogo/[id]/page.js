@@ -168,7 +168,7 @@ export default function PecaDetalhe() {
         :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--rosa:#c4748a;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
         body{background:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased;color:var(--black)}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
         .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:#3a3835;text-decoration:none;transition:color 0.2s}
         .nav-back:hover{color:var(--black)}
@@ -220,15 +220,64 @@ export default function PecaDetalhe() {
         .partilha-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;margin-right:0.25rem}
         .partilha-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--g2);background:var(--white);cursor:pointer;font-size:1rem;transition:all 0.2s;text-decoration:none;color:var(--black)}
         .partilha-btn:hover{border-color:var(--black);background:var(--g1)}
+        /* Sticky CTA bar para mobile */
+        .sticky-cta{display:none}
         @media(max-width:768px){
-          .nav{padding:1rem 1.5rem}
-          .layout{grid-template-columns:1fr;padding-top:60px}
+          .nav{padding:0.85rem 1rem}
+          .nav-logo{font-size:1rem}
+          .layout{grid-template-columns:1fr;padding-top:56px;padding-bottom:80px}
           .fotos{position:static;height:auto;padding:0}
-          .foto-main{height:75vw}
-          .fotos-thumb{height:65px;padding:0.5rem 0.75rem}
-          .thumb{width:65px}
-          .info{padding:1.5rem}
-          .nome{font-size:clamp(1.8rem,7vw,2.5rem)}
+          .foto-main{height:88vw;max-height:520px}
+          .fotos-thumb{height:60px;padding:0.5rem 0.75rem}
+          .thumb{width:60px}
+          .info{padding:1.25rem 1rem 1.5rem}
+          .nome{font-size:clamp(1.75rem,6vw,2.4rem)}
+          .preco-val{font-size:1.6rem}
+          /* Esconde botões inline no mobile — serão substituídos pelo sticky */
+          .btn-alugar,.btn-reservar{display:none}
+          /* Sticky CTA fixo no fundo */
+          .sticky-cta{
+            display:flex;
+            position:fixed;
+            bottom:0;left:0;right:0;
+            z-index:200;
+            background:rgba(248,247,245,0.97);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border-top:1px solid #e2dfda;
+            padding:0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
+            gap:0.6rem;
+            align-items:center;
+          }
+          .sticky-preco{
+            display:flex;flex-direction:column;flex-shrink:0;
+          }
+          .sticky-preco-val{font-family:'Cormorant',Georgia,serif;font-size:1.4rem;font-weight:300;line-height:1;color:#080808}
+          .sticky-preco-unit{font-family:'Jost',sans-serif;font-size:0.55rem;color:#b0ada6;letter-spacing:0.08em}
+          .sticky-btn-alugar{
+            flex:1;min-height:48px;
+            background:#080808;color:#f8f7f5;
+            border:none;
+            font-family:'Jost',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;
+            cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            text-decoration:none;
+          }
+          .sticky-btn-alugar:disabled{background:#c5c2be;cursor:not-allowed}
+          .sticky-btn-comprar{
+            min-height:48px;min-width:48px;
+            background:#c4748a;color:#fff;
+            border:none;
+            font-family:'Jost',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;
+            cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            text-decoration:none;
+            padding:0 0.85rem;
+            flex-shrink:0;
+          }
+          .deposito-box{margin-bottom:1rem}
+          .partilha{margin-top:1rem}
+          .secao{margin-bottom:1.25rem}
         }
       `}</style>
 
@@ -396,6 +445,36 @@ export default function PecaDetalhe() {
             {t.verCatalogo} →
           </a>
         </div>
+      </div>
+
+      {/* STICKY CTA — apenas visível no mobile via CSS */}
+      <div className="sticky-cta">
+        <div className="sticky-preco">
+          <span className="sticky-preco-val">{peca.preco_aluguer_dia}€</span>
+          <span className="sticky-preco-unit">{t.porcDia}</span>
+        </div>
+        {disponivel ? (
+          <button
+            className="sticky-btn-alugar"
+            onClick={irParaCheckout}
+            disabled={!tamanhoSelecionado}
+          >
+            {tamanhoSelecionado ? t.alugar : t.semTamanho}
+          </button>
+        ) : (
+          <a href={`/reserva?peca=${id}`} className="sticky-btn-alugar">
+            {t.reservar}
+          </a>
+        )}
+        <a
+          href="https://www.noragrei.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sticky-btn-comprar"
+          title={t.comprar}
+        >
+          ↗
+        </a>
       </div>
     </>
   );
