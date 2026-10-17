@@ -923,15 +923,16 @@ export default function Backoffice() {
   };
 
   const carregarEstatisticas = async () => {
-    const [alRes, stRes, pecasRes, clientesRes, reservasRes, recibosRes] = await Promise.all([
+    const [alRes, stRes, pecasRes, clientesRes, reservasRes, recibosRes, despesasRes] = await Promise.all([
       supabase.from("alugueres").select("id, estado, valor_aluguer, data_inicio, data_fim, created_at, cliente_id, stock_tamanho_id"),
       supabase.from("stock_tamanhos").select("id, tamanho, peca_id, pecas(id, nome, valor_peca, preco_aluguer_dia, categorias(nome))"),
       supabase.from("pecas").select("id, nome, valor_peca, preco_aluguer_dia, categorias(nome), stock_tamanhos(quantidade_total, quantidade_disponivel)"),
-      supabase.from("clientes").select("id, nome, email, cidade, codigo_postal, data_nascimento, profissao, alugueres(id, estado, valor_aluguer, created_at)"),
+      supabase.from("clientes").select("id, nome, email, cidade, codigo_postal, data_nascimento, profissao, genero, total_pecas_alugadas, alugueres(id, estado, valor_aluguer, created_at)"),
       supabase.from("reservas_espera").select("id, stock_tamanho_id, stock_tamanhos(peca_id, pecas(nome))"),
-      supabase.from("recibos").select("id, estado, valor_total, metodo_pagamento, comprovativo_url, created_at, clientes(nome, email)"),
+      supabase.from("recibos").select("id, estado, valor_total, valor_aluguer, valor_higienizacao, valor_deposito, metodo_pagamento, comprovativo_url, created_at, clientes(nome, email)"),
+      supabase.from("despesas").select("valor, categoria, data"),
     ]);
-    const al = alRes.data || [], st = stRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [], recibos = recibosRes.data || [];
+    const al = alRes.data || [], st = stRes.data || [], pl = pecasRes.data || [], cl = clientesRes.data || [], rl = reservasRes.data || [], recibos = recibosRes.data || [], despesas = despesasRes.data || [];
     const stMap = {}; st.forEach(s => { stMap[s.id] = s; });
     const clMap = {}; cl.forEach(c => { clMap[c.id] = c; });
     const alE = al.map(a => ({ ...a, peca: stMap[a.stock_tamanho_id]?.pecas || null, tamanho: stMap[a.stock_tamanho_id]?.tamanho || null, cliente: clMap[a.cliente_id] || null }));
@@ -985,7 +986,62 @@ export default function Backoffice() {
     const totalGastoClientes = clNivel.reduce((s,c) => s+c.totalGasto, 0);
     for (const c of clientesOrdenados) { acum += c.totalGasto; pareto20Clientes++; if (acum >= totalGastoClientes * 0.8) break; }
 
-    setEstatisticas({ roiPecas, pecasEspera, cidades, catCount, clientesMaisAtivos: [...clNivel].sort((a,b) => b.totalGasto-a.totalGasto).slice(0,5), taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0, ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length, totalReceita: alAtivos.reduce((s,a) => s+(a.valor_aluguer||0),0), totalAlugueres: alAtivos.length, pecaMaisAlugada: roiPecas[0]?.nome || "—", distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral, comprovativosPendentes, totalRecibos: recibos.length, mediaAtraso, medianaAtraso, mediaCiclo, rotacoesMes, pareto20Pecas, pareto20Clientes, totalPecas: pecasOrdenadas.length, totalClientes: clNivel.length });
+    // Perfil demográfico dos clientes Pareto (top 20% em receita)
+    const top20pct = clientesOrdenados.slice(0, Math.max(1, Math.ceil(clientesOrdenados.length * 0.2)));
+    const cidadesPareto = {}; top20pct.forEach(c => { if(c.cidade) cidadesPareto[c.cidade] = (cidadesPareto[c.cidade]||0)+1; });
+    const generosPareto = {}; top20pct.forEach(c => { const g = c.genero||"nd"; generosPareto[g] = (generosPareto[g]||0)+1; });
+    const profissoesPareto = {}; top20pct.forEach(c => { if(c.profissao) profissoesPareto[c.profissao] = (profissoesPareto[c.profissao]||0)+1; });
+    const idadesPareto = top20pct.map(c => { if(!c.data_nascimento) return null; const a = new Date().getFullYear()-new Date(c.data_nascimento).getFullYear(); return a>0&&a<100?a:null; }).filter(Boolean);
+    const idadeMediaPareto = idadesPareto.length > 0 ? Math.round(idadesPareto.reduce((s,a)=>s+a,0)/idadesPareto.length) : null;
+
+    // Tendência mensal (últimos 6 meses)
+    const agora = new Date();
+    const tendenciaMensal = Array.from({length:6},(_,i)=>{
+      const d = new Date(agora.getFullYear(), agora.getMonth()-5+i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+      const label = d.toLocaleDateString("pt-PT",{month:"short",year:"2-digit"});
+      const recMes = recibos.filter(r => r.estado==="pago" && r.created_at?.slice(0,7)===key).reduce((s,r)=>(s+(r.valor_aluguer||0)+(r.valor_higienizacao||0)),0);
+      const alMes = alAtivos.filter(a => a.created_at?.slice(0,7)===key).length;
+      const despMes = despesas.filter(d2 => d2.data?.slice(0,7)===key).reduce((s,d2)=>s+(d2.valor||0),0);
+      return { key, label, receita: recMes, alugueres: alMes, despesas: despMes, lucro: recMes - despMes };
+    });
+
+    // Breakeven mensal
+    // Receita média mensal real (últimos 3 meses com recibos pagos)
+    const receitaMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.receita,0)/3;
+    const despesasMedia3M = tendenciaMensal.slice(-3).reduce((s,m)=>s+m.despesas,0)/3;
+    // Custo diário médio = despesas/30
+    const custoDiario = despesasMedia3M / 30;
+    // Receita diária média = receita/30
+    const receitaDiaria = receitaMedia3M / 30;
+    // Dia do breakeven: quanto do mês até igualar custos fixos
+    const diaBreakeven = custoDiario > 0 && receitaDiaria > 0 ? Math.ceil(despesasMedia3M / receitaDiaria) : null;
+    // Margem operacional
+    const margemOp = receitaMedia3M > 0 ? ((receitaMedia3M - despesasMedia3M) / receitaMedia3M * 100).toFixed(1) : 0;
+    // Receita total dos recibos pagos (mais precisa que soma de alugueres)
+    const totalReceitaReal = recibos.filter(r=>r.estado==="pago").reduce((s,r)=>s+(r.valor_aluguer||0)+(r.valor_higienizacao||0),0);
+
+    setEstatisticas({
+      roiPecas, pecasEspera, cidades, catCount,
+      clientesMaisAtivos: [...clNivel].sort((a,b) => b.totalGasto-a.totalGasto).slice(0,5),
+      taxaCancelamento: al.length > 0 ? ((al.filter(a => a.estado==="cancelado").length/al.length)*100).toFixed(1) : 0,
+      ltv, churn: clNivel.filter(c => c.alugueresTotal===1).length,
+      totalReceita: totalReceitaReal,
+      totalAlugueres: alAtivos.length,
+      pecaMaisAlugada: roiPecas[0]?.nome || "—",
+      distribuicaoPagamento, receitaRecebida, receitaPendente, ticketMedioGeral,
+      comprovativosPendentes, totalRecibos: recibos.length,
+      mediaAtraso, medianaAtraso, mediaCiclo, rotacoesMes,
+      pareto20Pecas, pareto20Clientes, totalPecas: pecasOrdenadas.length, totalClientes: clNivel.length,
+      // Pareto perfil
+      cidadesPareto: Object.entries(cidadesPareto).sort((a,b)=>b[1]-a[1]).slice(0,4),
+      generosPareto, profissoesPareto: Object.entries(profissoesPareto).sort((a,b)=>b[1]-a[1]).slice(0,4),
+      idadeMediaPareto,
+      // Tendência
+      tendenciaMensal,
+      // Breakeven
+      receitaMedia3M, despesasMedia3M, custoDiario, receitaDiaria, diaBreakeven, margemOp,
+    });
   };
 
   const perguntarAI = async () => {
@@ -2290,6 +2346,113 @@ export default function Backoffice() {
                       );
                     })}
                   </div>
+                </div>
+
+                {/* BREAKEVEN & CUSTOS */}
+                <div style={{ ...CARD,marginTop:"1rem",borderTop:"3px solid #080808" }}>
+                  <p style={CARD_T}>💰 Breakeven & Gestão financeira (média 3 meses)</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1.5rem" }}>
+                    {[
+                      { val: `${Number(estatisticas.receitaMedia3M||0).toFixed(0)}€`, lbl: "Receita média/mês", cor:"#27ae60" },
+                      { val: `${Number(estatisticas.despesasMedia3M||0).toFixed(0)}€`, lbl: "Custos médios/mês", cor:"#e74c3c" },
+                      { val: `${Number(estatisticas.receitaMedia3M-estatisticas.despesasMedia3M||0).toFixed(0)}€`, lbl: "Resultado médio/mês", cor: (estatisticas.receitaMedia3M||0)>(estatisticas.despesasMedia3M||0)?"#27ae60":"#e74c3c" },
+                      { val: `${estatisticas.margemOp||0}%`, lbl: "Margem operacional", cor: parseFloat(estatisticas.margemOp||0)>20?"#27ae60":parseFloat(estatisticas.margemOp||0)>0?"#f39c12":"#e74c3c" },
+                    ].map((s,i)=>(
+                      <div key={i} style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
+                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Breakeven visual */}
+                  <div style={{ background:"#f8f8f6",padding:"1.25rem",marginBottom:"1rem" }}>
+                    <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Dia estimado de breakeven neste mês</div>
+                    {estatisticas.diaBreakeven ? (
+                      <>
+                        <div style={{ display:"flex",alignItems:"baseline",gap:"0.75rem",marginBottom:"0.75rem" }}>
+                          <div style={{ fontFamily:"'Cormorant',serif",fontSize:"3rem",fontWeight:300,color: estatisticas.diaBreakeven<=15?"#27ae60":estatisticas.diaBreakeven<=22?"#f39c12":"#e74c3c",lineHeight:1 }}>dia {estatisticas.diaBreakeven}</div>
+                          <div style={{ fontSize:"0.78rem",color:"#888" }}>
+                            {estatisticas.diaBreakeven<=15?"Excelente — cobre custos na 1ª quinzena":estatisticas.diaBreakeven<=22?"Aceitável — cobre custos na 3ª semana":"Atenção — cobre custos tarde no mês"}
+                          </div>
+                        </div>
+                        <div style={{ height:8,background:"#e2dfda",borderRadius:4,overflow:"hidden",marginBottom:"0.4rem" }}>
+                          <div style={{ height:"100%",width:`${Math.min(100,(estatisticas.diaBreakeven/30)*100)}%`,background:estatisticas.diaBreakeven<=15?"#27ae60":estatisticas.diaBreakeven<=22?"#f39c12":"#e74c3c",borderRadius:4 }}/>
+                        </div>
+                        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.62rem",color:"#aaa" }}>
+                          <span>Dia 1</span><span>Dia 15</span><span>Dia 30</span>
+                        </div>
+                        <p style={{ fontSize:"0.72rem",color:"#888",marginTop:"0.75rem" }}>
+                          Receita diária média: <strong>{Number(estatisticas.receitaDiaria||0).toFixed(0)}€/dia</strong> · Custo diário: <strong>{Number(estatisticas.custoDiario||0).toFixed(0)}€/dia</strong>
+                        </p>
+                      </>
+                    ) : (
+                      <p style={{ fontSize:"0.82rem",color:"#888" }}>Regista despesas na Caixa para calcular o breakeven.</p>
+                    )}
+                  </div>
+                  {/* Tendência mensal */}
+                  <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Evolução dos últimos 6 meses</div>
+                  <div style={{ display:"flex",gap:"2px",height:80,alignItems:"flex-end" }}>
+                    {(() => {
+                      const maxVal = Math.max(...(estatisticas.tendenciaMensal||[]).map(m=>Math.max(m.receita,m.despesas)),1);
+                      return (estatisticas.tendenciaMensal||[]).map((m,i) => (
+                        <div key={m.key} style={{ flex:1,display:"flex",gap:"1px",alignItems:"flex-end",position:"relative" }}>
+                          <div title={`Receita: ${m.receita.toFixed(0)}€`} style={{ flex:1,background:"#27ae60",height:`${(m.receita/maxVal)*100}%`,minHeight:2 }}/>
+                          <div title={`Custos: ${m.despesas.toFixed(0)}€`} style={{ flex:1,background:"#e74c3c",height:`${(m.despesas/maxVal)*100}%`,minHeight:2 }}/>
+                          <div style={{ position:"absolute",bottom:-18,left:0,right:0,fontSize:"0.5rem",color:"#888",textAlign:"center",whiteSpace:"nowrap" }}>{m.label}</div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div style={{ display:"flex",gap:"1rem",marginTop:"1.5rem",fontSize:"0.65rem",color:"#888" }}>
+                    <span style={{ display:"flex",alignItems:"center",gap:"0.3rem" }}><span style={{ width:10,height:10,background:"#27ae60",display:"inline-block" }}/> Receita</span>
+                    <span style={{ display:"flex",alignItems:"center",gap:"0.3rem" }}><span style={{ width:10,height:10,background:"#e74c3c",display:"inline-block" }}/> Custos</span>
+                  </div>
+                  <table style={{ width:"100%",borderCollapse:"collapse",marginTop:"1rem",fontSize:"0.78rem" }}>
+                    <thead><tr>{["Mês","Receita","Custos","Resultado"].map(h=><th key={h} style={{ ...TH }}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {(estatisticas.tendenciaMensal||[]).slice().reverse().map(m=>(
+                        <tr key={m.key} style={{ background:"#fff" }}>
+                          <td style={TD}><strong>{m.label}</strong></td>
+                          <td style={{ ...TD,color:"#27ae60",fontWeight:600 }}>{m.receita.toFixed(0)}€</td>
+                          <td style={{ ...TD,color:"#e74c3c" }}>{m.despesas.toFixed(0)}€</td>
+                          <td style={{ ...TD,fontWeight:700,color:m.lucro>=0?"#27ae60":"#e74c3c" }}>{m.lucro>=0?"+":""}{m.lucro.toFixed(0)}€</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* PERFIL CLIENTES PARETO */}
+                <div style={{ ...CARD,marginTop:"1rem" }}>
+                  <p style={CARD_T}>👤 Perfil dos clientes que geram 80% da receita</p>
+                  <p style={{ fontSize:"0.75rem",color:"#888",marginBottom:"1rem" }}>Top {Math.ceil((estatisticas.totalClientes||0)*0.2)} clientes ({Math.round(((estatisticas.pareto20Clientes||0)/(estatisticas.totalClientes||1))*100)}% da base) geram 80% da receita. Conhece-os.</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem" }}>
+                    <div style={{ background:"#f8f8f6",padding:"1rem" }}>
+                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Idade média</div>
+                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300 }}>{estatisticas.idadeMediaPareto ? `${estatisticas.idadeMediaPareto} anos` : "—"}</div>
+                    </div>
+                    <div style={{ background:"#f8f8f6",padding:"1rem" }}>
+                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Género</div>
+                      {Object.entries(estatisticas.generosPareto||{}).sort((a,b)=>b[1]-a[1]).map(([g,n])=>(
+                        <div key={g} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{g==="feminino"?"♀ Feminino":g==="masculino"?"♂ Masculino":g==="outro"?"⚧ Outro":"❓ Não definido"}: <strong>{n}</strong></div>
+                      ))}
+                    </div>
+                    <div style={{ background:"#f8f8f6",padding:"1rem" }}>
+                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Cidades</div>
+                      {(estatisticas.cidadesPareto||[]).map(([c,n])=>(
+                        <div key={c} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{c}: <strong>{n}</strong></div>
+                      ))}
+                    </div>
+                    <div style={{ background:"#f8f8f6",padding:"1rem" }}>
+                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Profissões</div>
+                      {(estatisticas.profissoesPareto||[]).length > 0 ? (estatisticas.profissoesPareto||[]).map(([p,n])=>(
+                        <div key={p} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{p}: <strong>{n}</strong></div>
+                      )) : <span style={{ fontSize:"0.78rem",color:"#bbb" }}>Dados insuficientes</span>}
+                    </div>
+                  </div>
+                  <p style={{ fontSize:"0.68rem",color:"#aaa",marginTop:"0.75rem",fontStyle:"italic" }}>
+                    Quanto mais dados de perfil os clientes preencherem (cidade, género, profissão, data de nascimento), mais precisa é esta análise.
+                  </p>
                 </div>
 
                 <div style={{ ...CARD,marginTop:"1rem" }}>
