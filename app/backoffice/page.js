@@ -258,7 +258,10 @@ function SeeWhois() {
                           </td>
                           <td style={TD}>{a.stock_tamanhos?.tamanho || "—"}</td>
                           <td style={{ ...TD,whiteSpace:"nowrap",fontSize:"0.8rem" }}>{a.data_inicio} → {a.data_fim}</td>
-                          <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
+                          <td style={TD}>
+                            <strong>{a.valor_aluguer}€</strong>
+                            {a.desconto_cesto && <div style={{ fontSize:"0.58rem",color:"#c4748a",marginTop:"0.1rem" }}>🛍 {a.desconto_cesto.startsWith("opcao_a") ? a.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "desc. caução"}</div>}
+                          </td>
                           <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":["devolvido_danificado","cancelado","nao_devolvido"].includes(a.estado)?"red":"orange")}>{ESTADO_LABEL_PT[a.estado] || a.estado}</span></td>
                           <td style={TD}>{reciboDoAluguer ? <button style={BTN("outline","sm")} onClick={() => abrirRecibo(reciboDoAluguer, a)}>🧾 Ver talão</button> : <span style={{ color:"#ccc",fontSize:"0.75rem" }}>—</span>}</td>
                         </tr>
@@ -396,7 +399,7 @@ function Caixa() {
   const carregarCaixa = async () => {
     setLoading(true);
     const [recibosRes, alugueresRes, despesasRes] = await Promise.all([
-      supabase.from("recibos").select("*, clientes(nome, codigo_cliente, nif)").eq("estado", "pago").order("created_at", { ascending: false }),
+      supabase.from("recibos").select("*, clientes(nome, codigo_cliente, nif), alugueres(desconto_cesto, valor_aluguer)").eq("estado", "pago").order("created_at", { ascending: false }),
       supabase.from("alugueres").select("id, valor_aluguer, deposito_valor, deposito_estado, caucao_libertada_em, clientes(nome, codigo_cliente)").eq("deposito_estado", "libertado").not("caucao_libertada_em", "is", null),
       supabase.from("despesas").select("*").order("data", { ascending: false }),
     ]);
@@ -408,6 +411,7 @@ function Caixa() {
       codigoCliente: r.clientes?.codigo_cliente || "—",
       nif: r.clientes?.nif || "—",
       numeroTalao: r.numero,
+      desconto_cesto: r.alugueres?.desconto_cesto || null,
       recibo: r,
     }));
     const saidasCaucao = (alugueresRes.data || []).map(a => ({
@@ -550,6 +554,7 @@ function RowDia({ linha, onApagarDespesa }) {
           <td colSpan={2} style={{ ...TD,fontSize:"0.78rem" }}>
             {item.descricao} <span style={{ color:"#888" }}>({item.categoria})</span>
             {item.nif && item.nif !== "—" && <span style={{ color:"#888",marginLeft:"0.5rem" }}>NIF {item.nif}</span>}
+            {item.desconto_cesto && <span style={{ marginLeft:"0.5rem",fontSize:"0.62rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem",borderRadius:2,fontWeight:600 }}>🛍 {item.desconto_cesto.startsWith("opcao_a") ? "Cesto " + item.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "Cesto desc. caução"}</span>}
           </td>
           <td style={{ ...TD,fontSize:"0.78rem",color:item.tipo==="entrada"?"#27ae60":"#e74c3c",fontWeight:600 }}>{item.tipo==="entrada"?"+":"-"}{item.valor.toFixed(0)}€</td>
           <td style={TD}></td>
@@ -747,25 +752,59 @@ export default function Backoffice() {
 
   const carregarDados = async () => {
     if (tab === "dashboard") {
-      const { data: al } = await supabase.from("alugueres").select("estado, valor_aluguer, created_at");
-      const { data: res } = await supabase.from("reservas_espera").select("id").eq("estado", "aguarda");
-      const { data: resCompletas } = await supabase
-        .from("reservas_espera")
-        .select("id, estado, data_inicio_desejada, data_fim_desejada, stock_tamanho_id, clientes(nome, codigo_cliente), stock_tamanhos(tamanho, pecas(nome, codigo_referencia))")
-        .in("estado", ["aguarda", "notificado"])
-        .order("created_at", { ascending: false });
-      const { data: stock } = await supabase.from("stock_tamanhos").select("quantidade_total");
-      if (al) {
-        const agora = new Date(), inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
-        const ativos = al.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado)).length;
-        const totalStock = stock?.reduce((s, t) => s + t.quantidade_total, 0) || 1;
-        setStats({ alugueres_ativos: ativos, devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length, receita_mes: al.filter(a => a.created_at >= inicioMes).reduce((s, a) => s + (a.valor_aluguer || 0), 0), clientes_total: 0, reservas_espera: res?.length || 0, taxa_ocupacao: Math.round((ativos / totalStock) * 100), reservasAtivas: resCompletas || [] });
-      }
+      const agora = new Date();
+      const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString();
+      const [alRes, resRes, resCompletasRes, stockRes, recibosRes, alugueresTodosRes] = await Promise.all([
+        supabase.from("alugueres").select("estado, valor_aluguer, deposito_valor, desconto_cesto, created_at"),
+        supabase.from("reservas_espera").select("id").eq("estado", "aguarda"),
+        supabase.from("reservas_espera").select("id, estado, data_inicio_desejada, data_fim_desejada, stock_tamanho_id, clientes(nome, codigo_cliente), stock_tamanhos(tamanho, pecas(nome, codigo_referencia))").in("estado", ["aguarda", "notificado"]).order("created_at", { ascending: false }),
+        supabase.from("stock_tamanhos").select("quantidade_total"),
+        supabase.from("recibos").select("valor_aluguer, valor_higienizacao, valor_deposito, valor_total, created_at").eq("estado", "pago").gte("created_at", inicioMes),
+        supabase.from("alugueres").select("id, estado, data_fim, data_inicio, valor_aluguer, deposito_valor, desconto_cesto, cliente_id, stock_tamanho_id").in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]),
+      ]);
+      const al = alRes.data || [];
+      const res = resRes.data || [];
+      const resCompletas = resCompletasRes.data || [];
+      const stock = stockRes.data || [];
+      const recibos = recibosRes.data || [];
+      const alRaw2 = alugueresTodosRes.data || [];
+
+      const ativos = al.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado)).length;
+      const totalStock = stock.reduce((s, t) => s + t.quantidade_total, 0) || 1;
+
+      // Receita real do mês = soma dos recibos pagos (aluguer + higienização, excluindo depósito)
+      const receita_mes = recibos.reduce((s, r) => s + (r.valor_aluguer || 0) + (r.valor_higienizacao || 0), 0);
+      const caucoes_mes = recibos.reduce((s, r) => s + (r.valor_deposito || 0), 0);
+
+      // Descontos de cesto aplicados este mês
+      const alMes = al.filter(a => a.created_at >= inicioMes);
+      const cestosMes = alMes.filter(a => a.desconto_cesto);
+      const desconto_cesto_mes = cestosMes.length; // nº de alugueres com desconto cesto
+
+      // Clientes por nível
+      const { data: niveisData } = await supabase.from("clientes").select("total_pecas_alugadas").neq("modo_lojista", true);
+      const niveis = { Bronze: 0, Prata: 0, Ouro: 0, Platina: 0 };
+      (niveisData || []).forEach(c => {
+        const nv = NIVEL(c.total_pecas_alugadas || 0);
+        niveis[nv.nome]++;
+      });
+
+      setStats({
+        alugueres_ativos: ativos,
+        devolucoes_hoje: al.filter(a => a.estado === "devolvido" && new Date(a.created_at).toDateString() === agora.toDateString()).length,
+        receita_mes,
+        caucoes_mes,
+        clientes_total: 0,
+        reservas_espera: res.length,
+        taxa_ocupacao: Math.round((ativos / totalStock) * 100),
+        reservasAtivas: resCompletas,
+        desconto_cesto_mes,
+        niveis,
+        alugueresAtivos: [], // preenchido abaixo
+      });
+
       const { count } = await supabase.from("clientes").select("id", { count: "exact" });
-      const { data: alRaw } = await supabase
-        .from("alugueres")
-        .select("id, estado, data_fim, data_inicio, valor_aluguer, cliente_id, stock_tamanho_id")
-        .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]);
+      const alRaw = alRaw2;
 
       let alugueresAtivos = [];
       for (const a of (alRaw || [])) {
@@ -1260,7 +1299,7 @@ export default function Backoffice() {
             </div>
 
             {/* KPIs SECUNDARIOS */}
-            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1.5rem" }}>
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1rem" }}>
               {[
                 { val: (stats.alugueresAtivos||[]).filter(a=>a.estado==="enviado").length, lbl: "Entregas pendentes", icon: "🚚" },
                 { val: (stats.alugueresAtivos||[]).filter(a=>new Date(a.data_fim)<new Date()&&a.estado==="ativo").length, lbl: "Em atraso", icon: "⚠️", cor: "#e74c3c" },
@@ -1276,6 +1315,41 @@ export default function Backoffice() {
                 </div>
               ))}
             </div>
+            {/* PAINEL CESTO + FIDELIDADE */}
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"#e2dfda",marginBottom:"1rem" }}>
+              {/* Cesto deste mês */}
+              <div style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
+                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🛍 Cestos este mês</div>
+                <div style={{ display:"flex",gap:"1.5rem",alignItems:"flex-end" }}>
+                  <div>
+                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:300,color:"#c4748a",lineHeight:1 }}>{stats.desconto_cesto_mes||0}</div>
+                    <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>com desconto</div>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:300,color:"#27ae60",lineHeight:1 }}>{Number(stats.caucoes_mes||0).toFixed(0)}€</div>
+                    <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>cauções recebidas</div>
+                  </div>
+                </div>
+              </div>
+              {/* Fidelidade - distribuição de níveis */}
+              <div style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
+                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🏆 Níveis de fidelidade</div>
+                <div style={{ display:"flex",gap:"1rem",flexWrap:"wrap" }}>
+                  {[
+                    { n:"Bronze",  icon:"🥉", cor:"#cd7f32" },
+                    { n:"Prata",   icon:"🥈", cor:"#95a5a6" },
+                    { n:"Ouro",    icon:"🥇", cor:"#f39c12" },
+                    { n:"Platina", icon:"💎", cor:"#6c5ce7" },
+                  ].map(lv => (
+                    <div key={lv.n} style={{ textAlign:"center" }}>
+                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:400,color:lv.cor,lineHeight:1 }}>{(stats.niveis||{})[lv.n]||0}</div>
+                      <div style={{ fontSize:"0.6rem",color:lv.cor,marginTop:"0.15rem" }}>{lv.icon} {lv.n}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginTop:"1rem",marginBottom:"2rem" }}>
               <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #080808" }}>
                 <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300 }}>{stats.taxa_ocupacao}%</div>
@@ -1727,7 +1801,7 @@ export default function Backoffice() {
             <div style={CARD}>
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%",borderCollapse:"collapse" }}>
-                  <thead><tr>{["Peça","Cliente","Progresso","Datas","Atraso","Valor","Depósito","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <thead><tr>{["Peça","Cliente","Progresso","Datas","Atraso","Valor","Cesto","Depósito","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                   <tbody>
                     {(() => {
                       const FILTRO_ESTADOS = {
@@ -1786,7 +1860,17 @@ export default function Backoffice() {
                           </td>
                           <td style={{ ...TD,whiteSpace:"nowrap" }}>{a.data_inicio} → {a.data_fim}</td>
                           <td style={TD}>{atraso>0?<span style={{ color:"#e74c3c",fontWeight:700 }}>+{atraso}d</span>:<span style={{ color:"#27ae60" }}>✓</span>}</td>
-                          <td style={TD}><strong>{a.valor_aluguer}€</strong></td>
+                          <td style={TD}>
+                            <strong>{a.valor_aluguer}€</strong>
+                            {a.desconto_cesto && <div style={{ fontSize:"0.6rem",color:"#888",marginTop:"0.15rem" }}>{a.deposito_valor}€ dep.</div>}
+                          </td>
+                          <td style={TD}>
+                            {a.desconto_cesto ? (
+                              <span style={{ ...BADGE("rosa"),whiteSpace:"nowrap" }}>
+                                🛍 {a.desconto_cesto.startsWith("opcao_a") ? "–" + a.desconto_cesto.replace("opcao_a_","").replace("pct","%") : "caução"}
+                              </span>
+                            ) : <span style={{ color:"#ccc",fontSize:"0.75rem" }}>—</span>}
+                          </td>
                           <td style={TD}>
                             <span style={BADGE(a.deposito_estado==="recebido"||a.deposito_estado==="libertado"?"green":"orange")}>{{recebido:"Recebido",pendente:"A aguardar",libertado:"Devolvido ao cliente"}[a.deposito_estado]||a.deposito_estado}</span>
                             {a.deposito_estado==="pendente"&&<button style={{ ...BTN("rosa","sm"),display:"block",marginTop:"0.25rem" }} onClick={()=>confirmarDeposito(a.id)}>Confirmar</button>}
