@@ -33,6 +33,7 @@ const T = {
     catNomes: { Festa: "Festa", Trabalho: "Trabalho", "Férias": "Férias", Jantar: "Jantar" },
     cupao: { texto: "Oferta de boas-vindas — 15% de desconto em noragrei.com", copiar: "Copiar código", copiado: "Copiado ✓" },
     destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
+    pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações — sem ocupar espaço.", btn: "Instalar agora", ios: "No Safari, toca em  e depois em \"Adicionar ao ecrã inicial\".", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
   },
   fr: {
     nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
@@ -64,6 +65,7 @@ const T = {
     catNomes: { Festa: "Soirée", Trabalho: "Travail", "Férias": "Vacances", Jantar: "Dîner" },
     cupao: { texto: "Offre de bienvenue — 15% de réduction sur noragrei.com", copiar: "Copier le code", copiado: "Copié ✓" },
     destaque: { label: "Sélection de la semaine", verTodas: "Voir toute la collection", alugar: "Louer", reservar: "Indisponible — Réserver", dispEm: "Disponible dans" },
+    pwa: { titulo: "Installer l'app Nora Grei", sub: "Accès rapide à la collection, commandes et notifications — sans encombrer.", btn: "Installer", ios: "Dans Safari, appuyez sur  puis \"Sur l'écran d'accueil\".", dispensar: "Plus tard", secTitulo: "Vous avez l'app?", secSub: "Installez sur votre téléphone pour accéder à la collection en un clic.", secBtn: "Installer l'app" },
   },
   lt: {
     nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
@@ -95,6 +97,7 @@ const T = {
     catNomes: { Festa: "Vakarėlis", Trabalho: "Darbas", "Férias": "Atostogos", Jantar: "Vakarienė" },
     cupao: { texto: "Sveikiname — 15% nuolaida noragrei.com", copiar: "Kopijuoti kodą", copiado: "Nukopijuota ✓" },
     destaque: { label: "Savaitės atranka", verTodas: "Žiūrėti visą kolekciją", alugar: "Nuomoti", reservar: "Neprieinama — Rezervuoti", dispEm: "Prieinama po" },
+    pwa: { titulo: "Įdiekite Nora Grei programėlę", sub: "Greita prieiga prie kolekcijos, užsakymų ir pranešimų — neužimant vietos.", btn: "Įdiegti", ios: "Safari, bakstelėkite  ir tada \"Pridėti prie pradžios ekrano\".", dispensar: "Vėliau", secTitulo: "Turite programėlę?", secSub: "Įdiekite telefone ir pasiekite kolekciją vienu prisilietimu.", secBtn: "Įdiegti programėlę" },
   },
 };
 
@@ -111,17 +114,39 @@ export default function Home() {
   const [videoComSom, setVideoComSom] = useState(false);
   const [pecasDestaque, setPecasDestaque] = useState([]);
   const [campanha, setCampanha] = useState(null);
+  const [pwaBanner, setPwaBanner] = useState(false); // "android" | "ios" | false
+  const [pwaPrompt, setPwaPrompt] = useState(null);
+  const [pwaInstalado, setPwaInstalado] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved); else setLang("pt");
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     carregarCampanha();
+
+    // PWA install prompt
+    const jaInstalado = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    if (jaInstalado) { setPwaInstalado(true); return; }
+    const jaDispensou = localStorage.getItem("ng_pwa_dismiss");
+    if (jaDispensou) return;
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIos) {
+      setTimeout(() => setPwaBanner("ios"), 5000);
+    } else {
+      const handler = (e) => { e.preventDefault(); setPwaPrompt(e); setTimeout(() => setPwaBanner("android"), 4000); };
+      window.addEventListener("beforeinstallprompt", handler);
+      return () => window.removeEventListener("beforeinstallprompt", handler);
+    }
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
     carregarConteudo();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const instalarPwa = async () => {
+    if (pwaPrompt) { pwaPrompt.prompt(); const { outcome } = await pwaPrompt.userChoice; if (outcome === "accepted") { setPwaBanner(false); setPwaInstalado(true); localStorage.setItem("ng_pwa_dismiss","1"); } }
+  };
+  const dispensarPwa = () => { setPwaBanner(false); localStorage.setItem("ng_pwa_dismiss","1"); };
 
   const carregarCampanha = async () => {
     const agora = new Date().toISOString();
@@ -415,6 +440,27 @@ export default function Home() {
           .nav{padding:1.25rem 4rem}
         }
 
+        .pwa-banner{position:fixed;bottom:72px;left:1rem;right:1rem;z-index:160;background:var(--black);color:var(--white);border-radius:0;padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.18);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
+        @media(min-width:768px){.pwa-banner{display:none}}
+        .pwa-banner-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+        .pwa-banner-icon{width:44px;height:44px;border-radius:10px;background:var(--rosa);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--serif);font-size:1.1rem;font-weight:300;letter-spacing:0.1em;color:#fff}
+        .pwa-banner-txt{flex:1}
+        .pwa-banner-titulo{font-size:0.8rem;font-weight:500;letter-spacing:0.05em;margin-bottom:0.2rem}
+        .pwa-banner-sub{font-size:0.7rem;color:rgba(255,255,255,0.65);line-height:1.45}
+        .pwa-banner-fechar{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;line-height:1}
+        .pwa-banner-btns{display:flex;gap:0.5rem}
+        .pwa-banner-btn{flex:1;padding:0.7rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;border:none;transition:opacity 0.2s}
+        .pwa-banner-btn.main{background:var(--white);color:var(--black)}
+        .pwa-banner-btn.sec{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.2)}
+        .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px}
+        .pwa-sec{padding:3rem 1.5rem;background:var(--g1);border-top:1px solid var(--g2);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem}
+        @media(min-width:768px){.pwa-sec{flex-direction:row;justify-content:space-between;text-align:left;padding:2.5rem 4rem}}
+        .pwa-sec-txt{}
+        .pwa-sec-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;margin-bottom:0.35rem}
+        .pwa-sec-sub{font-size:0.8rem;color:var(--g4);line-height:1.5}
+        .pwa-sec-btn{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);font-weight:500;padding:0.9rem 2rem;background:var(--black);color:var(--white);border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;text-decoration:none;display:inline-block}
+        .pwa-sec-btn:hover{background:#2a2926}
+
         .destaque-sec{padding:3rem 1.5rem 4rem;background:var(--white)}
         .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
         .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
@@ -437,6 +483,27 @@ export default function Home() {
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+      {pwaBanner && (
+        <div className="pwa-banner">
+          <div className="pwa-banner-top">
+            <div className="pwa-banner-icon">NG</div>
+            <div className="pwa-banner-txt">
+              <div className="pwa-banner-titulo">{t.pwa.titulo}</div>
+              <div className="pwa-banner-sub">{t.pwa.sub}</div>
+            </div>
+            <button className="pwa-banner-fechar" onClick={dispensarPwa}>✕</button>
+          </div>
+          {pwaBanner === "ios" ? (
+            <div className="pwa-banner-ios">{t.pwa.ios}</div>
+          ) : (
+            <div className="pwa-banner-btns">
+              <button className="pwa-banner-btn main" onClick={instalarPwa}>{t.pwa.btn}</button>
+              <button className="pwa-banner-btn sec" onClick={dispensarPwa}>{t.pwa.dispensar}</button>
+            </div>
+          )}
+        </div>
+      )}
 
       {banner && campanha && (
         <div className="cupao-banner">
@@ -677,6 +744,18 @@ export default function Home() {
         <span className="cta-final-tag">{t.cta.tag}</span>
         <a href="/catalogo" className="cta-final-btn">{t.cta.btn}</a>
       </section>
+
+      {!pwaInstalado && (
+        <div className="pwa-sec">
+          <div className="pwa-sec-txt">
+            <div className="pwa-sec-titulo">{t.pwa.secTitulo}</div>
+            <div className="pwa-sec-sub">{t.pwa.secSub}</div>
+          </div>
+          <button className="pwa-sec-btn" onClick={() => { if (pwaPrompt) { instalarPwa(); } else { setPwaBanner(pwaBanner ? false : (/iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "android")); } }}>
+            {t.pwa.secBtn}
+          </button>
+        </div>
+      )}
 
       <footer>
         <span className="footer-copy">{t.footer.copy}</span>
