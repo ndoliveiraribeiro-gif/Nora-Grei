@@ -269,7 +269,7 @@ export default function Home() {
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
   const copiarCupao = () => { if (campanha?.codigo) navigator.clipboard.writeText(campanha.codigo); setCupaoCopiado(true); setTimeout(() => setCupaoCopiado(false), 3000); };
   const t = T[lang] || T.pt;
-  const FOTO_FALLBACK = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=85";
+  const FOTO_FALLBACK = null; // sem fallback externo — só fotos reais da Nora Grei
 
   return (
     <>
@@ -563,7 +563,9 @@ export default function Home() {
         <div className="hero-bg">
           {videoUrl
             ? <video src={videoUrl} autoPlay muted loop playsInline ref={el => { if (el) el.play().catch(()=>{}); }} />
-            : <img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt="" />
+            : (heroPeca && heroPeca.fotos && heroPeca.fotos[0])
+              ? <img src={heroPeca.fotos[0]} alt="" />
+              : null
           }
         </div>
         <div className="hero-overlay" />
@@ -582,9 +584,9 @@ export default function Home() {
             {videoComSom ? "🔊 Som" : "🔇 Sem som"}
           </button>
         )}
-        {!videoUrl && (
+        {!videoUrl && heroPeca && heroPeca.fotos && heroPeca.fotos[0] && (
           <div className="hero-right-desktop">
-            <img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt={heroPeca ? heroPeca.nome : "Nora Grei"} />
+            <img src={heroPeca.fotos[0]} alt={heroPeca.nome || "Nora Grei"} />
             <div className="hero-caption">
               <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
               <span className="hero-caption-preco">{heroPeca && heroPeca.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
