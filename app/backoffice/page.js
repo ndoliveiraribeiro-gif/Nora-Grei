@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "landing", "estatisticas", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
@@ -612,6 +612,8 @@ export default function Backoffice() {
   const [aiPergunta, setAiPergunta] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
+  const [alugueresLojista, setAlugueresLojista] = useState([]);
+  const [subTabLojistas, setSubTabLojistas] = useState("depositos");
   const chatRef = useRef(null);
 
   const entrar = () => { if (senha === SENHA) { setLogado(true); setErroSenha(false); } else setErroSenha(true); };
@@ -745,6 +747,13 @@ export default function Backoffice() {
       });
       const { data: pcf } = await supabase.from("pecas").select("id, nome, fotos");
       if (pcf) setPecasComFoto(pcf.filter(p => p.fotos?.length > 0));
+    }
+    if (tab === "lojistas") {
+      const { data: al } = await supabase
+        .from("alugueres_lojista")
+        .select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)")
+        .order("created_at", { ascending: false });
+      if (al) setAlugueresLojista(al);
     }
     if (tab === "estatisticas") await carregarEstatisticas();
   };
@@ -1994,6 +2003,103 @@ export default function Backoffice() {
             )}
           </>
         )}
+
+        {tab === "lojistas" && (() => {
+          const depositos = alugueresLojista.filter(a => a.deposito_estado === "a_devolver");
+          const pagamentos = alugueresLojista.filter(a => a.estado === "devolvido" && !a.liquidado_em);
+          const disputas = alugueresLojista.filter(a => a.deposito_estado === "em_disputa");
+          const subTabs = [
+            { id: "depositos", label: `Depósitos a devolver (${depositos.length})` },
+            { id: "pagamentos", label: `Pagamentos pendentes (${pagamentos.length})` },
+            { id: "disputas", label: `Disputas (${disputas.length})` },
+            { id: "todos", label: `Todos (${alugueresLojista.length})` },
+          ];
+          const lista = subTabLojistas === "depositos" ? depositos : subTabLojistas === "pagamentos" ? pagamentos : subTabLojistas === "disputas" ? disputas : alugueresLojista;
+
+          const confirmarDepositoDevolucao = async (id) => {
+            await supabase.from("alugueres_lojista").update({ deposito_estado: "devolvido", deposito_devolvido_em: new Date().toISOString() }).eq("id", id);
+            const { data: al } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)").order("created_at", { ascending: false });
+            if (al) setAlugueresLojista(al);
+          };
+
+          const pagarLojista = async (a) => {
+            const valor = a.valor_aluguer ? parseFloat((a.valor_aluguer * 0.9).toFixed(2)) : 0;
+            await supabase.from("alugueres_lojista").update({ liquidado_em: new Date().toISOString(), valor_liquidacao: valor }).eq("id", a.id);
+            const { data: al } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)").order("created_at", { ascending: false });
+            if (al) setAlugueresLojista(al);
+          };
+
+          const resolverDisputa = async (id, decisao) => {
+            const novoEstado = decisao === "lojista" ? "retido_lojista" : "devolvido";
+            await supabase.from("alugueres_lojista").update({ deposito_estado: novoEstado, deposito_devolvido_em: new Date().toISOString() }).eq("id", id);
+            const { data: al } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)").order("created_at", { ascending: false });
+            if (al) setAlugueresLojista(al);
+          };
+
+          return (
+            <>
+              <div style={CARD}>
+                <p style={CARD_T}>Gestão de Lojistas</p>
+                <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap",marginBottom:"1.5rem" }}>
+                  {subTabs.map(s => (
+                    <button key={s.id} onClick={() => setSubTabLojistas(s.id)} style={{ padding:"0.4rem 0.9rem",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"none",background:subTabLojistas===s.id?"#080808":"#f0eeeb",color:subTabLojistas===s.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif" }}>{s.label}</button>
+                  ))}
+                </div>
+                {lista.length === 0 ? (
+                  <p style={{ fontSize:"0.85rem",color:"#aaa",padding:"2rem 0",textAlign:"center" }}>Nenhum registo.</p>
+                ) : (
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead>
+                      <tr>
+                        {["Lojista","Peça","Tamanho","Estado","Depósito","Aluguer","Ações"].map(h => <th key={h} style={TH}>{h}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lista.map(a => {
+                        const estadoCor = { pendente:"orange", confirmado:"orange", enviado:"green", ativo:"green", em_devolucao:"rosa", devolvido:"green", devolvido_danificado:"red" };
+                        const depCor = { pendente:"orange", recebido:"orange", a_devolver:"rosa", em_disputa:"red", devolvido:"green", retido_lojista:"red" };
+                        return (
+                          <tr key={a.id} style={{ background:"#fff",borderBottom:"1px solid #f0eeeb" }}>
+                            <td style={TD}>
+                              <div style={{ fontWeight:500,fontSize:"0.85rem" }}>{a.clientes?.nome || "—"}</div>
+                              <div style={{ fontSize:"0.72rem",color:"#888" }}>{a.clientes?.email}</div>
+                            </td>
+                            <td style={TD}>{a.pecas_lojista?.nome || "—"}</td>
+                            <td style={TD}>{a.stock_lojista?.tamanho || "—"}</td>
+                            <td style={TD}><span style={BADGE(estadoCor[a.estado]||"gray")}>{a.estado}</span></td>
+                            <td style={TD}><span style={BADGE(depCor[a.deposito_estado]||"gray")}>{a.deposito_estado || "—"}</span></td>
+                            <td style={TD}>{a.valor_aluguer ? `${a.valor_aluguer}€` : "—"}</td>
+                            <td style={TD}>
+                              <div style={{ display:"flex",gap:"0.4rem",flexWrap:"wrap" }}>
+                                {a.deposito_estado === "a_devolver" && (
+                                  <button style={BTN("green","sm")} onClick={() => confirmarDepositoDevolucao(a.id)}>✓ Devolver depósito</button>
+                                )}
+                                {a.estado === "devolvido" && !a.liquidado_em && (
+                                  <button style={BTN("rosa","sm")} onClick={() => pagarLojista(a)}>
+                                    Pagar {a.valor_aluguer ? `${(a.valor_aluguer*0.9).toFixed(2)}€` : "lojista"}
+                                  </button>
+                                )}
+                                {a.deposito_estado === "em_disputa" && (
+                                  <>
+                                    <button style={BTN("red","sm")} onClick={() => resolverDisputa(a.id, "lojista")}>Reter depósito</button>
+                                    <button style={BTN("green","sm")} onClick={() => resolverDisputa(a.id, "cliente")}>Devolver ao cliente</button>
+                                  </>
+                                )}
+                                {a.liquidado_em && (
+                                  <span style={{ fontSize:"0.68rem",color:"#27ae60" }}>✓ Pago {a.valor_liquidacao}€</span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </>
+          );
+        })()}
 
         {tab === "config" && (
           <>
