@@ -285,15 +285,15 @@ export default function PecaDetalhe() {
           .sticky-cta{
             display:flex;
             position:fixed;
-            bottom:calc(72px + env(safe-area-inset-bottom));
+            bottom:calc(64px + env(safe-area-inset-bottom));
             left:0;right:0;
             z-index:201;
             background:rgba(248,247,245,0.97);
             backdrop-filter:blur(16px);
             -webkit-backdrop-filter:blur(16px);
             border-top:1px solid #e2dfda;
-            padding:0.75rem 1rem;
-            gap:0.6rem;
+            padding:0.6rem 0.75rem;
+            gap:0.5rem;
             align-items:center;
           }
           .sticky-preco{
@@ -302,35 +302,35 @@ export default function PecaDetalhe() {
           .sticky-preco-val{font-family:'Cormorant',Georgia,serif;font-size:1.4rem;font-weight:300;line-height:1;color:#080808}
           .sticky-preco-unit{font-family:'Jost',sans-serif;font-size:0.55rem;color:#b0ada6;letter-spacing:0.08em}
           .sticky-btn-alugar{
-            flex:1;min-height:48px;
+            flex:2;min-height:46px;
             background:#080808;color:#f8f7f5;
             border:none;
-            font-family:'Jost',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;
             text-decoration:none;
+            padding:0 0.75rem;
           }
           .sticky-btn-alugar:disabled{background:#c5c2be;cursor:not-allowed}
           .sticky-btn-comprar{
-            min-height:48px;min-width:48px;
+            flex:1;min-height:46px;
             background:#c4748a;color:#fff;
             border:none;
-            font-family:'Jost',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;
             text-decoration:none;
-            padding:0 0.85rem;
-            flex-shrink:0;
+            padding:0 0.6rem;
+            white-space:nowrap;
           }
           .sticky-btn-contactar{
-            min-height:48px;
+            flex:1;min-height:46px;
             background:var(--white);color:var(--black);
             border:1.5px solid var(--black);
-            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
             cursor:pointer;
-            display:flex;align-items:center;justify-content:center;gap:0.4rem;
-            padding:0 0.85rem;
-            flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;gap:0.35rem;
+            padding:0 0.6rem;
             white-space:nowrap;
           }
           .deposito-box{margin-bottom:1rem}
@@ -526,29 +526,29 @@ export default function PecaDetalhe() {
             onClick={irParaCheckout}
             disabled={!tamanhoSelecionado}
           >
-            {tamanhoSelecionado ? t.alugar : t.semTamanho}
+            {tamanhoSelecionado ? "Alugar" : "Tamanho"}
           </button>
         ) : (
           <a href={`/reserva?peca=${id}`} className="sticky-btn-alugar">
-            {t.reservar}
+            Reservar
           </a>
         )}
         <button
           className="sticky-btn-contactar"
           onClick={contactarLojista}
           disabled={contactando}
+          title={t.contactar}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          {contactando ? "..." : "Chat"}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Chat
         </button>
         <a
           href="https://www.noragrei.com"
           target="_blank"
           rel="noopener noreferrer"
           className="sticky-btn-comprar"
-          title={t.comprar}
         >
-          ↗
+          Comprar
         </a>
       </div>
     </>
