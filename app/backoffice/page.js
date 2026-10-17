@@ -1869,7 +1869,13 @@ export default function Backoffice() {
                 </div>
                 <div><label style={LBL}>Preço aluguer/dia (€) *</label><input style={INP} type="number" value={novaPeca.preco_aluguer_dia} onChange={e => setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="35" /></div>
                 <div><label style={LBL}>Preço por ocasião (€)</label><input style={INP} type="number" value={novaPeca.preco_avulso} onChange={e => setNovaPeca(p=>({...p,preco_avulso:e.target.value}))} placeholder="89" /></div>
-                <div><label style={LBL}>Valor peça (€) — caução base</label><input style={INP} type="number" value={novaPeca.valor_peca} onChange={e => setNovaPeca(p=>({...p,valor_peca:e.target.value}))} placeholder="450" /></div>
+                <div><label style={LBL}>Valor peça (€) — caução base</label><input style={INP} type="number" value={novaPeca.valor_peca} onChange={e => {
+                  const v = e.target.value;
+                  const sugerido = v > 0 ? Math.round((parseFloat(v) * 0.10 / 3) * 10) / 10 : "";
+                  setNovaPeca(p => ({ ...p, valor_peca: v, ...(!p.preco_aluguer_dia ? { preco_aluguer_dia: sugerido } : {}) }));
+                }} placeholder="450" />
+                {novaPeca.valor_peca > 0 && (() => { const s = Math.round((parseFloat(novaPeca.valor_peca) * 0.10 / 3) * 10) / 10; return s > 0 ? <p style={{fontSize:"0.7rem",color:"#c4a882",marginTop:"0.25rem"}}>💡 Sugestão: {s}€/dia (valor × 10% ÷ 3)</p> : null; })()}
+                </div>
                 <div><label style={LBL}>Material</label><input style={INP} value={novaPeca.material} onChange={e => setNovaPeca(p=>({...p,material:e.target.value}))} placeholder="100% Seda natural" /></div>
                 <div><label style={LBL}>Origem</label><input style={INP} value={novaPeca.origem} onChange={e => setNovaPeca(p=>({...p,origem:e.target.value}))} /></div>
                 <div style={{ display:"flex",alignItems:"center",gap:"0.5rem",paddingTop:"1.5rem" }}>
