@@ -11,10 +11,10 @@ const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
 
 const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 0, cor: "#6c5ce7" };
-  if (n >= 10) return { nome: "Ouro", icon: "🥇", caucao: 50, cor: "#f39c12" };
-  if (n >= 5)  return { nome: "Prata", icon: "🥈", caucao: 75, cor: "#95a5a6" };
-  return { nome: "Bronze", icon: "🥉", caucao: 100, cor: "#cd7f32" };
+  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
+  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12" };
+  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6" };
+  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32" };
 };
 
 const ROW = { display: "flex", gap: "1rem", flexWrap: "wrap" };

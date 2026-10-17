@@ -75,9 +75,9 @@ const t = {
     aProcessar: "A processar...",
     badgeCaucaoDesconto: "pagas apenas",
     badgeCaucaoDesconto2: "da caução",
-    semCaucao: "Sem caução",
+    semCaucao: "Caução mínima",
     poupas: "Poupas",
-    platinaSemCaucao: "💎 Platina — sem caução!",
+    platinaSemCaucao: "💎 Platina — caução mínima garantida (8%)",
   },
   fr: {
     peca: "Votre pièce",
@@ -150,9 +150,9 @@ const t = {
     aProcessar: "Traitement en cours...",
     badgeCaucaoDesconto: "vous payez seulement",
     badgeCaucaoDesconto2: "du dépôt",
-    semCaucao: "Sans dépôt",
+    semCaucao: "Dépôt minimal",
     poupas: "Vous économisez",
-    platinaSemCaucao: "💎 Platine — sans dépôt !",
+    platinaSemCaucao: "💎 Platine — dépôt minimal garanti (8%)",
   },
   lt: {
     peca: "Jūsų drabužis",
@@ -225,19 +225,30 @@ const t = {
     aProcessar: "Apdorojama...",
     badgeCaucaoDesconto: "mokate tik",
     badgeCaucaoDesconto2: "užstato",
-    semCaucao: "Be užstato",
+    semCaucao: "Minimalus užstatas",
     poupas: "Sutaupote",
-    platinaSemCaucao: "💎 Platina — be užstato!",
+    platinaSemCaucao: "💎 Platina — minimalus užstatas (8%)",
   },
 };
 
 const HIGIENIZACAO = 9;
+const TAXA_SINISTRO = 0.03;   // 3% de probabilidade de sinistro por aluguer
+const FATOR_SEGURANCA = 1.5;  // margem de segurança actuarial
+const CAUCAO_PISO = 0.08;     // piso mínimo absoluto (8%) mesmo em Platina
 
 const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 0, cor: "#6c5ce7" };
-  if (n >= 10) return { nome: "Ouro", icon: "🥇", caucao: 50, cor: "#f39c12" };
-  if (n >= 5)  return { nome: "Prata", icon: "🥈", caucao: 75, cor: "#95a5a6" };
-  return { nome: "Bronze", icon: "🥉", caucao: 100, cor: "#cd7f32" };
+  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
+  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12" };
+  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6" };
+  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32" };
+};
+
+// Fórmula actuarial: MAX(risco_calculado, caucao_nivel, piso_minimo)
+const calcularCaucao = (valorPeca, caucaoPct) => {
+  const caucaoRisco = valorPeca * TAXA_SINISTRO * FATOR_SEGURANCA;
+  const caucaoNivel = valorPeca * caucaoPct / 100;
+  const caucaoPisoMin = valorPeca * CAUCAO_PISO;
+  return Math.round(Math.max(caucaoRisco, caucaoNivel, caucaoPisoMin));
 };
 
 function gerarNumeroRecibo() {
@@ -390,6 +401,7 @@ function CheckoutContent() {
   const [totalAlugueres, setTotalAlugueres] = useState(0);
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [datasOcupadas, setDatasOcupadas] = useState([]); // intervalos [{inicio, fim}] indisponíveis
   const [entrega, setEntrega] = useState("envio");
   const [pagamento, setPagamento] = useState("cartao");
   const [deposito, setDeposito] = useState("cartao");
@@ -428,6 +440,7 @@ function CheckoutContent() {
           const st = data.stock_tamanhos?.find(s => s.id === stockId);
           if (st) setTamanhoNome(st.tamanho);
         }
+        await carregarDatasOcupadas(data, stockId);
       }
     }
 
@@ -444,6 +457,86 @@ function CheckoutContent() {
     }
   };
 
+  // Carrega todos os intervalos ocupados para este stock/tamanho
+  // Considera também quantidades disponíveis: só bloqueia se TODOS os stocks do tamanho estão ocupados
+  const carregarDatasOcupadas = async (pecaData, stockIdParam) => {
+    if (!stockIdParam || !pecaData) return;
+
+    // Buscar todos os stock_tamanhos com o mesmo tamanho que o selecionado
+    const stockSelecionado = pecaData.stock_tamanhos?.find(s => s.id === stockIdParam);
+    if (!stockSelecionado) return;
+    const tamanhoNomeLocal = stockSelecionado.tamanho;
+
+    // Todos os stocks do mesmo tamanho desta peça
+    const stockIdsMesmoTamanho = (pecaData.stock_tamanhos || [])
+      .filter(s => s.tamanho === tamanhoNomeLocal)
+      .map(s => s.id);
+
+    if (stockIdsMesmoTamanho.length === 0) return;
+
+    const { data: alugsAtivos } = await supabase
+      .from("alugueres")
+      .select("stock_tamanho_id, data_inicio, data_fim, data_disponivel_novamente")
+      .in("stock_tamanho_id", stockIdsMesmoTamanho)
+      .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+
+    if (!alugsAtivos || alugsAtivos.length === 0) return;
+
+    // Agrupar por data: contar quantos stocks estão ocupados em cada intervalo
+    // Se nº ocupados >= nº total de stocks do tamanho → bloquear
+    const totalStocks = stockIdsMesmoTamanho.length;
+    const intervalos = [];
+
+    // Para cada dia num range de 180 dias, verificar se todos os stocks estão ocupados
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const limite = new Date(hoje.getTime() + 180 * 24 * 60 * 60 * 1000);
+
+    let bloqueioInicio = null;
+    let diaAtual = new Date(hoje);
+
+    while (diaAtual <= limite) {
+      const diaStr = diaAtual.toISOString().split("T")[0];
+      const ocupados = alugsAtivos.filter(a => {
+        const ini = new Date(a.data_inicio);
+        const fim = a.data_disponivel_novamente
+          ? new Date(a.data_disponivel_novamente)
+          : new Date(new Date(a.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+        ini.setHours(0,0,0,0); fim.setHours(0,0,0,0);
+        return diaAtual >= ini && diaAtual < fim;
+      }).length;
+
+      if (ocupados >= totalStocks) {
+        if (!bloqueioInicio) bloqueioInicio = diaStr;
+      } else {
+        if (bloqueioInicio) {
+          intervalos.push({ inicio: bloqueioInicio, fim: new Date(diaAtual.getTime() - 86400000).toISOString().split("T")[0] });
+          bloqueioInicio = null;
+        }
+      }
+      diaAtual = new Date(diaAtual.getTime() + 24 * 60 * 60 * 1000);
+    }
+    if (bloqueioInicio) intervalos.push({ inicio: bloqueioInicio, fim: limite.toISOString().split("T")[0] });
+
+    setDatasOcupadas(intervalos);
+  };
+
+  // Verifica se uma data está dentro de algum intervalo bloqueado
+  const dataBloqueada = (dataStr) => {
+    return datasOcupadas.some(iv => dataStr >= iv.inicio && dataStr <= iv.fim);
+  };
+
+  // Próxima data disponível a partir de hoje
+  const proximaDataDisponivel = () => {
+    const hoje = new Date().toISOString().split("T")[0];
+    let d = hoje;
+    for (let i = 0; i < 180; i++) {
+      if (!dataBloqueada(d)) return d;
+      const next = new Date(new Date(d).getTime() + 86400000);
+      d = next.toISOString().split("T")[0];
+    }
+    return hoje;
+  };
+
   const i = t[lang] || t.pt;
   const nv = NIVEL(totalAlugueres);
 
@@ -455,8 +548,9 @@ function CheckoutContent() {
   const valorAluguer = temGratis ? 0 : (peca ? peca.preco_aluguer_dia * numDias : 0);
 
   const valorDepositoBase = peca ? peca.valor_peca : 0;
-  const valorDeposito = Math.round(valorDepositoBase * nv.caucao / 100);
-  const descontoDeposito = valorDepositoBase - valorDeposito;
+  const valorDeposito = valorDepositoBase > 0 ? calcularCaucao(valorDepositoBase, nv.caucao) : 0;
+  const caucaoSemDesconto = valorDepositoBase > 0 ? calcularCaucao(valorDepositoBase, 100) : 0;
+  const descontoDeposito = caucaoSemDesconto - valorDeposito;
 
   const pagamentoSelecionado = i.pagamentoOpcoes.find(p => p.id === pagamento);
   const depositoSelecionado = i.depositoOpcoes.find(p => p.id === deposito);
@@ -669,7 +763,7 @@ function CheckoutContent() {
                 <span style={{ fontSize: "1.2rem" }}>{nv.icon}</span>
                 <div>
                   <div style={{ fontWeight: 500, fontSize: "0.88rem" }}>{i.nivel} {nv.nome}</div>
-                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.caucao === 0 ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
+                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.nome === "Platina" ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
                 </div>
               </div>
               {temGratis ? <div className="gratis-box">{i.gratis}</div> : pontos > 0 ? <div className="pontos-box">{i.pontos(pontos)}</div> : null}
@@ -678,14 +772,53 @@ function CheckoutContent() {
 
           <div className="sec">
             <p className="sec-t">{i.datas}</p>
+            {datasOcupadas.length > 0 && (
+              <div style={{fontSize:"0.75rem",color:"#946200",background:"#fff8e1",padding:"0.6rem 0.85rem",borderLeft:"3px solid #f39c12",marginBottom:"1rem",lineHeight:1.5}}>
+                ⚠️ Algumas datas estão indisponíveis para este tamanho. As datas bloqueadas não podem ser selecionadas.
+              </div>
+            )}
             <div className="dates">
               <div>
                 <label className="lbl">{i.dataInicio}</label>
-                <input className="inp" type="date" min={hoje} value={dataInicio} onChange={e => { setDataInicio(e.target.value); if (dataFim && e.target.value > dataFim) setDataFim(""); setErro(""); }} />
+                <input
+                  className="inp" type="date"
+                  min={proximaDataDisponivel()}
+                  value={dataInicio}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (dataBloqueada(val)) return; // ignora clique em data bloqueada
+                    setDataInicio(val);
+                    if (dataFim && val > dataFim) setDataFim("");
+                    setErro("");
+                  }}
+                  style={dataInicio && dataBloqueada(dataInicio) ? {borderColor:"#e74c3c"} : {}}
+                />
               </div>
               <div>
                 <label className="lbl">{i.dataFim}</label>
-                <input className="inp" type="date" min={dataInicio || hoje} value={dataFim} onChange={e => { setDataFim(e.target.value); setErro(""); }} />
+                <input
+                  className="inp" type="date"
+                  min={dataInicio || proximaDataDisponivel()}
+                  value={dataFim}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (dataBloqueada(val)) return;
+                    // Verificar se há datas bloqueadas no intervalo
+                    if (dataInicio) {
+                      const inicio = new Date(dataInicio);
+                      const fim = new Date(val);
+                      let d = new Date(inicio.getTime() + 86400000);
+                      let conflito = false;
+                      while (d <= fim) {
+                        if (dataBloqueada(d.toISOString().split("T")[0])) { conflito = true; break; }
+                        d = new Date(d.getTime() + 86400000);
+                      }
+                      if (conflito) { setErro("O período escolhido inclui datas indisponíveis. Escolhe outro intervalo."); return; }
+                    }
+                    setDataFim(val); setErro("");
+                  }}
+                  style={dataFim && dataBloqueada(dataFim) ? {borderColor:"#e74c3c"} : {}}
+                />
               </div>
             </div>
             {numDias > 0 && (
@@ -729,13 +862,13 @@ function CheckoutContent() {
           <div className="sec">
             <p className="sec-t">{i.deposito}</p>
             {nv.caucao < 100 && (
-              <div style={{ padding: "0.75rem 1rem", background: "#e8f5e9", borderLeft: "3px solid #27ae60", marginBottom: "1rem", fontSize: "0.85rem", color: "#27ae60" }}>
-                {nv.icon} {i.nivel} {nv.nome} — {i.badgeCaucaoDesconto} {nv.caucao}% {i.badgeCaucaoDesconto2} ({valorDeposito}€ / {valorDepositoBase}€)
+              <div style={{ padding: "0.75rem 1rem", background: nv.nome === "Platina" ? "#f8f4ff" : "#e8f5e9", borderLeft: `3px solid ${nv.nome === "Platina" ? "#6c5ce7" : "#27ae60"}`, marginBottom: "1rem", fontSize: "0.85rem", color: nv.nome === "Platina" ? "#6c5ce7" : "#27ae60" }}>
+                {nv.nome === "Platina"
+                  ? i.platinaSemCaucao
+                  : `${nv.icon} ${i.nivel} ${nv.nome} — ${i.badgeCaucaoDesconto} ${nv.caucao}% ${i.badgeCaucaoDesconto2} (${valorDeposito}€ / ${caucaoSemDesconto}€)`}
               </div>
             )}
-            {nv.caucao === 0 ? (
-              <div style={{ padding: "0.75rem 1rem", background: "#f8f4ff", borderLeft: "3px solid #6c5ce7", fontSize: "0.85rem", color: "#6c5ce7" }}>{i.platinaSemCaucao}</div>
-            ) : (
+            {false ? null : (
               <>
                 <div className="opts">
                   {i.depositoOpcoes.map(op => (
