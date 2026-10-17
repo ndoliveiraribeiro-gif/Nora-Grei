@@ -126,6 +126,31 @@ export default function PecaDetalhe() {
     router.push(`/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`);
   };
 
+  const adicionarAoCesto = () => {
+    if (!tamanhoSelecionado) return;
+    const stockSelecionado = peca?.stock_tamanhos?.find(s => s.tamanho === tamanhoSelecionado || s.id === tamanhoSelecionado);
+    let cesto = [];
+    try { cesto = JSON.parse(localStorage.getItem("ng_cesto") || "[]"); } catch (_) {}
+    // Evitar duplicado da mesma peça + tamanho
+    const jaExiste = cesto.some(i => i.pecaId === id && i.tamanhoNome === tamanhoSelecionado);
+    if (!jaExiste) {
+      cesto.push({
+        pecaId: id,
+        stockId: stockSelecionado?.id || null,
+        tamanhoNome: tamanhoSelecionado,
+        pecaNome: peca?.nome,
+        precoDia: peca?.preco_aluguer_dia,
+        valorPeca: peca?.valor_peca,
+        fotos: peca?.fotos,
+        dataInicio: null,
+        dataFim: null,
+      });
+      localStorage.setItem("ng_cesto", JSON.stringify(cesto));
+      window.dispatchEvent(new Event("cesto-atualizado"));
+    }
+    router.push("/cesto");
+  };
+
   const contactarLojista = async () => {
     if (!userLogado) { router.push("/entrar"); return; }
     setContactando(true);
@@ -251,9 +276,12 @@ export default function PecaDetalhe() {
         .deposito-box{background:var(--g1);padding:1rem 1.25rem;margin-bottom:1.5rem;border-left:3px solid var(--g2)}
         .deposito-val{font-family:var(--serif);font-size:1.5rem;font-weight:300}
         .deposito-desc{font-size:0.72rem;color:#5a5855;margin-top:0.2rem}
-        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s;margin-bottom:0.75rem}
+        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
         .btn-alugar:hover{background:#2a2926}
         .btn-alugar:disabled{background:#ccc;cursor:not-allowed}
+        .btn-cesto{width:100%;padding:0.85rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem}
+        .btn-cesto:hover{background:var(--g1)}
+        .btn-cesto:disabled{opacity:0.4;cursor:not-allowed}
         .btn-reservar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--g2);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:border-color 0.2s;text-decoration:none;display:block;text-align:center;margin-bottom:0.75rem}
         .btn-reservar:hover{border-color:var(--black)}
         .btn-comprar{width:100%;padding:1rem;background:var(--rosa);color:var(--white);border:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:block;text-align:center;transition:background 0.2s}
@@ -312,6 +340,13 @@ export default function PecaDetalhe() {
             padding:0 0.75rem;
           }
           .sticky-btn-alugar:disabled{background:#c5c2be;cursor:not-allowed}
+          .sticky-btn-cesto{
+            width:46px;min-height:46px;flex-shrink:0;
+            background:var(--white);border:1.5px solid var(--black);
+            font-size:1.1rem;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+          }
+          .sticky-btn-cesto:disabled{opacity:0.4;cursor:not-allowed}
           .sticky-btn-comprar{
             flex:1;min-height:46px;
             background:#c4748a;color:#fff;
@@ -431,9 +466,14 @@ export default function PecaDetalhe() {
           </div>
 
           {disponivel ? (
-            <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
-              {tamanhoSelecionado ? t.alugar : t.semTamanho}
-            </button>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+              <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
+                {tamanhoSelecionado ? t.alugar : t.semTamanho}
+              </button>
+              <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
+                🛍 {tamanhoSelecionado ? (lang === "fr" ? "Ajouter au panier" : lang === "lt" ? "Į krepšelį" : "Adicionar ao cesto") : (t.semTamanho || "Seleciona tamanho")}
+              </button>
+            </div>
           ) : (
             <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
           )}
@@ -521,13 +561,23 @@ export default function PecaDetalhe() {
           <span className="sticky-preco-unit">{t.porcDia}</span>
         </div>
         {disponivel ? (
-          <button
-            className="sticky-btn-alugar"
-            onClick={irParaCheckout}
-            disabled={!tamanhoSelecionado}
-          >
-            {tamanhoSelecionado ? "Alugar" : "Tamanho"}
-          </button>
+          <>
+            <button
+              className="sticky-btn-alugar"
+              onClick={irParaCheckout}
+              disabled={!tamanhoSelecionado}
+            >
+              {tamanhoSelecionado ? "Alugar" : "Tamanho"}
+            </button>
+            <button
+              className="sticky-btn-cesto"
+              onClick={adicionarAoCesto}
+              disabled={!tamanhoSelecionado}
+              title="Adicionar ao cesto"
+            >
+              🛍
+            </button>
+          </>
         ) : (
           <a href={`/reserva?peca=${id}`} className="sticky-btn-alugar">
             Reservar
