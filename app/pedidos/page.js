@@ -23,6 +23,24 @@ const TRADUCOES = {
     reservaTimer: "Disponível em",
     reservaDisponivelTitulo: "🎉 Disponível agora!",
     reservaConfirmar: "Confirmar e pagar",
+    comprarModal: "Como queres comprar esta peça?",
+    comprarUsada: "Comprar usada",
+    comprarUsadaDesc: "A peça que alugaste, inspeccionada e em bom estado",
+    comprarUsadaPreco: "200 € + portes",
+    comprarNova: "Voucher para peça nova",
+    comprarNovaDesc: "Usa o valor do teu aluguer como desconto em noragrei.com",
+    comprarNovaValor: "Desconto de",
+    cancelar: "Cancelar",
+    pagarReferencia: "Gerar referência MB",
+    portesEnvio: "Portes de envio",
+    portesValor: "6,90 €",
+    totalUsada: "Total a pagar",
+    referenciaGerada: "Referência MB",
+    entidade: "Entidade",
+    referencia: "Referência",
+    montante: "Montante",
+    validadeRef: "Válida até",
+    pecaEnviada: "A Nora Grei enviará a peça após confirmação do pagamento.",
   },
   fr: {
     titulo: "Mes commandes",
@@ -42,6 +60,24 @@ const TRADUCOES = {
     reservaTimer: "Disponible dans",
     reservaDisponivelTitulo: "🎉 Disponible maintenant !",
     reservaConfirmar: "Confirmer et payer",
+    comprarModal: "Comment souhaitez-vous acheter cette pièce ?",
+    comprarUsada: "Acheter d'occasion",
+    comprarUsadaDesc: "La pièce que vous avez louée, inspectée et en bon état",
+    comprarUsadaPreco: "200 € + livraison",
+    comprarNova: "Bon pour une pièce neuve",
+    comprarNovaDesc: "Utilisez votre montant de location comme remise sur noragrei.com",
+    comprarNovaValor: "Réduction de",
+    cancelar: "Annuler",
+    pagarReferencia: "Générer référence MB",
+    portesEnvio: "Frais de port",
+    portesValor: "6,90 €",
+    totalUsada: "Total à payer",
+    referenciaGerada: "Référence MB",
+    entidade: "Entité",
+    referencia: "Référence",
+    montante: "Montant",
+    validadeRef: "Valable jusqu'au",
+    pecaEnviada: "Nora Grei enverra la pièce après confirmation du paiement.",
   },
   lt: {
     titulo: "Mano užsakymai",
@@ -61,6 +97,24 @@ const TRADUCOES = {
     reservaTimer: "Prieinama po",
     reservaDisponivelTitulo: "🎉 Prieinama dabar!",
     reservaConfirmar: "Patvirtinti ir mokėti",
+    comprarModal: "Kaip norite įsigyti šį drabužį?",
+    comprarUsada: "Pirkti naudotą",
+    comprarUsadaDesc: "Drabužis, kurį nuomojotės, patikrintas ir geros būklės",
+    comprarUsadaPreco: "200 € + pristatymas",
+    comprarNova: "Kuponas naujam drabužiui",
+    comprarNovaDesc: "Naudokite nuomos sumą kaip nuolaidą noragrei.com",
+    comprarNovaValor: "Nuolaida",
+    cancelar: "Atšaukti",
+    pagarReferencia: "Generuoti MB nuorodą",
+    portesEnvio: "Pristatymo mokestis",
+    portesValor: "6,90 €",
+    totalUsada: "Iš viso mokėti",
+    referenciaGerada: "MB nuoroda",
+    entidade: "Įmonė",
+    referencia: "Nuoroda",
+    montante: "Suma",
+    validadeRef: "Galioja iki",
+    pecaEnviada: "Nora Grei išsiųs drabužį po mokėjimo patvirtinimo.",
   },
 };
 
@@ -120,45 +174,167 @@ function useCountdown(dataAlvo) {
   return { tempo, terminou };
 }
 
-function BotaoCodigoDesconto({ aluguer, i }) {
-  const [codigo, setCodigo] = useState(null);
-  const [copiado, setCopiado] = useState(false);
-  const [mostrar, setMostrar] = useState(false);
-  const [loading, setLoading] = useState(false);
+const PORTES = 6.90;
+const PRECO_USADA = 200;
 
-  const gerarCodigo = async () => {
+function BotaoComprarPeca({ aluguer, i }) {
+  const [fase, setFase] = useState("botao"); // botao | modal | pagamento_usada | voucher_nova
+  const [loading, setLoading] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+  const [codigo, setCodigo] = useState(null);
+  const [referencia, setReferencia] = useState(null);
+
+  const totalUsada = PRECO_USADA + PORTES;
+
+  // Gerar referência MB simulada (em produção integrar Easypay/Stripe/SIBS)
+  const gerarReferenciaUsada = async () => {
+    setLoading(true);
+    // Verificar se já existe compra pendente
+    const { data: existente } = await supabase
+      .from("compras_usadas")
+      .select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    if (existente) { setReferencia(existente); setFase("pagamento_usada"); setLoading(false); return; }
+
+    const entidade = "21666";
+    const ref = Math.floor(100000000 + Math.random() * 900000000).toString();
+    const validade = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+    const { data: nova } = await supabase.from("compras_usadas").insert({
+      aluguer_id: aluguer.id,
+      cliente_id: aluguer.cliente_id,
+      peca_id: aluguer.stock_tamanhos?.pecas?.id || null,
+      valor: totalUsada,
+      estado: "aguarda_pagamento",
+      mb_entidade: entidade,
+      mb_referencia: ref,
+      mb_montante: totalUsada,
+      mb_validade: validade,
+    }).select().single();
+
+    if (nova) { setReferencia(nova); }
+    setFase("pagamento_usada");
+    setLoading(false);
+  };
+
+  const gerarVoucherNova = async () => {
     setLoading(true);
     const { data: existente } = await supabase.from("codigos_desconto").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
-    if (existente) { setCodigo(existente); setMostrar(true); setLoading(false); return; }
+    if (existente) { setCodigo(existente); setFase("voucher_nova"); setLoading(false); return; }
     const cod = "NORA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     const { data: novo } = await supabase.from("codigos_desconto").insert({
       aluguer_id: aluguer.id, cliente_id: aluguer.cliente_id, codigo: cod,
       valor: aluguer.valor_aluguer || 0, estado: "ativo",
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     }).select().single();
-    if (novo) { setCodigo(novo); setMostrar(true); }
+    if (novo) setCodigo(novo);
+    setFase("voucher_nova");
     setLoading(false);
   };
 
-  const copiar = () => { navigator.clipboard.writeText(codigo.codigo); setCopiado(true); setTimeout(() => setCopiado(false), 2000); };
+  const copiar = (txt) => {
+    navigator.clipboard.writeText(txt);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
 
-  if (mostrar && codigo) return (
+  if (fase === "botao") return (
+    <button onClick={() => setFase("modal")}
+      style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
+      🏷️ {i.comprarPeca}
+    </button>
+  );
+
+  if (fase === "modal") return (
+    <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
+      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'1rem'}}>{i.comprarModal}</p>
+
+      {/* OPÇÃO A — Usada */}
+      <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
+          <div>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarUsada}</p>
+            <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarUsadaDesc}</p>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',fontWeight:300,color:'#080808'}}>{i.comprarUsadaPreco}</p>
+          </div>
+        </div>
+        <button onClick={gerarReferenciaUsada} disabled={loading}
+          style={{width:'100%',padding:'0.65rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500,marginTop:'0.5rem'}}>
+          {loading ? "..." : i.pagarReferencia}
+        </button>
+      </div>
+
+      {/* OPÇÃO B — Nova */}
+      <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
+          <div>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarNova}</p>
+            <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarNovaDesc}</p>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',fontWeight:300,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
+          </div>
+        </div>
+        <button onClick={gerarVoucherNova} disabled={loading}
+          style={{width:'100%',padding:'0.65rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500,marginTop:'0.5rem'}}>
+          {loading ? "..." : i.irParaLoja}
+        </button>
+      </div>
+
+      <button onClick={() => setFase("botao")}
+        style={{width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>
+        {i.cancelar}
+      </button>
+    </div>
+  );
+
+  if (fase === "pagamento_usada") return (
+    <div style={{marginTop:'0.75rem',background:'#f0eeeb',border:'1px solid #e2dfda',padding:'1.25rem'}}>
+      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#080808',fontWeight:600,marginBottom:'1rem'}}>{i.referenciaGerada}</p>
+      <div style={{background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
+          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.entidade}</span>
+          <span style={{fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808'}}>{referencia?.mb_entidade || "21666"}</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
+          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.referencia}</span>
+          <span style={{fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808',letterSpacing:'0.1em'}}>{referencia?.mb_referencia || "—"}</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
+          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.portesEnvio}</span>
+          <span style={{fontSize:'0.82rem',color:'#5a5855'}}>{i.portesValor}</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb'}}>
+          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.montante}</span>
+          <span style={{fontSize:'1rem',fontWeight:700,color:'#080808'}}>{referencia?.mb_montante ?? totalUsada}€</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',padding:'0.4rem 0'}}>
+          <span style={{fontSize:'0.7rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase'}}>{i.validadeRef}</span>
+          <span style={{fontSize:'0.82rem',color:'#5a5855'}}>{referencia?.mb_validade || "—"}</span>
+        </div>
+      </div>
+      <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem',lineHeight:1.5}}>{i.pecaEnviada}</p>
+      <button onClick={() => copiar(`${referencia?.mb_entidade} ${referencia?.mb_referencia}`)}
+        style={{width:'100%',padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
+        {copiado ? i.copiado : "📋 Copiar dados MB"}
+      </button>
+    </div>
+  );
+
+  if (fase === "voucher_nova" && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
       <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
       <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
       <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.5rem'}}>
-        <button onClick={copiar} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
+        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
         <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irParaLoja}</a>
       </div>
     </div>
   );
 
-  return (
-    <button onClick={gerarCodigo} disabled={loading} style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
-      {loading ? "..." : `🏷️ ${i.comprarPeca}`}
-    </button>
-  );
+  return null;
 }
 
 function PedidosContent() {
@@ -273,7 +449,7 @@ function PedidosContent() {
             )}
           </div>
         </div>
-        {mostrarComprar && <BotaoCodigoDesconto aluguer={a} i={i} />}
+        {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} />}
       </div>
     );
   };
