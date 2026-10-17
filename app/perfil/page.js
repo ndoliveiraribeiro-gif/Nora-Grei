@@ -1298,16 +1298,94 @@ export default function Perfil() {
                 </a>
               )}
             </div>
-            {tabLoja === "dashboard" && (
-              <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"0.75rem"}}>
-                {[{val:pecasLoja.length,lbl:"Peças"},{val:alugueresLoja.filter(a=>["ativo","enviado"].includes(a.estado)).length,lbl:"Alugueres ativos"},{val:alugueresLoja.filter(a=>a.estado!=="cancelado").reduce((s,a)=>s+(a.valor_aluguer||0),0).toFixed(0)+"€",lbl:"Receita total"},{val:diasTeste+" dias",lbl:"Teste restante"}].map((k,idx)=>(
-                  <div key={idx} style={{background:"var(--white)",padding:"1.25rem",borderTop:"3px solid var(--rosa)"}}>
-                    <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:"var(--rosa)"}}>{k.val}</div>
-                    <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.3rem"}}>{k.lbl}</div>
+            {tabLoja === "dashboard" && (() => {
+              const agora = new Date();
+              const mesAtual = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,"0")}`;
+              const concluidos = alugueresLoja.filter(a=>!["cancelado"].includes(a.estado));
+              const doMes = concluidos.filter(a=>(a.data_inicio||"").startsWith(mesAtual));
+              const receitaMes = doMes.reduce((s,a)=>s+(a.valor_aluguer||0)*0.9,0);
+              const receitaTotal = concluidos.reduce((s,a)=>s+(a.valor_aluguer||0)*0.9,0);
+              const ativos = alugueresLoja.filter(a=>["ativo","enviado"].includes(a.estado));
+              const pendentesAcao = alugueresLoja.filter(a=>["pendente","em_devolucao"].includes(a.estado));
+              // Peça estrela do mês
+              const recMes = {};
+              doMes.forEach(a=>{
+                const id = a.peca_lojista_id;
+                if(!id) return;
+                recMes[id]=(recMes[id]||{id,nome:a.pecas_lojista?.nome||"—",foto:a.pecas_lojista?.fotos?.[0]||null,total:0});
+                recMes[id].total+=(a.valor_aluguer||0)*0.9;
+              });
+              const estrela = Object.values(recMes).sort((a,b)=>b.total-a.total)[0]||null;
+              // Taxa de ocupação (dias alugados / dias totais disponíveis últimos 30 dias)
+              const diasJanela = 30;
+              const diasOcupados = concluidos.filter(a=>a.data_inicio&&a.data_fim).reduce((s,a)=>{
+                const ini=new Date(a.data_inicio), fim=new Date(a.data_fim);
+                const corte=new Date(agora-diasJanela*86400000);
+                const inicio=ini<corte?corte:ini;
+                const ffim=fim>agora?agora:fim;
+                return s+Math.max(0,(ffim-inicio)/86400000);
+              },0);
+              const diasPossiveis = pecasLoja.length * diasJanela;
+              const taxaOcupacao = diasPossiveis>0 ? Math.min(100,Math.round(diasOcupados/diasPossiveis*100)) : 0;
+              return (
+                <div>
+                  {/* Alertas de ação */}
+                  {pendentesAcao.length>0 && (
+                    <div style={{background:"#fff8e1",border:"1.5px solid #f39c12",padding:"0.85rem 1rem",marginBottom:"1rem",display:"flex",alignItems:"center",gap:"0.75rem",cursor:"pointer"}} onClick={()=>setTabLoja("alugueres")}>
+                      <span style={{fontSize:"1.2rem"}}>⚠️</span>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:"0.72rem",fontWeight:600,color:"#b8860b"}}>Ação necessária</div>
+                        <div style={{fontSize:"0.68rem",color:"#8a5a00",marginTop:"0.1rem"}}>
+                          {alugueresLoja.filter(a=>a.estado==="pendente").length>0 && `${alugueresLoja.filter(a=>a.estado==="pendente").length} aluguer(es) por confirmar · `}
+                          {alugueresLoja.filter(a=>a.estado==="em_devolucao").length>0 && `${alugueresLoja.filter(a=>a.estado==="em_devolucao").length} devolução(ões) por verificar`}
+                        </div>
+                      </div>
+                      <span style={{fontSize:"0.7rem",color:"#b8860b"}}>Ver →</span>
+                    </div>
+                  )}
+                  {/* KPIs principais */}
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.6rem",marginBottom:"0.6rem"}}>
+                    <div style={{background:"var(--white)",padding:"1.25rem",borderTop:"3px solid var(--rosa)",gridColumn:"1/-1"}}>
+                      <div style={{fontSize:"0.55rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Receita este mês</div>
+                      <div style={{fontFamily:"var(--serif)",fontSize:"2.4rem",fontWeight:300,color:"var(--rosa)",lineHeight:1}}>{receitaMes.toFixed(0)}€</div>
+                      <div style={{fontSize:"0.68rem",color:"var(--g4)",marginTop:"0.3rem"}}>{doMes.length} aluguer{doMes.length!==1?"es":""} · total acumulado {receitaTotal.toFixed(0)}€</div>
+                    </div>
+                    {[
+                      {val:ativos.length, lbl:"Ativos agora", cor:"#27ae60"},
+                      {val:pecasLoja.length, lbl:"Peças na loja", cor:"var(--rosa)"},
+                    ].map((k,i)=>(
+                      <div key={i} style={{background:"var(--white)",padding:"1.1rem",borderTop:`3px solid ${k.cor}`}}>
+                        <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:k.cor}}>{k.val}</div>
+                        <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.25rem"}}>{k.lbl}</div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                  {/* Taxa de ocupação */}
+                  <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
+                      <span style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)"}}>Taxa de ocupação (30 dias)</span>
+                      <span style={{fontFamily:"var(--serif)",fontSize:"1.2rem",color:taxaOcupacao>=50?"#27ae60":taxaOcupacao>=25?"#f39c12":"#e74c3c"}}>{taxaOcupacao}%</span>
+                    </div>
+                    <div style={{height:6,background:"#f0eeeb"}}>
+                      <div style={{height:"100%",width:`${taxaOcupacao}%`,background:taxaOcupacao>=50?"#27ae60":taxaOcupacao>=25?"#f39c12":"#e74c3c",transition:"width 0.4s"}}/>
+                    </div>
+                    <div style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.35rem"}}>{taxaOcupacao<25?"Preço pode estar alto ou peças precisam de mais visibilidade":taxaOcupacao<50?"A crescer — considera promover no feed":taxaOcupacao<75?"Boa ocupação":"Excelente — considera subir preço ou adicionar stock"}</div>
+                  </div>
+                  {/* Peça estrela do mês */}
+                  {estrela && (
+                    <div style={{background:"var(--white)",padding:"1.1rem",display:"flex",gap:"1rem",alignItems:"center"}}>
+                      {estrela.foto?<img src={estrela.foto} style={{width:52,height:66,objectFit:"cover",flexShrink:0}} alt=""/>:<div style={{width:52,height:66,background:"var(--g1)",flexShrink:0}}/>}
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:"0.55rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--rosa)",fontWeight:600,marginBottom:"0.25rem"}}>⭐ Peça do mês</div>
+                        <div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{estrela.nome}</div>
+                        <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{estrela.total.toFixed(0)}€ gerados este mês</div>
+                      </div>
+                    </div>
+                  )}
+                  {diasTeste>0 && <div style={{marginTop:"0.6rem",fontSize:"0.65rem",color:"var(--g4)",textAlign:"center",padding:"0.6rem",background:"var(--g1)"}}>{diasTeste} dias de período teste restantes</div>}
+                </div>
+              );
+            })()}
             {tabLoja === "pecas" && (
               <div className="card" style={{padding:0}}>
                 <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
