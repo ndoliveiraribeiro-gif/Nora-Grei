@@ -1,25 +1,33 @@
 ﻿"use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 const T = {
   pt: {
     nav: { catalogo: "Colecção", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Nova colecção — Primavera 2026", titulo: "Veste o extraordinário.", sub: "Sem comprar.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona" },
+    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Sem comprar.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona" },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
-      { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos." },
-      { num: "02", titulo: "Recebe", desc: "Entregamos em casa, limpa e pronta a usar." },
-      { num: "03", titulo: "Usa", desc: "Vive cada momento com estilo único." },
-      { num: "04", titulo: "Devolve ou troca", desc: "Renova o teu guarda-roupa sem acumular." },
+      { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
+      { num: "02", titulo: "Recebe", desc: "Entregamos em casa, limpa, inspeccionada e pronta a usar. Em 48h." },
+      { num: "03", titulo: "Usa", desc: "Vive cada momento com estilo único. Fotografa, partilha, brilha." },
+      { num: "04", titulo: "Devolve", desc: "Renova o teu guarda-roupa sem acumular. A caução é devolvida na totalidade." },
     ]},
     categorias: { label: "Para cada momento", titulo: "O look certo,", tituloSub: "para cada ocasião.", lista: ["Festa", "Trabalho", "Férias", "Jantar"] },
     porque: { label: "A nossa missão", titulo: "Porque a moda deve acompanhar a tua vida,", tituloSub: "não ocupar o teu armário.", pontos: ["Menos desperdício.", "Mais exclusividade.", "Mais liberdade.", "Moda consciente."] },
-    numeros: [{ val:"1.000+",label:"Alugueres realizados" },{ val:"200+",label:"Peças exclusivas" },{ val:"4.9★",label:"Avaliação média" },{ val:"48h",label:"Entrega rápida" }],
+    numeros: [{ val:"500+",label:"Alugueres realizados" },{ val:"120+",label:"Peças exclusivas" },{ val:"4.9★",label:"Avaliação média" },{ val:"48h",label:"Entrega rápida" }],
     sustentabilidade: { label:"Moda consciente", titulo:"Cada peça vive várias histórias.", stats:[{ val:"70%",label:"Água poupada vs comprar" },{ val:"5×",label:"Reutilizações por peça" },{ val:"60%",label:"Emissões reduzidas" }] },
     cta: { titulo:"O teu guarda-roupa infinito", sub:"começa aqui.", btn:"Explorar colecção", tag:"Moda exclusiva. Sem excessos." },
-    strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspecionadas", "Cancele quando quiser", "Moda consciente"],
-    footer: { copy:"© 2026 Nora Grei. Todos os direitos reservados.", links:["Colecção","Como funciona","Contacto","Termos","Privacidade"] },
+    strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspeccionadas", "Cancele quando quiser", "Moda consciente"],
+    footer: {
+      copy:"© 2026 Nora Grei. Todos os direitos reservados.",
+      cols: [
+        { titulo: "Explorar", links: [{ l:"Colecção", h:"/catalogo" },{ l:"Como funciona", h:"#como" },{ l:"Sustentabilidade", h:"#sustentabilidade" }] },
+        { titulo: "Conta", links: [{ l:"Entrar", h:"/entrar" },{ l:"Registar", h:"/registar" },{ l:"Os meus pedidos", h:"/pedidos" },{ l:"Perfil", h:"/perfil" }] },
+        { titulo: "Informação", links: [{ l:"Contacto", h:"mailto:hello@noragrei.com" },{ l:"Termos de uso", h:"/termos" },{ l:"Política de privacidade", h:"/privacidade" }] },
+      ],
+      social: "Segue-nos",
+    },
     bottomNav: { inicio:"Início", catalogo:"Colecção", pedidos:"Pedidos", perfil:"Perfil" },
     quickAccess: [
       { icon:"✦", label:"Ver colecção", desc:"Todas as peças" },
@@ -34,24 +42,39 @@ const T = {
     cupao: { texto: "Oferta de boas-vindas — 15% de desconto em noragrei.com", copiar: "Copiar código", copiado: "Copiado ✓" },
     destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
     pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações — sem ocupar espaço.", btn: "Instalar agora", ios: "No Safari, toca em  e depois em \"Adicionar ao ecrã inicial\".", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
+    trust: { label: "Porque nos escolhem", items: [
+      { icon: "✦", titulo: "Peças únicas", desc: "Cada peça é seleccionada a pensar na mulher que quer ser diferente em cada ocasião." },
+      { icon: "◎", titulo: "Caução garantida", desc: "O depósito é devolvido na totalidade quando a peça chega em boas condições." },
+      { icon: "↺", titulo: "Guarda-roupa infinito", desc: "Aluga quantas vezes quiseres. Sem limites, sem acumulação, sem culpa." },
+      { icon: "♡", titulo: "Higienização profissional", desc: "Cada peça é limpa e inspeccionada antes de chegar até ti." },
+    ]},
+    instagram: { label: "Inspira-te", titulo: "Segue-nos no Instagram", sub: "Vê como as nossas clientes usam as peças.", btn: "Ver @noragrei" },
   },
   fr: {
     nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelle collection — Printemps 2026", titulo: "Habillez l'extraordinaire.", sub: "Sans acheter.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche" },
+    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Sans acheter.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche" },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
-      { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves." },
-      { num: "02", titulo: "Recevez", desc: "Livré chez vous, propre et prêt à porter." },
-      { num: "03", titulo: "Portez", desc: "Vivez chaque moment avec style." },
-      { num: "04", titulo: "Retournez ou échangez", desc: "Renouvelez votre garde-robe sans accumuler." },
+      { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
+      { num: "02", titulo: "Recevez", desc: "Livré chez vous, propre, inspectée et prête à porter. En 48h." },
+      { num: "03", titulo: "Portez", desc: "Vivez chaque moment avec style. Photographiez, partagez, brillez." },
+      { num: "04", titulo: "Retournez", desc: "Renouvelez votre garde-robe sans accumuler. Le dépôt est intégralement remboursé." },
     ]},
     categorias: { label: "Pour chaque moment", titulo: "Le look parfait,", tituloSub: "pour chaque occasion.", lista: ["Festa", "Trabalho", "Férias", "Jantar"] },
     porque: { label: "Notre mission", titulo: "Parce que la mode doit suivre votre vie,", tituloSub: "pas occuper votre placard.", pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode responsable."] },
-    numeros: [{ val:"1.000+",label:"Locations réalisées" },{ val:"200+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
+    numeros: [{ val:"500+",label:"Locations réalisées" },{ val:"120+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
     sustentabilidade: { label:"Mode responsable", titulo:"Chaque pièce vit plusieurs histoires.", stats:[{ val:"70%",label:"Eau économisée vs achat" },{ val:"5×",label:"Réutilisations par pièce" },{ val:"60%",label:"Émissions réduites" }] },
     cta: { titulo:"Votre garde-robe infinie", sub:"commence ici.", btn:"Explorer la collection", tag:"Mode exclusive. Sans excès." },
     strip: ["Livraison gratuite", "Dépôt 100% remboursé", "Pièces inspectées", "Annulez à tout moment", "Mode responsable"],
-    footer: { copy:"© 2026 Nora Grei. Tous droits réservés.", links:["Collection","Comment ça marche","Contact","Conditions","Confidentialité"] },
+    footer: {
+      copy:"© 2026 Nora Grei. Tous droits réservés.",
+      cols: [
+        { titulo: "Explorer", links: [{ l:"Collection", h:"/catalogo" },{ l:"Comment ça marche", h:"#como" },{ l:"Durabilité", h:"#sustentabilidade" }] },
+        { titulo: "Compte", links: [{ l:"Connexion", h:"/entrar" },{ l:"S'inscrire", h:"/registar" },{ l:"Mes commandes", h:"/pedidos" },{ l:"Profil", h:"/perfil" }] },
+        { titulo: "Informations", links: [{ l:"Contact", h:"mailto:hello@noragrei.com" },{ l:"Conditions d'utilisation", h:"/termos" },{ l:"Politique de confidentialité", h:"/privacidade" }] },
+      ],
+      social: "Suivez-nous",
+    },
     bottomNav: { inicio:"Accueil", catalogo:"Collection", pedidos:"Commandes", perfil:"Profil" },
     quickAccess: [
       { icon:"✦", label:"Voir la collection", desc:"Toutes les pièces" },
@@ -66,24 +89,39 @@ const T = {
     cupao: { texto: "Offre de bienvenue — 15% de réduction sur noragrei.com", copiar: "Copier le code", copiado: "Copié ✓" },
     destaque: { label: "Sélection de la semaine", verTodas: "Voir toute la collection", alugar: "Louer", reservar: "Indisponible — Réserver", dispEm: "Disponible dans" },
     pwa: { titulo: "Installer l'app Nora Grei", sub: "Accès rapide à la collection, commandes et notifications — sans encombrer.", btn: "Installer", ios: "Dans Safari, appuyez sur  puis \"Sur l'écran d'accueil\".", dispensar: "Plus tard", secTitulo: "Vous avez l'app?", secSub: "Installez sur votre téléphone pour accéder à la collection en un clic.", secBtn: "Installer l'app" },
+    trust: { label: "Pourquoi nous choisir", items: [
+      { icon: "✦", titulo: "Pièces uniques", desc: "Chaque pièce est sélectionnée pour la femme qui veut être différente à chaque occasion." },
+      { icon: "◎", titulo: "Dépôt garanti", desc: "Le dépôt est intégralement remboursé lorsque la pièce arrive en bon état." },
+      { icon: "↺", titulo: "Garde-robe infinie", desc: "Louez autant que vous voulez. Sans limites, sans accumulation, sans culpabilité." },
+      { icon: "♡", titulo: "Nettoyage professionnel", desc: "Chaque pièce est nettoyée et inspectée avant de vous être livrée." },
+    ]},
+    instagram: { label: "Inspirez-vous", titulo: "Suivez-nous sur Instagram", sub: "Voyez comment nos clientes portent les pièces.", btn: "Voir @noragrei" },
   },
   lt: {
     nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauja kolekcija — 2026 pavasaris", titulo: "Apsirenkite išskirtinai.", sub: "Nepirkdami.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia" },
+    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nepirkdami.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia" },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
-      { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį." },
-      { num: "02", titulo: "Gaukite", desc: "Pristatome į namus, švarų ir paruoštą dėvėti." },
-      { num: "03", titulo: "Dėvėkite", desc: "Gyvenkite kiekvieną akimirką su savitu stiliumi." },
-      { num: "04", titulo: "Grąžinkite arba keiskite", desc: "Atnaujinkite spintą nekraudami daiktų." },
+      { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
+      { num: "02", titulo: "Gaukite", desc: "Pristatome į namus, švarų, patikrintą ir paruoštą dėvėti. Per 48 val." },
+      { num: "03", titulo: "Dėvėkite", desc: "Gyvenkite kiekvieną akimirką su savitu stiliumi. Fotografuokite, dalinkitės, spindėkite." },
+      { num: "04", titulo: "Grąžinkite", desc: "Atnaujinkite spintą nekraudami daiktų. Užstatas grąžinamas visas." },
     ]},
     categorias: { label: "Kiekvienai akimirkai", titulo: "Tinkamas stilius,", tituloSub: "kiekvienai progai.", lista: ["Festa", "Trabalho", "Férias", "Jantar"] },
     porque: { label: "Mūsų misija", titulo: "Nes mada turi atitikti jūsų gyvenimą,", tituloSub: "o ne užimti jūsų spintą.", pontos: ["Mažiau švaistymo.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."] },
-    numeros: [{ val:"1.000+",label:"Įvykdytų nuomų" },{ val:"200+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
+    numeros: [{ val:"500+",label:"Įvykdytų nuomų" },{ val:"120+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
     sustentabilidade: { label:"Sąmoninga mada", titulo:"Kiekvienas drabužis turi kelias istorijas.", stats:[{ val:"70%",label:"Sutaupyto vandens vs pirkimas" },{ val:"5×",label:"Pakartotiniai naudojimai" },{ val:"60%",label:"Sumažintos emisijos" }] },
     cta: { titulo:"Jūsų begalinė spinta", sub:"prasideda čia.", btn:"Naršyti kolekciją", tag:"Išskirtinė mada. Be perteklių." },
     strip: ["Nemokamas pristatymas", "100% grąžinamas užstatas", "Patikrinti drabužiai", "Atšaukite bet kada", "Sąmoninga mada"],
-    footer: { copy:"© 2026 Nora Grei. Visos teisės saugomos.", links:["Kolekcija","Kaip tai veikia","Kontaktai","Sąlygos","Privatumas"] },
+    footer: {
+      copy:"© 2026 Nora Grei. Visos teisės saugomos.",
+      cols: [
+        { titulo: "Naršyti", links: [{ l:"Kolekcija", h:"/catalogo" },{ l:"Kaip tai veikia", h:"#como" },{ l:"Tvarumas", h:"#sustentabilidade" }] },
+        { titulo: "Paskyra", links: [{ l:"Prisijungti", h:"/entrar" },{ l:"Registruotis", h:"/registar" },{ l:"Mano užsakymai", h:"/pedidos" },{ l:"Profilis", h:"/perfil" }] },
+        { titulo: "Informacija", links: [{ l:"Kontaktai", h:"mailto:hello@noragrei.com" },{ l:"Naudojimo sąlygos", h:"/termos" },{ l:"Privatumo politika", h:"/privacidade" }] },
+      ],
+      social: "Sekite mus",
+    },
     bottomNav: { inicio:"Pradžia", catalogo:"Kolekcija", pedidos:"Užsakymai", perfil:"Profilis" },
     quickAccess: [
       { icon:"✦", label:"Žiūrėti kolekciją", desc:"Visi drabužiai" },
@@ -98,6 +136,13 @@ const T = {
     cupao: { texto: "Sveikiname — 15% nuolaida noragrei.com", copiar: "Kopijuoti kodą", copiado: "Nukopijuota ✓" },
     destaque: { label: "Savaitės atranka", verTodas: "Žiūrėti visą kolekciją", alugar: "Nuomoti", reservar: "Neprieinama — Rezervuoti", dispEm: "Prieinama po" },
     pwa: { titulo: "Įdiekite Nora Grei programėlę", sub: "Greita prieiga prie kolekcijos, užsakymų ir pranešimų — neužimant vietos.", btn: "Įdiegti", ios: "Safari, bakstelėkite  ir tada \"Pridėti prie pradžios ekrano\".", dispensar: "Vėliau", secTitulo: "Turite programėlę?", secSub: "Įdiekite telefone ir pasiekite kolekciją vienu prisilietimu.", secBtn: "Įdiegti programėlę" },
+    trust: { label: "Kodėl mus renkasi", items: [
+      { icon: "✦", titulo: "Unikalūs drabužiai", desc: "Kiekvienas drabužis atrinktas moteriai, kuri nori būti skirtinga kiekvienai progai." },
+      { icon: "◎", titulo: "Užstatas garantuotas", desc: "Užstatas grąžinamas visas, kai drabužis grąžinamas geros būklės." },
+      { icon: "↺", titulo: "Begalinė spinta", desc: "Nuomokite kiek tik norite. Be apribojimų, be kaupimo, be kaltės." },
+      { icon: "♡", titulo: "Profesionalus valymas", desc: "Kiekvienas drabužis išvalomas ir patikrinamas prieš pristatant." },
+    ]},
+    instagram: { label: "Įkvėpkitės", titulo: "Sekite mus Instagram", sub: "Žiūrėkite, kaip mūsų klientės dėvi drabužius.", btn: "Žiūrėti @noragrei" },
   },
 };
 
@@ -111,11 +156,10 @@ export default function Home() {
   const [heroCarregado, setHeroCarregado] = useState(false);
   const [categoriaFotos, setCategoriaFotos] = useState({});
   const [videoUrl, setVideoUrl] = useState(null);
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const [videoComSom, setVideoComSom] = useState(false);
   const [pecasDestaque, setPecasDestaque] = useState([]);
   const [campanha, setCampanha] = useState(null);
-  const [pwaBanner, setPwaBanner] = useState(false); // "android" | "ios" | false
+  const [pwaBanner, setPwaBanner] = useState(false);
   const [pwaPrompt, setPwaPrompt] = useState(null);
   const [pwaInstalado, setPwaInstalado] = useState(false);
 
@@ -129,7 +173,6 @@ export default function Home() {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
 
-    // PWA install prompt (não bloqueia o resto)
     const jaInstalado = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
     if (!jaInstalado) {
       const jaDispensou = localStorage.getItem("ng_pwa_dismiss");
@@ -151,33 +194,19 @@ export default function Home() {
     if (pwaPrompt) {
       pwaPrompt.prompt();
       const { outcome } = await pwaPrompt.userChoice;
-      if (outcome === "accepted") {
-        setPwaBanner(false);
-        setPwaInstalado(true);
-        localStorage.setItem("ng_pwa_dismiss","1");
-      }
+      if (outcome === "accepted") { setPwaBanner(false); setPwaInstalado(true); localStorage.setItem("ng_pwa_dismiss","1"); }
     } else {
-      // Chrome mobile sem prompt ainda disponível — abre menu do browser
-      if (navigator.share) {
-        try { await navigator.share({ title: "Nora Grei", url: window.location.origin }); } catch(_) {}
-      }
+      if (navigator.share) { try { await navigator.share({ title: "Nora Grei", url: window.location.origin }); } catch(_) {} }
     }
   };
   const dispensarPwa = () => { setPwaBanner(false); localStorage.setItem("ng_pwa_dismiss","1"); };
 
   const carregarCampanha = async () => {
     const agora = new Date().toISOString();
-    const { data: cs } = await supabase
-      .from("campanhas")
-      .select("id, titulo, titulo_fr, titulo_lt, mensagem, mensagem_fr, mensagem_lt, codigo, desconto, tipo, url_destino, validade")
-      .eq("ativa", true)
-      .or(`validade.is.null,validade.gt.${agora}`)
-      .order("created_at", { ascending: false });
+    const { data: cs } = await supabase.from("campanhas").select("id, titulo, titulo_fr, titulo_lt, mensagem, mensagem_fr, mensagem_lt, codigo, desconto, tipo, url_destino, validade").eq("ativa", true).or(`validade.is.null,validade.gt.${agora}`).order("created_at", { ascending: false });
     if (!cs || cs.length === 0) return;
-    // Escolher por probabilidade
     const total = cs.reduce((s, c) => s + (c.probabilidade || 20), 0);
-    let r = Math.random() * total;
-    let escolhida = cs[0];
+    let r = Math.random() * total; let escolhida = cs[0];
     for (const c of cs) { r -= (c.probabilidade || 20); if (r <= 0) { escolhida = c; break; } }
     const visto = localStorage.getItem(`ng_banner_${escolhida.id}`);
     if (visto) return;
@@ -186,8 +215,8 @@ export default function Home() {
   };
 
   const aplicarHeroAutomatico = (todasPecas) => {
-    const comFotoReal = todasPecas.filter(function (p) { return p.fotos && p.fotos.filter(Boolean).length > 0; });
-    const destaque = comFotoReal.find(function (p) { return p.destaque; });
+    const comFotoReal = todasPecas.filter(p => p.fotos && p.fotos.filter(Boolean).length > 0);
+    const destaque = comFotoReal.find(p => p.destaque);
     if (destaque) { setHeroPeca(destaque); return; }
     if (comFotoReal[0]) setHeroPeca(comFotoReal[0]);
   };
@@ -196,86 +225,45 @@ export default function Home() {
     const { data: cfg } = await supabase.from("configuracoes").select("*").maybeSingle();
     if (cfg && cfg.video_landing_url) setVideoUrl(cfg.video_landing_url);
 
-    const { data: todasPecas } = await supabase
-      .from("pecas")
-      .select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)")
-      .not("fotos", "is", null)
-      .neq("fotos", "{}"); // excluir arrays vazios
+    const { data: todasPecas } = await supabase.from("pecas").select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)").not("fotos", "is", null).neq("fotos", "{}");
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
-      const escolhida = todasPecas.find(function (p) { return p.id === cfg.hero_peca_id; });
-      if (escolhida && escolhida.fotos && escolhida.fotos.filter(Boolean).length > 0) {
-        setHeroPeca(escolhida);
-      } else {
-        aplicarHeroAutomatico(todasPecas);
-      }
-    } else if (todasPecas) {
-      aplicarHeroAutomatico(todasPecas);
-    }
+      const escolhida = todasPecas.find(p => p.id === cfg.hero_peca_id);
+      if (escolhida && escolhida.fotos && escolhida.fotos.filter(Boolean).length > 0) { setHeroPeca(escolhida); } else { aplicarHeroAutomatico(todasPecas); }
+    } else if (todasPecas) { aplicarHeroAutomatico(todasPecas); }
     setHeroCarregado(true);
 
     if (todasPecas) {
       const mapa = {};
-      const mapaCampos = {
-        Festa: cfg ? cfg.categoria_festa_peca_id : null,
-        Trabalho: cfg ? cfg.categoria_trabalho_peca_id : null,
-        Férias: cfg ? cfg.categoria_ferias_peca_id : null,
-        Jantar: cfg ? cfg.categoria_jantar_peca_id : null,
-      };
-      const ocasioesAlvo = ["Festa", "Trabalho", "Férias", "Jantar"];
-
-      ocasioesAlvo.forEach(function (oc) {
+      const mapaCampos = { Festa: cfg?.categoria_festa_peca_id, Trabalho: cfg?.categoria_trabalho_peca_id, "Férias": cfg?.categoria_ferias_peca_id, Jantar: cfg?.categoria_jantar_peca_id };
+      ["Festa", "Trabalho", "Férias", "Jantar"].forEach(oc => {
         const idEscolhido = mapaCampos[oc];
-        if (idEscolhido) {
-          const escolhida = todasPecas.find(function (p) { return p.id === idEscolhido; });
-          if (escolhida && escolhida.fotos && escolhida.fotos[0]) {
-            mapa[oc] = escolhida.fotos[0];
-            return;
-          }
-        }
-        const encontrada = todasPecas.find(function (p) { return p.ocasioes && p.ocasioes.includes(oc) && p.fotos && p.fotos[0]; });
+        if (idEscolhido) { const e = todasPecas.find(p => p.id === idEscolhido); if (e && e.fotos?.[0]) { mapa[oc] = e.fotos[0]; return; } }
+        const encontrada = todasPecas.find(p => p.ocasioes?.includes(oc) && p.fotos?.[0]);
         if (encontrada) mapa[oc] = encontrada.fotos[0];
       });
-
-      const restantes = todasPecas.filter(function (p) { return p.fotos && p.fotos[0]; });
-      let idx = 0;
-      ocasioesAlvo.forEach(function (oc) {
-        if (!mapa[oc] && restantes[idx]) { mapa[oc] = restantes[idx].fotos[0]; idx++; }
-      });
+      const restantes = todasPecas.filter(p => p.fotos?.[0]); let idx = 0;
+      ["Festa", "Trabalho", "Férias", "Jantar"].forEach(oc => { if (!mapa[oc] && restantes[idx]) { mapa[oc] = restantes[idx].fotos[0]; idx++; } });
       setCategoriaFotos(mapa);
 
-      // Peças em destaque: primeiro as marcadas como destaque, depois as mais recentes
-      const comFoto = todasPecas.filter(function (p) { return p.fotos && p.fotos[0]; });
-      const destaque = comFoto.filter(function (p) { return p.destaque; });
-      const resto = comFoto.filter(function (p) { return !p.destaque; });
-      const seleccionadas = [...destaque, ...resto].slice(0, 6);
+      const comFoto = todasPecas.filter(p => p.fotos?.[0]);
+      const destaqueL = comFoto.filter(p => p.destaque);
+      const resto = comFoto.filter(p => !p.destaque);
+      const seleccionadas = [...destaqueL, ...resto].slice(0, 6);
 
-      // Verificar disponibilidade com alugueres activos
       if (seleccionadas.length > 0) {
-        const stockIds = seleccionadas.flatMap(function (p) { return (p.stock_tamanhos || []).map(function (s) { return s.id; }); });
-        const { data: alAtivos } = stockIds.length > 0 ? await supabase
-          .from("alugueres")
-          .select("stock_tamanho_id, data_fim, data_disponivel_novamente")
-          .in("stock_tamanho_id", stockIds)
-          .in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]) : { data: [] };
-
+        const stockIds = seleccionadas.flatMap(p => (p.stock_tamanhos || []).map(s => s.id));
+        const { data: alAtivos } = stockIds.length > 0 ? await supabase.from("alugueres").select("stock_tamanho_id, data_fim, data_disponivel_novamente").in("stock_tamanho_id", stockIds).in("estado", ["pendente","confirmado","enviado","ativo","em_verificacao"]) : { data: [] };
         const agora = new Date();
-        const pecasFormatadas = seleccionadas.map(function (p) {
-          const ids = (p.stock_tamanhos || []).map(function (s) { return s.id; });
-          const aluguerAtivo = (alAtivos || [])
-            .filter(function (a) { return ids.includes(a.stock_tamanho_id); })
-            .sort(function (a, b) { return new Date(b.data_fim) - new Date(a.data_fim); })[0];
-
+        const pecasFormatadas = seleccionadas.map(p => {
+          const ids = (p.stock_tamanhos || []).map(s => s.id);
+          const aluguerAtivo = (alAtivos || []).filter(a => ids.includes(a.stock_tamanho_id)).sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
           let dataFim = null;
-          let disponivel = (p.stock_tamanhos || []).some(function (s) { return s.quantidade_disponivel > 0; });
-
+          let disponivel = (p.stock_tamanhos || []).some(s => s.quantidade_disponivel > 0);
           if (aluguerAtivo) {
-            const dataDisp = aluguerAtivo.data_disponivel_novamente
-              ? new Date(aluguerAtivo.data_disponivel_novamente)
-              : new Date(new Date(aluguerAtivo.data_fim).getTime() + 3 * 86400000);
+            const dataDisp = aluguerAtivo.data_disponivel_novamente ? new Date(aluguerAtivo.data_disponivel_novamente) : new Date(new Date(aluguerAtivo.data_fim).getTime() + 3 * 86400000);
             if (dataDisp > agora) { dataFim = dataDisp.toISOString(); disponivel = false; }
           }
-
           return { ...p, disponivel, dataFim, categoria: p.categorias?.nome || "" };
         });
         setPecasDestaque(pecasFormatadas);
@@ -286,7 +274,6 @@ export default function Home() {
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
   const copiarCupao = () => { if (campanha?.codigo) navigator.clipboard.writeText(campanha.codigo); setCupaoCopiado(true); setTimeout(() => setCupaoCopiado(false), 3000); };
   const t = T[lang] || T.pt;
-  const FOTO_FALLBACK = null; // sem fallback externo — só fotos reais da Nora Grei
 
   return (
     <>
@@ -297,6 +284,8 @@ export default function Home() {
         html{scroll-behavior:smooth}
         body{background:var(--white);color:var(--black);font-family:var(--sans);font-size:17px;font-weight:400;line-height:1.7;-webkit-font-smoothing:antialiased}
         @media(max-width:768px){body{padding-bottom:72px}}
+
+        /* NAV */
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 4rem;transition:all 0.3s;background:rgba(248,247,245,0.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
         .nav.scrolled{padding:0.75rem 4rem;box-shadow:0 2px 20px rgba(0,0,0,0.06)}
         .logo{display:flex;flex-direction:column;text-decoration:none;color:var(--black)}
@@ -316,6 +305,7 @@ export default function Home() {
         .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}
         .nb-f:hover{background:#2a2926}
 
+        /* HERO */
         .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55);transition:opacity 1s ease;opacity:0}
@@ -335,13 +325,14 @@ export default function Home() {
         .hero-cta2{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:1rem 1.5rem;transition:all 0.2s;flex:1;text-align:center;max-width:180px}
         .hero-cta2:hover{color:#fff;border-color:#fff}
 
-
+        /* STRIP */
         .strip{background:var(--rosa);padding:0.75rem 0;overflow:hidden}
         .strip-track{display:flex;white-space:nowrap;animation:marquee 25s linear infinite}
         .strip-item{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.9);padding:0 2.5rem;flex-shrink:0}
         .strip-item::after{content:'✦';margin-left:2.5rem;color:rgba(255,255,255,0.4)}
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
+        /* QUICK ACCESS */
         .quick-access{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2)}
         .qa-item{background:var(--white);padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:0.35rem;text-decoration:none;color:var(--black);transition:background 0.2s;position:relative;overflow:hidden;border:none}
         .qa-item:hover{background:var(--g1)}
@@ -350,11 +341,13 @@ export default function Home() {
         .qa-label{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;padding-right:1.5rem}
         .qa-desc{font-size:0.75rem;color:var(--g4);font-weight:300}
 
+        /* SECTIONS */
         .sec{padding:4.5rem 1.5rem}
         .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.75rem;font-weight:500}
         .sec-titulo{font-family:var(--serif);font-size:clamp(2rem,6vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:2rem}
         .sec-titulo em{font-style:italic;color:var(--g4)}
 
+        /* COMO */
         .como-grid{display:flex;flex-direction:column;gap:1px;background:var(--g2)}
         .como-passo{background:var(--white);padding:1.75rem 1.5rem;display:flex;gap:1.5rem;align-items:flex-start;transition:background 0.2s}
         .como-passo:hover{background:var(--g1)}
@@ -363,6 +356,7 @@ export default function Home() {
         .como-titulo{font-family:var(--serif);font-size:1.3rem;font-weight:400;margin-bottom:0.3rem}
         .como-desc{font-size:0.88rem;color:var(--g4);line-height:1.6}
 
+        /* PORQUE */
         .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:4.5rem 1.5rem}
         .porque-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:300;line-height:1.2;color:#fff;margin-bottom:2.5rem}
         .porque-titulo em{font-style:italic;color:rgba(255,255,255,0.4);display:block}
@@ -371,6 +365,7 @@ export default function Home() {
         .porque-dot{width:8px;height:8px;border-radius:50%;background:var(--rosa);flex-shrink:0}
         .porque-text{font-family:var(--serif);font-size:1.3rem;font-weight:300;color:rgba(255,255,255,0.85)}
 
+        /* CATEGORIAS */
         .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--white)}
         .cat-card{position:relative;overflow:hidden;aspect-ratio:1/1;text-decoration:none;display:block;background:var(--g1)}
         .cat-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease}
@@ -378,17 +373,37 @@ export default function Home() {
         .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.75) 0%,transparent 50%);display:flex;align-items:flex-end;padding:1.25rem}
         .cat-nome{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:#fff;font-style:italic}
 
+        /* NÚMEROS */
         .numeros{display:grid;grid-template-columns:repeat(2,1fr);background:var(--black)}
         .numero{padding:2.5rem 1.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
         .numero:nth-child(even){border-right:none}
         .numero-val{font-family:var(--serif);font-size:3rem;font-weight:300;color:var(--rosa);line-height:1;margin-bottom:0.4rem}
         .numero-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
 
+        /* TRUST */
+        .trust-sec{padding:4.5rem 1.5rem;background:var(--g1)}
+        .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2);margin-top:2rem}
+        .trust-item{background:var(--white);padding:1.75rem 1.5rem}
+        .trust-icon{font-size:1.3rem;color:var(--rosa);margin-bottom:0.75rem;display:block}
+        .trust-titulo{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-bottom:0.4rem}
+        .trust-desc{font-size:0.82rem;color:var(--g4);line-height:1.65}
+
+        /* INSTAGRAM */
+        .insta-sec{padding:4.5rem 1.5rem;background:var(--black);text-align:center}
+        .insta-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500;margin-bottom:1rem}
+        .insta-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:300;color:#fff;margin-bottom:0.5rem}
+        .insta-sub{font-size:0.88rem;color:rgba(255,255,255,0.45);margin-bottom:2rem}
+        .insta-btn{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.25);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;display:inline-block}
+        .insta-btn:hover{border-color:#fff;background:rgba(255,255,255,0.05)}
+        @media(min-width:769px){.insta-sec{padding:5rem 4rem}}
+
+        /* SUSTENTABILIDADE */
         .sustent{background:var(--g1);padding:4.5rem 1.5rem}
         .sustent-stat{background:var(--white);padding:1.5rem;margin-bottom:1px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--rosa)}
         .sustent-val{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--rosa)}
         .sustent-label{font-size:0.82rem;color:var(--g4);text-align:right;max-width:20ch}
 
+        /* CTA FINAL */
         .cta-final{padding:5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
         .cta-final-titulo{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;line-height:1;color:#fff}
         .cta-final-sub{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.75rem}
@@ -396,11 +411,21 @@ export default function Home() {
         .cta-final-btn{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1.1rem 3rem;text-decoration:none;font-family:var(--sans);transition:background 0.2s;display:inline-block}
         .cta-final-btn:hover{background:#a85c72}
 
-        footer{padding:2rem 1.5rem;border-top:1px solid var(--g2);display:flex;flex-direction:column;gap:1rem}
+        /* FOOTER */
+        footer{padding:3rem 1.5rem 2rem;border-top:1px solid var(--g2);background:var(--white)}
+        .footer-cols{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem}
+        .footer-col-titulo{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--black);font-weight:500;margin-bottom:0.85rem}
+        .footer-col-links{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
+        .footer-col-links a{font-size:0.78rem;color:var(--g4);text-decoration:none;transition:color 0.2s}
+        .footer-col-links a:hover{color:var(--black)}
+        .footer-bottom{display:flex;flex-direction:column;gap:0.75rem;padding-top:1.5rem;border-top:1px solid var(--g2)}
         .footer-copy{font-size:0.65rem;color:var(--g4)}
-        .footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;list-style:none}
-        .footer-links a{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+        .footer-social{display:flex;align-items:center;gap:0.75rem}
+        .footer-social-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--g4)}
+        .footer-social-link{font-size:0.72rem;color:var(--g4);text-decoration:none;transition:color 0.2s}
+        .footer-social-link:hover{color:var(--rosa)}
 
+        /* BOTTOM NAV */
         .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--g2);padding:0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));transition:transform 0.3s ease}
         .bnav.pwa-open{transform:translateY(-100%)}
         .bnav-inner{display:flex;justify-content:space-around;align-items:center}
@@ -410,6 +435,7 @@ export default function Home() {
         .bnav-label{font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase}
         .bnav-dot{width:3px;height:3px;border-radius:50%;background:var(--rosa)}
 
+        /* CUPÃO BANNER */
         .cupao-banner{position:fixed;bottom:72px;left:0;right:0;z-index:150;background:var(--rosa);padding:1rem 1.5rem;animation:slideUp 0.4s ease}
         @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
         .cupao-inner{display:flex;flex-direction:column;gap:0.75rem}
@@ -419,6 +445,36 @@ export default function Home() {
         .cupao-btn{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;background:#fff;color:var(--rosa);border:none;padding:0.6rem 1.25rem;cursor:pointer;font-family:var(--sans);font-weight:600;flex:1}
         .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
 
+        /* DESTAQUE */
+        .destaque-sec{padding:3rem 1.5rem 4rem;background:var(--white)}
+        .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
+        .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
+        .destaque-ver{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:2px;transition:color 0.2s,border-color 0.2s}
+        .destaque-ver:hover{color:var(--black);border-color:var(--black)}
+        .destaque-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
+
+        /* PWA */
+        .pwa-banner{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:0;right:0;z-index:210;background:var(--black);color:var(--white);padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.28);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
+        @media(min-width:769px){.pwa-banner{display:none}}
+        .pwa-banner-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+        .pwa-banner-icon{width:44px;height:44px;border-radius:10px;background:var(--rosa);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--serif);font-size:1.1rem;font-weight:300;letter-spacing:0.1em;color:#fff}
+        .pwa-banner-txt{flex:1}
+        .pwa-banner-titulo{font-size:0.8rem;font-weight:500;letter-spacing:0.05em;margin-bottom:0.2rem}
+        .pwa-banner-sub{font-size:0.7rem;color:rgba(255,255,255,0.65);line-height:1.45}
+        .pwa-banner-fechar{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;line-height:1}
+        .pwa-banner-btns{display:flex;gap:0.5rem}
+        .pwa-banner-btn{flex:1;padding:0.7rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;border:none;transition:opacity 0.2s}
+        .pwa-banner-btn.main{background:var(--white);color:var(--black)}
+        .pwa-banner-btn.sec{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.2)}
+        .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px}
+        .pwa-sec{padding:3rem 1.5rem;background:var(--g1);border-top:1px solid var(--g2);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem}
+        .pwa-sec-txt{}
+        .pwa-sec-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;margin-bottom:0.35rem}
+        .pwa-sec-sub{font-size:0.8rem;color:var(--g4);line-height:1.5}
+        .pwa-sec-btn{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);font-weight:500;padding:0.9rem 2rem;background:var(--black);color:var(--white);border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;text-decoration:none;display:inline-block}
+        .pwa-sec-btn:hover{background:#2a2926}
+
+        /* RESPONSIVE DESKTOP */
         @media(min-width:769px){
           .hero{flex-direction:row;padding-top:80px;min-height:100vh}
           .hero-bg{display:none}
@@ -453,52 +509,27 @@ export default function Home() {
           .sustent{padding:5rem 4rem}
           .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem}
           .cta-final{padding:7rem 4rem}
-          footer{flex-direction:row;justify-content:space-between;align-items:center;padding:2rem 4rem}
+          footer{padding:4rem 4rem 2.5rem}
+          .footer-cols{grid-template-columns:repeat(3,1fr);gap:3rem;margin-bottom:3rem}
+          .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
           .bnav{display:none}
           .nav{padding:1.1rem 3rem}
           .cupao-banner{bottom:0;padding:1rem 3rem}
           .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
           .cupao-actions{flex:0}
+          .trust-sec{padding:5rem 4rem}
+          .trust-grid{grid-template-columns:repeat(4,1fr)}
+          .depo-sec{padding:5rem 4rem}
+          .destaque-sec{padding:4rem 4rem 5rem}
+          .destaque-grid{grid-template-columns:repeat(3,1fr);gap:1.25rem}
+          .pwa-sec{flex-direction:row;justify-content:space-between;text-align:left;padding:2.5rem 4rem}
         }
         @media(min-width:1200px){
           .cat-grid{grid-template-columns:repeat(4,1fr)}
           .sec{padding:6rem 5rem}
           .nav{padding:1.25rem 4rem}
+          .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
-
-        .pwa-banner{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:0;right:0;z-index:210;background:var(--black);color:var(--white);border-radius:0;padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.28);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
-        @media(min-width:769px){.pwa-banner{display:none}}
-        .pwa-banner-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-        .pwa-banner-icon{width:44px;height:44px;border-radius:10px;background:var(--rosa);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--serif);font-size:1.1rem;font-weight:300;letter-spacing:0.1em;color:#fff}
-        .pwa-banner-txt{flex:1}
-        .pwa-banner-titulo{font-size:0.8rem;font-weight:500;letter-spacing:0.05em;margin-bottom:0.2rem}
-        .pwa-banner-sub{font-size:0.7rem;color:rgba(255,255,255,0.65);line-height:1.45}
-        .pwa-banner-fechar{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;line-height:1}
-        .pwa-banner-btns{display:flex;gap:0.5rem}
-        .pwa-banner-btn{flex:1;padding:0.7rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;border:none;transition:opacity 0.2s}
-        .pwa-banner-btn.main{background:var(--white);color:var(--black)}
-        .pwa-banner-btn.sec{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.2)}
-        .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px}
-        .pwa-sec{padding:3rem 1.5rem;background:var(--g1);border-top:1px solid var(--g2);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem}
-        @media(min-width:768px){.pwa-sec{flex-direction:row;justify-content:space-between;text-align:left;padding:2.5rem 4rem}}
-        .pwa-sec-txt{}
-        .pwa-sec-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;margin-bottom:0.35rem}
-        .pwa-sec-sub{font-size:0.8rem;color:var(--g4);line-height:1.5}
-        .pwa-sec-btn{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);font-weight:500;padding:0.9rem 2rem;background:var(--black);color:var(--white);border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;text-decoration:none;display:inline-block}
-        .pwa-sec-btn:hover{background:#2a2926}
-
-        .destaque-sec{padding:3rem 1.5rem 4rem;background:var(--white)}
-        .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
-        .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
-        .destaque-ver{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:2px;transition:color 0.2s,border-color 0.2s}
-        .destaque-ver:hover{color:var(--black);border-color:var(--black)}
-        .destaque-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
-        @media(min-width:600px){.destaque-grid{grid-template-columns:repeat(2,1fr);gap:1rem}}
-        @media(min-width:769px){
-          .destaque-sec{padding:4rem 4rem 5rem}
-          .destaque-grid{grid-template-columns:repeat(3,1fr);gap:1.25rem}
-        }
-        @media(min-width:1200px){.destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}}
         @media(max-width:768px){
           .bnav{display:block}
           .hero-right-desktop{display:none}
@@ -510,6 +541,7 @@ export default function Home() {
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 
+      {/* PWA BANNER */}
       {pwaBanner && (
         <div className="pwa-banner">
           <div className="pwa-banner-top">
@@ -531,33 +563,25 @@ export default function Home() {
         </div>
       )}
 
+      {/* BANNER CAMPANHA */}
       {banner && campanha && (
         <div className="cupao-banner">
           <div className="cupao-inner">
             <div>
-              <div className="cupao-texto">
-                {(lang === "fr" && campanha.mensagem_fr) || (lang === "lt" && campanha.mensagem_lt) || campanha.mensagem || ""}
-              </div>
+              <div className="cupao-texto">{(lang === "fr" && campanha.mensagem_fr) || (lang === "lt" && campanha.mensagem_lt) || campanha.mensagem || ""}</div>
               {campanha.codigo && <div className="cupao-codigo">{campanha.codigo}</div>}
               {campanha.desconto && !campanha.codigo && <div className="cupao-codigo" style={{fontSize:"1.1rem"}}>{campanha.desconto}</div>}
             </div>
             <div className="cupao-actions">
-              {campanha.codigo && (
-                <button className="cupao-btn" onClick={copiarCupao}>
-                  {cupaoCopiado ? (t.cupao?.copiado || "Copiado ✓") : (t.cupao?.copiar || "Copiar código")}
-                </button>
-              )}
-              {campanha.url_destino && !campanha.codigo && (
-                <a href={campanha.url_destino} className="cupao-btn" style={{textDecoration:"none",textAlign:"center"}}>
-                  Ver oferta →
-                </a>
-              )}
+              {campanha.codigo && <button className="cupao-btn" onClick={copiarCupao}>{cupaoCopiado ? (t.cupao?.copiado || "Copiado ✓") : (t.cupao?.copiar || "Copiar código")}</button>}
+              {campanha.url_destino && !campanha.codigo && <a href={campanha.url_destino} className="cupao-btn" style={{textDecoration:"none",textAlign:"center"}}>Ver oferta →</a>}
               <button className="cupao-fechar" onClick={() => { setBanner(false); if (campanha?.id) localStorage.setItem(`ng_banner_${campanha.id}`, "1"); }}>✕</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* NAV */}
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
         <a href="/" className="logo">
           <span className="logo-name">Nora Grei</span>
@@ -582,11 +606,12 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section className="hero" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
         <div className="hero-bg">
           {videoUrl
             ? <video src={videoUrl} autoPlay muted loop playsInline ref={el => { if (el) el.play().catch(()=>{}); }} />
-            : (heroPeca && heroPeca.fotos && heroPeca.fotos.filter(Boolean)[0])
+            : (heroPeca?.fotos?.filter(Boolean)[0])
               ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt="" className={heroCarregado ? "visivel" : ""} />
               : null
           }
@@ -609,18 +634,19 @@ export default function Home() {
         )}
         {!videoUrl && (
           <div className="hero-right-desktop">
-            {heroPeca && heroPeca.fotos && heroPeca.fotos.filter(Boolean)[0]
+            {heroPeca?.fotos?.filter(Boolean)[0]
               ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt={heroPeca.nome || "Nora Grei"} className={heroCarregado ? "visivel" : ""} />
               : <div className="hero-right-placeholder"><span className="hero-right-placeholder-logo">Nora Grei</span><span className="hero-right-placeholder-tag">Alugar ou Comprar</span></div>
             }
             <div className="hero-caption">
               <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
-              <span className="hero-caption-preco">{heroPeca && heroPeca.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
+              <span className="hero-caption-preco">{heroPeca?.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
             </div>
           </div>
         )}
       </section>
 
+      {/* STRIP */}
       <div className="strip">
         <div className="strip-track">
           {[...Array(4)].map((_, i) => t.strip.map((item, j) => (
@@ -629,6 +655,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* QUICK ACCESS */}
       <div className="quick-access">
         {t.quickAccess.map((item, idx) => {
           const hrefs = ["/catalogo", userLogado ? "/perfil" : "/entrar", "/catalogo", "https://www.noragrei.com"];
@@ -636,7 +663,7 @@ export default function Home() {
           const label = idx === 1 ? (userLogado ? item.label : item.labelGuest) : item.label;
           const desc = idx === 1 ? (userLogado ? item.desc : item.descGuest) : item.desc;
           return (
-            <a key={idx} href={href} className="qa-item" target={href.indexOf("http") === 0 ? "_blank" : undefined} rel={href.indexOf("http") === 0 ? "noopener noreferrer" : undefined}>
+            <a key={idx} href={href} className="qa-item" target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}>
               <div className="qa-label">{label}</div>
               <div className="qa-desc">{desc}</div>
               <span className="qa-arrow">→</span>
@@ -645,6 +672,7 @@ export default function Home() {
         })}
       </div>
 
+      {/* CATEGORIAS */}
       <section className="sec" style={{paddingBottom:0}}>
         <p className="sec-label">{t.categorias.label}</p>
         <h2 className="sec-titulo">{t.categorias.titulo}<br /><em>{t.categorias.tituloSub}</em></h2>
@@ -652,16 +680,16 @@ export default function Home() {
       <div className="cat-grid">
         {t.categorias.lista.map((nomeCat, i) => (
           <a key={i} href="/catalogo" className="cat-card">
-            {categoriaFotos[nomeCat] ? <img src={categoriaFotos[nomeCat]} alt={nomeCat} /> : (
-              <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <span style={{fontFamily:"var(--serif)",fontSize:"2rem",fontWeight:300,color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span>
-              </div>
-            )}
-            <div className="cat-overlay"><span className="cat-nome">{t.catNomes ? t.catNomes[nomeCat] : nomeCat}</span></div>
+            {categoriaFotos[nomeCat]
+              ? <img src={categoriaFotos[nomeCat]} alt={nomeCat} />
+              : <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2rem",fontWeight:300,color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span></div>
+            }
+            <div className="cat-overlay"><span className="cat-nome">{t.catNomes?.[nomeCat] || nomeCat}</span></div>
           </a>
         ))}
       </div>
 
+      {/* PEÇAS EM DESTAQUE */}
       {pecasDestaque.length > 0 && (
         <section className="destaque-sec">
           <div className="destaque-header">
@@ -675,13 +703,10 @@ export default function Home() {
                 <div key={peca.id} style={{display:"flex",flexDirection:"column",background:"#f8f7f5",position:"relative",borderRadius:"2px",overflow:"hidden"}}>
                   <a href={`/catalogo/${peca.id}`} style={{textDecoration:"none",color:"inherit",display:"block",position:"relative"}}>
                     <div style={{aspectRatio:"3/4",background:"#e8e5e0",overflow:"hidden",position:"relative"}}>
-                      {peca.fotos && peca.fotos[0] ? (
-                        <img src={peca.fotos[0]} alt={peca.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
-                      ) : (
-                        <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                          <span style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span>
-                        </div>
-                      )}
+                      {peca.fotos?.[0]
+                        ? <img src={peca.fotos[0]} alt={peca.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
+                        : <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span></div>
+                      }
                       {!dispEstado && (
                         <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
                           {t.destaque.reservar.split("—")[0].trim()}
@@ -710,15 +735,10 @@ export default function Home() {
                       </div>
                     </div>
                   </a>
-                  {dispEstado ? (
-                    <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>
-                      {t.destaque.alugar}
-                    </a>
-                  ) : (
-                    <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>
-                      {t.destaque.reservar}
-                    </a>
-                  )}
+                  {dispEstado
+                    ? <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.alugar}</a>
+                    : <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.reservar}</a>
+                  }
                 </div>
               );
             })}
@@ -726,6 +746,7 @@ export default function Home() {
         </section>
       )}
 
+      {/* COMO FUNCIONA */}
       <section className="sec" id="como" style={{background:"var(--white)"}}>
         <p className="sec-label">{t.como.label}</p>
         <h2 className="sec-titulo">{t.como.titulo}</h2>
@@ -739,6 +760,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* TRUST */}
+      <section className="trust-sec">
+        <p className="sec-label">{t.trust.label}</p>
+        <div className="trust-grid">
+          {t.trust.items.map((item, i) => (
+            <div key={i} className="trust-item">
+              <span className="trust-icon">{item.icon}</span>
+              <div className="trust-titulo">{item.titulo}</div>
+              <div className="trust-desc">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PORQUE */}
       <section className="porque">
         <div>
           <p className="sec-label" style={{color:"var(--rosa)"}}>{t.missaoLabel}</p>
@@ -751,13 +787,23 @@ export default function Home() {
         </div>
       </section>
 
+      {/* NÚMEROS */}
       <div className="numeros">
         {t.numeros.map((n, i) => (
           <div key={i} className="numero"><div className="numero-val">{n.val}</div><div className="numero-label">{n.label}</div></div>
         ))}
       </div>
 
-      <section className="sustent">
+      {/* INSTAGRAM */}
+      <section className="insta-sec">
+        <p className="insta-label">{t.instagram.label}</p>
+        <div className="insta-titulo">{t.instagram.titulo}</div>
+        <p className="insta-sub">{t.instagram.sub}</p>
+        <a href="https://instagram.com/noragrei" target="_blank" rel="noopener noreferrer" className="insta-btn">{t.instagram.btn} ↗</a>
+      </section>
+
+      {/* SUSTENTABILIDADE */}
+      <section className="sustent" id="sustentabilidade">
         <p className="sec-label">{t.sustentabilidade.label}</p>
         <div className="sustent-inner">
           <h2 className="sec-titulo" style={{marginBottom:0}}>{t.sustentabilidade.titulo}</h2>
@@ -769,6 +815,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CTA FINAL */}
       <section className="cta-final">
         <div className="cta-final-titulo">{t.cta.titulo}</div>
         <div className="cta-final-sub">{t.cta.sub}</div>
@@ -776,6 +823,7 @@ export default function Home() {
         <a href="/catalogo" className="cta-final-btn">{t.cta.btn}</a>
       </section>
 
+      {/* PWA SECTION */}
       {!pwaInstalado && (
         <div className="pwa-sec">
           <div className="pwa-sec-txt">
@@ -788,11 +836,31 @@ export default function Home() {
         </div>
       )}
 
+      {/* FOOTER */}
       <footer>
-        <span className="footer-copy">{t.footer.copy}</span>
-        <ul className="footer-links">{t.footer.links.map((l, i) => <li key={i}><a href="#">{l}</a></li>)}</ul>
+        <div className="footer-cols">
+          {t.footer.cols.map((col, i) => (
+            <div key={i}>
+              <div className="footer-col-titulo">{col.titulo}</div>
+              <ul className="footer-col-links">
+                {col.links.map((link, j) => (
+                  <li key={j}><a href={link.h}>{link.l}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="footer-bottom">
+          <span className="footer-copy">{t.footer.copy}</span>
+          <div className="footer-social">
+            <span className="footer-social-label">{t.footer.social}</span>
+            <a href="https://instagram.com/noragrei" target="_blank" rel="noopener noreferrer" className="footer-social-link">Instagram</a>
+            <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="footer-social-link">noragrei.com</a>
+          </div>
+        </div>
       </footer>
 
+      {/* BOTTOM NAV */}
       <nav className={`bnav${pwaBanner ? " pwa-open" : ""}`}>
         <div className="bnav-inner">
           {[
