@@ -147,7 +147,20 @@ export default function Home() {
   }, []);
 
   const instalarPwa = async () => {
-    if (pwaPrompt) { pwaPrompt.prompt(); const { outcome } = await pwaPrompt.userChoice; if (outcome === "accepted") { setPwaBanner(false); setPwaInstalado(true); localStorage.setItem("ng_pwa_dismiss","1"); } }
+    if (pwaPrompt) {
+      pwaPrompt.prompt();
+      const { outcome } = await pwaPrompt.userChoice;
+      if (outcome === "accepted") {
+        setPwaBanner(false);
+        setPwaInstalado(true);
+        localStorage.setItem("ng_pwa_dismiss","1");
+      }
+    } else {
+      // Chrome mobile sem prompt ainda disponível — abre menu do browser
+      if (navigator.share) {
+        try { await navigator.share({ title: "Nora Grei", url: window.location.origin }); } catch(_) {}
+      }
+    }
   };
   const dispensarPwa = () => { setPwaBanner(false); localStorage.setItem("ng_pwa_dismiss","1"); };
 
@@ -383,7 +396,8 @@ export default function Home() {
         .footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;list-style:none}
         .footer-links a{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--g4);text-decoration:none}
 
-        .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--g2);padding:0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom))}
+        .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--g2);padding:0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));transition:transform 0.3s ease}
+        .bnav.pwa-open{transform:translateY(-100%)}
         .bnav-inner{display:flex;justify-content:space-around;align-items:center}
         .bnav-item{display:flex;flex-direction:column;align-items:center;gap:0.2rem;text-decoration:none;color:var(--g4);background:none;border:none;cursor:pointer;padding:0.2rem 1rem;font-family:var(--sans)}
         .bnav-item.on{color:var(--black)}
@@ -446,8 +460,8 @@ export default function Home() {
           .nav{padding:1.25rem 4rem}
         }
 
-        .pwa-banner{position:fixed;bottom:72px;left:1rem;right:1rem;z-index:160;background:var(--black);color:var(--white);border-radius:0;padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.18);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
-        @media(min-width:768px){.pwa-banner{display:none}}
+        .pwa-banner{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:0;right:0;z-index:210;background:var(--black);color:var(--white);border-radius:0;padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.28);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
+        @media(min-width:769px){.pwa-banner{display:none}}
         .pwa-banner-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
         .pwa-banner-icon{width:44px;height:44px;border-radius:10px;background:var(--rosa);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--serif);font-size:1.1rem;font-weight:300;letter-spacing:0.1em;color:#fff}
         .pwa-banner-txt{flex:1}
@@ -773,7 +787,7 @@ export default function Home() {
         <ul className="footer-links">{t.footer.links.map((l, i) => <li key={i}><a href="#">{l}</a></li>)}</ul>
       </footer>
 
-      <nav className="bnav">
+      <nav className={`bnav${pwaBanner ? " pwa-open" : ""}`}>
         <div className="bnav-inner">
           {[
             { href:"/", label:t.bottomNav.inicio, on:true, icon:<svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg> },
