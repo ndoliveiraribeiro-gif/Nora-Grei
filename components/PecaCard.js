@@ -72,48 +72,46 @@ export default function PecaCard({ peca, lang = "pt" }) {
         </div>
 
         {/* INFO */}
-        <div style={{padding:'1rem 1rem 0.5rem'}}>
+        <div style={{padding:'0.7rem 0.75rem 0.4rem'}}>
           {peca.categoria && (
-            <p style={{fontSize:'0.55rem',letterSpacing:'0.22em',textTransform:'uppercase',color:'#aaa89f',fontFamily:"'Jost',sans-serif",fontWeight:400,marginBottom:'0.3rem'}}>{peca.categoria}</p>
+            <p style={{fontSize:'0.5rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#aaa89f',fontFamily:"'Jost',sans-serif",fontWeight:400,marginBottom:'0.2rem'}}>{peca.categoria}</p>
           )}
-          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.2rem',fontWeight:300,lineHeight:1.2,marginBottom:'0.4rem'}}>{peca.nome}</h3>
-          {((peca.tamanhos && peca.tamanhos.length > 0) || (peca.tamanhosSemStock && peca.tamanhosSemStock.length > 0)) && (
-            <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap',marginBottom:'0.5rem'}}>
-              {peca.tamanhos && peca.tamanhos.map(t => (
-                <span key={t} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #e2dfda',padding:'0.2rem 0.5rem',color:'#6b6960',fontFamily:"'Jost',sans-serif",fontWeight:400}}>{t}</span>
+          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.05rem',fontWeight:300,lineHeight:1.2,marginBottom:'0.3rem'}}>{peca.nome}</h3>
+          {peca.tamanhos && peca.tamanhos.length > 0 && (
+            <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap',marginBottom:'0.35rem'}}>
+              {peca.tamanhos.slice(0,4).map(t => (
+                <span key={t} style={{fontSize:'0.5rem',letterSpacing:'0.08em',border:'1px solid #e2dfda',padding:'0.15rem 0.4rem',color:'#6b6960',fontFamily:"'Jost',sans-serif",fontWeight:400}}>{t}</span>
               ))}
-              {peca.tamanhosSemStock && peca.tamanhosSemStock.map(s => (
-                <a key={s.id} href={`/reserva?peca=${peca.id}&tamanho=${s.id}`} style={{fontSize:'0.58rem',letterSpacing:'0.1em',border:'1px solid #c4748a',padding:'0.2rem 0.5rem',color:'#c4748a',fontFamily:"'Jost',sans-serif",fontWeight:400,textDecoration:'none'}} title="Reservar">{s.tamanho} · Garanta a peça para o dia que precisa. Reserve →</a>
-              ))}
+              {peca.tamanhos.length > 4 && <span style={{fontSize:'0.5rem',color:'#aaa89f',fontFamily:"'Jost',sans-serif"}}>+{peca.tamanhos.length-4}</span>}
             </div>
           )}
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'0.75rem',borderTop:'1px solid #e2dfda'}}>
-            <div style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.3rem',fontWeight:300}}>
-              {peca.preco_aluguer_dia}€ <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',color:'#aaa89f',fontWeight:300}}>/dia</span>
+          <div style={{display:'flex',alignItems:'center',paddingTop:'0.5rem',borderTop:'1px solid #e2dfda'}}>
+            <div style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.15rem',fontWeight:300}}>
+              {peca.preco_aluguer_dia}€ <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.6rem',color:'#aaa89f',fontWeight:300}}>/dia</span>
             </div>
           </div>
         </div>
       </a>
 
       {/* BOTÕES */}
-      <div style={{padding:'0.75rem 1rem 1.25rem',display:'flex',gap:'0.5rem'}}>
+      <div style={{padding:'0.5rem 0.75rem 0.85rem',display:'flex',gap:'0.4rem'}}>
         {disponivel ? (
           <>
-            <a href={`/catalogo/${peca.id}`} style={{flex:1,padding:'0.65rem',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',background:'#080808',color:'#f8f7f5',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400,transition:'background 0.2s'}}
+            <a href={`/catalogo/${peca.id}`} style={{flex:2,padding:'0.6rem 0.5rem',fontSize:'0.55rem',letterSpacing:'0.12em',textTransform:'uppercase',background:'#080808',color:'#f8f7f5',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400}}
               onMouseEnter={e => e.currentTarget.style.background='#2a2926'}
               onMouseLeave={e => e.currentTarget.style.background='#080808'}>
               {l.alugar}
             </a>
             <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer"
-              style={{flex:1,padding:'0.65rem',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',background:'#f8f7f5',color:'#080808',border:'1px solid #e2dfda',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400,transition:'border-color 0.2s'}}
+              style={{flex:1,padding:'0.6rem 0.4rem',fontSize:'0.55rem',letterSpacing:'0.1em',textTransform:'uppercase',background:'#f8f7f5',color:'#080808',border:'1px solid #e2dfda',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400}}
               onMouseEnter={e => e.currentTarget.style.borderColor='#080808'}
               onMouseLeave={e => e.currentTarget.style.borderColor='#e2dfda'}>
-              {l.comprar} ↗
+              ↗
             </a>
           </>
         ) : (
           <a href={`/reserva?peca=${peca.id}`}
-            style={{flex:1,padding:'0.65rem',fontSize:'0.55rem',letterSpacing:'0.1em',textTransform:'uppercase',background:'#f0eeeb',color:'#4a4845',border:'1px solid #e2dfda',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400}}>
+            style={{flex:1,padding:'0.6rem',fontSize:'0.52rem',letterSpacing:'0.1em',textTransform:'uppercase',background:'#f0eeeb',color:'#4a4845',border:'1px solid #e2dfda',textAlign:'center',textDecoration:'none',fontFamily:"'Jost',sans-serif",fontWeight:400}}>
             {l.reservar}
           </a>
         )}

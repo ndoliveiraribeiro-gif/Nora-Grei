@@ -123,34 +123,41 @@ export default function Catalogo() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
         body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-        .cat-nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.25rem 4rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
-        .cat-nav-logo { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .cat-nav-back { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; color:#3a3835; text-decoration:none; font-weight:400; transition:color 0.2s; }
-        .cat-nav-back:hover { color:var(--black); }
-        .cat-header { padding: 8rem 4rem 3rem; }
-        .cat-header-label { font-size:0.75rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.75rem; font-weight:400; }
-        .cat-header-title { font-family:var(--serif); font-size:clamp(2.5rem,4vw,4rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; }
-        .cat-filters { padding:0 4rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:3rem; }
-        .filter-btn { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.6rem 1.25rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
-        .filter-btn:hover { border-color:var(--black); color:var(--black); }
+        /* MOBILE FIRST */
+        .cat-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1rem 1rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
+        .cat-nav-logo { font-family:var(--serif); font-size:1.1rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
+        .cat-nav-back { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:#3a3835; text-decoration:none; font-weight:400; }
+        .cat-header { padding:5rem 1rem 1.5rem; }
+        .cat-header-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.5rem; font-weight:400; }
+        .cat-header-title { font-family:var(--serif); font-size:clamp(1.8rem,8vw,3rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
+        .cat-filters { padding:0 1rem 1rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:1rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
+        .filter-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.9rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; }
         .filter-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
-        .filter-sep { width:1px; height:20px; background:var(--grey-200); }
-        .filter-select { font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.6rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; }
-        .cat-grid { padding:0 4rem 6rem; display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
-        .cat-empty { padding:4rem; text-align:center; font-family:var(--serif); font-size:1.5rem; font-weight:300; color:#3a3835; font-style:italic; }
-        .cat-loading { padding:4rem; text-align:center; font-size:0.82rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; font-weight:400; }
-        @media (max-width:900px) {
-          .cat-nav { padding:1rem 1.5rem; }
-          .cat-header { padding:6rem 1.5rem 2rem; }
-          .cat-header-label { font-size:0.88rem; color:#080808; font-weight:500; }
-          .cat-header-title { font-size:clamp(1.8rem,7vw,2.5rem); color:#080808; }
-          .cat-filters { padding:0 1.5rem 1.5rem; }
-          .filter-btn { font-size:0.82rem; color:#080808; }
-          .filter-select { font-size:0.82rem; color:#080808; }
-          .cat-grid { padding:0 1.5rem 4rem; grid-template-columns:repeat(2,1fr); gap:1rem; }
-          body { font-size:17px; color:#080808; }
+        .filter-sep { width:1px; height:16px; background:var(--grey-200); flex-shrink:0; }
+        .filter-select { font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.5rem 0.7rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; }
+        .cat-grid { padding:0 1rem 4rem; display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
+        .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--serif); font-size:1.3rem; font-weight:300; color:#3a3835; font-style:italic; }
+        .cat-loading { padding:4rem; text-align:center; font-size:0.78rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; }
+        /* TABLET */
+        @media (min-width:600px) {
+          .cat-nav { padding:1.1rem 2rem; }
+          .cat-header { padding:6rem 2rem 2rem; }
+          .cat-filters { padding:0 2rem 1.5rem; flex-wrap:wrap; overflow-x:visible; }
+          .cat-grid { padding:0 2rem 5rem; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
         }
-        @media (max-width:480px) { .cat-grid { grid-template-columns:1fr; } }
+        /* DESKTOP */
+        @media (min-width:960px) {
+          .cat-nav { padding:1.25rem 3rem; }
+          .cat-header { padding:7rem 3rem 2.5rem; }
+          .cat-filters { padding:0 3rem 2rem; }
+          .cat-grid { padding:0 3rem 6rem; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+          .filter-btn { font-size:0.72rem; padding:0.6rem 1.1rem; }
+          .filter-btn:hover { border-color:var(--black); color:var(--black); }
+          .filter-select { font-size:0.72rem; }
+        }
+        @media (min-width:1280px) {
+          .cat-grid { grid-template-columns:repeat(4,1fr); }
+        }
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />

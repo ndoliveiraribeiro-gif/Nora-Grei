@@ -321,7 +321,7 @@ export default function Home() {
           .hero{flex-direction:row;padding-top:80px;min-height:100vh}
           .hero-bg{display:none}
           .hero-overlay{display:none}
-          .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:5rem 4rem 5rem 6rem}
+          .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:5rem 3rem 5rem 4rem}
           .hero-eyebrow{color:var(--g4)}
           .hero-titulo{color:var(--black);font-size:clamp(3rem,4.5vw,5rem)}
           .hero-sub{color:var(--g4);font-size:clamp(3rem,4.5vw,5rem)}
@@ -335,25 +335,30 @@ export default function Home() {
           .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
           .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
           .hero-caption-preco{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
-          .video-sec{padding:6rem 6rem}
+          .video-sec{padding:5rem 4rem}
           .quick-access{grid-template-columns:repeat(4,1fr)}
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:3rem 2rem}
           .numero:nth-child(even){border-right:1px solid rgba(255,255,255,0.08)}
-          .sec{padding:7rem 6rem}
+          .sec{padding:5rem 4rem}
           .como-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
-          .porque{display:grid;grid-template-columns:1fr 1fr;gap:6rem;padding:7rem 6rem;align-items:center}
-          .cat-grid{grid-template-columns:repeat(4,1fr);gap:8px}
+          .porque{display:grid;grid-template-columns:1fr 1fr;gap:4rem;padding:5rem 4rem;align-items:center}
+          .cat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
           .cat-card{aspect-ratio:3/4}
-          .sustent{padding:7rem 6rem}
-          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;margin-top:3rem}
-          .cta-final{padding:10rem 6rem}
-          footer{flex-direction:row;justify-content:space-between;align-items:center;padding:2rem 6rem}
+          .sustent{padding:5rem 4rem}
+          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem}
+          .cta-final{padding:7rem 4rem}
+          footer{flex-direction:row;justify-content:space-between;align-items:center;padding:2rem 4rem}
           .bnav{display:none}
-          .nav{padding:1.25rem 4rem}
-          .cupao-banner{bottom:0;padding:1rem 4rem}
+          .nav{padding:1.1rem 3rem}
+          .cupao-banner{bottom:0;padding:1rem 3rem}
           .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
           .cupao-actions{flex:0}
+        }
+        @media(min-width:1200px){
+          .cat-grid{grid-template-columns:repeat(4,1fr)}
+          .sec{padding:6rem 5rem}
+          .nav{padding:1.25rem 4rem}
         }
         @media(max-width:768px){
           .bnav{display:block}
