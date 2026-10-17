@@ -610,7 +610,13 @@ export default function Home() {
       <section className="hero" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
         <div className="hero-bg">
           {videoUrl
-            ? <video src={videoUrl} autoPlay muted loop playsInline ref={el => { if (el) el.play().catch(()=>{}); }} />
+            ? <video src={videoUrl} autoPlay muted loop playsInline preload="auto" ref={el => {
+                if (!el) return;
+                el.muted = true;
+                const tryPlay = () => el.play().catch(() => setTimeout(tryPlay, 500));
+                if (el.readyState >= 3) tryPlay();
+                else el.addEventListener("canplay", tryPlay, { once: true });
+              }} />
             : (heroPeca?.fotos?.filter(Boolean)[0])
               ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt="" className={heroCarregado ? "visivel" : ""} />
               : null
