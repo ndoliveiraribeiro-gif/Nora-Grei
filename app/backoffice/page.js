@@ -1203,12 +1203,18 @@ export default function Backoffice() {
   const confirmarVerificacao = async (id, danificado=false, info=null) => {
     const agora = new Date().toISOString();
     const dispData = new Date(Date.now() + 3*24*60*60*1000).toISOString();
-    await supabase.from("alugueres").update({
+    const updateData = {
       estado: danificado ? "devolvido_danificado" : "devolvido",
       data_verificacao: agora,
       data_devolucao_real: agora,
       data_disponivel_novamente: dispData,
-    }).eq("id", id);
+    };
+    // Caução libertada automaticamente quando peça OK (sem danos)
+    if (!danificado) {
+      updateData.deposito_estado = "libertado";
+      updateData.caucao_libertada_em = agora;
+    }
+    await supabase.from("alugueres").update(updateData).eq("id", id);
 
     // Atribuir pontos e incrementar contagem ao cliente quando aluguer concluído
     if (info?.cliente_id) {
@@ -1555,7 +1561,11 @@ export default function Backoffice() {
                               <div style={{ fontSize:"0.65rem",color:"#c4748a",fontFamily:"monospace" }}>{a.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
                               <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
                             </td>
-                            <td style={TD}><span style={BADGE(a.estado==="ativo"?"green":a.estado==="enviado"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado]||a.estado}</span></td>
+                            <td style={TD}>
+                              <span style={BADGE(a.estado==="ativo"?"green":a.estado==="enviado"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado]||a.estado}</span>
+                              {a.estado==="ativo" && emAtraso && <div style={{ marginTop:"0.25rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e74c3c",fontWeight:700 }}>⚠️ Atraso {calcularAtraso(a.data_fim)}d</div>}
+                              {a.estado==="enviado" && prazoEntrega && new Date(prazoEntrega) < new Date() && <div style={{ marginTop:"0.25rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e67e22",fontWeight:700 }}>⚠️ Entrega atrasada</div>}
+                            </td>
                             <td style={TD}>
                               {a.estado === "enviado" && prazoEntrega && (
                                 <div style={{ color:"#1565c0",fontWeight:700,fontSize:"0.82rem" }}>
