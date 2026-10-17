@@ -79,6 +79,8 @@ export default function PecaDetalhe() {
   const [avaliacoesPeca, setAvaliacoesPeca] = useState([]);
   const [contactando, setContactando] = useState(false);
   const [totalAlugueres, setTotalAlugueres] = useState(0);
+  const [naWishlist, setNaWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -89,9 +91,25 @@ export default function PecaDetalhe() {
         setUserLogado(data.session.user);
         supabase.from("clientes").select("total_pecas_alugadas").eq("id", data.session.user.id).single()
           .then(({ data: cli }) => { if (cli) setTotalAlugueres(cli.total_pecas_alugadas || 0); });
+        // Verificar se peça está na wishlist
+        supabase.from("wishlist").select("id").eq("cliente_id", data.session.user.id).eq("peca_id", id).maybeSingle()
+          .then(({ data: w }) => { if (w) setNaWishlist(true); });
       }
     });
   }, [id]);
+
+  const toggleWishlist = async () => {
+    if (!userLogado) { router.push("/entrar"); return; }
+    setWishlistLoading(true);
+    if (naWishlist) {
+      await supabase.from("wishlist").delete().eq("cliente_id", userLogado.id).eq("peca_id", id);
+      setNaWishlist(false);
+    } else {
+      await supabase.from("wishlist").insert({ cliente_id: userLogado.id, peca_id: id });
+      setNaWishlist(true);
+    }
+    setWishlistLoading(false);
+  };
 
   const carregarPeca = async () => {
     setLoading(true);
@@ -628,6 +646,16 @@ export default function PecaDetalhe() {
             {peca.origem && <div className="info-row"><span className="info-key">{t.origem}</span><span>{peca.origem}</span></div>}
             {peca.categorias?.nome && <div className="info-row"><span className="info-key">{t.categoria}</span><span>{peca.categorias.nome}</span></div>}
           </div>
+
+          {/* WISHLIST */}
+          <button
+            onClick={toggleWishlist}
+            disabled={wishlistLoading}
+            style={{ display:"flex", alignItems:"center", gap:"0.5rem", background:"none", border:`1.5px solid ${naWishlist ? "#c4748a" : "#e2dfda"}`, padding:"0.65rem 1.25rem", width:"100%", justifyContent:"center", cursor:"pointer", fontFamily:"var(--sans)", fontSize:"0.72rem", letterSpacing:"0.12em", textTransform:"uppercase", color: naWishlist ? "#c4748a" : "#5a5855", marginBottom:"1rem", transition:"all 0.2s" }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={naWishlist ? "#c4748a" : "none"} stroke={naWishlist ? "#c4748a" : "#5a5855"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            {naWishlist ? "Guardado" : "Guardar para depois"}
+          </button>
 
           <div className="partilha">
             <span className="partilha-label">{t.partilhar}</span>

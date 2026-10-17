@@ -626,6 +626,7 @@ export default function Perfil() {
   const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
+  const [wishlistPecas, setWishlistPecas] = useState([]);
   const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
   const [loading, setLoading] = useState(true);
   const [guardado, setGuardado] = useState(false);
@@ -716,6 +717,10 @@ export default function Perfil() {
 
     const { data: res } = await supabase.from("reservas_espera").select("id").eq("cliente_id", user.id).eq("estado", "aguarda");
     if (res) setStats(prev => ({ ...prev, reservas: res.length }));
+
+    // Wishlist
+    const { data: wl } = await supabase.from("wishlist").select("peca_id, pecas(id, nome, preco_aluguer_dia, fotos, estado)").eq("cliente_id", user.id).order("created_at", { ascending: false });
+    if (wl) setWishlistPecas(wl.map(w => w.pecas).filter(Boolean));
 
     const agora = new Date().toISOString();
     const { data: resDisponiveis } = await supabase
@@ -1012,9 +1017,13 @@ export default function Perfil() {
         )}
 
         {!modoLojista && (
-          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem"}}>
-            <span style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid #c4748a",color:"#c4748a",fontFamily:"var(--sans)",marginBottom:"-2px"}}>O meu perfil</span>
-            <a href="/mensagens" style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
+            {[{id:"perfil",label:"O meu perfil"},{id:"guardados",label:"Guardados"}].map(tab => (
+              <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.5rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap"}}>
+                {tab.label}{tab.id==="guardados" && wishlistPecas.length>0 ? ` (${wishlistPecas.length})` : ""}
+              </button>
+            ))}
+            <a href="/mensagens" style={{padding:"0.85rem 1.5rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
               Mensagens
               {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
             </a>
@@ -1022,6 +1031,38 @@ export default function Perfil() {
         )}
 
         <div style={{display:modoLojista && tabAtiva==="loja"?"none":"block"}}>
+
+        {/* TAB GUARDADOS */}
+        {!modoLojista && tabAtiva === "guardados" && (
+          <div style={{padding:"0 0 2rem"}}>
+            <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>Peças guardadas</p>
+            {wishlistPecas.length === 0 ? (
+              <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
+                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>Ainda não guardaste nenhuma peça.</p>
+                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>Explorar catálogo →</a>
+              </div>
+            ) : (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"1px",background:"var(--g2)"}}>
+                {wishlistPecas.map(p => (
+                  <a key={p.id} href={`/catalogo/${p.id}`} style={{display:"block",background:"var(--white)",textDecoration:"none",color:"var(--black)"}}>
+                    {p.fotos?.[0]
+                      ? <img src={p.fotos[0]} alt={p.nome} style={{width:"100%",aspectRatio:"3/4",objectFit:"cover",display:"block"}} />
+                      : <div style={{width:"100%",aspectRatio:"3/4",background:"var(--g1)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2rem",color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span></div>
+                    }
+                    <div style={{padding:"0.75rem"}}>
+                      <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",fontWeight:300,marginBottom:"0.2rem"}}>{p.nome}</div>
+                      {p.preco_aluguer_dia && <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia}€/dia</div>}
+                      {p.estado !== "disponivel" && <div style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",marginTop:"0.2rem"}}>Indisponível</div>}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PERFIL NORMAL — oculto na tab guardados */}
+        <div style={{display: (!modoLojista && tabAtiva === "guardados") ? "none" : "block"}}>
         <div className="hero">
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
@@ -1281,7 +1322,8 @@ export default function Perfil() {
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
         </div>
       </div>
-        </div>
+        </div>{/* fim display:none guardados */}
+        </div>{/* fim display:none loja */}
 
         {modoLojista && tabAtiva === "loja" && (
           <div style={{padding:"1rem 0"}}>

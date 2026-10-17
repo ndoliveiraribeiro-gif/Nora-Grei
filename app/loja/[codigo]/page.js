@@ -25,11 +25,16 @@ export default function LojaPublica() {
   const [filtro, setFiltro] = useState("todos");
   const [mediaRating, setMediaRating] = useState(null);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
+  const [user, setUser] = useState(null);
+  const [seguindo, setSeguindo] = useState(false);
+  const [seguidores, setSeguidores] = useState(0);
+  const [seguindoLoading, setSeguindoLoading] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved);
     carregarLoja();
+    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null));
   }, [codigo]);
 
   const carregarLoja = async () => {
@@ -74,7 +79,33 @@ export default function LojaPublica() {
       setTotalAvaliacoes(avs.length);
     }
 
+    // Seguidores
+    const { count: numSeg } = await supabase.from("follows").select("*", { count: "exact", head: true }).eq("lojista_id", cli.id);
+    setSeguidores(numSeg || 0);
+
+    // Verificar se utilizador atual segue
+    const { data: sess } = await supabase.auth.getSession();
+    if (sess?.session?.user) {
+      const { data: follow } = await supabase.from("follows").select("id").eq("follower_id", sess.session.user.id).eq("lojista_id", cli.id).maybeSingle();
+      if (follow) setSeguindo(true);
+    }
+
     setLoading(false);
+  };
+
+  const toggleSeguir = async () => {
+    if (!user) { window.location.href = "/entrar"; return; }
+    setSeguindoLoading(true);
+    if (seguindo) {
+      await supabase.from("follows").delete().eq("follower_id", user.id).eq("lojista_id", lojista.id);
+      setSeguindo(false);
+      setSeguidores(s => Math.max(0, s - 1));
+    } else {
+      await supabase.from("follows").insert({ follower_id: user.id, lojista_id: lojista.id });
+      setSeguindo(true);
+      setSeguidores(s => s + 1);
+    }
+    setSeguindoLoading(false);
   };
 
   function MiniTimer({ dataFim }) {
@@ -167,6 +198,25 @@ export default function LojaPublica() {
             <span style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g4)",textDecoration:"underline"}}>({totalAvaliacoes} avaliações)</span>
           </a>
         )}
+        {/* Botão Seguir */}
+        <div style={{marginTop:"1.25rem",display:"flex",flexDirection:"column",alignItems:"center",gap:"0.4rem"}}>
+          <button
+            onClick={toggleSeguir}
+            disabled={seguindoLoading}
+            style={{
+              padding:"0.6rem 2rem", fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase",
+              fontFamily:"var(--sans)", cursor:"pointer", transition:"all 0.2s",
+              background: seguindo ? "var(--white)" : "var(--black)",
+              color: seguindo ? "var(--black)" : "var(--white)",
+              border: seguindo ? "1.5px solid var(--black)" : "1.5px solid var(--black)",
+            }}
+          >
+            {seguindo ? "✓ A seguir" : "+ Seguir"}
+          </button>
+          {seguidores > 0 && (
+            <span style={{fontSize:"0.65rem",color:"var(--g4)",letterSpacing:"0.08em"}}>{seguidores} {seguidores === 1 ? "seguidor" : "seguidores"}</span>
+          )}
+        </div>
       </div>
 
       <div className="filtros">

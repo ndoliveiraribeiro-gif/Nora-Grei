@@ -25,34 +25,57 @@ export default function FeedPage() {
   const [likesFeitos, setLikesFeitos] = useState({});
   const [pagina, setPagina] = useState(0);
   const [temMais, setTemMais] = useState(true);
+  const [feedTab, setFeedTab] = useState("parati"); // "parati" | "seguindo"
   const POR_PAG = 12;
   const t = T[lang] || T.pt;
 
   useEffect(() => {
     const l = localStorage.getItem("ng_lang") || navigator.language?.split("-")[0] || "pt";
     setLang(["pt","fr","lt"].includes(l) ? l : "pt");
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null));
-    carregar(0, true);
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null);
+      carregar(0, true, data?.user || null, feedTab);
+    });
   }, []);
 
-  const carregar = async (pag = 0, reset = false) => {
+  useEffect(() => {
+    carregar(0, true, user, feedTab);
+  }, [feedTab]);
+
+  const carregar = async (pag = 0, reset = false, currentUser = user, tab = feedTab) => {
     setLoading(true);
-    const { data } = await supabase
+    let query = supabase
       .from("feed_posts")
-      .select("*, clientes(nome, avatar_url), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
+      .select("*, clientes(nome, avatar_url, id), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
       .eq("estado", "publicado")
       .order("boosted", { ascending: false })
       .order("publicado_em", { ascending: false })
       .range(pag * POR_PAG, pag * POR_PAG + POR_PAG - 1);
+
+    // Tab "Seguindo": filtrar só posts de lojistas que o user segue
+    if (tab === "seguindo" && currentUser) {
+      const { data: follows } = await supabase.from("follows").select("lojista_id").eq("follower_id", currentUser.id);
+      const lojistaIds = (follows || []).map(f => f.lojista_id);
+      if (lojistaIds.length === 0) {
+        setPosts(reset ? [] : posts);
+        setTemMais(false);
+        setPagina(pag);
+        setLoading(false);
+        return;
+      }
+      query = query.in("cliente_id", lojistaIds);
+    }
+
+    const { data } = await query;
     const lista = data || [];
     setPosts(prev => reset ? lista : [...prev, ...lista]);
     setTemMais(lista.length === POR_PAG);
     setPagina(pag);
     setLoading(false);
     // likes do user
-    if (user && lista.length > 0) {
+    if (currentUser && lista.length > 0) {
       const ids = lista.map(p => p.id);
-      const { data: lk } = await supabase.from("feed_likes").select("post_id").eq("cliente_id", user.id).in("post_id", ids);
+      const { data: lk } = await supabase.from("feed_likes").select("post_id").eq("cliente_id", currentUser.id).in("post_id", ids);
       if (lk) {
         const map = {};
         lk.forEach(l => { map[l.post_id] = true; });
@@ -97,6 +120,9 @@ export default function FeedPage() {
         .feed-search{max-width:600px;margin:0 auto;position:relative}
         .feed-search input{width:100%;padding:0.55rem 1rem 0.55rem 2.2rem;border:1.5px solid #e8e4df;border-radius:20px;font-size:0.85rem;font-family:'Jost',sans-serif;background:#f7f5f2;outline:none}
         .feed-search svg{position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);color:#9c9894}
+        .feed-tabs{display:flex;max-width:600px;margin:0.5rem auto 0;border-bottom:1px solid #e8e4df}
+        .feed-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:0.55rem 0;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;font-family:'Jost',sans-serif;cursor:pointer;color:#9c9894;margin-bottom:-1px;transition:color 0.2s,border-color 0.2s}
+        .feed-tab.on{color:#1a1a1a;border-bottom-color:#c4748a}
         .feed-grid{max-width:600px;margin:0 auto;padding:1rem}
         .post-card{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
         .post-card.boosted{border:2px solid #c4a882;box-shadow:0 2px 12px rgba(196,168,130,0.2)}
@@ -143,6 +169,10 @@ export default function FeedPage() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input value={busca} onChange={e => setBusca(e.target.value)} placeholder={t.buscar} />
         </div>
+        <div className="feed-tabs">
+          <button className={`feed-tab${feedTab==="parati"?" on":""}`} onClick={() => setFeedTab("parati")}>Para ti</button>
+          <button className={`feed-tab${feedTab==="seguindo"?" on":""}`} onClick={() => { if (!user) { window.location.href="/entrar"; return; } setFeedTab("seguindo"); }}>Seguindo</button>
+        </div>
       </header>
 
       <div className="feed-grid">
@@ -153,7 +183,12 @@ export default function FeedPage() {
             </div>
           ))
         ) : postsFiltrados.length === 0 ? (
-          <p className="feed-empty">{t.semPosts}</p>
+          <div className="feed-empty">
+            {feedTab === "seguindo"
+              ? <><p style={{marginBottom:"0.75rem"}}>Ainda não segues nenhuma lojista.</p><a href="/catalogo" style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>Explorar catálogo →</a></>
+              : t.semPosts
+            }
+          </div>
         ) : (
           postsFiltrados.map(post => <PostCard key={post.id} post={post} t={t} lang={lang} liked={!!likesFeitos[post.id]} onLike={() => toggleLike(post)} />)
         )}
