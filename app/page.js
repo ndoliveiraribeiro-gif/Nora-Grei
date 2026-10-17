@@ -492,8 +492,8 @@ export default function Home() {
           <h2 className="video-titulo">{t.video.titulo}</h2>
         </div>
         {videoUrl ? (
-          <div className="video-wrap" onClick={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { if (videoPlaying) v.pause(); else v.play(); setVideoPlaying(!videoPlaying); } }}>
-            <video src={videoUrl} loop playsInline />
+          <div className="video-wrap" onClick={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { if (videoPlaying) { v.pause(); setVideoPlaying(false); } else { v.muted=false; v.play(); setVideoPlaying(true); } } }}>
+            <video src={videoUrl} loop playsInline autoPlay muted ref={el => { if (el) { el.play().then(()=>setVideoPlaying(true)).catch(()=>{}); } }} />
             {!videoPlaying && <div className="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>}
           </div>
         ) : (
