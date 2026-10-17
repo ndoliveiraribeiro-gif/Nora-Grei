@@ -1094,6 +1094,19 @@ export default function Backoffice() {
       data_devolucao_real: agora,
       data_disponivel_novamente: dispData,
     }).eq("id", id);
+
+    // Atribuir pontos e incrementar contagem ao cliente quando aluguer concluído
+    if (info?.cliente_id) {
+      const { data: cli } = await supabase.from("clientes").select("pontos, total_pecas_alugadas").eq("id", info.cliente_id).single();
+      if (cli) {
+        const novosCompletos = (cli.total_pecas_alugadas || 0) + 1;
+        await supabase.from("clientes").update({
+          pontos: (cli.pontos || 0) + 1,
+          total_pecas_alugadas: novosCompletos,
+        }).eq("id", info.cliente_id);
+      }
+    }
+
     carregarDados();
     if (info) { setNotaEmpresa(0); setComentarioEmpresa(""); setModalAvaliacao({ aluguer_id: id, ...info }); }
   };

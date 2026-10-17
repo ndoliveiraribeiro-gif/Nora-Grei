@@ -503,6 +503,7 @@ function CheckoutContent() {
 
   const confirmar = async () => {
     if (!dataInicio || !dataFim) { setErro(i.obrigatorio); return; }
+    if (!stockId) { setErro("Tamanho não selecionado. Volta atrás e escolhe um tamanho."); return; }
     if (!user) { window.location.href = `/entrar?redirect=/checkout?peca=${pecaId}&tamanho=${tamanhoParam}`; return; }
 
     if (pagamento === "mbway" && !qrAtivo) {
@@ -582,14 +583,33 @@ function CheckoutContent() {
         detalhes: { entrega, deposito_modalidade: deposito, peca_nome: peca?.nome, tamanho: tamanhoNome },
       }).select().single();
 
+      // Pontos: só descontar aluguer grátis agora; +1 ponto e contagem acumulam quando devolvido (no backoffice)
       if (temGratis) {
         await supabase.from("clientes").update({ pontos: pontos - 10 }).eq("id", user.id);
-      } else {
-        await supabase.from("clientes").update({
-          pontos: pontos + 1,
-          total_pecas_alugadas: totalAlugueres + 1
-        }).eq("id", user.id);
       }
+
+      // Notificar lojista: criar/atualizar conversa com mensagem automática do sistema
+      try {
+        const { data: lojista } = await supabase.from("clientes").select("id").eq("modo_lojista", true).limit(1).single();
+        if (lojista && lojista.id !== user.id) {
+          const { data: convExistente } = await supabase.from("conversas").select("id, nao_lidas_lojista").eq("cliente_id", user.id).eq("lojista_id", lojista.id).maybeSingle();
+          if (convExistente) {
+            await supabase.from("conversas").update({
+              ultima_mensagem_em: new Date().toISOString(),
+              nao_lidas_lojista: (convExistente.nao_lidas_lojista || 0) + 1,
+              assunto: `Novo aluguer: ${peca?.nome || ""}`,
+            }).eq("id", convExistente.id);
+          } else {
+            await supabase.from("conversas").insert({
+              cliente_id: user.id,
+              lojista_id: lojista.id,
+              assunto: `Novo aluguer: ${peca?.nome || ""}`,
+              ultima_mensagem_em: new Date().toISOString(),
+              nao_lidas_lojista: 1,
+            });
+          }
+        }
+      } catch (_) { /* notificação não bloqueia o fluxo */ }
 
       setRecibo(reciboData);
     } catch(e) { setErro(e.message); }
