@@ -616,6 +616,14 @@ export default function Backoffice() {
   const [subTabLojistas, setSubTabLojistas] = useState("depositos");
   const chatRef = useRef(null);
 
+  // Filtros alugueres
+  const [filtroEstadoAl, setFiltroEstadoAl] = useState("ativos");
+  const [pesquisaAl, setPesquisaAl] = useState("");
+
+  // Modal edição campanha
+  const [campanhaEditando, setCampanhaEditando] = useState(null);
+  const [editCampanha, setEditCampanha] = useState(null);
+
   const entrar = () => { if (senha === SENHA) { setLogado(true); setErroSenha(false); } else setErroSenha(true); };
 
   useEffect(() => { if (logado) carregarDados(); }, [logado, tab]);
@@ -980,6 +988,28 @@ export default function Backoffice() {
     const { error } = await supabase.from("campanhas").insert({ ...novaCampanha, probabilidade: parseInt(novaCampanha.probabilidade), codigo: novaCampanha.codigo||null, desconto: novaCampanha.desconto||null, validade: novaCampanha.validade||null, ativa: true });
     if (error) { alert("Erro: " + error.message); return; }
     setNovaCampanha({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
+    carregarDados();
+  };
+
+  const guardarEdicaoCampanha = async () => {
+    if (!editCampanha?.titulo || !editCampanha?.mensagem) { alert("Título e mensagem obrigatórios"); return; }
+    const { error } = await supabase.from("campanhas").update({
+      titulo: editCampanha.titulo,
+      mensagem: editCampanha.mensagem,
+      tipo: editCampanha.tipo,
+      titulo_fr: editCampanha.titulo_fr || null,
+      mensagem_fr: editCampanha.mensagem_fr || null,
+      titulo_lt: editCampanha.titulo_lt || null,
+      mensagem_lt: editCampanha.mensagem_lt || null,
+      codigo: editCampanha.codigo || null,
+      desconto: editCampanha.desconto || null,
+      probabilidade: parseInt(editCampanha.probabilidade),
+      validade: editCampanha.validade || null,
+      url_destino: editCampanha.url_destino || null,
+    }).eq("id", campanhaEditando.id);
+    if (error) { alert("Erro: " + error.message); return; }
+    setCampanhaEditando(null);
+    setEditCampanha(null);
     carregarDados();
   };
 
@@ -1536,13 +1566,55 @@ export default function Backoffice() {
         {tab === "alugueres" && (
           <>
             <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Alugueres</h1>
-            <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{alugueres.length} registados</p>
+            <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1rem" }}>{alugueres.length} registados</p>
+
+            {/* Filtros */}
+            <div style={{ display:"flex",gap:"0.75rem",flexWrap:"wrap",alignItems:"center",marginBottom:"1.5rem" }}>
+              {[
+                { id:"ativos", lbl:"Ativos", estados:["pendente","confirmado","enviado","ativo","em_verificacao"] },
+                { id:"todos", lbl:"Todos", estados:null },
+                { id:"pendente", lbl:"A aguardar pagamento", estados:["pendente"] },
+                { id:"confirmado", lbl:"A preparar envio", estados:["confirmado"] },
+                { id:"enviado", lbl:"A caminho", estados:["enviado"] },
+                { id:"ativo", lbl:"A usar", estados:["ativo"] },
+                { id:"em_verificacao", lbl:"Em verificação", estados:["em_verificacao"] },
+                { id:"devolvido", lbl:"Concluídos", estados:["devolvido","devolvido_danificado"] },
+                { id:"cancelado", lbl:"Cancelados", estados:["cancelado","nao_devolvido"] },
+              ].map(f => (
+                <button key={f.id} onClick={() => setFiltroEstadoAl(f.id)} style={{ padding:"0.35rem 0.75rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",border:"none",background:filtroEstadoAl===f.id?"#080808":"#f0eeeb",color:filtroEstadoAl===f.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap" }}>
+                  {f.lbl}
+                  {f.estados && <span style={{ marginLeft:"0.35rem",opacity:0.7 }}>({alugueres.filter(a=>f.estados.includes(a.estado)).length})</span>}
+                </button>
+              ))}
+              <input
+                value={pesquisaAl}
+                onChange={e => setPesquisaAl(e.target.value)}
+                placeholder="Pesquisar cliente ou peça..."
+                style={{ ...INP, width:"220px", fontSize:"0.8rem", padding:"0.35rem 0.75rem" }}
+              />
+            </div>
+
             <div style={CARD}>
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%",borderCollapse:"collapse" }}>
                   <thead><tr>{["Peça","Cliente","Progresso","Datas","Atraso","Valor","Depósito","Ações"].map(h=><th key={h} style={TH}>{h}</th>)}</tr></thead>
                   <tbody>
-                    {alugueres.map(a => {
+                    {(() => {
+                      const FILTRO_ESTADOS = {
+                        ativos: ["pendente","confirmado","enviado","ativo","em_verificacao"],
+                        pendente: ["pendente"], confirmado: ["confirmado"], enviado: ["enviado"],
+                        ativo: ["ativo"], em_verificacao: ["em_verificacao"],
+                        devolvido: ["devolvido","devolvido_danificado"],
+                        cancelado: ["cancelado","nao_devolvido"],
+                      };
+                      const estadosFiltro = FILTRO_ESTADOS[filtroEstadoAl];
+                      const q = pesquisaAl.toLowerCase();
+                      return alugueres.filter(a => {
+                        const passaEstado = !estadosFiltro || estadosFiltro.includes(a.estado);
+                        const passaPesquisa = !q || (a.clientes?.nome||"").toLowerCase().includes(q) || (a.clientes?.codigo_cliente||"").toLowerCase().includes(q) || (a.stock_tamanhos?.pecas?.nome||"").toLowerCase().includes(q) || (a.stock_tamanhos?.pecas?.codigo_referencia||"").toLowerCase().includes(q);
+                        return passaEstado && passaPesquisa;
+                      });
+                    })().map(a => {
                       const peca = a.stock_tamanhos?.pecas;
                       const nv = NIVEL(a.clientes?.total_pecas_alugadas||0);
                       const atraso = calcularAtraso(a.data_fim);
@@ -1782,6 +1854,7 @@ export default function Backoffice() {
                         <td style={TD}>
                           <div style={{ display:"flex",gap:"0.4rem" }}>
                             <button style={BTN(c.ativa?"outline":"rosa","sm")} onClick={async()=>{ await supabase.from("campanhas").update({ativa:!c.ativa}).eq("id",c.id); carregarDados(); }}>{c.ativa?"Pausar":"Ativar"}</button>
+                            <button style={BTN("outline","sm")} onClick={()=>{ setCampanhaEditando(c); setEditCampanha({ titulo:c.titulo||"", mensagem:c.mensagem||"", tipo:c.tipo||"cupao", titulo_fr:c.titulo_fr||"", mensagem_fr:c.mensagem_fr||"", titulo_lt:c.titulo_lt||"", mensagem_lt:c.mensagem_lt||"", codigo:c.codigo||"", desconto:c.desconto||"", probabilidade:c.probabilidade||20, validade:c.validade?c.validade.slice(0,16):"", url_destino:c.url_destino||"" }); }}>Editar</button>
                             <button style={BTN("red","sm")} onClick={async()=>{ if(confirm("Apagar?")){ await supabase.from("campanhas").delete().eq("id",c.id); carregarDados(); } }}>Apagar</button>
                           </div>
                         </td>
@@ -1817,10 +1890,21 @@ export default function Backoffice() {
 
             <div style={CARD}>
               <p style={CARD_T}>Foto do Hero (banner principal)</p>
-              <select style={INP} value={landingCfg.hero_peca_id} onChange={e => setLandingCfg(p => ({...p, hero_peca_id: e.target.value}))}>
-                <option value="">Automático (peça em destaque)</option>
-                {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-              </select>
+              <div style={{ display:"flex",gap:"1rem",alignItems:"flex-start" }}>
+                <div style={{ flex:1 }}>
+                  <select style={INP} value={landingCfg.hero_peca_id} onChange={e => setLandingCfg(p => ({...p, hero_peca_id: e.target.value}))}>
+                    <option value="">Automático (peça em destaque)</option>
+                    {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}{p.destaque?" ★":""}</option>)}
+                  </select>
+                  <div style={{ fontSize:"0.7rem",color:"#888",marginTop:"0.4rem" }}>
+                    {landingCfg.hero_peca_id ? `Peça selecionada manualmente` : `A usar peça marcada como ★ Destaque automaticamente`}
+                  </div>
+                </div>
+                {landingCfg.hero_peca_id && (() => {
+                  const p = pecasComFoto.find(x => x.id === landingCfg.hero_peca_id);
+                  return p?.fotos?.[0] ? <img src={p.fotos[0]} alt={p.nome} style={{ width:80,height:100,objectFit:"cover",flexShrink:0,border:"1px solid #e2dfda" }} /> : null;
+                })()}
+              </div>
             </div>
 
             <div style={CARD}>
@@ -1834,13 +1918,40 @@ export default function Backoffice() {
                 ].map(([label, key]) => (
                   <div key={key}>
                     <label style={LBL}>{label}</label>
-                    <select style={INP} value={landingCfg[key]} onChange={e => setLandingCfg(p => ({...p, [key]: e.target.value}))}>
-                      <option value="">Automático</option>
-                      {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                    </select>
+                    <div style={{ display:"flex",gap:"0.75rem",alignItems:"center" }}>
+                      <select style={{ ...INP,flex:1 }} value={landingCfg[key]} onChange={e => setLandingCfg(p => ({...p, [key]: e.target.value}))}>
+                        <option value="">Automático</option>
+                        {pecasComFoto.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                      </select>
+                      {landingCfg[key] && (() => {
+                        const p = pecasComFoto.find(x => x.id === landingCfg[key]);
+                        return p?.fotos?.[0] ? <img src={p.fotos[0]} alt={p.nome} style={{ width:44,height:56,objectFit:"cover",flexShrink:0,border:"1px solid #e2dfda" }} /> : null;
+                      })()}
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Vista da Selecção da semana */}
+            <div style={CARD}>
+              <p style={CARD_T}>Selecção da semana (homepage)</p>
+              <p style={{ fontSize:"0.78rem",color:"#888",marginBottom:"1rem" }}>
+                As primeiras {pecasComFoto.filter(p=>p.destaque).length > 0 ? pecasComFoto.filter(p=>p.destaque).length : "0"} peças com ★ Destaque aparecem primeiro na homepage. Completa até 6 com as mais recentes.
+              </p>
+              <div style={{ display:"flex",gap:"0.75rem",flexWrap:"wrap",marginBottom:"1rem" }}>
+                {pecasComFoto.filter(p=>p.destaque).map(p => (
+                  <div key={p.id} style={{ textAlign:"center",position:"relative" }}>
+                    {p.fotos?.[0] && <img src={p.fotos[0]} alt={p.nome} style={{ width:64,height:80,objectFit:"cover",border:"2px solid #c4748a" }} />}
+                    <div style={{ fontSize:"0.5rem",color:"#c4748a",marginTop:"0.2rem",fontWeight:600 }}>★ DESTAQUE</div>
+                    <div style={{ fontSize:"0.55rem",color:"#555",maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{p.nome}</div>
+                  </div>
+                ))}
+                {pecasComFoto.filter(p=>p.destaque).length === 0 && (
+                  <p style={{ fontSize:"0.8rem",color:"#b8860b",fontStyle:"italic" }}>Nenhuma peça com ★ Destaque. Vai ao Catálogo e activa o destaque nas peças que queres mostrar.</p>
+                )}
+              </div>
+              <button style={BTN("outline","sm")} onClick={() => setTab("catalogo")}>Gerir destaques no Catálogo →</button>
             </div>
 
             <button style={BTN("black")} onClick={guardarLanding}>Guardar alterações</button>
@@ -2180,6 +2291,39 @@ export default function Backoffice() {
         )}
 
       </div>
+
+      {campanhaEditando && editCampanha && (
+        <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",overflowY:"auto" }}>
+          <div style={{ background:"#fff",padding:"2rem",maxWidth:"640px",width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative" }}>
+            <button onClick={()=>{ setCampanhaEditando(null); setEditCampanha(null); }} style={{ position:"absolute",top:"1rem",right:"1rem",background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#888" }}>✕</button>
+            <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem" }}>Editar campanha</h2>
+            <div style={COL2}>
+              <div><label style={LBL}>Título * (PT)</label><input style={INP} value={editCampanha.titulo} onChange={e=>setEditCampanha(p=>({...p,titulo:e.target.value}))} /></div>
+              <div><label style={LBL}>Tipo</label>
+                <select style={INP} value={editCampanha.tipo} onChange={e=>setEditCampanha(p=>({...p,tipo:e.target.value}))}>
+                  <option value="cupao">Cupão de desconto</option>
+                  <option value="novidade">Novidade de produto</option>
+                  <option value="oferta">Oferta especial</option>
+                </select>
+              </div>
+              <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem * (PT)</label><textarea style={{ ...INP,resize:"vertical",minHeight:"80px" }} value={editCampanha.mensagem} onChange={e=>setEditCampanha(p=>({...p,mensagem:e.target.value}))} /></div>
+              <div><label style={LBL}>Título FR</label><input style={INP} value={editCampanha.titulo_fr} onChange={e=>setEditCampanha(p=>({...p,titulo_fr:e.target.value}))} /></div>
+              <div><label style={LBL}>Título LT</label><input style={INP} value={editCampanha.titulo_lt} onChange={e=>setEditCampanha(p=>({...p,titulo_lt:e.target.value}))} /></div>
+              <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem FR</label><textarea style={{ ...INP,resize:"vertical",minHeight:"60px" }} value={editCampanha.mensagem_fr} onChange={e=>setEditCampanha(p=>({...p,mensagem_fr:e.target.value}))} /></div>
+              <div style={{ gridColumn:"1/-1" }}><label style={LBL}>Mensagem LT</label><textarea style={{ ...INP,resize:"vertical",minHeight:"60px" }} value={editCampanha.mensagem_lt} onChange={e=>setEditCampanha(p=>({...p,mensagem_lt:e.target.value}))} /></div>
+              <div><label style={LBL}>Código desconto</label><input style={INP} value={editCampanha.codigo} onChange={e=>setEditCampanha(p=>({...p,codigo:e.target.value}))} /></div>
+              <div><label style={LBL}>Descrição desconto</label><input style={INP} value={editCampanha.desconto} onChange={e=>setEditCampanha(p=>({...p,desconto:e.target.value}))} /></div>
+              <div><label style={LBL}>Probabilidade (%)</label><input style={INP} type="number" min="1" max="100" value={editCampanha.probabilidade} onChange={e=>setEditCampanha(p=>({...p,probabilidade:e.target.value}))} /></div>
+              <div><label style={LBL}>Validade (opcional)</label><input style={INP} type="datetime-local" value={editCampanha.validade} onChange={e=>setEditCampanha(p=>({...p,validade:e.target.value}))} /></div>
+              <div style={{ gridColumn:"1/-1" }}><label style={LBL}>URL destino</label><input style={INP} value={editCampanha.url_destino} onChange={e=>setEditCampanha(p=>({...p,url_destino:e.target.value}))} /></div>
+            </div>
+            <div style={{ display:"flex",gap:"0.75rem",marginTop:"1.5rem" }}>
+              <button style={BTN("rosa")} onClick={guardarEdicaoCampanha}>Guardar alterações</button>
+              <button style={BTN("outline")} onClick={()=>{ setCampanhaEditando(null); setEditCampanha(null); }}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {aluguerParaEnviar && (
         <ModalEnvio
