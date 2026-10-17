@@ -392,6 +392,7 @@ function CheckoutContent() {
   const pecaId = searchParams.get("peca");
   const tamanhoParam = searchParams.get("tamanho");
   const stockId = searchParams.get("stock_id") || tamanhoParam;
+  const refParam = searchParams.get("ref");
 
   const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
@@ -416,6 +417,10 @@ function CheckoutContent() {
   const [erroCampo, setErroCampo] = useState("");
   const [recibo, setRecibo] = useState(null);
   const [ocasiao, setOcasiao] = useState("");
+  const [codigoAfiliado, setCodigoAfiliado] = useState("");
+  const [afiliadoAtivo, setAfiliadoAtivo] = useState(null); // { id, nome, desconto_pct, comissao_pct }
+  const [afiliadoErro, setAfiliadoErro] = useState("");
+  const [afiliadoOk, setAfiliadoOk] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -423,6 +428,8 @@ function CheckoutContent() {
     const saved = localStorage.getItem("ng_lang");
     if (saved && t[saved]) setLang(saved);
     carregarDados();
+    // Aplica código afiliado vindo do URL (?ref=CODIGO)
+    if (refParam) { setCodigoAfiliado(refParam.toUpperCase()); validarAfiliado(refParam.toUpperCase()); }
   }, []);
 
   const carregarDados = async () => {
@@ -456,6 +463,14 @@ function CheckoutContent() {
         setTotalAlugueres(cliente.total_pecas_alugadas || 0);
       }
     }
+  };
+
+  const validarAfiliado = async (codigo) => {
+    const c = (codigo || codigoAfiliado).trim().toUpperCase();
+    if (!c) { setAfiliadoAtivo(null); setAfiliadoOk(false); setAfiliadoErro(""); return; }
+    const { data } = await supabase.from("afiliados").select("id, nome, desconto_pct, comissao_pct").eq("codigo", c).eq("ativo", true).maybeSingle();
+    if (data) { setAfiliadoAtivo(data); setAfiliadoOk(true); setAfiliadoErro(""); }
+    else { setAfiliadoAtivo(null); setAfiliadoOk(false); setAfiliadoErro("Código não encontrado ou inválido."); }
   };
 
   // Carrega todos os intervalos ocupados para este stock/tamanho
@@ -546,7 +561,9 @@ function CheckoutContent() {
     : 0;
 
   const temGratis = pontos >= 10 && pontos % 10 === 0;
-  const valorAluguer = temGratis ? 0 : (peca ? peca.preco_aluguer_dia * numDias : 0);
+  const valorAluguerBase = temGratis ? 0 : (peca ? peca.preco_aluguer_dia * numDias : 0);
+  const descontoAfiliado = afiliadoAtivo && !temGratis ? Math.round(valorAluguerBase * (afiliadoAtivo.desconto_pct / 100) * 100) / 100 : 0;
+  const valorAluguer = Math.max(0, valorAluguerBase - descontoAfiliado);
 
   const valorDepositoBase = peca ? peca.valor_peca : 0;
   const valorDeposito = valorDepositoBase > 0 ? calcularCaucao(valorDepositoBase, nv.caucao) : 0;
@@ -661,8 +678,30 @@ function CheckoutContent() {
         deposito_estado: depositoEstadoInicial,
         ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
         ...(ocasiao ? { ocasiao } : {}),
+        ...(afiliadoAtivo ? { codigo_afiliado: codigoAfiliado.trim().toUpperCase(), afiliado_id: afiliadoAtivo.id } : {}),
       }).select().single();
       if (error) throw error;
+
+      // Registar conversão do afiliado
+      if (afiliadoAtivo && novoAluguer) {
+        const comissaoValor = Math.round(valorAluguerBase * (afiliadoAtivo.comissao_pct / 100) * 100) / 100;
+        await supabase.from("conversoes_afiliado").insert({
+          afiliado_id: afiliadoAtivo.id,
+          aluguer_id: novoAluguer.id,
+          codigo_usado: codigoAfiliado.trim().toUpperCase(),
+          valor_aluguer: valorAluguerBase,
+          desconto_aplicado: descontoAfiliado,
+          comissao_valor: comissaoValor,
+          utm_source: new URLSearchParams(window.location.search).get("utm_source"),
+          utm_medium: new URLSearchParams(window.location.search).get("utm_medium"),
+          utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign"),
+        });
+        // Atualizar totais do afiliado
+        await supabase.from("afiliados").update({
+          total_conversoes: (afiliadoAtivo.total_conversoes || 0) + 1,
+          total_comissao_gerada: (afiliadoAtivo.total_comissao_gerada || 0) + comissaoValor,
+        }).eq("id", afiliadoAtivo.id);
+      }
 
       const numeroRecibo = gerarNumeroRecibo();
       const { data: reciboData } = await supabase.from("recibos").insert({
@@ -939,7 +978,24 @@ function CheckoutContent() {
               {qrAtivo && (
                 <div className="aviso-pendente" style={{ background: "#e3f2fd", borderColor: "#1976d2", color: "#1565c0" }}>{i.avisoMbway}</div>
               )}
-              <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguer.toFixed(2)}€`}</span></div>
+              {/* CÓDIGO AFILIADO */}
+              <div style={{marginBottom:"0.75rem"}}>
+                <div style={{display:"flex",gap:"0.5rem",alignItems:"stretch"}}>
+                  <input
+                    value={codigoAfiliado}
+                    onChange={e => { setCodigoAfiliado(e.target.value.toUpperCase()); setAfiliadoOk(false); setAfiliadoErro(""); setAfiliadoAtivo(null); }}
+                    onKeyDown={e => e.key === "Enter" && validarAfiliado()}
+                    placeholder="Código de desconto"
+                    style={{flex:1,border:"1px solid #ddd",padding:"0.6rem 0.75rem",fontSize:"0.82rem",fontFamily:"var(--sans, sans-serif)",letterSpacing:"0.05em",textTransform:"uppercase",outline:"none"}}
+                  />
+                  <button onClick={() => validarAfiliado()} style={{background:"#080808",color:"#fff",border:"none",padding:"0 1rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans, sans-serif)",whiteSpace:"nowrap"}}>Aplicar</button>
+                </div>
+                {afiliadoOk && <p style={{fontSize:"0.75rem",color:"#27ae60",marginTop:"0.3rem"}}>✓ {afiliadoAtivo?.desconto_pct}% de desconto aplicado ({afiliadoAtivo?.nome})</p>}
+                {afiliadoErro && <p style={{fontSize:"0.75rem",color:"#e74c3c",marginTop:"0.3rem"}}>{afiliadoErro}</p>}
+              </div>
+
+              <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguerBase.toFixed(2)}€`}</span></div>
+              {descontoAfiliado > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Desconto ({afiliadoAtivo?.desconto_pct}% — {codigoAfiliado})</span><span>−{descontoAfiliado.toFixed(2)}€</span></div>}
               <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
               <div className="r-linha">
                 <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>

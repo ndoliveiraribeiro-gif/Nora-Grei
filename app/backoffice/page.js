@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const SENHA = "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "landing", "estatisticas", "config"];
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "landing", "estatisticas", "config"];
 const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", landing: "Landing Page", estatisticas: "Estatísticas & AI", config: "Config" };
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
@@ -587,6 +587,212 @@ function RowDia({ linha, onApagarDespesa }) {
         </td></tr>
       )}
     </>
+  );
+}
+
+function AfiliadosTab() {
+  const [afiliados, setAfiliados] = useState([]);
+  const [conversoes, setConversoes] = useState([]);
+  const [form, setForm] = useState({ nome:"", handle:"", plataforma:"instagram", codigo:"", desconto_pct:10, comissao_pct:10, email:"", notas:"" });
+  const [editId, setEditId] = useState(null);
+  const [vista, setVista] = useState("lista"); // "lista" | "novo" | "conversoes"
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => { carregar(); }, []);
+
+  const carregar = async () => {
+    const { data: afs } = await supabase.from("afiliados").select("*").order("created_at", { ascending: false });
+    setAfiliados(afs || []);
+    const { data: cvs } = await supabase.from("conversoes_afiliado").select("*, afiliados(nome,codigo)").order("created_at", { ascending: false }).limit(50);
+    setConversoes(cvs || []);
+  };
+
+  const salvar = async () => {
+    setLoading(true);
+    const payload = { ...form, codigo: form.codigo.trim().toUpperCase(), desconto_pct: Number(form.desconto_pct), comissao_pct: Number(form.comissao_pct) };
+    if (editId) {
+      await supabase.from("afiliados").update(payload).eq("id", editId);
+    } else {
+      await supabase.from("afiliados").insert(payload);
+    }
+    setMsg(editId ? "Afiliado actualizado." : "Afiliado criado.");
+    setForm({ nome:"", handle:"", plataforma:"instagram", codigo:"", desconto_pct:10, comissao_pct:10, email:"", notas:"" });
+    setEditId(null); setVista("lista"); setLoading(false);
+    carregar();
+    setTimeout(() => setMsg(""), 3000);
+  };
+
+  const toggleAtivo = async (af) => {
+    await supabase.from("afiliados").update({ ativo: !af.ativo }).eq("id", af.id);
+    carregar();
+  };
+
+  const marcarPago = async (id) => {
+    await supabase.from("conversoes_afiliado").update({ comissao_paga: true, comissao_paga_em: new Date().toISOString() }).eq("id", id);
+    carregar();
+  };
+
+  const editarAfiliado = (af) => {
+    setForm({ nome: af.nome, handle: af.handle||"", plataforma: af.plataforma||"instagram", codigo: af.codigo, desconto_pct: af.desconto_pct, comissao_pct: af.comissao_pct, email: af.email||"", notas: af.notas||"" });
+    setEditId(af.id); setVista("novo");
+  };
+
+  const copiarLink = (codigo) => {
+    navigator.clipboard.writeText(`${window.location.origin}/catalogo?ref=${codigo}&utm_source=afiliado&utm_medium=social`);
+    setMsg("Link copiado!");
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const totalPorPagar = conversoes.filter(c => !c.comissao_paga).reduce((s, c) => s + (c.comissao_valor || 0), 0);
+
+  const FLD = { border:"1px solid #e0ddd8", padding:"0.55rem 0.75rem", fontSize:"0.82rem", fontFamily:"inherit", width:"100%", background:"#faf9f7", outline:"none" };
+  const BTN = { fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", padding:"0.65rem 1.25rem", border:"none", cursor:"pointer", fontFamily:"inherit" };
+
+  return (
+    <div style={{ maxWidth:900 }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.5rem" }}>
+        <div>
+          <h1 style={{ fontFamily:"'Cormorant',serif", fontSize:"2rem", fontWeight:300, marginBottom:"0.1rem" }}>Afiliados</h1>
+          <p style={{ fontSize:"0.75rem", color:"#888" }}>Criadores de conteúdo com código de desconto + comissão rastreável</p>
+        </div>
+        <div style={{ display:"flex", gap:"0.5rem" }}>
+          {["lista","conversoes","novo"].map(v => (
+            <button key={v} onClick={() => { setVista(v); setEditId(null); setForm({ nome:"", handle:"", plataforma:"instagram", codigo:"", desconto_pct:10, comissao_pct:10, email:"", notas:"" }); }} style={{ ...BTN, background: vista===v ? "#080808":"#f0eeeb", color: vista===v ? "#fff":"#080808" }}>
+              {v === "lista" ? "Lista" : v === "conversoes" ? `Conversões (${conversoes.filter(c=>!c.comissao_paga).length} por pagar)` : editId ? "Editar" : "Novo afiliado"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {msg && <div style={{ background:"#eaf7ed", border:"1px solid #27ae60", color:"#27ae60", padding:"0.65rem 1rem", fontSize:"0.8rem", marginBottom:"1rem" }}>{msg}</div>}
+
+      {/* RESUMO TOPO */}
+      {vista === "lista" && (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1px", background:"#e0ddd8", marginBottom:"1.5rem" }}>
+          {[
+            { label:"Afiliados activos", val: afiliados.filter(a=>a.ativo).length },
+            { label:"Total conversões", val: afiliados.reduce((s,a)=>s+(a.total_conversoes||0),0) },
+            { label:"Comissões por pagar", val: `${totalPorPagar.toFixed(2)}€` },
+          ].map((s,i) => (
+            <div key={i} style={{ background:"#faf9f7", padding:"1.25rem 1.5rem" }}>
+              <div style={{ fontFamily:"'Cormorant',serif", fontSize:"2rem", fontWeight:300, color:"#c4748a" }}>{s.val}</div>
+              <div style={{ fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#888" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {vista === "lista" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:"1px", background:"#e0ddd8" }}>
+          {afiliados.length === 0 && <div style={{ background:"#faf9f7", padding:"2rem", textAlign:"center", fontSize:"0.82rem", color:"#aaa" }}>Nenhum afiliado criado.</div>}
+          {afiliados.map(af => (
+            <div key={af.id} style={{ background:"#faf9f7", padding:"1rem 1.25rem", display:"flex", alignItems:"center", gap:"1rem", flexWrap:"wrap" }}>
+              <div style={{ flex:1, minWidth:160 }}>
+                <div style={{ fontWeight:500, marginBottom:"0.15rem" }}>{af.nome}</div>
+                <div style={{ fontSize:"0.72rem", color:"#888" }}>{af.handle && `${af.handle} · `}{af.plataforma}</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontFamily:"'Cormorant',serif", fontSize:"1.4rem", fontWeight:300, letterSpacing:"0.1em", color:"#080808" }}>{af.codigo}</div>
+                <div style={{ fontSize:"0.6rem", color:"#aaa", letterSpacing:"0.1em" }}>código</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:"1rem", fontWeight:500, color:"#c4748a" }}>{af.desconto_pct}%</div>
+                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>desc. cliente</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:"1rem", fontWeight:500 }}>{af.comissao_pct}%</div>
+                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>comissão</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:"1rem", fontWeight:500 }}>{af.total_conversoes || 0}</div>
+                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>conversões</div>
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <div style={{ fontSize:"1rem", fontWeight:500, color:"#27ae60" }}>{(af.total_comissao_gerada||0).toFixed(2)}€</div>
+                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>gerado</div>
+              </div>
+              <div style={{ display:"flex", gap:"0.4rem", flexShrink:0 }}>
+                <button onClick={() => copiarLink(af.codigo)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.6rem" }} title="Copiar link de afiliado">🔗 Link</button>
+                <button onClick={() => editarAfiliado(af)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.6rem" }}>Editar</button>
+                <button onClick={() => toggleAtivo(af)} style={{ ...BTN, background: af.ativo?"#fdf0f2":"#eaf7ed", color: af.ativo?"#c0392b":"#27ae60", fontSize:"0.6rem" }}>{af.ativo ? "Pausar" : "Activar"}</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {vista === "conversoes" && (
+        <div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"1px", background:"#e0ddd8" }}>
+            <div style={{ background:"#f0eeeb", padding:"0.6rem 1rem", display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr 1fr", gap:"0.5rem" }}>
+              {["Data","Afiliado","Código","Aluguer","Desconto","Comissão"].map(h => <span key={h} style={{ fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888" }}>{h}</span>)}
+            </div>
+            {conversoes.length === 0 && <div style={{ background:"#faf9f7", padding:"2rem", textAlign:"center", fontSize:"0.82rem", color:"#aaa" }}>Nenhuma conversão.</div>}
+            {conversoes.map(c => (
+              <div key={c.id} style={{ background:"#faf9f7", padding:"0.75rem 1rem", display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr 1fr", gap:"0.5rem", alignItems:"center" }}>
+                <span style={{ fontSize:"0.75rem", color:"#888" }}>{new Date(c.created_at).toLocaleDateString("pt-PT")}</span>
+                <span style={{ fontSize:"0.8rem", fontWeight:500 }}>{c.afiliados?.nome || "—"}</span>
+                <span style={{ fontSize:"0.75rem", fontFamily:"monospace", letterSpacing:"0.05em" }}>{c.codigo_usado}</span>
+                <span style={{ fontSize:"0.8rem" }}>{c.valor_aluguer?.toFixed(2)}€</span>
+                <span style={{ fontSize:"0.8rem", color:"#c4748a" }}>−{c.desconto_aplicado?.toFixed(2)}€</span>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
+                  <span style={{ fontSize:"0.8rem", fontWeight:500, color: c.comissao_paga?"#27ae60":"#e74c3c" }}>{c.comissao_valor?.toFixed(2)}€</span>
+                  {!c.comissao_paga && <button onClick={() => marcarPago(c.id)} style={{ ...BTN, background:"#eaf7ed", color:"#27ae60", fontSize:"0.55rem", padding:"0.25rem 0.5rem" }}>✓ Pagar</button>}
+                  {c.comissao_paga && <span style={{ fontSize:"0.6rem", color:"#27ae60" }}>pago</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {vista === "novo" && (
+        <div style={{ background:"#faf9f7", border:"1px solid #e0ddd8", padding:"2rem" }}>
+          <h2 style={{ fontFamily:"'Cormorant',serif", fontSize:"1.5rem", fontWeight:300, marginBottom:"1.5rem" }}>{editId ? "Editar afiliado" : "Novo afiliado"}</h2>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem", marginBottom:"1rem" }}>
+            {[
+              { label:"Nome *", key:"nome", placeholder:"Ex: Ana Silva" },
+              { label:"Handle (@)", key:"handle", placeholder:"@anasilva" },
+              { label:"Email (para pagamentos)", key:"email", placeholder:"ana@email.com" },
+              { label:"Código único *", key:"codigo", placeholder:"EX: ANA15", upper:true },
+            ].map(f => (
+              <div key={f.key}>
+                <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>{f.label}</label>
+                <input value={form[f.key]} onChange={e => setForm(v => ({ ...v, [f.key]: f.upper ? e.target.value.toUpperCase() : e.target.value }))} placeholder={f.placeholder} style={FLD} />
+              </div>
+            ))}
+            <div>
+              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Plataforma</label>
+              <select value={form.plataforma} onChange={e => setForm(v=>({...v, plataforma:e.target.value}))} style={FLD}>
+                {["instagram","tiktok","youtube","outro"].map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Desconto para o cliente (%)</label>
+              <input type="number" min="0" max="50" value={form.desconto_pct} onChange={e => setForm(v=>({...v, desconto_pct:e.target.value}))} style={FLD} />
+            </div>
+            <div>
+              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Comissão para o criador (%)</label>
+              <input type="number" min="0" max="50" value={form.comissao_pct} onChange={e => setForm(v=>({...v, comissao_pct:e.target.value}))} style={FLD} />
+            </div>
+          </div>
+          <div style={{ marginBottom:"1.5rem" }}>
+            <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Notas internas</label>
+            <textarea value={form.notas} onChange={e => setForm(v=>({...v, notas:e.target.value}))} rows={2} style={{ ...FLD, resize:"vertical" }} />
+          </div>
+          {form.codigo && (
+            <div style={{ background:"#f0eeeb", padding:"0.75rem 1rem", marginBottom:"1.25rem", fontSize:"0.78rem", color:"#5a5855" }}>
+              Link de partilha: <strong>{typeof window !== "undefined" ? window.location.origin : "https://noragrei.com"}/catalogo?ref={form.codigo}</strong>
+            </div>
+          )}
+          <div style={{ display:"flex", gap:"0.75rem" }}>
+            <button onClick={salvar} disabled={loading || !form.nome || !form.codigo} style={{ ...BTN, background:"#080808", color:"#fff", opacity: (!form.nome||!form.codigo)?0.5:1 }}>{loading ? "A guardar..." : editId ? "Actualizar" : "Criar afiliado"}</button>
+            <button onClick={() => { setVista("lista"); setEditId(null); }} style={{ ...BTN, background:"#f0eeeb", color:"#080808" }}>Cancelar</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -2177,6 +2383,10 @@ export default function Backoffice() {
 
         {tab === "mensagens" && (
           <MensagensBackoffice />
+        )}
+
+        {tab === "afiliados" && (
+          <AfiliadosTab />
         )}
 
         {tab === "landing" && (
