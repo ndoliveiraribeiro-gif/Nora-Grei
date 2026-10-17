@@ -412,9 +412,12 @@ export default function Home() {
           .hero-cta1{max-width:none;flex:0}
           .hero-cta2{color:var(--g4);border-color:var(--g2);max-width:none;flex:0}
           .hero-cta2:hover{color:var(--black);border-color:var(--black)}
-          .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%}
+          .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%;background:linear-gradient(135deg,#1a0a10 0%,#2d1520 40%,#0d0d0d 100%)}
           .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease}
           .hero-right-desktop:hover img{transform:scale(1.03)}
+          .hero-right-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+          .hero-right-placeholder-logo{font-family:var(--serif);font-size:clamp(3rem,6vw,5rem);font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.12)}
+          .hero-right-placeholder-tag{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.08)}
           .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
           .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
           .hero-caption-preco{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
@@ -584,9 +587,12 @@ export default function Home() {
             {videoComSom ? "🔊 Som" : "🔇 Sem som"}
           </button>
         )}
-        {!videoUrl && heroPeca && heroPeca.fotos && heroPeca.fotos[0] && (
+        {!videoUrl && (
           <div className="hero-right-desktop">
-            <img src={heroPeca.fotos[0]} alt={heroPeca.nome || "Nora Grei"} />
+            {heroPeca && heroPeca.fotos && heroPeca.fotos[0]
+              ? <img src={heroPeca.fotos[0]} alt={heroPeca.nome || "Nora Grei"} />
+              : <div className="hero-right-placeholder"><span className="hero-right-placeholder-logo">Nora Grei</span><span className="hero-right-placeholder-tag">Alugar ou Comprar</span></div>
+            }
             <div className="hero-caption">
               <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
               <span className="hero-caption-preco">{heroPeca && heroPeca.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
