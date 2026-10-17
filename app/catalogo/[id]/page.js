@@ -64,7 +64,7 @@ export default function PecaDetalhe() {
     setLoading(true);
     const { data } = await supabase
       .from("pecas")
-      .select("*, lojista_id, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
+      .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_total, quantidade_disponivel)")
       .eq("id", id)
       .single();
 
