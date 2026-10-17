@@ -503,6 +503,122 @@ function CartaoAvaliacao({ aluguer, i }) {
   );
 }
 
+function AvaliacoesLojista({ alugueresLoja, clienteId }) {
+  const concluidos = alugueresLoja.filter(a => ["devolvido","devolvido_danificado"].includes(a.estado));
+  const [avaliacoes, setAvaliacoes] = useState({});
+  const [respostas, setRespostas] = useState({});
+  const [loadingIds, setLoadingIds] = useState({});
+
+  useEffect(() => {
+    if (!concluidos.length) return;
+    const ids = concluidos.map(a => a.id);
+    supabase.from("avaliacoes_lojista").select("*").in("aluguer_lojista_id", ids).then(({ data }) => {
+      if (data) {
+        const map = {};
+        data.forEach(av => { map[av.aluguer_lojista_id] = av; });
+        setAvaliacoes(map);
+        const r = {};
+        data.forEach(av => { r[av.aluguer_lojista_id] = { nota: av.nota_lojista_cliente || 0, comentario: av.comentario_lojista || "" }; });
+        setRespostas(r);
+      }
+    });
+  }, [concluidos.length]);
+
+  const estrelas = (n, onChange) => (
+    <div style={{display:"flex",gap:"0.2rem"}}>
+      {[1,2,3,4,5].map(v => (
+        <span key={v} onClick={() => onChange && onChange(v)} style={{fontSize:"1.2rem",cursor:onChange?"pointer":"default",color:v<=n?"#c4748a":"#e2dfda",lineHeight:1}}>★</span>
+      ))}
+    </div>
+  );
+
+  const enviarResposta = async (aluguerLojista) => {
+    const r = respostas[aluguerLojista.id];
+    if (!r?.nota) return;
+    setLoadingIds(l => ({...l, [aluguerLojista.id]: true}));
+    await supabase.from("avaliacoes_lojista").upsert({
+      aluguer_lojista_id: aluguerLojista.id,
+      cliente_id: aluguerLojista.cliente_id,
+      lojista_id: clienteId,
+      nota_lojista_cliente: r.nota,
+      comentario_lojista: r.comentario || null,
+    }, { onConflict: "aluguer_lojista_id" });
+    setAvaliacoes(prev => ({...prev, [aluguerLojista.id]: {...(prev[aluguerLojista.id]||{}), nota_lojista_cliente: r.nota, comentario_lojista: r.comentario}}));
+    setLoadingIds(l => ({...l, [aluguerLojista.id]: false}));
+  };
+
+  if (concluidos.length === 0) return (
+    <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não tens alugueres concluídos.</p>
+  );
+
+  // Média global
+  const notasRecebidas = Object.values(avaliacoes).filter(av => av.nota_cliente_lojista).map(av => av.nota_cliente_lojista);
+  const media = notasRecebidas.length ? (notasRecebidas.reduce((s,n)=>s+n,0)/notasRecebidas.length).toFixed(1) : null;
+
+  return (
+    <>
+      {media && (
+        <div style={{display:"flex",alignItems:"center",gap:"1rem",padding:"1rem",background:"#fdf6f8",borderLeft:"3px solid #c4748a",marginBottom:"1.5rem"}}>
+          <div style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"#c4748a",lineHeight:1}}>{media}</div>
+          <div>
+            <div style={{display:"flex",gap:"0.15rem",marginBottom:"0.2rem"}}>
+              {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"1rem",color:v<=Math.round(media)?"#c4748a":"#e2dfda"}}>★</span>)}
+            </div>
+            <div style={{fontSize:"0.68rem",color:"var(--g4)",letterSpacing:"0.1em"}}>{notasRecebidas.length} avaliação{notasRecebidas.length!==1?"ões":""}</div>
+          </div>
+        </div>
+      )}
+
+      {concluidos.map(a => {
+        const av = avaliacoes[a.id];
+        const r = respostas[a.id] || { nota: 0, comentario: "" };
+        const jaRespondeu = av?.nota_lojista_cliente;
+
+        return (
+          <div key={a.id} style={{padding:"1rem 0",borderBottom:"1px solid var(--g1)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"0.5rem"}}>
+              <div>
+                <span style={{fontWeight:500,fontSize:"0.88rem"}}>{a.pecas_lojista?.nome||"—"}</span>
+                <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.75rem"}}>· {a.clientes?.nome}</span>
+              </div>
+              <span style={{fontSize:"0.68rem",color:"var(--g4)"}}>{a.data_fim}</span>
+            </div>
+
+            {av?.nota_cliente_lojista ? (
+              <div style={{background:"var(--g1)",padding:"0.75rem",marginBottom:"0.75rem"}}>
+                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Avaliação do cliente</div>
+                {estrelas(av.nota_cliente_lojista, null)}
+                {av.comentario_cliente && <p style={{fontSize:"0.78rem",color:"var(--g4)",marginTop:"0.3rem",fontStyle:"italic"}}>"{av.comentario_cliente}"</p>}
+              </div>
+            ) : (
+              <p style={{fontSize:"0.75rem",color:"#aaa",marginBottom:"0.75rem",fontStyle:"italic"}}>Cliente ainda não avaliou.</p>
+            )}
+
+            <div style={{background:"#fdf6f8",padding:"0.75rem",borderLeft:"2px solid #c4748a"}}>
+              <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.4rem"}}>
+                {jaRespondeu ? "A tua avaliação do cliente" : "Avaliar este cliente"}
+              </div>
+              {estrelas(jaRespondeu || r.nota, jaRespondeu ? null : (v) => setRespostas(prev=>({...prev,[a.id]:{...r,nota:v}})))}
+              {!jaRespondeu && r.nota > 0 && (
+                <>
+                  <textarea value={r.comentario} onChange={e=>setRespostas(prev=>({...prev,[a.id]:{...r,comentario:e.target.value}}))}
+                    placeholder="Comentário opcional sobre o cliente..."
+                    style={{width:"100%",marginTop:"0.5rem",padding:"0.5rem",border:"1.5px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.8rem",resize:"vertical",minHeight:"60px",outline:"none"}} />
+                  <button onClick={()=>enviarResposta(a)} disabled={loadingIds[a.id]}
+                    style={{marginTop:"0.5rem",padding:"0.5rem 1.1rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer"}}>
+                    {loadingIds[a.id]?"...":"Guardar avaliação"}
+                  </button>
+                </>
+              )}
+              {jaRespondeu && av.comentario_lojista && <p style={{fontSize:"0.78rem",color:"var(--g4)",marginTop:"0.3rem",fontStyle:"italic"}}>"{av.comentario_lojista}"</p>}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 const CAMPOS_OBRIGATORIOS = ["nome", "telefone", "morada", "numero_porta", "codigo_postal", "cidade", "nif", "numero_cc"];
 
 export default function Perfil() {
@@ -1146,8 +1262,8 @@ export default function Perfil() {
         {modoLojista && tabAtiva === "loja" && (
           <div style={{padding:"1rem 0"}}>
             <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
-              {["Dashboard","Peças","Alugueres","Liquidações"].map((s,idx) => (
-                <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
+              {["Dashboard","Peças","Alugueres","Liquidações","Avaliações"].map((s,idx) => (
+                <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
               ))}
             </div>
             {tabLoja === "dashboard" && (
@@ -1315,6 +1431,11 @@ export default function Perfil() {
                     </>
                   );
                 })()}
+              </div>
+            )}
+            {tabLoja === "avaliacoes" && (
+              <div className="card" style={{padding:"1.5rem"}}>
+                <AvaliacoesLojista alugueresLoja={alugueresLoja} clienteId={clienteData?.id} />
               </div>
             )}
           </div>

@@ -360,6 +360,80 @@ function PedidosContent() {
             )}
           </div>
         </div>
+
+        {/* AVALIAÇÃO — após devolução */}
+        {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && (
+          <CartaoAvaliacaoLojista aluguerLojista={a} />
+        )}
+      </div>
+    );
+  };
+
+  const CartaoAvaliacaoLojista = ({ aluguerLojista }) => {
+    const [avaliacao, setAvaliacao] = useState(null);
+    const [nota, setNota] = useState(0);
+    const [comentario, setComentario] = useState("");
+    const [enviado, setEnviado] = useState(false);
+    const [loadingAv, setLoadingAv] = useState(false);
+
+    useEffect(() => {
+      supabase.from("avaliacoes_lojista").select("*").eq("aluguer_lojista_id", aluguerLojista.id).maybeSingle().then(({ data }) => {
+        if (data) { setAvaliacao(data); setNota(data.nota_cliente_lojista || 0); setEnviado(true); }
+      });
+    }, [aluguerLojista.id]);
+
+    const enviarAvaliacao = async () => {
+      if (nota === 0) return;
+      setLoadingAv(true);
+      await supabase.from("avaliacoes_lojista").upsert({
+        aluguer_lojista_id: aluguerLojista.id,
+        cliente_id: aluguerLojista.cliente_id,
+        lojista_id: aluguerLojista.lojista_id,
+        nota_cliente_lojista: nota,
+        comentario_cliente: comentario || null,
+      }, { onConflict: "aluguer_lojista_id" });
+      setEnviado(true); setLoadingAv(false);
+    };
+
+    const estrelas = (n, onChange) => (
+      <div style={{display:"flex",gap:"0.25rem",marginBottom:"0.5rem"}}>
+        {[1,2,3,4,5].map(v => (
+          <span key={v} onClick={() => onChange && onChange(v)} style={{fontSize:"1.4rem",cursor:onChange?"pointer":"default",color:v<=n?"#c4748a":"#e2dfda",lineHeight:1}}>★</span>
+        ))}
+      </div>
+    );
+
+    return (
+      <div style={{marginTop:"0.75rem",padding:"0.85rem 1rem",background:"#fdf6f8",borderLeft:"3px solid #c4748a"}}>
+        <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>Avalia esta experiência</div>
+        {enviado ? (
+          <>
+            {estrelas(nota, null)}
+            {avaliacao?.comentario_cliente && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
+            {avaliacao?.nota_lojista_cliente && (
+              <div style={{marginTop:"0.75rem",paddingTop:"0.6rem",borderTop:"1px solid #f0d0da"}}>
+                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>Avaliação do lojista</div>
+                {estrelas(avaliacao.nota_lojista_cliente, null)}
+                {avaliacao.comentario_lojista && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_lojista}"</p>}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {estrelas(nota, setNota)}
+            {nota > 0 && (
+              <>
+                <textarea value={comentario} onChange={e => setComentario(e.target.value)}
+                  placeholder="Deixa um comentário sobre o lojista (opcional)..."
+                  style={{width:"100%",padding:"0.6rem",border:"1.5px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",color:"#080808",resize:"vertical",minHeight:"70px",outline:"none",marginBottom:"0.5rem"}} />
+                <button onClick={enviarAvaliacao} disabled={loadingAv}
+                  style={{padding:"0.55rem 1.25rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.62rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",cursor:"pointer",fontWeight:500}}>
+                  {loadingAv ? "..." : "Enviar avaliação"}
+                </button>
+              </>
+            )}
+          </>
+        )}
       </div>
     );
   };

@@ -22,6 +22,8 @@ export default function LojaPublica() {
   const [pecas, setPecas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("todos");
+  const [mediaRating, setMediaRating] = useState(null);
+  const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -36,6 +38,15 @@ export default function LojaPublica() {
     setLojista(cli);
     const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(tamanho, quantidade_disponivel)").eq("cliente_id", cli.id).eq("estado", "disponivel").order("created_at", { ascending: false });
     setPecas(ps || []);
+
+    // Média de avaliações do lojista
+    const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista").eq("lojista_id", cli.id).not("nota_cliente_lojista","is",null);
+    if (avs && avs.length > 0) {
+      const media = avs.reduce((s,a) => s + a.nota_cliente_lojista, 0) / avs.length;
+      setMediaRating(media.toFixed(1));
+      setTotalAvaliacoes(avs.length);
+    }
+
     setLoading(false);
   };
 
@@ -100,6 +111,15 @@ export default function LojaPublica() {
       <div className="hero-loja">
         <h1 className="loja-nome">{t.lojaDeLabel} {lojista.nome}</h1>
         {lojista.cidade && <p className="loja-local">{lojista.cidade}{lojista.pais ? `, ${lojista.pais}` : ""}</p>}
+        {mediaRating && (
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem",marginTop:"0.75rem"}}>
+            <div style={{display:"flex",gap:"0.1rem"}}>
+              {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"1rem",color:v<=Math.round(mediaRating)?"#c4748a":"#e2dfda"}}>★</span>)}
+            </div>
+            <span style={{fontFamily:"var(--sans)",fontSize:"0.82rem",fontWeight:500,color:"var(--black)"}}>{mediaRating}</span>
+            <span style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g4)"}}>({totalAvaliacoes})</span>
+          </div>
+        )}
       </div>
 
       <div className="filtros">
