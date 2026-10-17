@@ -25,7 +25,7 @@ const CARD_T = { fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "u
 const LBL = { display: "block", fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#555", marginBottom: "0.4rem", fontWeight: 500 };
 const INP = { width: "100%", padding: "0.75rem 0.9rem", border: "1.5px solid #e2dfda", background: "#fff", fontSize: "0.9rem", fontFamily: "'Jost',sans-serif", color: "#080808", outline: "none", boxSizing: "border-box" };
 const BTN = (c="black",s="md") => ({ padding: s==="sm"?"0.3rem 0.65rem":"0.55rem 1rem", fontSize: s==="sm"?"0.6rem":"0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", border: c==="outline"?"1.5px solid #e2dfda":"none", background: c==="black"?"#080808":c==="rosa"?"#c4748a":c==="red"?"#fff5f5":c==="green"?"#27ae60":"#fff", color: c==="black"||c==="rosa"||c==="green"?"#fff":c==="red"?"#e74c3c":"#080808", cursor: "pointer", fontFamily: "'Jost',sans-serif", fontWeight: 500 });
-const BADGE = (c) => ({ display: "inline-block", fontSize: "0.58rem", letterSpacing: "0.1em", textTransform: "uppercase", padding: "0.2rem 0.5rem", fontWeight: 600, background: c==="green"?"#e8f5e9":c==="orange"?"#fff8e1":c==="red"?"#fff5f5":c==="rosa"?"#fff0f3":"#f0eeeb", color: c==="green"?"#27ae60":c==="orange"?"#f39c12":c==="red"?"#e74c3c":c==="rosa"?"#c4748a":"#888" });
+const BADGE = (c) => ({ display: "inline-block", fontSize: "0.58rem", letterSpacing: "0.1em", textTransform: "uppercase", padding: "0.2rem 0.5rem", fontWeight: 600, background: c==="green"?"#e8f5e9":c==="orange"?"#fff8e1":c==="red"?"#fff5f5":c==="rosa"?"#fff0f3":c==="blue"?"#e8f4f8":"#f0eeeb", color: c==="green"?"#27ae60":c==="orange"?"#f39c12":c==="red"?"#e74c3c":c==="rosa"?"#c4748a":c==="blue"?"#2980b9":"#888" });
 const TH = { fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#888", fontWeight: 600, padding: "0.6rem 0.75rem", textAlign: "left", borderBottom: "2px solid #f0eeeb", whiteSpace: "nowrap" };
 const TD = { fontSize: "0.85rem", padding: "0.85rem 0.75rem", borderBottom: "1px solid #f8f8f8", verticalAlign: "middle" };
 
@@ -987,7 +987,7 @@ export default function Backoffice() {
     if (!novaCampanha.titulo || !novaCampanha.mensagem) { alert("Título e mensagem obrigatórios"); return; }
     const { error } = await supabase.from("campanhas").insert({ ...novaCampanha, probabilidade: parseInt(novaCampanha.probabilidade), codigo: novaCampanha.codigo||null, desconto: novaCampanha.desconto||null, validade: novaCampanha.validade||null, ativa: true });
     if (error) { alert("Erro: " + error.message); return; }
-    setNovaCampanha({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
+    setNovaCampanha({ titulo: "", titulo_fr: "", titulo_lt: "", mensagem: "", mensagem_fr: "", mensagem_lt: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
     carregarDados();
   };
 
@@ -1817,6 +1817,7 @@ export default function Backoffice() {
                 <div><label style={LBL}>Tipo</label>
                   <select style={INP} value={novaCampanha.tipo} onChange={e=>setNovaCampanha(p=>({...p,tipo:e.target.value}))}>
                     <option value="cupao">Cupão de desconto</option>
+                    <option value="banner">Banner promoção</option>
                     <option value="novidade">Novidade de produto</option>
                     <option value="oferta">Oferta especial</option>
                   </select>
@@ -1845,8 +1846,15 @@ export default function Backoffice() {
                 <tbody>
                   {campanhas.map(c=>(
                       <tr key={c.id} style={{ background:"#fff" }}>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{c.titulo}</div><div style={{ fontSize:"0.75rem",color:"#888",maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{c.mensagem}</div></td>
-                        <td style={TD}><span style={BADGE(c.tipo==="cupao"?"rosa":"green")}>{c.tipo}</span></td>
+                        <td style={TD}>
+                          <div style={{ fontWeight:600 }}>{c.titulo}</div>
+                          <div style={{ fontSize:"0.75rem",color:"#888",maxWidth:220,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{c.mensagem}</div>
+                          <div style={{ display:"flex",gap:"0.3rem",marginTop:"0.3rem" }}>
+                            {c.titulo_fr && <span style={{ fontSize:"0.6rem",background:"#e8f4f8",color:"#2980b9",padding:"0.1rem 0.35rem",borderRadius:2 }}>FR</span>}
+                            {c.titulo_lt && <span style={{ fontSize:"0.6rem",background:"#e8f8ee",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:2 }}>LT</span>}
+                          </div>
+                        </td>
+                        <td style={TD}><span style={BADGE(c.tipo==="cupao"?"rosa":c.tipo==="banner"?"blue":"green")}>{c.tipo}</span></td>
                         <td style={{ ...TD,fontWeight:700,letterSpacing:"0.1em" }}>{c.codigo||"—"}</td>
                         <td style={TD}>{c.probabilidade}%</td>
                         <td style={{ ...TD,fontSize:"0.8rem" }}>{c.validade?new Date(c.validade).toLocaleDateString("pt-PT"):"Sem limite"}</td>
@@ -2302,6 +2310,7 @@ export default function Backoffice() {
               <div><label style={LBL}>Tipo</label>
                 <select style={INP} value={editCampanha.tipo} onChange={e=>setEditCampanha(p=>({...p,tipo:e.target.value}))}>
                   <option value="cupao">Cupão de desconto</option>
+                  <option value="banner">Banner promoção</option>
                   <option value="novidade">Novidade de produto</option>
                   <option value="oferta">Oferta especial</option>
                 </select>

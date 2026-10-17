@@ -110,18 +110,38 @@ export default function Home() {
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [videoComSom, setVideoComSom] = useState(false);
   const [pecasDestaque, setPecasDestaque] = useState([]);
+  const [campanha, setCampanha] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved); else setLang("pt");
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
-    const visto = localStorage.getItem("ng_banner_cupao");
-    if (!visto) { setTimeout(() => { setBanner(true); setTimeout(() => { setBanner(false); localStorage.setItem("ng_banner_cupao","1"); }, 8000); }, 2000); }
+    carregarCampanha();
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
     carregarConteudo();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const carregarCampanha = async () => {
+    const agora = new Date().toISOString();
+    const { data: cs } = await supabase
+      .from("campanhas")
+      .select("id, titulo, titulo_fr, titulo_lt, mensagem, mensagem_fr, mensagem_lt, codigo, desconto, tipo, url_destino, validade")
+      .eq("ativa", true)
+      .or(`validade.is.null,validade.gt.${agora}`)
+      .order("created_at", { ascending: false });
+    if (!cs || cs.length === 0) return;
+    // Escolher por probabilidade
+    const total = cs.reduce((s, c) => s + (c.probabilidade || 20), 0);
+    let r = Math.random() * total;
+    let escolhida = cs[0];
+    for (const c of cs) { r -= (c.probabilidade || 20); if (r <= 0) { escolhida = c; break; } }
+    const visto = localStorage.getItem(`ng_banner_${escolhida.id}`);
+    if (visto) return;
+    setCampanha(escolhida);
+    setTimeout(() => { setBanner(true); setTimeout(() => { setBanner(false); localStorage.setItem(`ng_banner_${escolhida.id}`, "1"); }, 9000); }, 2000);
+  };
 
   const aplicarHeroAutomatico = (todasPecas) => {
     const destaque = todasPecas.find(function (p) { return p.destaque && p.fotos && p.fotos[0]; });
@@ -219,7 +239,7 @@ export default function Home() {
   };
 
   const changeLang = (l) => { localStorage.setItem("ng_lang", l); setLang(l); };
-  const copiarCupao = () => { navigator.clipboard.writeText("NORA15"); setCupaoCopiado(true); setTimeout(() => setCupaoCopiado(false), 3000); };
+  const copiarCupao = () => { if (campanha?.codigo) navigator.clipboard.writeText(campanha.codigo); setCupaoCopiado(true); setTimeout(() => setCupaoCopiado(false), 3000); };
   const t = T[lang] || T.pt;
   const FOTO_FALLBACK = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=85";
 
@@ -418,16 +438,28 @@ export default function Home() {
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 
-      {banner && (
+      {banner && campanha && (
         <div className="cupao-banner">
           <div className="cupao-inner">
             <div>
-              <div className="cupao-texto">{t.cupao ? t.cupao.texto : "Oferta de boas-vindas — 15% de desconto em noragrei.com"}</div>
-              <div className="cupao-codigo">NORA15</div>
+              <div className="cupao-texto">
+                {(lang === "fr" && campanha.mensagem_fr) || (lang === "lt" && campanha.mensagem_lt) || campanha.mensagem || ""}
+              </div>
+              {campanha.codigo && <div className="cupao-codigo">{campanha.codigo}</div>}
+              {campanha.desconto && !campanha.codigo && <div className="cupao-codigo" style={{fontSize:"1.1rem"}}>{campanha.desconto}</div>}
             </div>
             <div className="cupao-actions">
-              <button className="cupao-btn" onClick={copiarCupao}>{cupaoCopiado ? (t.cupao ? t.cupao.copiado : "Copiado ✓") : (t.cupao ? t.cupao.copiar : "Copiar código")}</button>
-              <button className="cupao-fechar" onClick={() => { setBanner(false); localStorage.setItem("ng_banner_cupao","1"); }}>✕</button>
+              {campanha.codigo && (
+                <button className="cupao-btn" onClick={copiarCupao}>
+                  {cupaoCopiado ? (t.cupao?.copiado || "Copiado ✓") : (t.cupao?.copiar || "Copiar código")}
+                </button>
+              )}
+              {campanha.url_destino && !campanha.codigo && (
+                <a href={campanha.url_destino} className="cupao-btn" style={{textDecoration:"none",textAlign:"center"}}>
+                  Ver oferta →
+                </a>
+              )}
+              <button className="cupao-fechar" onClick={() => { setBanner(false); if (campanha?.id) localStorage.setItem(`ng_banner_${campanha.id}`, "1"); }}>✕</button>
             </div>
           </div>
         </div>
