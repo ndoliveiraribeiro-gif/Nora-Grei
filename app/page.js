@@ -108,6 +108,7 @@ export default function Home() {
   const [categoriaFotos, setCategoriaFotos] = useState({});
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [videoComSom, setVideoComSom] = useState(false);
   const [pecasDestaque, setPecasDestaque] = useState([]);
 
   useEffect(() => {
@@ -250,10 +251,13 @@ export default function Home() {
         .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}
         .nb-f:hover{background:#2a2926}
 
-        .hero{min-height:90svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
+        .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55)}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.2) 0%,rgba(8,8,8,0.65) 60%,rgba(8,8,8,0.85) 100%);z-index:1}
+        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center center}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.15) 0%,rgba(8,8,8,0.45) 50%,rgba(8,8,8,0.82) 100%);z-index:1}
+        .hero-sound{position:absolute;bottom:2rem;right:1.5rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
+        .hero-sound:hover{background:rgba(255,255,255,0.22)}
         .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
         .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
@@ -265,16 +269,6 @@ export default function Home() {
         .hero-cta2{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:1rem 1.5rem;transition:all 0.2s;flex:1;text-align:center;max-width:180px}
         .hero-cta2:hover{color:#fff;border-color:#fff}
 
-        .video-sec{padding:4rem 1.5rem;background:var(--black)}
-        .video-header{text-align:center;margin-bottom:2rem}
-        .video-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.6rem;font-weight:500}
-        .video-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.5rem);font-weight:300;color:#fff}
-        .video-wrap{position:relative;width:fit-content;max-width:100%;margin:0 auto;background:#1a1a1a;cursor:pointer;overflow:hidden;border-radius:2px;display:flex;justify-content:center}
-        .video-wrap video{width:100%;height:100%;object-fit:contain;background:#000}
-        .video-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:2}
-        .video-wrap:hover .video-play-btn{transform:translate(-50%,-50%) scale(1.08)}
-        .video-play-btn svg{width:26px;height:26px;fill:var(--black);margin-left:3px}
-        .video-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:rgba(255,255,255,0.3)}
 
         .strip{background:var(--rosa);padding:0.75rem 0;overflow:hidden}
         .strip-track{display:flex;white-space:nowrap;animation:marquee 25s linear infinite}
@@ -376,7 +370,6 @@ export default function Home() {
           .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
           .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
           .hero-caption-preco{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
-          .video-sec{padding:5rem 4rem}
           .quick-access{grid-template-columns:repeat(4,1fr)}
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:3rem 2rem}
@@ -465,7 +458,12 @@ export default function Home() {
       </nav>
 
       <section className="hero" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
-        <div className="hero-bg"><img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt="" /></div>
+        <div className="hero-bg">
+          {videoUrl
+            ? <video src={videoUrl} autoPlay muted loop playsInline ref={el => { if (el) el.play().catch(()=>{}); }} />
+            : <img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt="" />
+          }
+        </div>
         <div className="hero-overlay" />
         <div className="hero-content">
           <p className="hero-eyebrow">{t.hero.eyebrow}</p>
@@ -477,34 +475,21 @@ export default function Home() {
             <a href="#como" className="hero-cta2">{t.hero.cta2} →</a>
           </div>
         </div>
-        <div className="hero-right-desktop">
-          <img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt={heroPeca ? heroPeca.nome : "Nora Grei"} />
-          <div className="hero-caption">
-            <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
-            <span className="hero-caption-preco">{heroPeca && heroPeca.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
-          </div>
-        </div>
-      </section>
-
-      {videoUrl && <section className="video-sec">
-        <div className="video-header">
-          <p className="video-label">{t.video.label}</p>
-          <h2 className="video-titulo">{t.video.titulo}</h2>
-        </div>
-        {videoUrl ? (
-          <div className="video-wrap" onClick={(e) => { const v = e.currentTarget.querySelector("video"); if (v) { if (videoPlaying) { v.pause(); setVideoPlaying(false); } else { v.muted=false; v.play(); setVideoPlaying(true); } } }}>
-            <video src={videoUrl} loop playsInline autoPlay muted ref={el => { if (el) { el.play().then(()=>setVideoPlaying(true)).catch(()=>{}); } }} />
-            {!videoPlaying && <div className="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>}
-          </div>
-        ) : (
-          <div className="video-wrap" style={{cursor:"default"}}>
-            <div className="video-placeholder">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>
-              <span style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>{t.videoEmBreve}</span>
+        {videoUrl && (
+          <button className="hero-sound" onClick={() => { const v = document.querySelector(".hero-bg video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
+            {videoComSom ? "🔊 Som" : "🔇 Sem som"}
+          </button>
+        )}
+        {!videoUrl && (
+          <div className="hero-right-desktop">
+            <img src={heroPeca && heroPeca.fotos ? heroPeca.fotos[0] : FOTO_FALLBACK} alt={heroPeca ? heroPeca.nome : "Nora Grei"} />
+            <div className="hero-caption">
+              <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
+              <span className="hero-caption-preco">{heroPeca && heroPeca.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
             </div>
           </div>
         )}
-      </section>}
+      </section>
 
       <div className="strip">
         <div className="strip-track">
