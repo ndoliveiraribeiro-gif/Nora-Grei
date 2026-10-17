@@ -280,7 +280,7 @@ export default function PecaDetalhe() {
           .nome{font-size:clamp(1.75rem,6vw,2.4rem)}
           .preco-val{font-size:1.6rem}
           /* Esconde botões inline no mobile — serão substituídos pelo sticky */
-          .btn-alugar,.btn-reservar{display:none}
+          .btn-alugar,.btn-reservar,.btn-comprar,.btn-contactar{display:none}
           /* Sticky CTA fixo no fundo */
           .sticky-cta{
             display:flex;
@@ -322,14 +322,15 @@ export default function PecaDetalhe() {
             flex-shrink:0;
           }
           .sticky-btn-contactar{
-            min-height:48px;min-width:48px;
+            min-height:48px;
             background:var(--white);color:var(--black);
             border:1.5px solid var(--black);
-            font-family:'Jost',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;
             cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
+            display:flex;align-items:center;justify-content:center;gap:0.4rem;
             padding:0 0.85rem;
             flex-shrink:0;
+            white-space:nowrap;
           }
           .deposito-box{margin-bottom:1rem}
           .partilha{margin-top:1rem}
@@ -535,9 +536,9 @@ export default function PecaDetalhe() {
           className="sticky-btn-contactar"
           onClick={contactarLojista}
           disabled={contactando}
-          title={t.contactar}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          {contactando ? "..." : "Chat"}
         </button>
         <a
           href="https://www.noragrei.com"
