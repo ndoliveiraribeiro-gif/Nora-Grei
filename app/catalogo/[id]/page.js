@@ -271,7 +271,7 @@ export default function PecaDetalhe() {
         @media(max-width:768px){
           .nav{padding:0.85rem 1rem}
           .nav-logo{font-size:1rem}
-          .layout{grid-template-columns:1fr;padding-top:56px;padding-bottom:80px}
+          .layout{grid-template-columns:1fr;padding-top:56px;padding-bottom:calc(80px + 72px + env(safe-area-inset-bottom))}
           .fotos{position:static;height:auto;padding:0}
           .foto-main{height:88vw;max-height:520px}
           .fotos-thumb{height:60px;padding:0.5rem 0.75rem}
@@ -281,17 +281,18 @@ export default function PecaDetalhe() {
           .preco-val{font-size:1.6rem}
           /* Esconde botões inline no mobile — serão substituídos pelo sticky */
           .btn-alugar,.btn-reservar,.btn-comprar,.btn-contactar{display:none}
-          /* Sticky CTA fixo no fundo */
+          /* Sticky CTA fixo no fundo — acima da bottom nav (bnav z-index:200) */
           .sticky-cta{
             display:flex;
             position:fixed;
-            bottom:0;left:0;right:0;
-            z-index:200;
+            bottom:calc(72px + env(safe-area-inset-bottom));
+            left:0;right:0;
+            z-index:201;
             background:rgba(248,247,245,0.97);
             backdrop-filter:blur(16px);
             -webkit-backdrop-filter:blur(16px);
             border-top:1px solid #e2dfda;
-            padding:0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
+            padding:0.75rem 1rem;
             gap:0.6rem;
             align-items:center;
           }
