@@ -159,13 +159,13 @@ export default function LojaPublica() {
         <h1 className="loja-nome">{t.lojaDeLabel} {lojista.nome}</h1>
         {lojista.cidade && <p className="loja-local">{lojista.cidade}{lojista.pais ? `, ${lojista.pais}` : ""}</p>}
         {mediaRating && (
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem",marginTop:"0.75rem"}}>
+          <a href={`/loja/${codigo}/avaliacoes`} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem",marginTop:"0.75rem",textDecoration:"none"}}>
             <div style={{display:"flex",gap:"0.1rem"}}>
               {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"1rem",color:v<=Math.round(mediaRating)?"#c4748a":"#e2dfda"}}>★</span>)}
             </div>
             <span style={{fontFamily:"var(--sans)",fontSize:"0.82rem",fontWeight:500,color:"var(--black)"}}>{mediaRating}</span>
-            <span style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g4)"}}>({totalAvaliacoes})</span>
-          </div>
+            <span style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g4)",textDecoration:"underline"}}>({totalAvaliacoes} avaliações)</span>
+          </a>
         )}
       </div>
 
