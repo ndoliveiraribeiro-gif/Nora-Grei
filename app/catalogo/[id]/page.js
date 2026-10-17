@@ -3,22 +3,30 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-const TAXA_SINISTRO = 0.03;
-const FATOR_SEGURANCA = 1.5;
-const CAUCAO_PISO = 0.08;
-
-const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
-  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12" };
-  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6" };
-  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32" };
+// Caução baseada em ROI: quantos alugueres são precisos para recuperar a peça
+// Fórmula: (valor_peca - receita_já_gerada) / alugueres_esperados_mes × fator_risco
+// Tecto: valor_peca. Piso: 5% do valor.
+const calcularCaucaoRoi = (valorPeca, precoDia, totalAlugueres, nv) => {
+  if (!valorPeca || valorPeca <= 0) return 0;
+  const diasMediosPorAluguer = 3;
+  const aluguersMes = 4; // estimativa conservadora
+  const receitaEsperadaMes = aluguersMes * precoDia * diasMediosPorAluguer;
+  const receitaJaGerada = totalAlugueres * precoDia * diasMediosPorAluguer;
+  const valorResidual = Math.max(0, valorPeca - receitaJaGerada);
+  // Caucao = valor residual / meses para amortizar (3 meses base) × desconto por nível
+  const mesesAmort = 3;
+  const caucaoBase = Math.min(valorResidual / mesesAmort, valorResidual * 0.4);
+  const descontoNivel = nv.descCaucao; // % de desconto por nível de confiança
+  const caucao = Math.round(caucaoBase * (1 - descontoNivel / 100));
+  const piso = Math.round(valorPeca * 0.05);
+  return Math.max(piso, caucao);
 };
 
-const calcularCaucao = (valorPeca, caucaoPct) => {
-  const r = valorPeca * TAXA_SINISTRO * FATOR_SEGURANCA;
-  const n = valorPeca * caucaoPct / 100;
-  const p = valorPeca * CAUCAO_PISO;
-  return Math.round(Math.max(r, n, p));
+const NIVEL = (n) => {
+  if (n >= 20) return { nome: "Platina", icon: "💎", descCaucao: 80, cor: "#6c5ce7" };
+  if (n >= 10) return { nome: "Ouro",    icon: "🥇", descCaucao: 60, cor: "#f39c12" };
+  if (n >= 5)  return { nome: "Prata",   icon: "🥈", descCaucao: 40, cor: "#95a5a6" };
+  return             { nome: "Bronze",   icon: "🥉", descCaucao: 0,  cor: "#cd7f32" };
 };
 
 function Timer({ dataFim, lang }) {
@@ -511,21 +519,32 @@ export default function PecaDetalhe() {
 
           <div className="deposito-box">
             <p className="secao-label">{t.deposito}</p>
-            {peca.valor_peca > 0 ? (() => {
+            {peca.valor_peca > 0 && peca.preco_aluguer_dia > 0 ? (() => {
               const nv = NIVEL(totalAlugueres);
-              const caucaoValor = calcularCaucao(peca.valor_peca, nv.caucao);
-              const caucaoSemNivel = calcularCaucao(peca.valor_peca, 100);
+              const caucaoValor = calcularCaucaoRoi(peca.valor_peca, peca.preco_aluguer_dia, totalAlugueres, nv);
+              const caucaoSemNivel = calcularCaucaoRoi(peca.valor_peca, peca.preco_aluguer_dia, 0, NIVEL(0));
               const temDesconto = caucaoValor < caucaoSemNivel;
+              // Barra de progresso: quanto já se gerou de receita vs valor peça
+              const diasMedios = 3, receitaGerada = Math.min(totalAlugueres * peca.preco_aluguer_dia * diasMedios, peca.valor_peca);
+              const pctRoi = Math.min(100, Math.round((receitaGerada / peca.valor_peca) * 100));
               return (
                 <>
                   <p className="deposito-val">{caucaoValor}€ <span style={{ fontSize: "0.72rem", fontFamily: "var(--sans)", fontWeight: 300, color: nv.cor }}>{nv.icon} {nv.nome}</span></p>
-                  {temDesconto && <p style={{ fontSize: "0.72rem", color: "#95a5a6", textDecoration: "line-through" }}>{caucaoSemNivel}€ sem nível</p>}
+                  {temDesconto && <p style={{ fontSize: "0.72rem", color: "#95a5a6", textDecoration: "line-through", marginBottom:"0.25rem" }}>{caucaoSemNivel}€ sem histórico</p>}
+                  {totalAlugueres > 0 && (
+                    <div style={{ margin:"0.4rem 0 0.25rem" }}>
+                      <div style={{ height:"4px", background:"#e8e4df", borderRadius:"2px", overflow:"hidden" }}>
+                        <div style={{ height:"100%", width:`${pctRoi}%`, background:"#c4a882", borderRadius:"2px", transition:"width 0.5s" }} />
+                      </div>
+                      <p style={{ fontSize:"0.65rem", color:"#9c9894", marginTop:"0.2rem" }}>{pctRoi}% do valor da peça recuperado</p>
+                    </div>
+                  )}
                   <p className="deposito-desc">{t.depositoDesc}</p>
                 </>
               );
             })() : (
               <>
-                <p className="deposito-val">{peca.valor_peca || "—"}€</p>
+                <p className="deposito-val">{peca.valor_peca ? `${peca.valor_peca}€` : "—"}</p>
                 <p className="deposito-desc">{t.depositoDesc}</p>
               </>
             )}
@@ -544,9 +563,22 @@ export default function PecaDetalhe() {
             <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
           )}
 
-          <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="btn-comprar">
-            {t.comprar} — noragrei.com ↗
-          </a>
+          <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap", marginTop:"0.25rem" }}>
+            {peca.preco_avulso > 0 && (
+              <a href={`/checkout?peca=${id}&modo=ocasiao`} style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #1a1a1a", background:"#fff", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", cursor:"pointer", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
+                onMouseEnter={e=>{e.currentTarget.style.background="#1a1a1a";e.currentTarget.style.color="#fff";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#1a1a1a";}}>
+                <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.15rem" }}>Por ocasião</span>
+                <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.preco_avulso}€</span>
+              </a>
+            )}
+            <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
+              <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.15rem" }}>Comprar nova</span>
+              <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.valor_peca ? `${peca.valor_peca}€` : "ver preço ↗"}</span>
+            </a>
+          </div>
 
           <button
             className="btn-contactar"
