@@ -215,22 +215,24 @@ export default function PecaLojaPage() {
               </a>
             </div>
           ) : (
-            <button
-              className="btn-checkout"
-              onClick={irParaCheckout}
-              disabled={!tamanhoSelecionado}
-            >
-              {peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
-            </button>
-            {peca.tipo !== "comprar" && (
+            <>
               <button
-                className="btn-cesto"
-                onClick={adicionarAoCesto}
+                className="btn-checkout"
+                onClick={irParaCheckout}
                 disabled={!tamanhoSelecionado}
               >
-                🛍 Adicionar ao cesto
+                {peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
               </button>
-            )}
+              {peca.tipo !== "comprar" && (
+                <button
+                  className="btn-cesto"
+                  onClick={adicionarAoCesto}
+                  disabled={!tamanhoSelecionado}
+                >
+                  🛍 Adicionar ao cesto
+                </button>
+              )}
+            </>
           )}
 
           {/* Botões de partilha */}
