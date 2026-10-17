@@ -5,24 +5,58 @@ import PecaCard from "@/components/PecaCard";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"];
 
+// Ocasiões — filtro por tag/ocasiao na tabela pecas (coluna: ocasiao TEXT[])
+const OCASIOES = {
+  pt: [
+    { key: "casamento",   label: "💍 Casamento" },
+    { key: "gala",        label: "✨ Gala" },
+    { key: "cocktail",    label: "🥂 Cocktail" },
+    { key: "festa",       label: "🎉 Festa" },
+    { key: "trabalho",    label: "💼 Trabalho" },
+    { key: "dia",         label: "☀️ Dia a dia" },
+    { key: "praia",       label: "🌊 Praia / Verão" },
+  ],
+  fr: [
+    { key: "casamento",   label: "💍 Mariage" },
+    { key: "gala",        label: "✨ Gala" },
+    { key: "cocktail",    label: "🥂 Cocktail" },
+    { key: "festa",       label: "🎉 Fête" },
+    { key: "trabalho",    label: "💼 Travail" },
+    { key: "dia",         label: "☀️ Quotidien" },
+    { key: "praia",       label: "🌊 Plage / Été" },
+  ],
+  lt: [
+    { key: "casamento",   label: "💍 Vestuvės" },
+    { key: "gala",        label: "✨ Gala" },
+    { key: "cocktail",    label: "🥂 Kokteilis" },
+    { key: "festa",       label: "🎉 Šventė" },
+    { key: "trabalho",    label: "💼 Darbas" },
+    { key: "dia",         label: "☀️ Kasdien" },
+    { key: "praia",       label: "🌊 Paplūdimys" },
+  ],
+};
+
 const translations = {
   pt: {
-    titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas",
+    titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas", todasOcasiao: "Todas as ocasiões",
     semResultados: "Nenhuma peça encontrada.", loading: "A carregar...",
     categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"],
     ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
+    ocasiao: "Para que ocasião?",
   },
   fr: {
-    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout",
+    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout", todasOcasiao: "Toutes les occasions",
     semResultados: "Aucune pièce trouvée.", loading: "Chargement...",
     categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes"],
     ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
+    ocasiao: "Pour quelle occasion ?",
   },
   lt: {
-    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi",
+    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi", todasOcasiao: "Visos progos",
     semResultados: "Drabužių nerasta.", loading: "Kraunama...",
     categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai"],
     ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
+    ocasiao: "Kokia proga?",
   },
 };
 
@@ -35,6 +69,7 @@ export default function Catalogo() {
   const [pecas, setPecas] = useState(pecasExemplo);
   const [loading, setLoading] = useState(false);
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
+  const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
   const [ordenar, setOrdenar] = useState("recentes");
   const [lang, setLang] = useState("pt");
 
@@ -110,6 +145,7 @@ export default function Catalogo() {
 
   const pecasFiltradas = pecas
     .filter(p => filtroCategoria === "todas" || p.categoria === categoriaTraduzidaParaBD(filtroCategoria))
+    .filter(p => filtroOcasiao === "todas" || (p.ocasiao && p.ocasiao.includes(filtroOcasiao)))
     .sort((a, b) => {
       if (ordenar === "precoAsc") return a.preco_aluguer_dia - b.preco_aluguer_dia;
       if (ordenar === "precoDesc") return b.preco_aluguer_dia - a.preco_aluguer_dia;
@@ -130,6 +166,12 @@ export default function Catalogo() {
         .cat-header { padding:5rem 1rem 1.5rem; }
         .cat-header-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.5rem; font-weight:400; }
         .cat-header-title { font-family:var(--serif); font-size:clamp(1.8rem,8vw,3rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
+        .cat-ocasiao-wrap { padding:0.75rem 1rem 0; }
+        .cat-ocasiao-label { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:#888; font-weight:400; margin-bottom:0.5rem; display:block; }
+        .cat-ocasiao { display:flex; gap:0.45rem; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:0.75rem; scrollbar-width:none; }
+        .cat-ocasiao::-webkit-scrollbar { display:none; }
+        .ocasiao-btn { font-size:0.62rem; letter-spacing:0.05em; padding:0.42rem 0.85rem; border-radius:999px; border:1px solid var(--grey-200); background:var(--white); color:#3a3835; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.15s; }
+        .ocasiao-btn.active { background:#c4748a; color:#fff; border-color:#c4748a; }
         .cat-filters { padding:0 1rem 1rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:1rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
         .filter-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.9rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; }
         .filter-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
@@ -142,6 +184,7 @@ export default function Catalogo() {
         @media (min-width:600px) {
           .cat-nav { padding:1.1rem 2rem; }
           .cat-header { padding:6rem 2rem 2rem; }
+          .cat-ocasiao-wrap { padding:0.75rem 2rem 0; }
           .cat-filters { padding:0 2rem 1.5rem; flex-wrap:wrap; overflow-x:visible; }
           .cat-grid { padding:0 2rem 5rem; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
         }
@@ -149,6 +192,10 @@ export default function Catalogo() {
         @media (min-width:960px) {
           .cat-nav { padding:1.25rem 3rem; }
           .cat-header { padding:7rem 3rem 2.5rem; }
+          .cat-ocasiao-wrap { padding:0.75rem 3rem 0; }
+          .cat-ocasiao { overflow-x:visible; flex-wrap:wrap; }
+          .ocasiao-btn { font-size:0.68rem; padding:0.48rem 1rem; }
+          .ocasiao-btn:hover:not(.active) { border-color:#c4748a; color:#c4748a; }
           .cat-filters { padding:0 3rem 2rem; }
           .cat-grid { padding:0 3rem 6rem; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
           .filter-btn { font-size:0.72rem; padding:0.6rem 1.1rem; }
@@ -170,6 +217,16 @@ export default function Catalogo() {
       <div className="cat-header">
         <p className="cat-header-label">{t.titulo}</p>
         <h1 className="cat-header-title">{t.subtitulo}</h1>
+      </div>
+
+      <div className="cat-ocasiao-wrap">
+        <span className="cat-ocasiao-label">{t.ocasiao}</span>
+        <div className="cat-ocasiao">
+          <button className={`ocasiao-btn${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
+          {(OCASIOES[lang] || OCASIOES.pt).map(o => (
+            <button key={o.key} className={`ocasiao-btn${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
+          ))}
+        </div>
       </div>
 
       <div className="cat-filters">
