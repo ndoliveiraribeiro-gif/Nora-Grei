@@ -167,6 +167,7 @@ function PedidosContent() {
   const [ativos, setAtivos] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [historico, setHistorico] = useState([]);
+  const [alugueresLojista, setAlugueresLojista] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("pt");
 
@@ -190,6 +191,14 @@ function PedidosContent() {
       setAtivos(alugueres.filter(a => ["ativo","enviado","confirmado","pendente","em_verificacao"].includes(a.estado)));
       setHistorico(alugueres.filter(a => ["devolvido","cancelado","devolvido_danificado"].includes(a.estado)));
     }
+
+    // Alugueres de lojistas (lojas públicas)
+    const { data: alLojista } = await supabase
+      .from("alugueres_lojista")
+      .select("*, pecas_lojista(nome, fotos), stock_lojista(tamanho)")
+      .eq("cliente_id", user.id)
+      .order("created_at", { ascending: false });
+    if (alLojista) setAlugueresLojista(alLojista);
 
     const { data: res } = await supabase
       .from("reservas_espera")
@@ -265,6 +274,92 @@ function PedidosContent() {
           </div>
         </div>
         {mostrarComprar && <BotaoCodigoDesconto aluguer={a} i={i} />}
+      </div>
+    );
+  };
+
+  const TRANSPORTADORA_URL = {
+    CTT: "https://www.ctt.pt/feapl_2/app/open/cttexpresso/objectSearch/objectSearch.jspx?objects=",
+    DHL: "https://www.dhl.com/pt-pt/home/tracking.html?tracking-id=",
+    FEDEX: "https://www.fedex.com/fedextrack/?trknbr=",
+    GLS: "https://gls-group.eu/PT/pt/seguimento-encomendas?match=",
+    CORREOS: "https://www.correos.es/ss/Satellite/site/pagina-inicio/sidioma=pt_PT&tracking=",
+    UPS: "https://www.ups.com/track?loc=pt_PT&tracknum=",
+    SEUR: "https://www.seur.com/livetracking/?segOnlineIdentificador=",
+    DPEX: "https://tracking.dpex.com/?track=",
+    NACEX: "https://www.nacex.pt/seguimientoDetalle.do?reference=",
+  };
+
+  const trackingLink = (transportadora, numero) => {
+    if (!transportadora || !numero) return null;
+    const key = transportadora.toUpperCase().replace(/\s/g,"");
+    return TRANSPORTADORA_URL[key] ? `${TRANSPORTADORA_URL[key]}${numero}` : null;
+  };
+
+  const CardAluguerLojista = ({ a }) => {
+    const peca = a.pecas_lojista;
+    const estadoCores = {
+      pendente:{ bg:"#fff8e1",color:"#f39c12",label:"A aguardar confirmação do lojista" },
+      confirmado:{ bg:"#f3e5f5",color:"#7b1fa2",label:"Confirmado — a preparar envio" },
+      enviado:{ bg:"#e3f2fd",color:"#1976d2",label:"A caminho" },
+      ativo:{ bg:"#e8f5e9",color:"#27ae60",label:"A usar" },
+      em_devolucao:{ bg:"#fff8e1",color:"#e67e22",label:"Em devolução" },
+      devolvido:{ bg:"#f0eeeb",color:"#5a5855",label:"Concluído" },
+      devolvido_danificado:{ bg:"#fff5f5",color:"#e74c3c",label:"Concluído — com danos" },
+    };
+    const ec = estadoCores[a.estado] || estadoCores.pendente;
+    const link = trackingLink(a.tracking_transportadora, a.tracking_numero);
+    const isAtivo = ["pendente","confirmado","enviado","ativo","em_devolucao"].includes(a.estado);
+
+    return (
+      <div style={{background:"#fff",padding:"1.25rem",borderBottom:"1px solid #f0eeeb", borderLeft: a.estado==="enviado" ? "3px solid #1976d2" : a.estado==="ativo" ? "3px solid #27ae60" : "none"}}>
+        <div style={{display:"flex",gap:"1rem",alignItems:"flex-start"}}>
+          <div style={{width:60,height:75,flexShrink:0,background:"#f0eeeb",overflow:"hidden"}}>
+            {peca?.fotos?.[0] && <img src={peca.fotos[0]} alt={peca?.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top"}} />}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.15rem"}}>
+              <p style={{fontFamily:"'Cormorant',serif",fontSize:"1.1rem",fontWeight:400,color:"#080808"}}>{peca?.nome||"Peça"}</p>
+              <span style={{fontSize:"0.52rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.15rem 0.4rem",background:"#f0eeeb",color:"#888",fontFamily:"'Jost',sans-serif"}}>Loja</span>
+            </div>
+            <p style={{fontSize:"0.78rem",color:"#5a5855",marginBottom:"0.25rem"}}>Tam. {a.stock_lojista?.tamanho} · {a.valor_aluguer}€</p>
+            <p style={{fontSize:"0.78rem",color:"#5a5855",marginBottom:"0.5rem"}}>{a.data_inicio} → {a.data_fim}</p>
+            <span style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.25rem 0.6rem",fontWeight:500,fontFamily:"'Jost',sans-serif",background:ec.bg,color:ec.color}}>{ec.label}</span>
+
+            {/* TRACKING — visível quando enviado */}
+            {a.estado === "enviado" && (
+              <div style={{marginTop:"0.75rem",background:"#e3f2fd",borderLeft:"3px solid #1976d2",padding:"0.75rem 1rem"}}>
+                <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.4rem"}}>📦 A caminho</div>
+                {a.tracking_numero ? (
+                  <>
+                    <div style={{display:"flex",alignItems:"center",gap:"0.5rem",flexWrap:"wrap"}}>
+                      <span style={{fontSize:"0.72rem",color:"#3f3e3c"}}>Transportadora:</span>
+                      <span style={{fontSize:"0.82rem",fontWeight:600,color:"#080808"}}>{a.tracking_transportadora || "—"}</span>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginTop:"0.25rem",flexWrap:"wrap"}}>
+                      <span style={{fontSize:"0.72rem",color:"#3f3e3c"}}>Nº tracking:</span>
+                      <span style={{fontSize:"0.85rem",fontWeight:700,fontFamily:"monospace",color:"#080808",letterSpacing:"0.05em"}}>{a.tracking_numero}</span>
+                    </div>
+                    {link ? (
+                      <a href={link} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",marginTop:"0.6rem",padding:"0.4rem 0.9rem",background:"#1976d2",color:"#fff",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",textDecoration:"none",fontWeight:500}}>
+                        Rastrear encomenda ↗
+                      </a>
+                    ) : (
+                      <div style={{marginTop:"0.4rem",fontSize:"0.68rem",color:"#5a5855"}}>Usa o nº acima no site da transportadora para rastrear.</div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{fontSize:"0.78rem",color:"#5a5855"}}>Informação de tracking a aguardar pelo lojista.</div>
+                )}
+              </div>
+            )}
+
+            {/* DATA DEVOLUÇÃO — quando ativo */}
+            {a.estado === "ativo" && a.data_fim && (
+              <p style={{fontSize:"0.75rem",color:"#c4748a",marginTop:"0.5rem",fontWeight:500}}>↩ Devolução prevista: <strong>{a.data_fim}</strong></p>
+            )}
+          </div>
+        </div>
       </div>
     );
   };
@@ -350,14 +445,32 @@ function PedidosContent() {
       <div className="page">
         <h1 className="titulo">{i.titulo}</h1>
         <div className="tabs">
-          <button className={`tab${tab==="ativos"?" on":""}`} onClick={() => setTab("ativos")}>{i.ativos}{ativos.length>0?` (${ativos.length})`:""}</button>
+          <button className={`tab${tab==="ativos"?" on":""}`} onClick={() => setTab("ativos")}>{i.ativos}{(ativos.length + alugueresLojista.filter(a=>["pendente","confirmado","enviado","ativo","em_devolucao"].includes(a.estado)).length)>0?` (${ativos.length + alugueresLojista.filter(a=>["pendente","confirmado","enviado","ativo","em_devolucao"].includes(a.estado)).length})`:""}</button>
           <button className={`tab${tab==="reservas"?" on":""}`} onClick={() => setTab("reservas")}>{i.reservas}{reservas.length>0?` (${reservas.length})`:""}</button>
           <button className={`tab${tab==="historico"?" on":""}`} onClick={() => setTab("historico")}>{i.historico}</button>
         </div>
         <div className="content">
-          {tab==="ativos" && (ativos.length===0 ? <div className="empty"><p>{i.semAtivos}</p><a href="/catalogo">{i.verCatalogo}</a></div> : ativos.map(a => <CardAluguer key={a.id} a={a} mostrarComprar={false} />))}
+          {tab==="ativos" && (() => {
+            const ativosLojista = alugueresLojista.filter(a => ["pendente","confirmado","enviado","ativo","em_devolucao"].includes(a.estado));
+            const totalAtivos = ativos.length + ativosLojista.length;
+            return totalAtivos === 0
+              ? <div className="empty"><p>{i.semAtivos}</p><a href="/catalogo">{i.verCatalogo}</a></div>
+              : <>
+                  {ativos.map(a => <CardAluguer key={a.id} a={a} mostrarComprar={false} />)}
+                  {ativosLojista.map(a => <CardAluguerLojista key={"lj-"+a.id} a={a} />)}
+                </>;
+          })()}
           {tab==="reservas" && (reservas.length===0 ? <div className="empty"><p>{i.semReservas}</p><a href="/catalogo">{i.verCatalogo}</a></div> : reservas.map(r => <CardReserva key={r.id} r={r} />))}
-          {tab==="historico" && (historico.length===0 ? <div className="empty"><p>{i.semHistorico}</p><a href="/catalogo">{i.verCatalogo}</a></div> : historico.map(a => <CardAluguer key={a.id} a={a} mostrarComprar={true} />))}
+          {tab==="historico" && (() => {
+            const historicoLojista = alugueresLojista.filter(a => ["devolvido","devolvido_danificado"].includes(a.estado));
+            const totalHistorico = historico.length + historicoLojista.length;
+            return totalHistorico === 0
+              ? <div className="empty"><p>{i.semHistorico}</p><a href="/catalogo">{i.verCatalogo}</a></div>
+              : <>
+                  {historico.map(a => <CardAluguer key={a.id} a={a} mostrarComprar={true} />)}
+                  {historicoLojista.map(a => <CardAluguerLojista key={"lj-"+a.id} a={a} />)}
+                </>;
+          })()}
         </div>
       </div>
     </>

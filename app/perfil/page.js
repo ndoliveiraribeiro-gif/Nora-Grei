@@ -1194,7 +1194,15 @@ export default function Perfil() {
                         <div style={{fontSize:"0.82rem",fontFamily:"var(--serif)",color:"var(--rosa)",marginTop:"0.25rem"}}>
                           {(a.valor_aluguer||0).toFixed(2)}€ {a.deposito_valor ? `+ ${(a.deposito_valor||0).toFixed(2)}€ dep.` : ""}
                         </div>
-                        {a.tracking_numero && <div style={{fontSize:"0.7rem",color:"var(--g4)",marginTop:"0.2rem"}}>📦 {a.tracking_transportadora} {a.tracking_numero}</div>}
+                        {a.tracking_numero && (
+                          <div style={{marginTop:"0.6rem",background:"#e3f2fd",borderLeft:"3px solid #1976d2",padding:"0.6rem 0.85rem"}}>
+                            <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.3rem"}}>📦 Envio registado</div>
+                            <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
+                              <span style={{fontSize:"0.7rem",color:"#3f3e3c"}}>{a.tracking_transportadora}</span>
+                              <span style={{fontSize:"0.8rem",fontWeight:700,fontFamily:"monospace",color:"#080808",letterSpacing:"0.05em"}}>{a.tracking_numero}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {/* Ações por estado */}
