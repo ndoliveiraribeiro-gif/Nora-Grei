@@ -22,11 +22,29 @@ const calcularCaucaoRoi = (valorPeca, precoDia, totalAlugueres, nv) => {
   return Math.max(piso, caucao);
 };
 
-const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", descCaucao: 80, cor: "#6c5ce7" };
-  if (n >= 10) return { nome: "Ouro",    icon: "🥇", descCaucao: 60, cor: "#f39c12" };
-  if (n >= 5)  return { nome: "Prata",   icon: "🥈", descCaucao: 40, cor: "#95a5a6" };
-  return             { nome: "Bronze",   icon: "🥉", descCaucao: 0,  cor: "#cd7f32" };
+const NIVEL_NOMES = {
+  pt: { platina:"Platina", ouro:"Ouro", prata:"Prata", bronze:"Bronze" },
+  fr: { platina:"Platine", ouro:"Or",   prata:"Argent", bronze:"Bronze" },
+  lt: { platina:"Platina", ouro:"Auksas", prata:"Sidabras", bronze:"Bronza" },
+};
+const NIVEL = (n, lang = "pt") => {
+  const nm = NIVEL_NOMES[lang] || NIVEL_NOMES.pt;
+  if (n >= 20) return { nome: nm.platina, icon: "💎", descCaucao: 80, cor: "#6c5ce7" };
+  if (n >= 10) return { nome: nm.ouro,    icon: "🥇", descCaucao: 60, cor: "#f39c12" };
+  if (n >= 5)  return { nome: nm.prata,   icon: "🥈", descCaucao: 40, cor: "#95a5a6" };
+  return             { nome: nm.bronze,   icon: "🥉", descCaucao: 0,  cor: "#cd7f32" };
+};
+
+const OCASIOES_I18N = {
+  pt: { "Casamento":"Casamento","Gala":"Gala","Cocktail":"Cocktail","Festa":"Festa","Trabalho":"Trabalho","Dia a dia":"Dia a dia","Jantar":"Jantar","Férias":"Férias","Praia":"Praia","Praia/Férias":"Praia/Férias" },
+  fr: { "Casamento":"Mariage","Gala":"Gala","Cocktail":"Cocktail","Festa":"Fête","Trabalho":"Travail","Dia a dia":"Quotidien","Jantar":"Dîner","Férias":"Vacances","Praia":"Plage","Praia/Férias":"Plage/Vacances" },
+  lt: { "Casamento":"Vestuvės","Gala":"Gala","Cocktail":"Kokteilis","Festa":"Šventė","Trabalho":"Darbas","Dia a dia":"Kasdien","Jantar":"Vakarienė","Férias":"Atostogos","Praia":"Paplūdimys","Praia/Férias":"Paplūdimys/Atostogos" },
+};
+
+const CATEGORIAS_I18N = {
+  pt: { "Vestidos":"Vestidos","Conjuntos":"Conjuntos","Blusas":"Blusas","Casacos":"Casacos","Saias":"Saias","Calças":"Calças","Acessórios":"Acessórios","Malas":"Malas","Sapatos":"Sapatos","Fatos":"Fatos","Tops":"Tops" },
+  fr: { "Vestidos":"Robes","Conjuntos":"Ensembles","Blusas":"Blouses","Casacos":"Manteaux","Saias":"Jupes","Calças":"Pantalons","Acessórios":"Accessoires","Malas":"Sacs","Sapatos":"Chaussures","Fatos":"Costumes","Tops":"Tops" },
+  lt: { "Vestidos":"Suknelės","Conjuntos":"Komplektai","Blusas":"Palaidinės","Casacos":"Paltai","Saias":"Sijonai","Calças":"Kelnės","Acessórios":"Aksesuarai","Malas":"Krepšiai","Sapatos":"Batai","Fatos":"Kostiumai","Tops":"Topai" },
 };
 
 function Timer({ dataFim, lang }) {
@@ -59,9 +77,9 @@ function Timer({ dataFim, lang }) {
 }
 
 const TRADUCOES = {
-  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei", livreEm:"livre em", reservarTamanho:"reservar", contactar:"Falar com a lojista", contactarLoading:"A abrir chat...", contactarEntrar:"Entra para contactar", pecaNova:"Peça nova", alugaPor:"Aluga por apenas", poupas:"Em vez de comprares por", economia:"de economia" },
-  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei", livreEm:"libre le", reservarTamanho:"réserver", contactar:"Contacter la boutique", contactarLoading:"Ouverture...", contactarEntrar:"Connectez-vous pour contacter", pecaNova:"Pièce neuve", alugaPor:"Loue pour seulement", poupas:"Au lieu d'acheter pour", economia:"d'économie" },
-  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei", livreEm:"laisva", reservarTamanho:"rezervuoti", contactar:"Susisiekti su parduotuve", contactarLoading:"Atidaroma...", contactarEntrar:"Prisijunkite norėdami susisiekti", pecaNova:"Nauja prekė", alugaPor:"Nuomok tik už", poupas:"Vietoj pirkimo už", economia:"sutaupymas" },
+  pt: { voltar:"← Catálogo", alugar:"Alugar agora", reservar:"Reservar quando disponível", disponivel:"Disponível", indisponivel:"Indisponível", tamanho:"Tamanho", ocasioes:"Ocasiões", material:"Material", origem:"Origem", deposito:"Depósito de caução", depositoDesc:"Devolvido no final do aluguer", semTamanho:"Seleciona um tamanho", porcDia:"/dia", comprar:"Comprar", partilhar:"Partilhar", descricao:"Descrição", categoria:"Categoria", disponibilidade:"Disponibilidade", verCatalogo:"Ver catálogo completo", avaliacoes:"Avaliações", semAvaliacoes:"Ainda sem avaliações.", anonimo:"Cliente Nora Grei", livreEm:"livre em", reservarTamanho:"reservar", contactar:"Falar com a lojista", contactarLoading:"A abrir chat...", contactarEntrar:"Entra para contactar", pecaNova:"Peça nova", alugaPor:"Aluga por apenas", poupas:"Em vez de comprares por", economia:"de economia", semHistorico:"sem histórico", roiRecuperado:"% do valor da peça recuperado", notaStylist:"Nota da stylist", porOcasiao:"Por ocasião", comprarNova:"Comprar nova", alugar2:"Alugar", tamanho2:"Tamanho", reservar2:"Reservar", adicionarCesto:"Adicionar ao cesto", aoCesto:"Ao cesto", guardado:"Guardado", guardarDepois:"Guardar para depois", linkCopiado:"Link copiado! Contém o teu código de afiliado.", carregando:"A carregar...", naoEncontrada:"Peça não encontrada", voltarCatalogo:"← Voltar ao catálogo" },
+  fr: { voltar:"← Catalogue", alugar:"Louer maintenant", reservar:"Réserver quand disponible", disponivel:"Disponible", indisponivel:"Indisponible", tamanho:"Taille", ocasioes:"Occasions", material:"Matière", origem:"Origine", deposito:"Dépôt de garantie", depositoDesc:"Remboursé à la fin", semTamanho:"Sélectionne une taille", porcDia:"/jour", comprar:"Acheter", partilhar:"Partager", descricao:"Description", categoria:"Catégorie", disponibilidade:"Disponibilité", verCatalogo:"Voir tout le catalogue", avaliacoes:"Avis", semAvaliacoes:"Pas encore d'avis.", anonimo:"Cliente Nora Grei", livreEm:"libre le", reservarTamanho:"réserver", contactar:"Contacter la boutique", contactarLoading:"Ouverture...", contactarEntrar:"Connectez-vous pour contacter", pecaNova:"Pièce neuve", alugaPor:"Loue pour seulement", poupas:"Au lieu d'acheter pour", economia:"d'économie", semHistorico:"sans historique", roiRecuperado:"% de la valeur récupérée", notaStylist:"Note de la styliste", porOcasiao:"À l'occasion", comprarNova:"Acheter neuf", alugar2:"Louer", tamanho2:"Taille", reservar2:"Réserver", adicionarCesto:"Ajouter au panier", aoCesto:"Au panier", guardado:"Sauvegardé", guardarDepois:"Sauvegarder pour plus tard", linkCopiado:"Lien copié ! Il contient ton code d'affiliation.", carregando:"Chargement...", naoEncontrada:"Article introuvable", voltarCatalogo:"← Retour au catalogue" },
+  lt: { voltar:"← Katalogas", alugar:"Nuomoti dabar", reservar:"Rezervuoti", disponivel:"Prieinama", indisponivel:"Neprieinama", tamanho:"Dydis", ocasioes:"Progos", material:"Medžiaga", origem:"Kilmė", deposito:"Užstatas", depositoDesc:"Grąžinamas pabaigoje", semTamanho:"Pasirink dydį", porcDia:"/d.", comprar:"Pirkti", partilhar:"Dalintis", descricao:"Aprašymas", categoria:"Kategorija", disponibilidade:"Prieinamumas", verCatalogo:"Peržiūrėti katalogą", avaliacoes:"Atsiliepimai", semAvaliacoes:"Dar nėra atsiliepimų.", anonimo:"Cliente Nora Grei", livreEm:"laisva", reservarTamanho:"rezervuoti", contactar:"Susisiekti su parduotuve", contactarLoading:"Atidaroma...", contactarEntrar:"Prisijunkite norėdami susisiekti", pecaNova:"Nauja prekė", alugaPor:"Nuomok tik už", poupas:"Vietoj pirkimo už", economia:"sutaupymas", semHistorico:"be istorijos", roiRecuperado:"% vertės susigrąžinta", notaStylist:"Stilistės pastaba", porOcasiao:"Atskirai", comprarNova:"Pirkti naują", alugar2:"Nuomoti", tamanho2:"Dydis", reservar2:"Rezervuoti", adicionarCesto:"Į krepšelį", aoCesto:"Krepšelis", guardado:"Išsaugota", guardarDepois:"Išsaugoti vėlesniam", linkCopiado:"Nuoroda nukopijuota! Joje yra jūsų partnerystės kodas.", carregando:"Kraunama...", naoEncontrada:"Prekė nerasta", voltarCatalogo:"← Grįžti į katalogą" },
 };
 
 export default function PecaDetalhe() {
@@ -169,8 +187,6 @@ export default function PecaDetalhe() {
     setLoading(false);
   };
 
-  const t = TRADUCOES[lang] || TRADUCOES.pt;
-
   const irParaCheckout = () => {
     if (!tamanhoSelecionado) return;
     if (!userLogado) { router.push("/entrar"); return; }
@@ -274,16 +290,18 @@ export default function PecaDetalhe() {
     }
   };
 
+  const t = TRADUCOES[lang] || TRADUCOES.pt;
+
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',color:'#888',textTransform:'uppercase'}}>
-      A carregar...
+      {t.carregando}
     </div>
   );
 
   if (!peca) return (
     <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",gap:'1rem'}}>
-      <p style={{fontSize:'0.85rem',color:'#888'}}>Peça não encontrada</p>
-      <a href="/catalogo" style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#080808'}}>← Voltar ao catálogo</a>
+      <p style={{fontSize:'0.85rem',color:'#888'}}>{t.naoEncontrada}</p>
+      <a href="/catalogo" style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'#080808'}}>{t.voltarCatalogo}</a>
     </div>
   );
 
@@ -469,7 +487,7 @@ export default function PecaDetalhe() {
         </div>
 
         <div className="info">
-          {peca.categorias?.nome && <p className="badge-cat">{peca.categorias.nome}</p>}
+          {peca.categorias?.nome && <p className="badge-cat">{(CATEGORIAS_I18N[lang] || CATEGORIAS_I18N.pt)[peca.categorias.nome] || peca.categorias.nome}</p>}
           <h1 className="nome">{peca.nome}</h1>
 
           <div className="preco-row">
@@ -478,7 +496,7 @@ export default function PecaDetalhe() {
             {peca.preco_avulso && <>
               <span style={{color:'#ccc',fontSize:'0.8rem'}}>·</span>
               <span className="preco-val" style={{fontSize:'1.3rem'}}>{peca.preco_avulso}€</span>
-              <span className="preco-unit">/ocasião</span>
+              <span className="preco-unit">/{t.porOcasiao.toLowerCase()}</span>
             </>}
           </div>
 
@@ -530,7 +548,7 @@ export default function PecaDetalhe() {
             <div className="secao">
               <p className="secao-label">{t.ocasioes}</p>
               <div className="ocasioes-wrap">
-                {peca.ocasioes.map(o => <span key={o} className="ocasiao-tag">{o}</span>)}
+                {peca.ocasioes.map(o => <span key={o} className="ocasiao-tag">{(OCASIOES_I18N[lang] || OCASIOES_I18N.pt)[o] || o}</span>)}
               </div>
             </div>
           )}
@@ -538,9 +556,9 @@ export default function PecaDetalhe() {
           <div className="deposito-box">
             <p className="secao-label">{t.deposito}</p>
             {peca.valor_peca > 0 && peca.preco_aluguer_dia > 0 ? (() => {
-              const nv = NIVEL(totalAlugueres);
+              const nv = NIVEL(totalAlugueres, lang);
               const caucaoValor = calcularCaucaoRoi(peca.valor_peca, peca.preco_aluguer_dia, totalAlugueres, nv);
-              const caucaoSemNivel = calcularCaucaoRoi(peca.valor_peca, peca.preco_aluguer_dia, 0, NIVEL(0));
+              const caucaoSemNivel = calcularCaucaoRoi(peca.valor_peca, peca.preco_aluguer_dia, 0, NIVEL(0, lang));
               const temDesconto = caucaoValor < caucaoSemNivel;
               // Barra de progresso: quanto já se gerou de receita vs valor peça
               const diasMedios = 3, receitaGerada = Math.min(totalAlugueres * peca.preco_aluguer_dia * diasMedios, peca.valor_peca);
@@ -548,13 +566,13 @@ export default function PecaDetalhe() {
               return (
                 <>
                   <p className="deposito-val">{caucaoValor}€ <span style={{ fontSize: "0.72rem", fontFamily: "var(--sans)", fontWeight: 300, color: nv.cor }}>{nv.icon} {nv.nome}</span></p>
-                  {temDesconto && <p style={{ fontSize: "0.72rem", color: "#95a5a6", textDecoration: "line-through", marginBottom:"0.25rem" }}>{caucaoSemNivel}€ sem histórico</p>}
+                  {temDesconto && <p style={{ fontSize: "0.72rem", color: "#95a5a6", textDecoration: "line-through", marginBottom:"0.25rem" }}>{caucaoSemNivel}€ {t.semHistorico}</p>}
                   {totalAlugueres > 0 && (
                     <div style={{ margin:"0.4rem 0 0.25rem" }}>
                       <div style={{ height:"4px", background:"#e8e4df", borderRadius:"2px", overflow:"hidden" }}>
                         <div style={{ height:"100%", width:`${pctRoi}%`, background:"#c4a882", borderRadius:"2px", transition:"width 0.5s" }} />
                       </div>
-                      <p style={{ fontSize:"0.65rem", color:"#9c9894", marginTop:"0.2rem" }}>{pctRoi}% do valor da peça recuperado</p>
+                      <p style={{ fontSize:"0.65rem", color:"#9c9894", marginTop:"0.2rem" }}>{pctRoi}{t.roiRecuperado}</p>
                     </div>
                   )}
                   <p className="deposito-desc">{t.depositoDesc}</p>
@@ -574,7 +592,7 @@ export default function PecaDetalhe() {
                 {tamanhoSelecionado ? t.alugar : t.semTamanho}
               </button>
               <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
-                🛍 {tamanhoSelecionado ? (lang === "fr" ? "Ajouter au panier" : lang === "lt" ? "Į krepšelį" : "Adicionar ao cesto") : (t.semTamanho || "Seleciona tamanho")}
+                🛍 {tamanhoSelecionado ? t.adicionarCesto : t.semTamanho}
               </button>
             </div>
           ) : (
@@ -586,15 +604,15 @@ export default function PecaDetalhe() {
               <a href={`/checkout?peca=${id}&modo=ocasiao`} style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #1a1a1a", background:"#fff", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", cursor:"pointer", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
                 onMouseEnter={e=>{e.currentTarget.style.background="#1a1a1a";e.currentTarget.style.color="#fff";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#1a1a1a";}}>
-                <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.15rem" }}>Por ocasião</span>
+                <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.15rem" }}>{t.porOcasiao}</span>
                 <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.preco_avulso}€</span>
               </a>
             )}
             <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
               onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
               onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
-              <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.15rem" }}>Comprar nova</span>
-              <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.valor_peca ? `${peca.valor_peca}€` : "ver preço ↗"}</span>
+              <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.15rem" }}>{t.comprarNova}</span>
+              <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.valor_peca ? `${peca.valor_peca}€` : "↗"}</span>
             </a>
           </div>
 
@@ -612,22 +630,44 @@ export default function PecaDetalhe() {
           {/* BANNER CONSELHO STYLIST */}
           {(() => {
             const conselho = peca.conselho_stylist || (() => {
-              const cat = peca.categorias?.nome || "";
               const mat = peca.material || "";
               const ocs = peca.ocasioes || [];
-              const ocsPt = ocs.slice(0,2).join(" e ");
-              if (ocs.includes("Casamento") || ocs.includes("Gala")) return `Perfeita para ocasiões formais. ${mat ? `O ${mat.toLowerCase()} garante elegância e conforto durante toda a cerimónia.` : "Ideal para cerimónias e eventos de gala."}`;
-              if (ocs.includes("Praia") || ocs.includes("Férias")) return `Uma escolha leve e descontraída para ${ocsPt.toLowerCase()}. ${mat ? `O ${mat.toLowerCase()} é ideal para dias quentes.` : ""}`;
-              if (ocs.includes("Trabalho")) return `Sofisticada e versátil para o dia a dia profissional. ${mat ? `Em ${mat.toLowerCase()}, mantém-se impecável ao longo do dia.` : ""}`;
-              if (ocs.includes("Festa") || ocs.includes("Cocktail")) return `Uma escolha infalível para ${ocsPt.toLowerCase()}. ${mat ? `O ${mat.toLowerCase()} cria um look sofisticado sem esforço.` : "Vai destacar-se pela elegância."}`;
-              if (ocsPt) return `Ideal para ${ocsPt.toLowerCase()}. ${mat ? `Em ${mat.toLowerCase()}, confortável e elegante.` : "Uma peça versátil para várias ocasiões."}`;
-              return `Uma peça cuidadosamente selecionada pela Nora Grei. ${mat ? `Em ${mat.toLowerCase()}, com um toque de sofisticação.` : ""}`;
+              const ocsI18n = ocs.map(o => (OCASIOES_I18N[lang] || OCASIOES_I18N.pt)[o] || o);
+              const ocsList = ocsI18n.slice(0,2).join(lang === "fr" ? " et " : lang === "lt" ? " ir " : " e ");
+              if (ocs.includes("Casamento") || ocs.includes("Gala")) {
+                if (lang === "fr") return `Parfaite pour les occasions formelles.${mat ? ` Le ${mat.toLowerCase()} garantit élégance et confort tout au long de la cérémonie.` : " Idéale pour les cérémonies et les galas."}`;
+                if (lang === "lt") return `Puikiai tinka formalioms progoms.${mat ? ` ${mat} užtikrina eleganciją ir patogumą visą ceremoniją.` : " Ideali ceremonijoms ir galos vakarėliams."}`;
+                return `Perfeita para ocasiões formais.${mat ? ` O ${mat.toLowerCase()} garante elegância e conforto durante toda a cerimónia.` : " Ideal para cerimónias e eventos de gala."}`;
+              }
+              if (ocs.includes("Praia") || ocs.includes("Férias")) {
+                if (lang === "fr") return `Un choix léger et décontracté pour ${ocsList.toLowerCase()}.${mat ? ` Le ${mat.toLowerCase()} est idéal pour les journées chaudes.` : ""}`;
+                if (lang === "lt") return `Lengvas ir laisvalaikiškas pasirinkimas ${ocsList.toLowerCase()}.${mat ? ` ${mat} puikiai tinka karštoms dienoms.` : ""}`;
+                return `Uma escolha leve e descontraída para ${ocsList.toLowerCase()}.${mat ? ` O ${mat.toLowerCase()} é ideal para dias quentes.` : ""}`;
+              }
+              if (ocs.includes("Trabalho")) {
+                if (lang === "fr") return `Sophistiquée et polyvalente pour le quotidien professionnel.${mat ? ` En ${mat.toLowerCase()}, elle reste impeccable toute la journée.` : ""}`;
+                if (lang === "lt") return `Rafinuotas ir universalus pasirinkimas kasdieniam darbui.${mat ? ` ${mat} — puikiai atrodo visą dieną.` : ""}`;
+                return `Sofisticada e versátil para o dia a dia profissional.${mat ? ` Em ${mat.toLowerCase()}, mantém-se impecável ao longo do dia.` : ""}`;
+              }
+              if (ocs.includes("Festa") || ocs.includes("Cocktail")) {
+                if (lang === "fr") return `Un choix infaillible pour ${ocsList.toLowerCase()}.${mat ? ` Le ${mat.toLowerCase()} crée un look sophistiqué sans effort.` : " Vous brillerez par votre élégance."}`;
+                if (lang === "lt") return `Nepralenksimas pasirinkimas ${ocsList.toLowerCase()}.${mat ? ` ${mat} sukuria rafinuotą įvaizdį be pastangų.` : " Išsiskirsite elegancija."}`;
+                return `Uma escolha infalível para ${ocsList.toLowerCase()}.${mat ? ` O ${mat.toLowerCase()} cria um look sofisticado sem esforço.` : " Vai destacar-se pela elegância."}`;
+              }
+              if (ocsList) {
+                if (lang === "fr") return `Idéale pour ${ocsList.toLowerCase()}.${mat ? ` En ${mat.toLowerCase()}, confortable et élégante.` : " Une pièce polyvalente pour diverses occasions."}`;
+                if (lang === "lt") return `Idealu ${ocsList.toLowerCase()}.${mat ? ` ${mat} — patogi ir elegantiška.` : " Universali detalė įvairioms progoms."}`;
+                return `Ideal para ${ocsList.toLowerCase()}.${mat ? ` Em ${mat.toLowerCase()}, confortável e elegante.` : " Uma peça versátil para várias ocasiões."}`;
+              }
+              if (lang === "fr") return `Une pièce soigneusement sélectionnée par Nora Grei.${mat ? ` En ${mat.toLowerCase()}, avec une touche de sophistication.` : ""}`;
+              if (lang === "lt") return `Kruopščiai Nora Grei atrinktas drabužis.${mat ? ` ${mat} — su rafinuotu akcentu.` : ""}`;
+              return `Uma peça cuidadosamente selecionada pela Nora Grei.${mat ? ` Em ${mat.toLowerCase()}, com um toque de sofisticação.` : ""}`;
             })();
             return conselho ? (
               <div style={{ background:"#f9f6f2", borderLeft:"3px solid #c4748a", padding:"0.85rem 1rem", marginBottom:"1.25rem", display:"flex", gap:"0.75rem", alignItems:"flex-start" }}>
                 <span style={{ fontSize:"1.1rem", flexShrink:0 }}>✨</span>
                 <div>
-                  <p style={{ fontSize:"0.58rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#c4748a", fontWeight:600, marginBottom:"0.3rem", fontFamily:"var(--sans)" }}>Nota da stylist</p>
+                  <p style={{ fontSize:"0.58rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#c4748a", fontWeight:600, marginBottom:"0.3rem", fontFamily:"var(--sans)" }}>{t.notaStylist}</p>
                   <p style={{ fontSize:"0.85rem", color:"#3f3e3c", lineHeight:1.55, margin:0, fontFamily:"var(--sans)" }}>{conselho}</p>
                 </div>
               </div>
@@ -644,7 +684,7 @@ export default function PecaDetalhe() {
           <div style={{marginBottom:'1.5rem'}}>
             {peca.material && <div className="info-row"><span className="info-key">{t.material}</span><span>{peca.material}</span></div>}
             {peca.origem && <div className="info-row"><span className="info-key">{t.origem}</span><span>{peca.origem}</span></div>}
-            {peca.categorias?.nome && <div className="info-row"><span className="info-key">{t.categoria}</span><span>{peca.categorias.nome}</span></div>}
+            {peca.categorias?.nome && <div className="info-row"><span className="info-key">{t.categoria}</span><span>{(CATEGORIAS_I18N[lang] || CATEGORIAS_I18N.pt)[peca.categorias.nome] || peca.categorias.nome}</span></div>}
           </div>
 
           {/* WISHLIST */}
@@ -654,7 +694,7 @@ export default function PecaDetalhe() {
             style={{ display:"flex", alignItems:"center", gap:"0.5rem", background:"none", border:`1.5px solid ${naWishlist ? "#c4748a" : "#e2dfda"}`, padding:"0.65rem 1.25rem", width:"100%", justifyContent:"center", cursor:"pointer", fontFamily:"var(--sans)", fontSize:"0.72rem", letterSpacing:"0.12em", textTransform:"uppercase", color: naWishlist ? "#c4748a" : "#5a5855", marginBottom:"1rem", transition:"all 0.2s" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill={naWishlist ? "#c4748a" : "none"} stroke={naWishlist ? "#c4748a" : "#5a5855"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            {naWishlist ? "Guardado" : "Guardar para depois"}
+            {naWishlist ? t.guardado : t.guardarDepois}
           </button>
 
           <div className="partilha">
@@ -678,7 +718,7 @@ export default function PecaDetalhe() {
               }
             </button>
           </div>
-          {partilhado && <p style={{fontSize:"0.7rem",color:"#27ae60",marginTop:"0.35rem"}}>Link copiado! Contém o teu código de afiliado.</p>}
+          {partilhado && <p style={{fontSize:"0.7rem",color:"#27ae60",marginTop:"0.35rem"}}>{t.linkCopiado}</p>}
 
           {/* AVALIAÇÕES */}
           <div style={{marginTop:'2rem',paddingTop:'1.5rem',borderTop:'1px solid var(--g2)'}}>
@@ -725,20 +765,20 @@ export default function PecaDetalhe() {
               onClick={irParaCheckout}
               disabled={!tamanhoSelecionado}
             >
-              {tamanhoSelecionado ? "Alugar" : "Tamanho"}
+              {tamanhoSelecionado ? t.alugar2 : t.tamanho2}
             </button>
             <button
               className="sticky-btn-cesto"
               onClick={adicionarAoCesto}
               disabled={!tamanhoSelecionado}
-              title="Adicionar ao cesto"
+              title={t.adicionarCesto}
             >
               🛍
             </button>
           </>
         ) : (
           <a href={`/reserva?peca=${id}`} className="sticky-btn-alugar">
-            Reservar
+            {t.reservar2}
           </a>
         )}
         <button
