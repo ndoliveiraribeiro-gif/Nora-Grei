@@ -594,10 +594,23 @@ export default function PecaLojaPage() {
 
           {/* Info extra */}
           <div style={{marginBottom:"1.5rem"}}>
+            {peca.categoria && <div className="info-row"><span className="info-key">Categoria</span><span>{peca.categoria}</span></div>}
+            {peca.cor && <div className="info-row"><span className="info-key">Cor</span><span>{peca.cor}</span></div>}
             {peca.material && <div className="info-row"><span className="info-key">{i.material}</span><span>{peca.material}</span></div>}
             {peca.origem && <div className="info-row"><span className="info-key">{i.origem}</span><span>{peca.origem}</span></div>}
-            {peca.condicao && <div className="info-row"><span className="info-key">Condição</span><span>{peca.condicao}</span></div>}
+            {peca.condicao && <div className="info-row"><span className="info-key">Condição</span><span>{{novo:"Novo (com etiqueta)",como_novo:"Como novo",muito_bom:"Muito bom estado",bom:"Bom estado",usado:"Usado"}[peca.condicao]||peca.condicao}</span></div>}
           </div>
+
+          {/* Defeito — alerta de transparência */}
+          {peca.tem_defeito && (
+            <div style={{marginBottom:"1.5rem",padding:"0.85rem 1rem",border:"1.5px solid #e74c3c",background:"#fff5f5"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:peca.descricao_defeito?"0.4rem":"0",fontFamily:"var(--sans)",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c0392b",fontWeight:600}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Peça com defeito
+              </div>
+              {peca.descricao_defeito && <p style={{fontSize:"0.8rem",color:"#7b241c",margin:0,lineHeight:1.5}}>{peca.descricao_defeito}</p>}
+            </div>
+          )}
 
           {/* Wishlist */}
           <button onClick={toggleWishlist} disabled={wishlistLoading}
