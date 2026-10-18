@@ -1042,41 +1042,28 @@ export default function Perfil() {
 
       <div className="page">
 
-        {modoLojista && (
-          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem"}}>
-            {[{id:"perfil",label:"O meu perfil"},{id:"loja",label:"A minha loja"}].map(t => (
-              <button key={t.id} onClick={() => setTabAtiva(t.id)} style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===t.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===t.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px"}}>{t.label}</button>
-            ))}
-            <a href="/mensagens" style={{padding:"0.85rem 2rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem"}}>
-              Mensagens
-              {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
-            </a>
-          </div>
-        )}
-
-        {!modoLojista && (
-          <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
-            {[
-              {id:"perfil",label:"Perfil"},
-              {id:"pedidos",label:"Pedidos", badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
-              {id:"guardados",label:"Guardados", badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
-            ].map(tab => (
-              <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
-                {tab.label}
-                {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
-              </button>
-            ))}
-            <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
-              Mensagens
-              {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
-            </a>
-          </div>
-        )}
+        <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
+          {[
+            {id:"perfil",label:"Perfil"},
+            {id:"pedidos",label:"Pedidos", badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
+            {id:"guardados",label:"Guardados", badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+            ...(modoLojista ? [{id:"loja",label:"A minha loja"}] : []),
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
+              {tab.label}
+              {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
+            </button>
+          ))}
+          <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
+            Mensagens
+            {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
+          </a>
+        </div>
 
         <div style={{display:modoLojista && tabAtiva==="loja"?"none":"block"}}>
 
         {/* TAB PEDIDOS */}
-        {!modoLojista && tabAtiva === "pedidos" && (
+        {tabAtiva === "pedidos" && (
           <div style={{padding:"0 0 2rem"}}>
             {alugueresAtivos.length === 0 && alugueresHistorico.length === 0 ? (
               <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
@@ -1146,7 +1133,7 @@ export default function Perfil() {
         )}
 
         {/* TAB GUARDADOS */}
-        {!modoLojista && tabAtiva === "guardados" && (
+        {tabAtiva === "guardados" && (
           <div style={{padding:"0 0 2rem"}}>
             <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>Peças guardadas</p>
             {wishlistPecas.length === 0 ? (
@@ -1174,8 +1161,8 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* PERFIL NORMAL — oculto nas tabs guardados e pedidos */}
-        <div style={{display: (!modoLojista && (tabAtiva === "guardados" || tabAtiva === "pedidos")) ? "none" : "block"}}>
+        {/* PERFIL NORMAL — oculto nas tabs guardados, pedidos e loja */}
+        <div style={{display: (tabAtiva === "guardados" || tabAtiva === "pedidos" || tabAtiva === "loja") ? "none" : "block"}}>
         <div className="hero">
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
