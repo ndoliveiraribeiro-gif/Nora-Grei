@@ -981,7 +981,7 @@ export default function Perfil() {
   const [codigoLoja, setCodigoLoja] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
@@ -1196,6 +1196,11 @@ export default function Perfil() {
       valor_peca: novaPeca.valor_peca ? parseFloat(novaPeca.valor_peca) : null,
       material: novaPeca.material||null,
       marca: novaPeca.marca||null,
+      cor: novaPeca.cor||null,
+      categoria: novaPeca.categoria||null,
+      condicao: novaPeca.condicao||"como_novo",
+      tem_defeito: novaPeca.tem_defeito||false,
+      descricao_defeito: novaPeca.tem_defeito?(novaPeca.descricao_defeito||null):null,
       ocasioes: novaPeca.ocasioes,
       link_compra_externa: novaPeca.link_compra_externa||null,
       link_externo_ativo: false,
@@ -1222,7 +1227,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
-    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
     setFotosLojista([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
@@ -1239,6 +1244,11 @@ export default function Perfil() {
       valor_peca: editarPeca.valor_peca ? parseFloat(editarPeca.valor_peca) : null,
       material: editarPeca.material || null,
       marca: editarPeca.marca || null,
+      cor: editarPeca.cor || null,
+      categoria: editarPeca.categoria || null,
+      condicao: editarPeca.condicao || "como_novo",
+      tem_defeito: editarPeca.tem_defeito || false,
+      descricao_defeito: editarPeca.tem_defeito ? (editarPeca.descricao_defeito || null) : null,
       ocasioes: editarPeca.ocasioes || [],
       link_compra_externa: editarPeca.link_compra_externa || null,
     }).eq("id", editarPeca.id);
@@ -2353,10 +2363,68 @@ export default function Perfil() {
           <div style={{background:"#fff",padding:"2rem",maxWidth:"520px",width:"100%",marginTop:"2rem",marginBottom:"2rem"}}>
             <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>Editar peça</h3>
 
+            {/* Categoria */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Categoria</label>
+              <select className="inp" value={editarPeca.categoria||""} onChange={e=>{
+                const cat=e.target.value;
+                const semTamanho=["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
+                const tams=semTamanho.includes(cat)?[{tamanho:"Único",quantidade:1}]:editarPeca.tamanhos;
+                setEditarPeca(p=>({...p,categoria:cat,tamanhos:tams}));
+              }} style={{background:"#fff"}}>
+                <option value="">Selecionar categoria...</option>
+                <optgroup label="Vestuário">
+                  {["Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+                <optgroup label="Acessórios">
+                  {["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+                <optgroup label="Relógios">
+                  <option>Relógios</option>
+                </optgroup>
+                <optgroup label="Calçado">
+                  {["Saltos","Sandálias","Botas","Sapatilhas","Calçado"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+              </select>
+            </div>
+
             {/* Nome + Marca */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
               <div className="fg"><label className="lbl">Nome da peça *</label><input className="inp" value={editarPeca.nome||""} onChange={e=>setEditarPeca(p=>({...p,nome:e.target.value}))} /></div>
               <div className="fg"><label className="lbl">Marca / Designer</label><input className="inp" value={editarPeca.marca||""} onChange={e=>setEditarPeca(p=>({...p,marca:e.target.value}))} placeholder="Zara, Mango, Gucci..." /></div>
+            </div>
+
+            {/* Cor + Condição */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg">
+                <label className="lbl">Cor principal</label>
+                <input className="inp" value={editarPeca.cor||""} onChange={e=>setEditarPeca(p=>({...p,cor:e.target.value}))} placeholder="Preto, Branco, Azul..." list="cores-editar" />
+                <datalist id="cores-editar">
+                  {["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"].map(c=><option key={c} value={c}/>)}
+                </datalist>
+              </div>
+              <div className="fg">
+                <label className="lbl">Condição</label>
+                <select className="inp" value={editarPeca.condicao||"como_novo"} onChange={e=>setEditarPeca(p=>({...p,condicao:e.target.value}))} style={{background:"#fff"}}>
+                  <option value="novo">Novo (com etiqueta)</option>
+                  <option value="como_novo">Como novo (nunca usado)</option>
+                  <option value="muito_bom">Muito bom estado</option>
+                  <option value="bom">Bom estado</option>
+                  <option value="usado">Usado</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Defeito */}
+            <div style={{marginBottom:"1rem",padding:"0.85rem 1rem",border:`1.5px solid ${editarPeca.tem_defeito?"#e74c3c":"var(--g2)"}`,background:editarPeca.tem_defeito?"#fff5f5":"#fafafa"}}>
+              <label style={{display:"flex",alignItems:"center",gap:"0.6rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:editarPeca.tem_defeito?"#c0392b":"var(--g4)",fontWeight:600}}>
+                <input type="checkbox" checked={editarPeca.tem_defeito||false} onChange={e=>setEditarPeca(p=>({...p,tem_defeito:e.target.checked,descricao_defeito:""}))} style={{width:"1rem",height:"1rem",cursor:"pointer",accentColor:"#e74c3c"}} />
+                Peça tem defeito
+              </label>
+              {editarPeca.tem_defeito && (
+                <textarea className="inp" value={editarPeca.descricao_defeito||""} onChange={e=>setEditarPeca(p=>({...p,descricao_defeito:e.target.value}))} style={{resize:"vertical",minHeight:"60px",marginTop:"0.6rem",border:"1.5px solid #e74c3c"}} placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..." />
+              )}
+              {!editarPeca.tem_defeito && <span style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
             </div>
 
             {/* Descrição */}
@@ -2444,10 +2512,68 @@ export default function Perfil() {
               {fotosLojista.length > 0 && <div style={{display:"flex",gap:"0.5rem",marginTop:"0.5rem",flexWrap:"wrap"}}>{fotosLojista.map((f,idx2)=><span key={idx2} style={{fontSize:"0.7rem",color:"var(--g4)",background:"var(--g1)",padding:"0.2rem 0.5rem"}}>{f.name}</span>)}</div>}
             </div>
 
+            {/* Categoria */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Categoria *</label>
+              <select className="inp" value={novaPeca.categoria} onChange={e=>{
+                const cat=e.target.value;
+                const semTamanho=["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
+                const tams=semTamanho.includes(cat)?[{tamanho:"Único",quantidade:1}]:novaPeca.tamanhos;
+                setNovaPeca(p=>({...p,categoria:cat,tamanhos:tams}));
+              }} style={{background:"#fff"}}>
+                <option value="">Selecionar categoria...</option>
+                <optgroup label="Vestuário">
+                  {["Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+                <optgroup label="Acessórios">
+                  {["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+                <optgroup label="Relógios">
+                  <option>Relógios</option>
+                </optgroup>
+                <optgroup label="Calçado">
+                  {["Saltos","Sandálias","Botas","Sapatilhas","Calçado"].map(c=><option key={c}>{c}</option>)}
+                </optgroup>
+              </select>
+            </div>
+
             {/* Nome + Marca */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
               <div className="fg"><label className="lbl">Nome da peça *</label><input className="inp" value={novaPeca.nome} onChange={e=>setNovaPeca(p=>({...p,nome:e.target.value}))} placeholder="Ex: Vestido midi azul" /></div>
               <div className="fg"><label className="lbl">Marca / Designer</label><input className="inp" value={novaPeca.marca} onChange={e=>setNovaPeca(p=>({...p,marca:e.target.value}))} placeholder="Zara, Mango, Gucci..." /></div>
+            </div>
+
+            {/* Cor + Condição */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg">
+                <label className="lbl">Cor principal</label>
+                <input className="inp" value={novaPeca.cor} onChange={e=>setNovaPeca(p=>({...p,cor:e.target.value}))} placeholder="Preto, Branco, Azul..." list="cores-lista" />
+                <datalist id="cores-lista">
+                  {["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"].map(c=><option key={c} value={c}/>)}
+                </datalist>
+              </div>
+              <div className="fg">
+                <label className="lbl">Condição</label>
+                <select className="inp" value={novaPeca.condicao} onChange={e=>setNovaPeca(p=>({...p,condicao:e.target.value}))} style={{background:"#fff"}}>
+                  <option value="novo">Novo (com etiqueta)</option>
+                  <option value="como_novo">Como novo (nunca usado)</option>
+                  <option value="muito_bom">Muito bom estado</option>
+                  <option value="bom">Bom estado</option>
+                  <option value="usado">Usado</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Defeito */}
+            <div style={{marginBottom:"1rem",padding:"0.85rem 1rem",border:`1.5px solid ${novaPeca.tem_defeito?"#e74c3c":"var(--g2)"}`,background:novaPeca.tem_defeito?"#fff5f5":"#fafafa"}}>
+              <label style={{display:"flex",alignItems:"center",gap:"0.6rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:novaPeca.tem_defeito?"#c0392b":"var(--g4)",fontWeight:600}}>
+                <input type="checkbox" checked={novaPeca.tem_defeito} onChange={e=>setNovaPeca(p=>({...p,tem_defeito:e.target.checked,descricao_defeito:""}))} style={{width:"1rem",height:"1rem",cursor:"pointer",accentColor:"#e74c3c"}} />
+                Peça tem defeito
+              </label>
+              {novaPeca.tem_defeito && (
+                <textarea className="inp" value={novaPeca.descricao_defeito} onChange={e=>setNovaPeca(p=>({...p,descricao_defeito:e.target.value}))} style={{resize:"vertical",minHeight:"60px",marginTop:"0.6rem",border:"1.5px solid #e74c3c"}} placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..." />
+              )}
+              {!novaPeca.tem_defeito && <span style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
             </div>
 
             {/* Descrição */}
