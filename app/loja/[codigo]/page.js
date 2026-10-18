@@ -174,7 +174,17 @@ export default function LojaPublica() {
         .sem-pecas{text-align:center;padding:5rem 2rem;font-size:0.85rem;color:var(--g4)}
       `}</style>
 
-      <nav className="nav">
+      {/* Banner de gestão — visível apenas para o dono da loja */}
+      {user && lojista && user.id === lojista.id && (
+        <div style={{position:"fixed",top:0,left:0,right:0,zIndex:200,background:"var(--black)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.45rem 2rem",fontFamily:"var(--sans)"}}>
+          <span style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da tua loja</span>
+          <div style={{display:"flex",gap:"0.5rem"}}>
+            <a href="/perfil#loja-dashboard" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
+            <a href="/perfil" style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
+          </div>
+        </div>
+      )}
+      <nav className="nav" style={user && lojista && user.id === lojista.id ? {top:"32px"} : {}}>
         <a href="/" className="nav-logo">Nora Grei</a>
         <div style={{display:"flex",alignItems:"center",gap:"1.5rem"}}>
           <div style={{display:"flex",gap:"0.4rem"}}>
@@ -186,7 +196,7 @@ export default function LojaPublica() {
         </div>
       </nav>
 
-      <div className="hero-loja">
+      <div className="hero-loja" style={user && lojista && user.id === lojista.id ? {paddingTop:"9.5rem"} : {}}>
         <h1 className="loja-nome">{t.lojaDeLabel} {lojista.nome}</h1>
         {lojista.cidade && <p className="loja-local">{lojista.cidade}{lojista.pais ? `, ${lojista.pais}` : ""}</p>}
         {mediaRating && (

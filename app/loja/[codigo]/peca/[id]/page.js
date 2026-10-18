@@ -399,7 +399,17 @@ export default function PecaLojaPage() {
     <>
       <style>{ESTILOS}</style>
 
-      <nav className="nav">
+      {/* Banner de gestão — visível apenas para o dono da loja */}
+      {userLogado && lojista && userLogado.id === lojista.id && (
+        <div style={{position:"fixed",top:0,left:0,right:0,zIndex:200,background:"var(--black)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.45rem 2rem",fontFamily:"var(--sans)"}}>
+          <span style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da peça</span>
+          <div style={{display:"flex",gap:"0.5rem"}}>
+            <a href="/perfil" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
+            <a href="/perfil" style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
+          </div>
+        </div>
+      )}
+      <nav className="nav" style={userLogado && lojista && userLogado.id === lojista.id ? {top:"32px"} : {}}>
         <a href="/" className="nav-logo">Nora Grei</a>
         <a href={`/loja/${codigo}`} className="nav-back">{i.voltar}{lojista?.nome ? ` ${lojista.nome}` : ""}</a>
       </nav>
