@@ -28,7 +28,7 @@ const T = {
       ],
       social: "Segue-nos",
     },
-    bottomNav: { inicio:"Início", catalogo:"Colecção", pedidos:"Pedidos", perfil:"Perfil" },
+    bottomNav: { inicio:"Início", catalogo:"Colecção", feed:"Feed", pedidos:"Pedidos", perfil:"Perfil" },
     quickAccess: [
       { icon:"✦", label:"Ver colecção", desc:"Todas as peças" },
       { icon:"◉", label: "Perfil", labelGuest: "Entrar", desc: "Pedidos e níveis", descGuest: "Cria conta" },
@@ -75,7 +75,7 @@ const T = {
       ],
       social: "Suivez-nous",
     },
-    bottomNav: { inicio:"Accueil", catalogo:"Collection", pedidos:"Commandes", perfil:"Profil" },
+    bottomNav: { inicio:"Accueil", catalogo:"Collection", feed:"Feed", pedidos:"Commandes", perfil:"Profil" },
     quickAccess: [
       { icon:"✦", label:"Voir la collection", desc:"Toutes les pièces" },
       { icon:"◉", label: "Profil", labelGuest: "Connexion", desc: "Commandes et niveaux", descGuest: "Créer un compte" },
@@ -122,7 +122,7 @@ const T = {
       ],
       social: "Sekite mus",
     },
-    bottomNav: { inicio:"Pradžia", catalogo:"Kolekcija", pedidos:"Užsakymai", perfil:"Profilis" },
+    bottomNav: { inicio:"Pradžia", catalogo:"Kolekcija", feed:"Feed", pedidos:"Užsakymai", perfil:"Profilis" },
     quickAccess: [
       { icon:"✦", label:"Žiūrėti kolekciją", desc:"Visi drabužiai" },
       { icon:"◉", label: "Profilis", labelGuest: "Prisijungti", desc: "Užsakymai ir lygiai", descGuest: "Sukurti paskyrą" },
@@ -425,16 +425,6 @@ export default function Home() {
         .footer-social-link{font-size:0.72rem;color:var(--g4);text-decoration:none;transition:color 0.2s}
         .footer-social-link:hover{color:var(--rosa)}
 
-        /* BOTTOM NAV */
-        .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--g2);padding:0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));transition:transform 0.3s ease}
-        .bnav.pwa-open{transform:translateY(-100%)}
-        .bnav-inner{display:flex;justify-content:space-around;align-items:center}
-        .bnav-item{display:flex;flex-direction:column;align-items:center;gap:0.2rem;text-decoration:none;color:var(--g4);background:none;border:none;cursor:pointer;padding:0.2rem 1rem;font-family:var(--sans)}
-        .bnav-item.on{color:var(--black)}
-        .bnav-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-        .bnav-label{font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase}
-        .bnav-dot{width:3px;height:3px;border-radius:50%;background:var(--rosa)}
-
         /* CUPÃO BANNER */
         .cupao-banner{position:fixed;bottom:72px;left:0;right:0;z-index:150;background:var(--rosa);padding:1rem 1.5rem;animation:slideUp 0.4s ease}
         @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -512,7 +502,6 @@ export default function Home() {
           footer{padding:4rem 4rem 2.5rem}
           .footer-cols{grid-template-columns:repeat(3,1fr);gap:3rem;margin-bottom:3rem}
           .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
-          .bnav{display:none}
           .nav{padding:1.1rem 3rem}
           .cupao-banner{bottom:0;padding:1rem 3rem}
           .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
@@ -531,7 +520,6 @@ export default function Home() {
           .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
         @media(max-width:768px){
-          .bnav{display:block}
           .hero-right-desktop{display:none}
           .nav{padding:0.9rem 1.25rem}
           .nav-links,.nav-right .nb-o,.nav-right .nb-f{display:none}
@@ -867,23 +855,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* BOTTOM NAV */}
-      <nav className={`bnav${pwaBanner ? " pwa-open" : ""}`}>
-        <div className="bnav-inner">
-          {[
-            { href:"/", label:t.bottomNav.inicio, on:true, icon:<svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg> },
-            { href:"/catalogo", label:t.bottomNav.catalogo, on:false, icon:<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
-            { href:userLogado ? "/pedidos" : "/entrar", label:t.bottomNav.pedidos, on:false, icon:<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> },
-            { href:userLogado ? "/perfil" : "/entrar", label:t.bottomNav.perfil, on:false, icon:<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-          ].map((item, i) => (
-            <a key={i} href={item.href} className={`bnav-item${item.on ? " on" : ""}`}>
-              <div className="bnav-icon">{item.icon}</div>
-              <span className="bnav-label">{item.label}</span>
-              {item.on && <div className="bnav-dot" />}
-            </a>
-          ))}
-        </div>
-      </nav>
     </>
   );
 }
