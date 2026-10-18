@@ -554,7 +554,7 @@ const t = {
     verTalao: "Ver talão",
     dataLabel: "Data", metodoLabel: "Método",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -635,7 +635,7 @@ const t = {
     verTalao: "Voir le reçu",
     dataLabel: "Date", metodoLabel: "Méthode",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -716,9 +716,49 @@ const t = {
     verTalao: "Žiūrėti kvitą",
     dataLabel: "Data", metodoLabel: "Mokėjimo būdas",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.",
   },
 };
+
+function WishlistCard({ p, eDisponivel, i }) {
+  const tempo = useCountdownDetalhado(p._dataDisponivel || null);
+  return (
+    <div style={{display:"block",background:"var(--white)",textDecoration:"none",color:"var(--black)",position:"relative"}}>
+      <a href={`/catalogo/${p.id}`} style={{display:"block",textDecoration:"none",color:"inherit"}}>
+        {p.fotos?.[0]
+          ? <img src={p.fotos[0]} alt={p.nome} style={{width:"100%",aspectRatio:"3/4",objectFit:"cover",display:"block"}} />
+          : <div style={{width:"100%",aspectRatio:"3/4",background:"var(--g1)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2rem",color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span></div>
+        }
+      </a>
+      <div style={{padding:"0.75rem"}}>
+        <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",fontWeight:300,marginBottom:"0.2rem"}}>{p.nome}</div>
+        {p.preco_aluguer_dia && <div style={{fontSize:"0.75rem",color:"var(--g4)",marginBottom:"0.4rem"}}>{p.preco_aluguer_dia}€/dia</div>}
+        {eDisponivel ? (
+          <>
+            <div style={{display:"inline-block",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#27ae60",background:"rgba(39,174,96,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.5rem"}}>{i.disponivel}</div>
+            <a href={`/catalogo/${p.id}`} style={{display:"block",textAlign:"center",padding:"0.45rem 0",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"#c4748a",color:"#fff",textDecoration:"none",borderRadius:"2px"}}>{i.alugar}</a>
+          </>
+        ) : (
+          <>
+            <div style={{display:"inline-block",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",background:"rgba(192,57,43,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.35rem"}}>{i.alugada}</div>
+            {tempo && (
+              <div style={{fontSize:"0.65rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
+                <span style={{color:"var(--g4)"}}>{i.disponivelEm}: </span>
+                <span style={{fontWeight:600,color:"var(--black)"}}>{tempo}</span>
+              </div>
+            )}
+            {!tempo && p._dataDisponivel && (
+              <div style={{fontSize:"0.65rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
+                {i.disponivelEm}: {new Date(p._dataDisponivel).toLocaleDateString()}
+              </div>
+            )}
+            <a href={`/catalogo/${p.id}`} style={{display:"block",textAlign:"center",padding:"0.45rem 0",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"var(--g2)",color:"var(--g6)",border:"1px solid var(--g2)",textDecoration:"none",borderRadius:"2px"}}>{i.reservar}</a>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function StarRating({ value, onChange, readonly }) {
   return (
@@ -1026,9 +1066,32 @@ export default function Perfil() {
     const { data: res } = await supabase.from("reservas_espera").select("id").eq("cliente_id", user.id).eq("estado", "aguarda");
     if (res) setStats(prev => ({ ...prev, reservas: res.length }));
 
-    // Wishlist
+    // Wishlist — inclui alugueres activos para mostrar disponibilidade
     const { data: wl } = await supabase.from("wishlist").select("peca_id, pecas(id, nome, preco_aluguer_dia, fotos, estado)").eq("cliente_id", user.id).order("created_at", { ascending: false });
-    if (wl) setWishlistPecas(wl.map(w => w.pecas).filter(Boolean));
+    if (wl) {
+      const pecasWl = wl.map(w => w.pecas).filter(Boolean);
+      // Para cada peça, verificar se há aluguer activo e quando fica disponível
+      const pecasComDisp = await Promise.all(pecasWl.map(async (p) => {
+        if (p.estado !== "disponivel") {
+          // Buscar stock_ids desta peça
+          const { data: stocks } = await supabase.from("stock_tamanhos").select("id").eq("peca_id", p.id);
+          const stockIds = stocks?.map(s => s.id) || [];
+          if (stockIds.length > 0) {
+            const { data: alAtivo } = await supabase
+              .from("alugueres")
+              .select("data_fim, data_disponivel_novamente, estado")
+              .in("estado", ["ativo","enviado","confirmado","pendente"])
+              .in("stock_id", stockIds)
+              .order("data_fim", { ascending: false })
+              .limit(1);
+            const al = alAtivo?.[0];
+            return { ...p, _dataDisponivel: al?.data_disponivel_novamente || al?.data_fim || null };
+          }
+        }
+        return p;
+      }));
+      setWishlistPecas(pecasComDisp);
+    }
 
     const agora = new Date().toISOString();
     const { data: resDisponiveis } = await supabase
@@ -1442,19 +1505,12 @@ export default function Perfil() {
               </div>
             ) : (
               <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"1px",background:"var(--g2)"}}>
-                {wishlistPecas.map(p => (
-                  <a key={p.id} href={`/catalogo/${p.id}`} style={{display:"block",background:"var(--white)",textDecoration:"none",color:"var(--black)"}}>
-                    {p.fotos?.[0]
-                      ? <img src={p.fotos[0]} alt={p.nome} style={{width:"100%",aspectRatio:"3/4",objectFit:"cover",display:"block"}} />
-                      : <div style={{width:"100%",aspectRatio:"3/4",background:"var(--g1)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2rem",color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span></div>
-                    }
-                    <div style={{padding:"0.75rem"}}>
-                      <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",fontWeight:300,marginBottom:"0.2rem"}}>{p.nome}</div>
-                      {p.preco_aluguer_dia && <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia}€/dia</div>}
-                      {p.estado !== "disponivel" && <div style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",marginTop:"0.2rem"}}>{i.indisponivel}</div>}
-                    </div>
-                  </a>
-                ))}
+                {wishlistPecas.map(p => {
+                  const eDisponivel = p.estado === "disponivel";
+                  return (
+                    <WishlistCard key={p.id} p={p} eDisponivel={eDisponivel} i={i} />
+                  );
+                })}
               </div>
             )}
           </div>
