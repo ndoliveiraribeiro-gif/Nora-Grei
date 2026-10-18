@@ -599,20 +599,23 @@ export default function PecaDetalhe() {
               <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
                 🛍 {tamanhoSelecionado ? t.adicionarCesto : t.semTamanho}
               </button>
+              {peca.preco_avulso > 0 && (
+                <a href={`/checkout?peca=${id}&modo=ocasiao`} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.65rem 1rem", border:"1px solid #d5d0c8", background:"#f8f7f5", color:"#1a1a1a", textDecoration:"none", fontFamily:"var(--sans)", transition:"all 0.15s" }}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor="#080808";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#d5d0c8";}}>
+                  <div>
+                    <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#888580", marginBottom:"0.1rem" }}>Aluguer · Evento único</div>
+                    <div style={{ fontSize:"0.68rem", color:"#3f3e3c" }}>Usa numa ocasião e devolves</div>
+                  </div>
+                  <div style={{ fontSize:"1.1rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</div>
+                </a>
+              )}
             </div>
           ) : (
             <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
           )}
 
           <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap", marginTop:"0.25rem" }}>
-            {peca.preco_avulso > 0 && (
-              <a href={`/checkout?peca=${id}&modo=ocasiao`} style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #1a1a1a", background:"#fff", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", cursor:"pointer", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
-                onMouseEnter={e=>{e.currentTarget.style.background="#1a1a1a";e.currentTarget.style.color="#fff";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#1a1a1a";}}>
-                <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.15rem" }}>{t.porOcasiao}</span>
-                <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.preco_avulso}€</span>
-              </a>
-            )}
             <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
               onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
               onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
