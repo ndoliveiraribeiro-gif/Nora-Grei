@@ -314,6 +314,7 @@ export default function Home() {
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.15) 0%,rgba(8,8,8,0.45) 50%,rgba(8,8,8,0.82) 100%);z-index:1}
         .hero-sound{position:absolute;bottom:2rem;right:1.5rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
         .hero-sound:hover{background:rgba(255,255,255,0.22)}
+        @media(min-width:769px){.hero>.hero-sound{display:none!important}}
         .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
         .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
@@ -342,9 +343,9 @@ export default function Home() {
         .qa-desc{font-size:0.75rem;color:var(--g4);font-weight:300}
 
         /* SECTIONS */
-        .sec{padding:4.5rem 1.5rem}
-        .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.75rem;font-weight:500}
-        .sec-titulo{font-family:var(--serif);font-size:clamp(2rem,6vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:2rem}
+        .sec{padding:3rem 1.5rem}
+        .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.6rem;font-weight:500}
+        .sec-titulo{font-family:var(--serif);font-size:clamp(1.8rem,6vw,3rem);font-weight:300;line-height:1.1;margin-bottom:1.5rem}
         .sec-titulo em{font-style:italic;color:var(--g4)}
 
         /* COMO */
@@ -357,7 +358,7 @@ export default function Home() {
         .como-desc{font-size:0.88rem;color:var(--g4);line-height:1.6}
 
         /* PORQUE */
-        .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:4.5rem 1.5rem}
+        .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:3rem 1.5rem}
         .porque-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:300;line-height:1.2;color:#fff;margin-bottom:2.5rem}
         .porque-titulo em{font-style:italic;color:rgba(255,255,255,0.4);display:block}
         .porque-ponto{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.08)}
@@ -381,7 +382,7 @@ export default function Home() {
         .numero-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
 
         /* TRUST */
-        .trust-sec{padding:4.5rem 1.5rem;background:var(--g1)}
+        .trust-sec{padding:3rem 1.5rem;background:var(--g1)}
         .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2);margin-top:2rem}
         .trust-item{background:var(--white);padding:1.75rem 1.5rem}
         .trust-icon{font-size:1.3rem;color:var(--rosa);margin-bottom:0.75rem;display:block}
@@ -389,22 +390,22 @@ export default function Home() {
         .trust-desc{font-size:0.82rem;color:var(--g4);line-height:1.65}
 
         /* INSTAGRAM */
-        .insta-sec{padding:4.5rem 1.5rem;background:var(--black);text-align:center}
+        .insta-sec{padding:3rem 1.5rem;background:var(--black);text-align:center}
         .insta-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500;margin-bottom:1rem}
         .insta-titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:300;color:#fff;margin-bottom:0.5rem}
         .insta-sub{font-size:0.88rem;color:rgba(255,255,255,0.45);margin-bottom:2rem}
         .insta-btn{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.25);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;display:inline-block}
         .insta-btn:hover{border-color:#fff;background:rgba(255,255,255,0.05)}
-        @media(min-width:769px){.insta-sec{padding:5rem 4rem}}
+        @media(min-width:769px){.insta-sec{padding:3.5rem 4rem}}
 
         /* SUSTENTABILIDADE */
-        .sustent{background:var(--g1);padding:4.5rem 1.5rem}
+        .sustent{background:var(--g1);padding:3rem 1.5rem}
         .sustent-stat{background:var(--white);padding:1.5rem;margin-bottom:1px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--rosa)}
         .sustent-val{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--rosa)}
         .sustent-label{font-size:0.82rem;color:var(--g4);text-align:right;max-width:20ch}
 
         /* CTA FINAL */
-        .cta-final{padding:5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
+        .cta-final{padding:3.5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
         .cta-final-titulo{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;line-height:1;color:#fff}
         .cta-final-sub{font-family:var(--serif);font-size:clamp(2.5rem,8vw,5rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.75rem}
         .cta-final-tag{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:2.5rem;display:block}
@@ -436,7 +437,7 @@ export default function Home() {
         .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
 
         /* DESTAQUE */
-        .destaque-sec{padding:3rem 1.5rem 4rem;background:var(--white)}
+        .destaque-sec{padding:2.5rem 1.5rem 3rem;background:var(--white)}
         .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
         .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
         .destaque-ver{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:2px;transition:color 0.2s,border-color 0.2s}
@@ -478,6 +479,7 @@ export default function Home() {
           .hero-cta2{color:var(--g4);border-color:var(--g2);max-width:none;flex:0}
           .hero-cta2:hover{color:var(--black);border-color:var(--black)}
           .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%;background:linear-gradient(135deg,#1a0a10 0%,#2d1520 40%,#0d0d0d 100%)}
+          .hero-right-desktop video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
           .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease,opacity 1s ease;opacity:0}
           .hero-right-desktop img.visivel{opacity:1}
           .hero-right-desktop:hover img{transform:scale(1.03)}
@@ -491,31 +493,31 @@ export default function Home() {
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:3rem 2rem}
           .numero:nth-child(even){border-right:1px solid rgba(255,255,255,0.08)}
-          .sec{padding:5rem 4rem}
+          .sec{padding:3.5rem 4rem}
           .como-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
-          .porque{display:grid;grid-template-columns:1fr 1fr;gap:4rem;padding:5rem 4rem;align-items:center}
+          .porque{display:grid;grid-template-columns:1fr 1fr;gap:4rem;padding:3.5rem 4rem;align-items:center}
           .cat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
           .cat-card{aspect-ratio:3/4}
-          .sustent{padding:5rem 4rem}
-          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem}
-          .cta-final{padding:7rem 4rem}
-          footer{padding:4rem 4rem 2.5rem}
-          .footer-cols{grid-template-columns:repeat(3,1fr);gap:3rem;margin-bottom:3rem}
+          .sustent{padding:3.5rem 4rem}
+          .sustent-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:2rem}
+          .cta-final{padding:4.5rem 4rem}
+          footer{padding:3rem 4rem 2rem}
+          .footer-cols{grid-template-columns:repeat(3,1fr);gap:3rem;margin-bottom:2rem}
           .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
           .nav{padding:1.1rem 3rem}
           .cupao-banner{bottom:0;padding:1rem 3rem}
           .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
           .cupao-actions{flex:0}
-          .trust-sec{padding:5rem 4rem}
+          .trust-sec{padding:3.5rem 4rem}
           .trust-grid{grid-template-columns:repeat(4,1fr)}
-          .depo-sec{padding:5rem 4rem}
-          .destaque-sec{padding:4rem 4rem 5rem}
+          .depo-sec{padding:3.5rem 4rem}
+          .destaque-sec{padding:3rem 4rem 3.5rem}
           .destaque-grid{grid-template-columns:repeat(3,1fr);gap:1.25rem}
           .pwa-sec{flex-direction:row;justify-content:space-between;text-align:left;padding:2.5rem 4rem}
         }
         @media(min-width:1200px){
           .cat-grid{grid-template-columns:repeat(4,1fr)}
-          .sec{padding:6rem 5rem}
+          .sec{padding:4rem 5rem}
           .nav{padding:1.25rem 4rem}
           .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
@@ -623,22 +625,35 @@ export default function Home() {
           </div>
         </div>
         {videoUrl && (
-          <button className="hero-sound" onClick={() => { const v = document.querySelector(".hero-bg video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
+          <button className="hero-sound" style={{display:"block"}} onClick={() => { const v = document.querySelector(".hero-bg video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
             {videoComSom ? "🔊 Som" : "🔇 Sem som"}
           </button>
         )}
-        {!videoUrl && (
-          <div className="hero-right-desktop">
-            {heroPeca?.fotos?.filter(Boolean)[0]
+        <div className="hero-right-desktop">
+          {videoUrl
+            ? <video src={videoUrl} autoPlay muted loop playsInline preload="auto" ref={el => {
+                if (!el) return;
+                el.muted = true;
+                const tryPlay = () => el.play().catch(() => setTimeout(tryPlay, 500));
+                if (el.readyState >= 3) tryPlay();
+                else el.addEventListener("canplay", tryPlay, { once: true });
+              }} />
+            : heroPeca?.fotos?.filter(Boolean)[0]
               ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt={heroPeca.nome || "Nora Grei"} className={heroCarregado ? "visivel" : ""} />
               : <div className="hero-right-placeholder"><span className="hero-right-placeholder-logo">Nora Grei</span><span className="hero-right-placeholder-tag">Alugar ou Comprar</span></div>
-            }
+          }
+          {!videoUrl && (
             <div className="hero-caption">
               <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
               <span className="hero-caption-preco">{heroPeca?.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
             </div>
-          </div>
-        )}
+          )}
+          {videoUrl && (
+            <button className="hero-sound" style={{position:"absolute",bottom:"1.5rem",right:"1.5rem"}} onClick={() => { const v = document.querySelector(".hero-right-desktop video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
+              {videoComSom ? "🔊 Som" : "🔇 Sem som"}
+            </button>
+          )}
+        </div>
       </section>
 
       {/* STRIP */}
