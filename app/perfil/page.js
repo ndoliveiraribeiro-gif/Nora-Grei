@@ -3,11 +3,17 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
 
-const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", sigla: "PLT", cor: "#6c5ce7", caucao: 0, proximo: null, falta: 0 };
-  if (n >= 10) return { nome: "Ouro", sigla: "OUR", cor: "#b8860b", caucao: 50, proximo: "Platina", falta: 20 - n };
-  if (n >= 5)  return { nome: "Prata", sigla: "PRT", cor: "#6b7280", caucao: 75, proximo: "Ouro", falta: 10 - n };
-  return { nome: "Bronze", sigla: "BRZ", cor: "#a8632f", caucao: 100, proximo: "Prata", falta: 5 - n };
+const NIVEL_NOMES_PERFIL = {
+  pt: { platina:"Platina", ouro:"Ouro", prata:"Prata", bronze:"Bronze" },
+  fr: { platina:"Platine", ouro:"Or",   prata:"Argent", bronze:"Bronze" },
+  lt: { platina:"Platina", ouro:"Auksas", prata:"Sidabras", bronze:"Bronza" },
+};
+const NIVEL = (n, lang = "pt") => {
+  const nm = NIVEL_NOMES_PERFIL[lang] || NIVEL_NOMES_PERFIL.pt;
+  if (n >= 20) return { nome: nm.platina, sigla: "PLT", cor: "#6c5ce7", caucao: 0, proximo: null, falta: 0 };
+  if (n >= 10) return { nome: nm.ouro,    sigla: "OUR", cor: "#b8860b", caucao: 50, proximo: nm.platina, falta: 20 - n };
+  if (n >= 5)  return { nome: nm.prata,   sigla: "PRT", cor: "#6b7280", caucao: 75, proximo: nm.ouro,    falta: 10 - n };
+  return { nome: nm.bronze, sigla: "BRZ", cor: "#a8632f", caucao: 100, proximo: nm.prata, falta: 5 - n };
 };
 
 const ESTADO_INFO = {
@@ -308,7 +314,7 @@ const t = {
     reservaPrazoTempo: "Tempo restante para confirmar:",
     verTalao: "Ver talão",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -363,7 +369,7 @@ const t = {
     reservaPrazoTempo: "Temps restant pour confirmer :",
     verTalao: "Voir le reçu",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -418,7 +424,7 @@ const t = {
     reservaPrazoTempo: "Laikas patvirtinti:",
     verTalao: "Žiūrėti kvitą",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas",
   },
 };
 
@@ -931,8 +937,8 @@ export default function Perfil() {
 
   if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Jost',sans-serif",fontSize:'0.8rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#3f3e3c'}}>...</div>;
 
-  const nv = NIVEL(stats.totalPecas);
-  const proximoNivelMin = nv.nome === "Bronze" ? 5 : nv.nome === "Prata" ? 10 : nv.nome === "Ouro" ? 20 : 20;
+  const nv = NIVEL(stats.totalPecas, lang);
+  const proximoNivelMin = nv.sigla === "BRZ" ? 5 : nv.sigla === "PRT" ? 10 : nv.sigla === "OUR" ? 20 : 20;
   const progressoPct = nv.proximo ? Math.min(100, Math.round(((stats.totalPecas - (proximoNivelMin - nv.falta)) / nv.falta) * 100)) : 100;
 
   const alugueresAtivos = alugueres.filter(a => ["pendente","confirmado","enviado","ativo","em_verificacao"].includes(a.estado));
@@ -940,10 +946,11 @@ export default function Perfil() {
 
   const perfilIncompleto = !CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
 
+  const _nm = NIVEL_NOMES_PERFIL[lang] || NIVEL_NOMES_PERFIL.pt;
   const NIVEIS_TABELA = [
-    { sigla: "BRZ", nome: "Bronze", cor: "#a8632f", caucao: "100%" },
-    { sigla: "PRT", nome: "Prata", cor: "#6b7280", caucao: "75%" },
-    { sigla: "OUR", nome: "Ouro", cor: "#b8860b", caucao: "50%" },
+    { sigla: "BRZ", nome: _nm.bronze, cor: "#a8632f", caucao: "100%" },
+    { sigla: "PRT", nome: _nm.prata,  cor: "#6b7280", caucao: "75%" },
+    { sigla: "OUR", nome: _nm.ouro,   cor: "#b8860b", caucao: "50%" },
   ];
 
   return (
@@ -1044,10 +1051,10 @@ export default function Perfil() {
 
         <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
           {[
-            {id:"perfil",label:"Perfil"},
-            {id:"pedidos",label:"Pedidos", badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
-            {id:"guardados",label:"Guardados", badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
-            ...(modoLojista ? [{id:"loja",label:"A minha loja"}] : []),
+            {id:"perfil",label:i.tabPerfil},
+            {id:"pedidos",label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
+            {id:"guardados",label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+            ...(modoLojista ? [{id:"loja",label:i.tabLoja}] : []),
           ].map(tab => (
             <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
               {tab.label}
@@ -1055,7 +1062,7 @@ export default function Perfil() {
             </button>
           ))}
           <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
-            Mensagens
+            {i.tabMensagens}
             {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
           </a>
         </div>
@@ -1207,7 +1214,7 @@ export default function Perfil() {
           {nv.proximo && (
             <div>
               <div className="nivel-barra"><div className="nivel-barra-fill" style={{width:`${progressoPct}%`,background:nv.cor}} /></div>
-              <div className="nivel-info"><span>{stats.totalPecas} · {i.alugueresLabel}</span><span>{i.faltam} {nv.falta} {i.para} {nv.nome}</span></div>
+              <div className="nivel-info"><span>{stats.totalPecas} · {i.alugueresLabel}</span><span>{i.faltam} {nv.falta} {i.para} {nv.proximo}</span></div>
             </div>
           )}
           {!nv.proximo && <div style={{fontSize:'0.82rem',color:nv.cor,fontWeight:600,marginTop:'0.5rem'}}>{i.nivelMaximo}</div>}
@@ -1215,7 +1222,7 @@ export default function Perfil() {
             {NIVEIS_TABELA.map(nivel => (
               <div key={nivel.sigla} className="beneficio">
                 <div className="beneficio-sigla" style={{color:nivel.cor}}>{nivel.nome}</div>
-                <div className="beneficio-label">Caução {nivel.caucao}</div>
+                <div className="beneficio-label">{i.caucaoLabel} {nivel.caucao}</div>
               </div>
             ))}
           </div>
