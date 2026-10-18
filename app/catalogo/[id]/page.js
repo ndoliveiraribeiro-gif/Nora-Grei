@@ -491,13 +491,18 @@ export default function PecaDetalhe() {
           <h1 className="nome">{peca.nome}</h1>
 
           <div className="preco-row">
-            <span className="preco-val">{peca.preco_aluguer_dia}€</span>
-            <span className="preco-unit">{t.porcDia}</span>
-            {peca.preco_avulso && <>
-              <span style={{color:'#ccc',fontSize:'0.8rem'}}>·</span>
-              <span className="preco-val" style={{fontSize:'1.3rem'}}>{peca.preco_avulso}€</span>
+            {peca.preco_aluguer_dia > 0 ? <>
+              <span className="preco-val">{peca.preco_aluguer_dia}€</span>
+              <span className="preco-unit">{t.porcDia}</span>
+              {peca.preco_avulso > 0 && <>
+                <span style={{color:'#ccc',fontSize:'0.8rem'}}>·</span>
+                <span className="preco-val" style={{fontSize:'1.3rem'}}>{peca.preco_avulso}€</span>
+                <span className="preco-unit">/{t.porOcasiao.toLowerCase()}</span>
+              </>}
+            </> : peca.preco_avulso > 0 ? <>
+              <span className="preco-val">{peca.preco_avulso}€</span>
               <span className="preco-unit">/{t.porOcasiao.toLowerCase()}</span>
-            </>}
+            </> : null}
           </div>
 
           {peca.valor_peca > 0 && peca.preco_aluguer_dia > 0 && (() => {
@@ -755,8 +760,13 @@ export default function PecaDetalhe() {
       {/* STICKY CTA — apenas visível no mobile via CSS */}
       <div className="sticky-cta">
         <div className="sticky-preco">
-          <span className="sticky-preco-val">{peca.preco_aluguer_dia}€</span>
-          <span className="sticky-preco-unit">{t.porcDia}</span>
+          {peca.preco_aluguer_dia > 0 ? <>
+            <span className="sticky-preco-val">{peca.preco_aluguer_dia}€</span>
+            <span className="sticky-preco-unit">{t.porcDia}</span>
+          </> : peca.preco_avulso > 0 ? <>
+            <span className="sticky-preco-val">{peca.preco_avulso}€</span>
+            <span className="sticky-preco-unit">/{t.porOcasiao.toLowerCase()}</span>
+          </> : null}
         </div>
         {disponivel ? (
           <>
