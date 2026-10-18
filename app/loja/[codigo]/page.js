@@ -5,14 +5,33 @@ import { supabase } from "@/lib/supabase";
 
 const T = {
   pt: {
-    pecas: "Peças disponíveis", vender: "À venda", alugar: "Alugar", comprar: "Comprar", dispDia: "/dia", semPecas: "Esta loja ainda não tem peças disponíveis.", disponivel: "Disponível", indisponivel: "Indisponível", voltar: "← Catálogo", lojaDeLabel: "Loja de", contactar: "Contactar lojista", verDetalhe: "Ver detalhe",
+    pecas: "Peças disponíveis", vender: "À venda", alugar: "Alugar", comprar: "Comprar", comprarNova: "Comprar nova", usada: "Usada", dispDia: "/dia", semPecas: "Esta loja ainda não tem peças disponíveis.", disponivel: "Disponível", indisponivel: "Indisponível", voltar: "← Catálogo", lojaDeLabel: "Loja de", contactar: "Contactar lojista", verDetalhe: "Ver detalhe", todasOcasiao: "Todas as ocasiões", ocasiao: "Por ocasião",
   },
   fr: {
-    pecas: "Pièces disponibles", vender: "À vendre", alugar: "Louer", comprar: "Acheter", dispDia: "/jour", semPecas: "Cette boutique n'a pas encore de pièces disponibles.", disponivel: "Disponible", indisponivel: "Indisponible", voltar: "← Catalogue", lojaDeLabel: "Boutique de", contactar: "Contacter le vendeur", verDetalhe: "Voir le détail",
+    pecas: "Pièces disponibles", vender: "À vendre", alugar: "Louer", comprar: "Acheter", comprarNova: "Acheter neuf", usada: "Occasion", dispDia: "/jour", semPecas: "Cette boutique n'a pas encore de pièces disponibles.", disponivel: "Disponible", indisponivel: "Indisponible", voltar: "← Catalogue", lojaDeLabel: "Boutique de", contactar: "Contacter le vendeur", verDetalhe: "Voir le détail", todasOcasiao: "Toutes les occasions", ocasiao: "Par occasion",
   },
   lt: {
-    pecas: "Turimi drabužiai", vender: "Parduodama", alugar: "Nuomoti", comprar: "Pirkti", dispDia: "/d.", semPecas: "Ši parduotuvė dar neturi drabužių.", disponivel: "Prieinama", indisponivel: "Neprieinama", voltar: "← Katalogas", lojaDeLabel: "Parduotuvė", contactar: "Susisiekti", verDetalhe: "Žiūrėti",
+    pecas: "Turimi drabužiai", vender: "Parduodama", alugar: "Nuomoti", comprar: "Pirkti", comprarNova: "Pirkti naują", usada: "Naudota", dispDia: "/d.", semPecas: "Ši parduotuvė dar neturi drabužių.", disponivel: "Prieinama", indisponivel: "Neprieinama", voltar: "← Katalogas", lojaDeLabel: "Parduotuvė", contactar: "Susisiekti", verDetalhe: "Žiūrėti", todasOcasiao: "Visos progos", ocasiao: "Pagal progą",
   },
+};
+
+// Ocasiões sem emojis (profissional)
+const OCASIOES_LOJA = {
+  pt: [
+    { key: "Casamento", label: "Casamento" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Cocktail" },
+    { key: "Festa", label: "Festa" }, { key: "Jantar", label: "Jantar" }, { key: "Trabalho", label: "Trabalho" },
+    { key: "Dia a dia", label: "Dia a dia" }, { key: "Praia", label: "Praia" }, { key: "Férias", label: "Férias" },
+  ],
+  fr: [
+    { key: "Casamento", label: "Mariage" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Cocktail" },
+    { key: "Festa", label: "Fête" }, { key: "Jantar", label: "Dîner" }, { key: "Trabalho", label: "Travail" },
+    { key: "Dia a dia", label: "Quotidien" }, { key: "Praia", label: "Plage" }, { key: "Férias", label: "Vacances" },
+  ],
+  lt: [
+    { key: "Casamento", label: "Vestuvės" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Kokteilis" },
+    { key: "Festa", label: "Šventė" }, { key: "Jantar", label: "Vakarienė" }, { key: "Trabalho", label: "Darbas" },
+    { key: "Dia a dia", label: "Kasdien" }, { key: "Praia", label: "Paplūdimys" }, { key: "Férias", label: "Atostogos" },
+  ],
 };
 
 export default function LojaPublica() {
@@ -23,6 +42,7 @@ export default function LojaPublica() {
   const [pecas, setPecas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("todos");
+  const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
   const [mediaRating, setMediaRating] = useState(null);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
   const [user, setUser] = useState(null);
@@ -128,7 +148,17 @@ export default function LojaPublica() {
   }
 
   const t = T[lang] || T.pt;
-  const pecasFiltradas = filtro === "alugar" ? pecas.filter(p => p.preco_aluguer_dia) : filtro === "comprar" ? pecas.filter(p => p.preco_venda) : pecas;
+  const temNoraGrei = pecas.some(p => p.origem === "Nora Grei");
+  const ocasioesDisponiveis = OCASIOES_LOJA[lang] || OCASIOES_LOJA.pt;
+  const pecasFiltradas = pecas
+    .filter(p => {
+      if (filtro === "alugar") return !!p.preco_aluguer_dia;
+      if (filtro === "comprar") return !!p.preco_venda;
+      if (filtro === "comprar_nova") return p.origem === "Nora Grei";
+      if (filtro === "usada") return p.origem !== "Nora Grei";
+      return true;
+    })
+    .filter(p => filtroOcasiao === "todas" || (Array.isArray(p.ocasioes) && p.ocasioes.includes(filtroOcasiao)));
 
   if (loading) return (
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Jost',sans-serif",fontSize:"0.8rem",letterSpacing:"0.2em",color:"#888",textTransform:"uppercase"}}>...</div>
@@ -229,14 +259,28 @@ export default function LojaPublica() {
         </div>
       </div>
 
-      <div className="filtros">
+      {/* Filtros principais */}
+      <div className="filtros" style={{flexWrap:"wrap",gap:"0.4rem",paddingBottom:"0.75rem"}}>
         {[
-          {id:"todos", label:{pt:"Todos",fr:"Tous",lt:"Visi"}},
-          {id:"alugar", label:{pt:t.alugar,fr:t.alugar,lt:t.alugar}},
-          {id:"comprar", label:{pt:t.comprar,fr:t.comprar,lt:t.comprar}},
+          {id:"todos",    label:{pt:"Todos",fr:"Tous",lt:"Visi"}},
+          {id:"alugar",   label:{pt:t.alugar,fr:t.alugar,lt:t.alugar}},
+          {id:"comprar",  label:{pt:t.comprar,fr:t.comprar,lt:t.comprar}},
+          ...(temNoraGrei ? [{id:"comprar_nova", label:{pt:t.comprarNova,fr:t.comprarNova,lt:t.comprarNova}}] : []),
+          {id:"usada",    label:{pt:t.usada,fr:t.usada,lt:t.usada}},
         ].map(f => (
           <button key={f.id} className={`filtro-btn${filtro===f.id?" on":""}`} onClick={() => setFiltro(f.id)}>{f.label[lang]||f.label.pt}</button>
         ))}
+      </div>
+
+      {/* Filtro por ocasião — pills */}
+      <div style={{padding:"0 2rem 1rem",borderBottom:"1px solid var(--g1)"}}>
+        <span style={{fontSize:"0.58rem",letterSpacing:"0.22em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.5rem"}}>{t.ocasiao}</span>
+        <div style={{display:"flex",gap:"0.4rem",overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:"0.25rem",scrollbarWidth:"none"}}>
+          <button onClick={()=>setFiltroOcasiao("todas")} style={{fontSize:"0.62rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao==="todas"?"#c4748a":"var(--g2)",background:filtroOcasiao==="todas"?"#c4748a":"transparent",color:filtroOcasiao==="todas"?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{t.todasOcasiao}</button>
+          {ocasioesDisponiveis.map(o => (
+            <button key={o.key} onClick={()=>setFiltroOcasiao(o.key)} style={{fontSize:"0.62rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao===o.key?"#c4748a":"var(--g2)",background:filtroOcasiao===o.key?"#c4748a":"transparent",color:filtroOcasiao===o.key?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{o.label}</button>
+          ))}
+        </div>
       </div>
 
       {pecasFiltradas.length === 0 ? (
@@ -254,8 +298,15 @@ export default function LojaPublica() {
                   {p.preco_venda && <span>{p.preco_venda}€</span>}
                 </div>
                 <div className="peca-tags">
+                  {p.origem === "Nora Grei"
+                    ? <span className="tag" style={{background:"#c4a882",color:"#fff",border:"none",fontWeight:600,letterSpacing:"0.08em"}}>Nora Grei</span>
+                    : <span className="tag" style={{background:"var(--g1)",color:"var(--g6)",border:"none"}}>{t.usada}</span>
+                  }
                   {p.preco_aluguer_dia && <span className="tag tag-rosa">{t.alugar}</span>}
                   {p.preco_venda && <span className="tag">{t.comprar}</span>}
+                  {Array.isArray(p.ocasioes) && p.ocasioes[0] && (
+                    <span className="tag" style={{background:"transparent",border:"1px solid var(--g2)",color:"var(--g4)",fontSize:"0.55rem"}}>{p.ocasioes[0]}</span>
+                  )}
                   {p.stock_lojista?.every(s => s.quantidade_disponivel === 0) && (
                     timers[p.id]
                       ? <MiniTimer dataFim={timers[p.id]} />
