@@ -23,6 +23,7 @@ const TRADUCOES = {
     reservaTimer: "Disponível em",
     reservaDisponivelTitulo: "🎉 Disponível agora!",
     reservaConfirmar: "Confirmar e pagar",
+    verTalao: "Ver talão", avaliarExperiencia: "Avalia a tua experiência", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação",
     comprarModal: "Como queres comprar esta peça?",
     comprarUsada: "Comprar usada",
     comprarUsadaDesc: "A peça que alugaste, inspeccionada e em bom estado",
@@ -60,6 +61,7 @@ const TRADUCOES = {
     reservaTimer: "Disponible dans",
     reservaDisponivelTitulo: "🎉 Disponible maintenant !",
     reservaConfirmar: "Confirmer et payer",
+    verTalao: "Voir le reçu", avaliarExperiencia: "Évaluez votre expérience", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer",
     comprarModal: "Comment souhaitez-vous acheter cette pièce ?",
     comprarUsada: "Acheter d'occasion",
     comprarUsadaDesc: "La pièce que vous avez louée, inspectée et en bon état",
@@ -97,6 +99,7 @@ const TRADUCOES = {
     reservaTimer: "Prieinama po",
     reservaDisponivelTitulo: "🎉 Prieinama dabar!",
     reservaConfirmar: "Patvirtinti ir mokėti",
+    verTalao: "Peržiūrėti kvitą", avaliarExperiencia: "Įvertinkite savo patirtį", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", comentarioPlaceholder: "Palikite komentarą (neprivaloma)...", enviarAvaliacao: "Siųsti",
     comprarModal: "Kaip norite įsigyti šį drabužį?",
     comprarUsada: "Pirkti naudotą",
     comprarUsadaDesc: "Drabužis, kurį nuomojotės, patikrintas ir geros būklės",
@@ -579,6 +582,102 @@ function PedidosContent() {
     return <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:c.bg,color:c.color}}>{i.estado[estado]||estado}</span>;
   };
 
+  const StarRating = ({ value, onChange, readonly }) => (
+    <div style={{display:"flex",gap:"0.2rem",marginBottom:"0.4rem"}}>
+      {[1,2,3,4,5].map(v => (
+        <span key={v} onClick={() => !readonly && onChange && onChange(v)}
+          style={{fontSize:"1.3rem",cursor:readonly?"default":"pointer",color:v<=value?"#c4748a":"#e2dfda",lineHeight:1}}>★</span>
+      ))}
+    </div>
+  );
+
+  const BotaoVerTalao = ({ a }) => {
+    const [recibo, setRecibo] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [aberto, setAberto] = useState(false);
+    const buscar = async () => {
+      if (recibo) { setAberto(true); return; }
+      setLoading(true);
+      const { data } = await supabase.from("recibos").select("*").eq("aluguer_id", a.id).maybeSingle();
+      setLoading(false);
+      if (data) { setRecibo(data); setAberto(true); }
+    };
+    return (
+      <>
+        <button onClick={buscar} disabled={loading} style={{marginTop:"0.5rem",padding:"0.45rem 1rem",background:"#f0eeeb",border:"none",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif",color:"#5a5855",display:"block"}}>
+          {loading ? "..." : i.verTalao}
+        </button>
+        {aberto && recibo && (
+          <div onClick={() => setAberto(false)} style={{position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+            <div onClick={e => e.stopPropagation()} style={{background:"#fff",width:"100%",maxWidth:380,padding:"1.75rem",fontFamily:"'Jost',sans-serif"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1.25rem"}}>
+                <div><div style={{fontFamily:"'Cormorant',serif",fontSize:"1.4rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>NORA GREI</div><div style={{fontSize:"0.62rem",color:"#888",letterSpacing:"0.1em",marginTop:"0.15rem"}}>Recibo #{recibo.numero}</div></div>
+                <button onClick={() => setAberto(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#888"}}>×</button>
+              </div>
+              <div style={{borderTop:"1px solid #f0eeeb",paddingTop:"1rem",display:"flex",flexDirection:"column",gap:"0.5rem"}}>
+                {[["Método", recibo.metodo_pagamento], ["Aluguer", recibo.valor_aluguer != null ? `${recibo.valor_aluguer}€` : null], ["Higienização", recibo.valor_higienizacao != null ? `${recibo.valor_higienizacao}€` : null], ["Depósito", recibo.valor_deposito != null ? `${recibo.valor_deposito}€` : null]].filter(r => r[1]).map(([l, v]) => (
+                  <div key={l} style={{display:"flex",justifyContent:"space-between",fontSize:"0.82rem",color:"#5a5855"}}><span>{l}</span><span>{v}</span></div>
+                ))}
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:"1rem",fontWeight:600,borderTop:"1px solid #f0eeeb",paddingTop:"0.75rem",marginTop:"0.25rem"}}><span>Total</span><span>{recibo.valor_total}€</span></div>
+                <div style={{textAlign:"center",marginTop:"0.5rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:recibo.estado==="pago"?"#27ae60":"#e67e22",fontWeight:600}}>{recibo.estado==="pago"?"✓ Pago":"A aguardar pagamento"}</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const CartaoAvaliacao = ({ a }) => {
+    const [avaliacao, setAvaliacao] = useState(null);
+    const [nota, setNota] = useState(0);
+    const [comentario, setComentario] = useState("");
+    const [enviado, setEnviado] = useState(false);
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+      supabase.from("avaliacoes").select("*").eq("aluguer_id", a.id).maybeSingle().then(({ data }) => {
+        if (data) { setAvaliacao(data); setNota(data.nota_cliente_empresa || 0); setEnviado(true); }
+      });
+    }, [a.id]);
+    const enviar = async () => {
+      if (nota === 0) return;
+      setLoading(true);
+      await supabase.from("avaliacoes").upsert({ aluguer_id: a.id, cliente_id: a.cliente_id, nota_cliente_empresa: nota, comentario_cliente: comentario || null }, { onConflict: "aluguer_id" });
+      setEnviado(true); setLoading(false);
+    };
+    return (
+      <div style={{marginTop:"0.75rem",padding:"0.85rem 1rem",background:"#fdf6f8",borderLeft:"3px solid #c4748a"}}>
+        <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>{enviado ? i.tuaAvaliacao : i.avaliarExperiencia}</div>
+        {enviado ? (
+          <>
+            <StarRating value={nota} readonly />
+            {avaliacao?.comentario_cliente && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
+            {avaliacao?.nota_empresa_cliente && (
+              <div style={{marginTop:"0.75rem",paddingTop:"0.6rem",borderTop:"1px solid #f0d0da"}}>
+                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
+                <StarRating value={avaliacao.nota_empresa_cliente} readonly />
+                {avaliacao.comentario_empresa && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_empresa}"</p>}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <StarRating value={nota} onChange={setNota} />
+            {nota > 0 && (
+              <>
+                <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder={i.comentarioPlaceholder}
+                  style={{width:"100%",marginTop:"0.5rem",padding:"0.65rem",border:"1.5px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",color:"#080808",resize:"vertical",minHeight:"72px",outline:"none"}} />
+                <button onClick={enviar} disabled={loading} style={{marginTop:"0.4rem",padding:"0.55rem 1.25rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.62rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>
+                  {loading ? "..." : i.enviarAvaliacao}
+                </button>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
+
   const CardAluguer = ({ a, mostrarComprar }) => {
     const peca = a.stock_tamanhos?.pecas;
     return (
@@ -607,6 +706,8 @@ function PedidosContent() {
           </div>
         </div>
         {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} lang={lang} />}
+        <BotaoVerTalao a={a} />
+        {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && <CartaoAvaliacao a={a} />}
       </div>
     );
   };
