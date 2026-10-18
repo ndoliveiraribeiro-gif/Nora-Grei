@@ -141,6 +141,10 @@ export default function CestoPage() {
   const [loading, setLoading] = useState(true);
   // Estado individual por peça: { [idx]: { processando, sucesso, erro } }
   const [estadoItem, setEstadoItem] = useState({});
+  // Desconto congelado: guardado quando cesto tem 3+ peças e cliente escolhe opção
+  // Fica fixo mesmo quando peças vão sendo confirmadas individualmente
+  const [descontoCongelado, setDescontoCongelado] = useState(null); // null | { pct, tipo }
+  const [descontoAplicado, setDescontoAplicado] = useState(false); // true depois de 1ª confirmação
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -200,8 +204,16 @@ export default function CestoPage() {
 
   const i = T[lang] || T.pt;
   const nv = NIVEL(totalAlugueres, lang);
-  const temDesconto = cesto.length >= 3;
+  // temDesconto activo se cesto originalmente tinha 3+ OU se já congelou
+  const temDesconto = cesto.length >= 3 || descontoCongelado !== null;
   const todosPedidos = cesto.length > 0 && cesto.every((_, idx) => estadoItem[idx]?.sucesso);
+
+  // Quando cesto atingir 3+ peças pela primeira vez, congelar o desconto ao escolher opção
+  // O desconto congelado persiste mesmo quando peças vão sendo removidas ao confirmar
+  const pctDescontoActivo = descontoCongelado
+    ? descontoCongelado.pct
+    : (cesto.length >= 3 && opcaoDesconto === "A" ? nv.descontoAluguer : 0);
+  const tipoDescontoActivo = descontoCongelado?.tipo || opcaoDesconto;
 
   // Cálculos
   const subtotalAluguer = cesto.reduce((s, item) => {
@@ -211,7 +223,7 @@ export default function CestoPage() {
     return s + (item.peca?.preco_aluguer_dia || 0) * dias;
   }, 0);
 
-  const descontoAluguerPct = temDesconto && opcaoDesconto === "A" ? nv.descontoAluguer : 0;
+  const descontoAluguerPct = pctDescontoActivo;
   const descontoAluguerVal = Math.round(subtotalAluguer * descontoAluguerPct / 100 * 100) / 100;
   const totalAluguer = subtotalAluguer - descontoAluguerVal;
 
@@ -238,8 +250,17 @@ export default function CestoPage() {
     try {
       const hoje = new Date().toISOString().split("T")[0];
       const daqui3dias = new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0];
-      // Desconto de volume só se 3+ peças ainda no cesto
-      const descontoAtual = cesto.length >= 3 && opcaoDesconto === "A" ? nv.descontoAluguer : 0;
+
+      // Congelar desconto na primeira confirmação (para as restantes peças manterem o mesmo benefício)
+      let descontoAtual = pctDescontoActivo;
+      let tipoAtual = tipoDescontoActivo;
+      if (!descontoAplicado && (cesto.length >= 3 || descontoCongelado)) {
+        const pctACongelar = cesto.length >= 3 && opcaoDesconto === "A" ? nv.descontoAluguer : 0;
+        setDescontoCongelado({ pct: pctACongelar, tipo: opcaoDesconto });
+        setDescontoAplicado(true);
+        descontoAtual = pctACongelar;
+        tipoAtual = opcaoDesconto;
+      }
 
       const dias = item.dataInicio && item.dataFim
         ? Math.max(1, Math.ceil((new Date(item.dataFim) - new Date(item.dataInicio)) / 86400000))
@@ -264,7 +285,7 @@ export default function CestoPage() {
           valor_aluguer: Math.round(valorAluguerItem * 100) / 100,
           deposito_valor: valorCaucaoItem,
           deposito_estado: "recebido",
-          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (cesto.length >= 3 ? "opcao_b_caucao" : null),
+          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (temDesconto && tipoAtual === "B" ? "opcao_b_caucao" : null),
         }).select().single();
 
         if (novoAluguer) {
@@ -310,7 +331,7 @@ export default function CestoPage() {
           deposito_modalidade: "cartao",
           deposito_estado: "recebido",
           deposito_confirmado_em: new Date().toISOString(),
-          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (cesto.length >= 3 ? "opcao_b_caucao" : null),
+          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (temDesconto && tipoAtual === "B" ? "opcao_b_caucao" : null),
         }).select().single();
 
         if (novoAluguer) {
@@ -443,24 +464,37 @@ export default function CestoPage() {
                   <div className="desconto-titulo">
                     {nv.icon} {i.desconto} — {i.nivel} {nv.nome}
                   </div>
-                  <p className="desconto-nota">{i.descontoNota(cesto.length)}</p>
-                  <div className="opcoes-desconto">
-                    <div className={`opcao-d${opcaoDesconto === "A" ? " on" : ""}`} onClick={() => setOpcaoDesconto("A")}>
-                      <div className="opcao-radio" />
-                      <div>
-                        <div className="opcao-label">{i.opcaoA}</div>
-                        <div className="opcao-desc">{i.opcaoADesc(nv.descontoAluguer)}</div>
-                        <div className="opcao-poupas">{i.poupas} {descontoAluguerVal.toFixed(2)}€</div>
-                      </div>
+                  {descontoCongelado ? (
+                    /* Já iniciou confirmações — desconto fixo */
+                    <div style={{ fontSize: "0.8rem", color: "#5a5855", marginTop: "0.5rem" }}>
+                      {descontoCongelado.tipo === "A"
+                        ? <span style={{ color: "#27ae60", fontWeight: 500 }}>✓ {i.opcaoA}: {descontoCongelado.pct}% aplicado a todas as peças</span>
+                        : <span style={{ color: "#27ae60", fontWeight: 500 }}>✓ {i.opcaoB}: caução reduzida ao nível {nv.nome}</span>
+                      }
+                      <div style={{ fontSize: "0.72rem", color: "#95a5a6", marginTop: "0.25rem" }}>Opção fixada ao confirmar a 1ª peça</div>
                     </div>
-                    <div className={`opcao-d${opcaoDesconto === "B" ? " on" : ""}`} onClick={() => setOpcaoDesconto("B")}>
-                      <div className="opcao-radio" />
-                      <div>
-                        <div className="opcao-label">{i.opcaoB}</div>
-                        <div className="opcao-desc">{i.opcaoBDesc}</div>
+                  ) : (
+                    <>
+                      <p className="desconto-nota">{i.descontoNota(cesto.length)}</p>
+                      <div className="opcoes-desconto">
+                        <div className={`opcao-d${opcaoDesconto === "A" ? " on" : ""}`} onClick={() => setOpcaoDesconto("A")}>
+                          <div className="opcao-radio" />
+                          <div>
+                            <div className="opcao-label">{i.opcaoA}</div>
+                            <div className="opcao-desc">{i.opcaoADesc(nv.descontoAluguer)}</div>
+                            <div className="opcao-poupas">{i.poupas} {descontoAluguerVal.toFixed(2)}€</div>
+                          </div>
+                        </div>
+                        <div className={`opcao-d${opcaoDesconto === "B" ? " on" : ""}`} onClick={() => setOpcaoDesconto("B")}>
+                          <div className="opcao-radio" />
+                          <div>
+                            <div className="opcao-label">{i.opcaoB}</div>
+                            <div className="opcao-desc">{i.opcaoBDesc}</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               )}
             </>
