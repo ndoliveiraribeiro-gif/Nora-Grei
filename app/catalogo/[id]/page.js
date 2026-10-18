@@ -494,14 +494,9 @@ export default function PecaDetalhe() {
             {peca.preco_aluguer_dia > 0 ? <>
               <span className="preco-val">{peca.preco_aluguer_dia}€</span>
               <span className="preco-unit">{t.porcDia}</span>
-              {peca.preco_avulso > 0 && <>
-                <span style={{color:'#ccc',fontSize:'0.8rem'}}>·</span>
-                <span className="preco-val" style={{fontSize:'1.3rem'}}>{peca.preco_avulso}€</span>
-                <span className="preco-unit">/{t.porOcasiao.toLowerCase()}</span>
-              </>}
             </> : peca.preco_avulso > 0 ? <>
               <span className="preco-val">{peca.preco_avulso}€</span>
-              <span className="preco-unit">/{t.porOcasiao.toLowerCase()}</span>
+              <span className="preco-unit" style={{fontSize:"0.6rem",letterSpacing:"0.1em"}}>venda usada</span>
             </> : null}
           </div>
 
@@ -591,37 +586,49 @@ export default function PecaDetalhe() {
             )}
           </div>
 
-          {disponivel ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-              <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
-                {tamanhoSelecionado ? t.alugar : t.semTamanho}
-              </button>
-              <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
-                🛍 {tamanhoSelecionado ? t.adicionarCesto : t.semTamanho}
-              </button>
-              {peca.preco_avulso > 0 && (
-                <a href={`/checkout?peca=${id}&modo=ocasiao`} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.65rem 1rem", border:"1px solid #d5d0c8", background:"#f8f7f5", color:"#1a1a1a", textDecoration:"none", fontFamily:"var(--sans)", transition:"all 0.15s" }}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor="#080808";}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#d5d0c8";}}>
-                  <div>
-                    <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#888580", marginBottom:"0.1rem" }}>Aluguer · Evento único</div>
-                    <div style={{ fontSize:"0.68rem", color:"#3f3e3c" }}>Usa numa ocasião e devolves</div>
-                  </div>
-                  <div style={{ fontSize:"1.1rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</div>
-                </a>
-              )}
-            </div>
-          ) : (
-            <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
-          )}
+          {/* BLOCO DE AÇÕES — 3 opções */}
+          <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem", marginTop:"0.25rem" }}>
 
-          <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap", marginTop:"0.25rem" }}>
-            <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:"140px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0.75rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", borderRadius:"6px", fontFamily:"var(--sans)", transition:"all 0.15s", textAlign:"center" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
-              <span style={{ fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.15rem" }}>{t.comprarNova}</span>
-              <span style={{ fontSize:"1.1rem", fontWeight:700 }}>{peca.valor_peca ? `${peca.valor_peca}€` : "↗"}</span>
-            </a>
+            {/* 1. ALUGAR POR DIA */}
+            {peca.preco_aluguer_dia > 0 && (disponivel ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
+                <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
+                  {tamanhoSelecionado ? t.alugar : t.semTamanho}
+                </button>
+                <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
+                  🛍 {tamanhoSelecionado ? t.adicionarCesto : t.semTamanho}
+                </button>
+              </div>
+            ) : (
+              <a href={`/reserva?peca=${id}`} className="btn-reservar">{t.reservar}</a>
+            ))}
+
+            {/* 2. COMPRAR USADA */}
+            {peca.preco_avulso > 0 && (
+              <a href={`/checkout?peca=${id}&modo=comprar_usada`} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.8rem 1rem", border:"1.5px solid #080808", background:"#fff", color:"#080808", textDecoration:"none", fontFamily:"var(--sans)", transition:"all 0.15s" }}
+                onMouseEnter={e=>{e.currentTarget.style.background="#080808";e.currentTarget.style.color="#fff";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#080808";}}>
+                <div>
+                  <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.1rem" }}>Comprar peça usada</div>
+                  <div style={{ fontSize:"0.65rem", opacity:0.6 }}>Peça de segunda mão em bom estado</div>
+                </div>
+                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</span>
+              </a>
+            )}
+
+            {/* 3. COMPRAR NOVA */}
+            {peca.valor_peca > 0 && (
+              <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.8rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", fontFamily:"var(--sans)", transition:"all 0.15s" }}
+                onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
+                <div>
+                  <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.1rem" }}>Comprar nova</div>
+                  <div style={{ fontSize:"0.65rem", color:"#888580" }}>noragrei.com ↗</div>
+                </div>
+                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap", color:"#c4a882" }}>{peca.valor_peca}€</span>
+              </a>
+            )}
+
           </div>
 
           <button
