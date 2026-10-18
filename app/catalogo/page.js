@@ -148,9 +148,19 @@ export default function Catalogo() {
         .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
 
       const agora = new Date();
+      // Mapear stock_tamanho_id -> nº de alugueres ativos nesse stock
+      const alugueresAtivosIds = new Set((alugueresAtivos || []).map(a => a.stock_tamanho_id));
+
       const formatadas = (ngData || []).map(p => {
-        const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
-        const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
+        const stockTamanhos = p.stock_tamanhos || [];
+        // Um tamanho está disponível se: tem quantidade_disponivel > 0 E não está em aluguer ativo
+        const tamanhosDisponiveis = stockTamanhos.filter(s =>
+          s.quantidade_disponivel > 0 && !alugueresAtivosIds.has(s.id)
+        );
+        const temStock = tamanhosDisponiveis.length > 0;
+
+        // Data de regresso: o aluguer ativo mais tardio
+        const stockIds = stockTamanhos.map(s => s.id);
         const aluguerEmCurso = (alugueresAtivos || [])
           .filter(a => stockIds.includes(a.stock_tamanho_id))
           .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
@@ -165,8 +175,10 @@ export default function Catalogo() {
           ...p,
           _origem: "ng",
           categoria: p.categorias?.nome || "",
-          tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
-          tamanhosSemStock: p.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0).map(s => ({ tamanho: s.tamanho, id: s.id })) || [],
+          tamanhos: tamanhosDisponiveis.map(s => s.tamanho),
+          tamanhosSemStock: stockTamanhos.filter(s =>
+            s.quantidade_disponivel === 0 || alugueresAtivosIds.has(s.id)
+          ).map(s => ({ tamanho: s.tamanho, id: s.id })),
           data_fim: dataFimFinal,
           estado: temStock ? "disponivel" : "indisponivel",
         };
@@ -179,17 +191,30 @@ export default function Catalogo() {
         .not("nome", "is", null)
         .order("created_at", { ascending: false });
 
-      const formatadasLoj = (lojData || []).map(p => ({
-        ...p,
-        _origem: "lojista",
-        categoria: p.categoria || "",
-        tamanhos: (p.stock_lojista || []).filter(s => (s.quantidade_disponivel ?? 1) > 0).map(s => s.tamanho),
-        estado: (p.stock_lojista || []).some(s => (s.quantidade_disponivel ?? 1) > 0) ? "disponivel" : "indisponivel",
-        lojaCodigo: p.clientes?.codigo_cliente || "",
-        lojistaNome: p.clientes?.nome || "",
-        lojistaId: p.clientes?.id || "",
-        preco_aluguer_dia: p.preco_aluguer_dia || 0,
-      }));
+      // Alugueres ativos de lojistas
+      const { data: alugueresLojAtivos } = await supabase
+        .from("alugueres_lojista")
+        .select("stock_lojista_id")
+        .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
+      const alugueresLojAtivosIds = new Set((alugueresLojAtivos || []).map(a => a.stock_lojista_id));
+
+      const formatadasLoj = (lojData || []).map(p => {
+        const stockLoj = p.stock_lojista || [];
+        const tamanhosDisponiveis = stockLoj.filter(s =>
+          (s.quantidade_disponivel ?? 1) > 0 && !alugueresLojAtivosIds.has(s.id)
+        );
+        return {
+          ...p,
+          _origem: "lojista",
+          categoria: p.categoria || "",
+          tamanhos: tamanhosDisponiveis.map(s => s.tamanho),
+          estado: tamanhosDisponiveis.length > 0 ? "disponivel" : "indisponivel",
+          lojaCodigo: p.clientes?.codigo_cliente || "",
+          lojistaNome: p.clientes?.nome || "",
+          lojistaId: p.clientes?.id || "",
+          preco_aluguer_dia: p.preco_aluguer_dia || 0,
+        };
+      });
 
       setPecas([...formatadas, ...formatadasLoj]);
     } catch (e) {
