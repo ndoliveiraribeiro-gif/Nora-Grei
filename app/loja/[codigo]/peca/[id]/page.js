@@ -233,6 +233,9 @@ export default function PecaLojaPage() {
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [contactando, setContactando] = useState(false);
   const [avaliacoes, setAvaliacoes] = useState([]);
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const hoje = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem("ng_lang") : null;
@@ -311,6 +314,9 @@ export default function PecaLojaPage() {
     window.location.href = `/loja/${codigo}/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`;
   };
 
+  const diasAluguer = dataInicio && dataFim ? Math.max(1, Math.ceil((new Date(dataFim) - new Date(dataInicio)) / 86400000)) : 0;
+  const totalAluguer = diasAluguer && peca?.preco_aluguer_dia ? diasAluguer * peca.preco_aluguer_dia : 0;
+
   const adicionarAoCesto = () => {
     if (!tamanhoSelecionado) return;
     const stockSel = peca?.stock_lojista?.find(s => s.id === tamanhoSelecionado);
@@ -318,7 +324,7 @@ export default function PecaLojaPage() {
     try { cesto = JSON.parse(localStorage.getItem("ng_cesto") || "[]"); } catch (_) {}
     const jaExiste = cesto.some(c => c.pecaId === id && c.stockId === tamanhoSelecionado);
     if (!jaExiste) {
-      cesto.push({ pecaId: id, stockId: tamanhoSelecionado, tamanhoNome: stockSel?.tamanho || tamanhoSelecionado, pecaNome: peca?.nome, precoDia: peca?.preco_aluguer_dia, valorPeca: peca?.valor_peca || peca?.preco_venda, fotos: peca?.fotos, dataInicio: null, dataFim: null, lojaCodigo: codigo });
+      cesto.push({ pecaId: id, stockId: tamanhoSelecionado, tamanhoNome: stockSel?.tamanho || tamanhoSelecionado, pecaNome: peca?.nome, precoDia: peca?.preco_aluguer_dia, precoVenda: peca?.preco_venda, valorPeca: peca?.valor_peca || peca?.preco_venda, fotos: peca?.fotos, dataInicio: dataInicio || null, dataFim: dataFim || null, lojaCodigo: codigo, lojistaId: lojista?.id, lojistaNome: lojista?.nome, origem: "lojista" });
       localStorage.setItem("ng_cesto", JSON.stringify(cesto));
       window.dispatchEvent(new Event("cesto-atualizado"));
     }
@@ -518,6 +524,29 @@ export default function PecaLojaPage() {
                 </div>
               )}
               <p className="deposito-desc">{i.depositoDesc}</p>
+            </div>
+          )}
+
+          {/* Datas de aluguer */}
+          {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && peca.preco_aluguer_dia && (
+            <div style={{marginBottom:"0.85rem",border:"1.5px solid var(--g2)",padding:"0.85rem 1rem",background:"#fafaf8"}}>
+              <p style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.6rem"}}>Datas de aluguer</p>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem"}}>
+                <div>
+                  <label style={{fontSize:"0.6rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Início</label>
+                  <input type="date" value={dataInicio} min={hoje} onChange={e=>{setDataInicio(e.target.value);if(dataFim&&e.target.value>=dataFim)setDataFim("")}} style={{width:"100%",border:"1px solid var(--g2)",padding:"0.45rem 0.5rem",fontFamily:"var(--sans)",fontSize:"0.75rem",outline:"none",background:"#fff"}} />
+                </div>
+                <div>
+                  <label style={{fontSize:"0.6rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Fim</label>
+                  <input type="date" value={dataFim} min={dataInicio||hoje} onChange={e=>setDataFim(e.target.value)} style={{width:"100%",border:"1px solid var(--g2)",padding:"0.45rem 0.5rem",fontFamily:"var(--sans)",fontSize:"0.75rem",outline:"none",background:"#fff"}} />
+                </div>
+              </div>
+              {diasAluguer > 0 && (
+                <div style={{marginTop:"0.6rem",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span style={{fontSize:"0.65rem",color:"var(--g4)"}}>{diasAluguer} dia{diasAluguer!==1?"s":""} × {peca.preco_aluguer_dia}€</span>
+                  <span style={{fontSize:"0.95rem",fontWeight:700,color:"var(--black)"}}>{totalAluguer}€</span>
+                </div>
+              )}
             </div>
           )}
 

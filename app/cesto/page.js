@@ -163,15 +163,27 @@ export default function CestoPage() {
       if (cli) setTotalAlugueres(cli.total_pecas_alugadas || 0);
     }
 
-    // Enriquecer cesto com dados das peças
+    // Enriquecer cesto com dados das peças (Nora Grei + lojistas)
     if (cestoGuardado.length > 0) {
-      const pecaIds = [...new Set(cestoGuardado.map(i => i.pecaId))];
-      const { data: pecas } = await supabase
-        .from("pecas")
-        .select("id, nome, fotos, preco_aluguer_dia, valor_peca, categorias(nome)")
-        .in("id", pecaIds);
+      const ngIds = cestoGuardado.filter(i => i.origem !== "lojista").map(i => i.pecaId);
+      const lojIds = cestoGuardado.filter(i => i.origem === "lojista").map(i => i.pecaId);
       const pecasMap = {};
-      (pecas || []).forEach(p => { pecasMap[p.id] = p; });
+
+      if (ngIds.length > 0) {
+        const { data: pecas } = await supabase
+          .from("pecas")
+          .select("id, nome, fotos, preco_aluguer_dia, valor_peca")
+          .in("id", ngIds);
+        (pecas || []).forEach(p => { pecasMap[p.id] = p; });
+      }
+      if (lojIds.length > 0) {
+        const { data: pecasLoj } = await supabase
+          .from("pecas_lojista")
+          .select("id, nome, fotos, preco_aluguer_dia, preco_venda, valor_peca")
+          .in("id", lojIds);
+        (pecasLoj || []).forEach(p => { pecasMap[p.id] = p; });
+      }
+
       const enriquecido = cestoGuardado
         .filter(i => pecasMap[i.pecaId])
         .map(i => ({ ...i, peca: pecasMap[i.pecaId] }));

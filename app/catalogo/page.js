@@ -5,6 +5,56 @@ import PecaCard from "@/components/PecaCard";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"];
 
+// Card inline para peças de lojistas (link diferente)
+function PecaCardLojista({ peca, lang }) {
+  const disponivel = peca.estado !== "indisponivel";
+  const l = { pt:{ alugar:"Alugar" }, fr:{ alugar:"Louer" }, lt:{ alugar:"Nuomoti" } };
+  const lbl = (l[lang] || l.pt).alugar;
+  const href = `/loja/${peca.lojaCodigo}/peca/${peca.id}`;
+  return (
+    <div style={{display:"flex",flexDirection:"column",background:"#f8f7f5",position:"relative",borderRadius:"2px",overflow:"hidden"}}>
+      <a href={href} style={{textDecoration:"none",color:"inherit",display:"block",position:"relative"}}>
+        <div style={{aspectRatio:"3/4",background:"#e8e5e0",overflow:"hidden",position:"relative"}}>
+          {peca.fotos && peca.fotos[0] ? (
+            <img src={peca.fotos[0]} alt={peca.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
+          ) : (
+            <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span>
+            </div>
+          )}
+          {/* Badge Lojista */}
+          <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.44rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.22rem 0.5rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
+        </div>
+        <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
+          {peca.categoria && (
+            <p style={{fontSize:"0.48rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"'Jost',sans-serif",marginBottom:"0.15rem"}}>{peca.categoria}</p>
+          )}
+          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.15rem",color:"#080808"}}>{peca.nome}</h3>
+          {peca.lojistaNome && (
+            <p style={{fontSize:"0.46rem",letterSpacing:"0.08em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{peca.lojistaNome}</p>
+          )}
+          {peca.tamanhos && peca.tamanhos.length > 0 && (
+            <div style={{display:"flex",gap:"0.25rem",flexWrap:"wrap",marginBottom:"0.3rem"}}>
+              {peca.tamanhos.slice(0,5).map(t => (
+                <span key={t} style={{fontSize:"0.47rem",letterSpacing:"0.06em",border:"1px solid #dedad4",padding:"0.12rem 0.35rem",color:"#6b6960",fontFamily:"'Jost',sans-serif"}}>{t}</span>
+              ))}
+            </div>
+          )}
+          <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
+            <span style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1.2rem",fontWeight:300,color:"#080808"}}>{peca.preco_aluguer_dia}€</span>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.55rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+          </div>
+        </div>
+      </a>
+      {disponivel ? (
+        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:400,minHeight:"44px"}}>{lbl}</a>
+      ) : (
+        <div style={{margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"1px solid #dedad4",color:"#b0ada6",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"44px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
+      )}
+    </div>
+  );
+}
+
 // Ocasiões — filtro por tag/ocasiao na tabela pecas (coluna: ocasiao TEXT[])
 const OCASIOES = {
   pt: [
@@ -43,6 +93,7 @@ const translations = {
     categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"],
     ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
     ocasiao: "Para que ocasião?",
+    fonte: "Fonte", todasFontes: "Todas", noraGrei: "Nora Grei", lojistas: "Lojistas",
   },
   fr: {
     titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout", todasOcasiao: "Toutes les occasions",
@@ -50,6 +101,7 @@ const translations = {
     categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes"],
     ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
     ocasiao: "Pour quelle occasion ?",
+    fonte: "Source", todasFontes: "Tout", noraGrei: "Nora Grei", lojistas: "Boutiques",
   },
   lt: {
     titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi", todasOcasiao: "Visos progos",
@@ -57,6 +109,7 @@ const translations = {
     categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai"],
     ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
     ocasiao: "Kokia proga?",
+    fonte: "Šaltinis", todasFontes: "Visi", noraGrei: "Nora Grei", lojistas: "Parduotuvės",
   },
 };
 
@@ -66,10 +119,11 @@ const pecasExemplo = [
 ];
 
 export default function Catalogo() {
-  const [pecas, setPecas] = useState(pecasExemplo);
-  const [loading, setLoading] = useState(false);
+  const [pecas, setPecas] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
   const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
+  const [filtroFonte, setFiltroFonte] = useState("todas");
   const [ordenar, setOrdenar] = useState("recentes");
   const [lang, setLang] = useState("pt");
 
@@ -82,53 +136,62 @@ export default function Catalogo() {
   const carregarPecas = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Peças Nora Grei
+      const { data: ngData } = await supabase
         .from("pecas")
         .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
         .order("created_at", { ascending: false });
-
-      if (error) throw error;
 
       const { data: alugueresAtivos } = await supabase
         .from("alugueres")
         .select("stock_tamanho_id, data_fim, data_disponivel_novamente, estado")
         .in("estado", ["pendente", "confirmado", "enviado", "ativo", "em_verificacao"]);
 
-      if (data && data.length > 0) {
-        const agora = new Date();
-        const formatadas = data.map(p => {
-          const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
-          const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
+      const agora = new Date();
+      const formatadas = (ngData || []).map(p => {
+        const temStock = p.stock_tamanhos?.some(s => s.quantidade_disponivel > 0);
+        const stockIds = p.stock_tamanhos?.map(s => s.id) || [];
+        const aluguerEmCurso = (alugueresAtivos || [])
+          .filter(a => stockIds.includes(a.stock_tamanho_id))
+          .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
+        let dataFimFinal = null;
+        if (aluguerEmCurso) {
+          const dataDisp = aluguerEmCurso.data_disponivel_novamente
+            ? new Date(aluguerEmCurso.data_disponivel_novamente)
+            : new Date(new Date(aluguerEmCurso.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
+          if (dataDisp > agora) dataFimFinal = dataDisp.toISOString();
+        }
+        return {
+          ...p,
+          _origem: "ng",
+          categoria: p.categorias?.nome || "",
+          tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
+          tamanhosSemStock: p.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0).map(s => ({ tamanho: s.tamanho, id: s.id })) || [],
+          data_fim: dataFimFinal,
+          estado: temStock ? "disponivel" : "indisponivel",
+        };
+      });
 
-          const aluguerEmCurso = (alugueresAtivos || [])
-            .filter(a => stockIds.includes(a.stock_tamanho_id))
-            .sort((a, b) => new Date(b.data_fim) - new Date(a.data_fim))[0];
+      // Peças lojistas (pecas_lojista) + dados do lojista
+      const { data: lojData } = await supabase
+        .from("pecas_lojista")
+        .select("*, stock_lojista(id, tamanho, quantidade_disponivel), clientes(id, nome, codigo_cliente)")
+        .not("nome", "is", null)
+        .order("created_at", { ascending: false });
 
-          let dataFimFinal = null;
-          let indisponivel = false;
+      const formatadasLoj = (lojData || []).map(p => ({
+        ...p,
+        _origem: "lojista",
+        categoria: p.categoria || "",
+        tamanhos: (p.stock_lojista || []).filter(s => (s.quantidade_disponivel ?? 1) > 0).map(s => s.tamanho),
+        estado: (p.stock_lojista || []).some(s => (s.quantidade_disponivel ?? 1) > 0) ? "disponivel" : "indisponivel",
+        lojaCodigo: p.clientes?.codigo_cliente || "",
+        lojistaNome: p.clientes?.nome || "",
+        lojistaId: p.clientes?.id || "",
+        preco_aluguer_dia: p.preco_aluguer_dia || 0,
+      }));
 
-          if (aluguerEmCurso) {
-            const dataDisp = aluguerEmCurso.data_disponivel_novamente
-              ? new Date(aluguerEmCurso.data_disponivel_novamente)
-              : new Date(new Date(aluguerEmCurso.data_fim).getTime() + 3 * 24 * 60 * 60 * 1000);
-
-            if (dataDisp > agora) {
-              dataFimFinal = dataDisp.toISOString();
-              indisponivel = true;
-            }
-          }
-
-          return {
-            ...p,
-            categoria: p.categorias?.nome || "",
-            tamanhos: p.stock_tamanhos?.filter(s => s.quantidade_disponivel > 0).map(s => s.tamanho) || [],
-            tamanhosSemStock: p.stock_tamanhos?.filter(s => s.quantidade_disponivel === 0).map(s => ({ tamanho: s.tamanho, id: s.id })) || [],
-            data_fim: dataFimFinal,
-            estado: temStock ? "disponivel" : "indisponivel",
-          };
-        });
-        setPecas(formatadas);
-      }
+      setPecas([...formatadas, ...formatadasLoj]);
     } catch (e) {
       console.error("Erro ao carregar peças:", e);
     }
@@ -144,11 +207,12 @@ export default function Catalogo() {
   };
 
   const pecasFiltradas = pecas
+    .filter(p => filtroFonte === "todas" || (filtroFonte === "ng" ? p._origem === "ng" : p._origem === "lojista"))
     .filter(p => filtroCategoria === "todas" || p.categoria === categoriaTraduzidaParaBD(filtroCategoria))
     .filter(p => filtroOcasiao === "todas" || (p.ocasiao && p.ocasiao.includes(filtroOcasiao)))
     .sort((a, b) => {
-      if (ordenar === "precoAsc") return a.preco_aluguer_dia - b.preco_aluguer_dia;
-      if (ordenar === "precoDesc") return b.preco_aluguer_dia - a.preco_aluguer_dia;
+      if (ordenar === "precoAsc") return (a.preco_aluguer_dia||0) - (b.preco_aluguer_dia||0);
+      if (ordenar === "precoDesc") return (b.preco_aluguer_dia||0) - (a.preco_aluguer_dia||0);
       return 0;
     });
 
@@ -229,6 +293,17 @@ export default function Catalogo() {
         </div>
       </div>
 
+      {/* Filtro de fonte (Nora Grei / Lojistas) */}
+      <div style={{padding:"0 1rem 0.75rem",display:"flex",gap:"0.4rem",overflowX:"auto",scrollbarWidth:"none"}}>
+        {[["todas", t.todasFontes], ["ng", t.noraGrei], ["lojista", t.lojistas]].map(([key, label]) => (
+          <button key={key}
+            onClick={() => setFiltroFonte(key)}
+            style={{fontSize:"0.6rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.38rem 0.8rem",border:`1px solid ${filtroFonte===key?"#080808":"#e2dfda"}`,background:filtroFonte===key?"#080808":"transparent",color:filtroFonte===key?"#f8f7f5":"#5a5855",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap",flexShrink:0,fontWeight:400}}>
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="cat-filters">
         <button className={`filter-btn${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
         {t.categorias.map(cat => (
@@ -248,9 +323,11 @@ export default function Catalogo() {
         <div className="cat-empty">{t.semResultados}</div>
       ) : (
         <div className="cat-grid">
-          {pecasFiltradas.map(peca => (
-            <PecaCard key={peca.id} peca={peca} lang={lang} />
-          ))}
+          {pecasFiltradas.map(peca =>
+            peca._origem === "lojista"
+              ? <PecaCardLojista key={`loj-${peca.id}`} peca={peca} lang={lang} />
+              : <PecaCard key={`ng-${peca.id}`} peca={peca} lang={lang} />
+          )}
         </div>
       )}
     </>
