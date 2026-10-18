@@ -722,7 +722,7 @@ export default function Perfil() {
       const completos = al.filter(a => ["devolvido","devolvido_danificado"].includes(a.estado)).length;
       const ativos = al.filter(a => ["ativo","enviado","confirmado","pendente","em_verificacao"].includes(a.estado)).length;
       const gasto = al.reduce((s, a) => s + (a.valor_aluguer || 0), 0);
-      setStats({ totalAlugueres: al.filter(a => a.estado !== "cancelado").length, totalGasto: gasto, pecasAtivas: ativos, reservas: 0, pontos: c?.pontos || completos, totalPecas: completos });
+      setStats({ totalAlugueres: al.filter(a => a.estado !== "cancelado").length, totalGasto: gasto, pecasAtivas: ativos, reservas: 0, pontos: completos, totalPecas: completos });
     }
 
     const { data: res } = await supabase.from("reservas_espera").select("id").eq("cliente_id", user.id).eq("estado", "aguarda");
