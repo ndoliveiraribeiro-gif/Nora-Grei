@@ -1131,6 +1131,7 @@ export default function Perfil() {
                               <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
                               <BotaoVerTalao aluguer={a} i={i} />
                               {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
+                              {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && <CartaoAvaliacao aluguer={a} i={i} />}
                             </div>
                           </div>
                         </div>
