@@ -31,9 +31,9 @@ function Timer({ dataFim, lang }) {
 
 export default function PecaCard({ peca, lang = "pt" }) {
   const labels = {
-    pt: { alugar: "Alugar", comprar: "Comprar", reservar: "Indisponível — Reservar", disponivel: "Disponível", indisponivel: "Indisponível" },
-    fr: { alugar: "Louer", comprar: "Acheter", reservar: "Indisponible — Réserver", disponivel: "Disponible", indisponivel: "Indisponible" },
-    lt: { alugar: "Nuomoti", comprar: "Pirkti", reservar: "Neprieinama — Rezervuoti", disponivel: "Prieinama", indisponivel: "Neprieinama" },
+    pt: { alugar: "Alugar", comprar: "Comprar", reservar: "Indisponível — Reservar", disponivel: "Disponível", indisponivel: "Indisponível", guardar: "Guardar", removerGuardado: "Remover dos guardados" },
+    fr: { alugar: "Louer", comprar: "Acheter", reservar: "Indisponible — Réserver", disponivel: "Disponible", indisponivel: "Indisponible", guardar: "Sauvegarder", removerGuardado: "Retirer des favoris" },
+    lt: { alugar: "Nuomoti", comprar: "Pirkti", reservar: "Neprieinama — Rezervuoti", disponivel: "Prieinama", indisponivel: "Neprieinama", guardar: "Išsaugoti", removerGuardado: "Pašalinti iš išsaugotų" },
   };
   const l = labels[lang] || labels.pt;
   const disponivel = peca.estado === "disponivel";
@@ -100,7 +100,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
               transition:'background 0.2s, transform 0.15s',
               transform: wishlistLoading ? 'scale(0.9)' : 'scale(1)',
             }}
-            aria-label={naWishlist ? "Remover dos guardados" : "Guardar"}
+            aria-label={naWishlist ? l.removerGuardado : l.guardar}
           >
             <svg viewBox="0 0 24 24" width="15" height="15"
               fill={naWishlist ? "#fff" : "none"}

@@ -24,6 +24,7 @@ const TRADUCOES = {
     reservaDisponivelTitulo: "🎉 Disponível agora!",
     reservaConfirmar: "Confirmar e pagar",
     verTalao: "Ver talão", avaliarExperiencia: "Avalia a tua experiência", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação",
+    talaoMetodo: "Método", talaoAluguer: "Aluguer", talaoHigienizacao: "Higienização", talaoDeposito: "Depósito", talaoTotal: "Total", talaoPago: "✓ Pago", talaoAguarda: "A aguardar pagamento",
     comprarModal: "Como queres comprar esta peça?",
     comprarUsada: "Comprar usada",
     comprarUsadaDesc: "A peça que alugaste, inspeccionada e em bom estado",
@@ -62,6 +63,7 @@ const TRADUCOES = {
     reservaDisponivelTitulo: "🎉 Disponible maintenant !",
     reservaConfirmar: "Confirmer et payer",
     verTalao: "Voir le reçu", avaliarExperiencia: "Évaluez votre expérience", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer",
+    talaoMetodo: "Méthode", talaoAluguer: "Location", talaoHigienizacao: "Nettoyage", talaoDeposito: "Dépôt", talaoTotal: "Total", talaoPago: "✓ Payé", talaoAguarda: "En attente de paiement",
     comprarModal: "Comment souhaitez-vous acheter cette pièce ?",
     comprarUsada: "Acheter d'occasion",
     comprarUsadaDesc: "La pièce que vous avez louée, inspectée et en bon état",
@@ -100,6 +102,7 @@ const TRADUCOES = {
     reservaDisponivelTitulo: "🎉 Prieinama dabar!",
     reservaConfirmar: "Patvirtinti ir mokėti",
     verTalao: "Peržiūrėti kvitą", avaliarExperiencia: "Įvertinkite savo patirtį", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", comentarioPlaceholder: "Palikite komentarą (neprivaloma)...", enviarAvaliacao: "Siųsti",
+    talaoMetodo: "Mokėjimo būdas", talaoAluguer: "Nuoma", talaoHigienizacao: "Valymas", talaoDeposito: "Užstatas", talaoTotal: "Iš viso", talaoPago: "✓ Apmokėta", talaoAguarda: "Laukiama apmokėjimo",
     comprarModal: "Kaip norite įsigyti šį drabužį?",
     comprarUsada: "Pirkti naudotą",
     comprarUsadaDesc: "Drabužis, kurį nuomojotės, patikrintas ir geros būklės",
@@ -591,7 +594,7 @@ function PedidosContent() {
     </div>
   );
 
-  const BotaoVerTalao = ({ a }) => {
+  const BotaoVerTalao = ({ a, i }) => {
     const [recibo, setRecibo] = useState(null);
     const [loading, setLoading] = useState(false);
     const [aberto, setAberto] = useState(false);
@@ -615,11 +618,11 @@ function PedidosContent() {
                 <button onClick={() => setAberto(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#888"}}>×</button>
               </div>
               <div style={{borderTop:"1px solid #f0eeeb",paddingTop:"1rem",display:"flex",flexDirection:"column",gap:"0.5rem"}}>
-                {[["Método", recibo.metodo_pagamento], ["Aluguer", recibo.valor_aluguer != null ? `${recibo.valor_aluguer}€` : null], ["Higienização", recibo.valor_higienizacao != null ? `${recibo.valor_higienizacao}€` : null], ["Depósito", recibo.valor_deposito != null ? `${recibo.valor_deposito}€` : null]].filter(r => r[1]).map(([l, v]) => (
+                {[[i.talaoMetodo, recibo.metodo_pagamento], [i.talaoAluguer, recibo.valor_aluguer != null ? `${recibo.valor_aluguer}€` : null], [i.talaoHigienizacao, recibo.valor_higienizacao != null ? `${recibo.valor_higienizacao}€` : null], [i.talaoDeposito, recibo.valor_deposito != null ? `${recibo.valor_deposito}€` : null]].filter(r => r[1]).map(([l, v]) => (
                   <div key={l} style={{display:"flex",justifyContent:"space-between",fontSize:"0.82rem",color:"#5a5855"}}><span>{l}</span><span>{v}</span></div>
                 ))}
-                <div style={{display:"flex",justifyContent:"space-between",fontSize:"1rem",fontWeight:600,borderTop:"1px solid #f0eeeb",paddingTop:"0.75rem",marginTop:"0.25rem"}}><span>Total</span><span>{recibo.valor_total}€</span></div>
-                <div style={{textAlign:"center",marginTop:"0.5rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:recibo.estado==="pago"?"#27ae60":"#e67e22",fontWeight:600}}>{recibo.estado==="pago"?"✓ Pago":"A aguardar pagamento"}</div>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:"1rem",fontWeight:600,borderTop:"1px solid #f0eeeb",paddingTop:"0.75rem",marginTop:"0.25rem"}}><span>{i.talaoTotal}</span><span>{recibo.valor_total}€</span></div>
+                <div style={{textAlign:"center",marginTop:"0.5rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:recibo.estado==="pago"?"#27ae60":"#e67e22",fontWeight:600}}>{recibo.estado==="pago"? i.talaoPago : i.talaoAguarda}</div>
               </div>
             </div>
           </div>
@@ -706,7 +709,7 @@ function PedidosContent() {
           </div>
         </div>
         {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} lang={lang} />}
-        <BotaoVerTalao a={a} />
+        <BotaoVerTalao a={a} i={i} />
         {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && <CartaoAvaliacao a={a} />}
       </div>
     );
