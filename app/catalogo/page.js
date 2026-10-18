@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import PecaCard from "@/components/PecaCard";
 
-const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"];
+const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"];
 
 // Card inline para peças de lojistas (link diferente)
 function PecaCardLojista({ peca, lang }) {
@@ -58,31 +58,31 @@ function PecaCardLojista({ peca, lang }) {
 // Ocasiões — filtro por tag/ocasiao na tabela pecas (coluna: ocasiao TEXT[])
 const OCASIOES = {
   pt: [
-    { key: "casamento",   label: "💍 Casamento" },
-    { key: "gala",        label: "✨ Gala" },
-    { key: "cocktail",    label: "🥂 Cocktail" },
-    { key: "festa",       label: "🎉 Festa" },
-    { key: "trabalho",    label: "💼 Trabalho" },
-    { key: "dia",         label: "☀️ Dia a dia" },
-    { key: "praia",       label: "🌊 Praia / Verão" },
+    { key: "casamento",   label: "Casamento" },
+    { key: "gala",        label: "Gala" },
+    { key: "cocktail",    label: "Cocktail" },
+    { key: "festa",       label: "Festa" },
+    { key: "trabalho",    label: "Trabalho" },
+    { key: "dia",         label: "Dia a dia" },
+    { key: "praia",       label: "Praia / Verão" },
   ],
   fr: [
-    { key: "casamento",   label: "💍 Mariage" },
-    { key: "gala",        label: "✨ Gala" },
-    { key: "cocktail",    label: "🥂 Cocktail" },
-    { key: "festa",       label: "🎉 Fête" },
-    { key: "trabalho",    label: "💼 Travail" },
-    { key: "dia",         label: "☀️ Quotidien" },
-    { key: "praia",       label: "🌊 Plage / Été" },
+    { key: "casamento",   label: "Mariage" },
+    { key: "gala",        label: "Gala" },
+    { key: "cocktail",    label: "Cocktail" },
+    { key: "festa",       label: "Fête" },
+    { key: "trabalho",    label: "Travail" },
+    { key: "dia",         label: "Quotidien" },
+    { key: "praia",       label: "Plage / Été" },
   ],
   lt: [
-    { key: "casamento",   label: "💍 Vestuvės" },
-    { key: "gala",        label: "✨ Gala" },
-    { key: "cocktail",    label: "🥂 Kokteilis" },
-    { key: "festa",       label: "🎉 Šventė" },
-    { key: "trabalho",    label: "💼 Darbas" },
-    { key: "dia",         label: "☀️ Kasdien" },
-    { key: "praia",       label: "🌊 Paplūdimys" },
+    { key: "casamento",   label: "Vestuvės" },
+    { key: "gala",        label: "Gala" },
+    { key: "cocktail",    label: "Kokteilis" },
+    { key: "festa",       label: "Šventė" },
+    { key: "trabalho",    label: "Darbas" },
+    { key: "dia",         label: "Kasdien" },
+    { key: "praia",       label: "Paplūdimys" },
   ],
 };
 
@@ -90,25 +90,25 @@ const translations = {
   pt: {
     titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas", todasOcasiao: "Todas as ocasiões",
     semResultados: "Nenhuma peça encontrada.", loading: "A carregar...",
-    categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias"],
+    categorias: ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"],
     ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
-    ocasiao: "Para que ocasião?",
+    ocasiao: "Ocasião",
     fonte: "Fonte", todasFontes: "Todas", noraGrei: "Nora Grei", lojistas: "Lojistas",
   },
   fr: {
-    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout", todasOcasiao: "Toutes les occasions",
+    titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout", todasOcasiao: "Toutes",
     semResultados: "Aucune pièce trouvée.", loading: "Chargement...",
-    categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes"],
+    categorias: ["Robes", "Manteaux", "Ensembles", "Accessoires", "Corsets", "Hauts", "Pantalons", "Jupes", "Montres"],
     ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
-    ocasiao: "Pour quelle occasion ?",
+    ocasiao: "Occasion",
     fonte: "Source", todasFontes: "Tout", noraGrei: "Nora Grei", lojistas: "Boutiques",
   },
   lt: {
-    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi", todasOcasiao: "Visos progos",
+    titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi", todasOcasiao: "Visos",
     semResultados: "Drabužių nerasta.", loading: "Kraunama...",
-    categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai"],
+    categorias: ["Suknelės", "Paltai", "Komplektai", "Aksesuarai", "Korsetai", "Marškinėliai", "Kelnės", "Sijonai", "Laikrodžiai"],
     ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
-    ocasiao: "Kokia proga?",
+    ocasiao: "Proga",
     fonte: "Šaltinis", todasFontes: "Visi", noraGrei: "Nora Grei", lojistas: "Parduotuvės",
   },
 };
@@ -230,17 +230,23 @@ export default function Catalogo() {
         .cat-header { padding:5rem 1rem 1.5rem; }
         .cat-header-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.5rem; font-weight:400; }
         .cat-header-title { font-family:var(--serif); font-size:clamp(1.8rem,8vw,3rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
-        .cat-ocasiao-wrap { padding:0.75rem 1rem 0; }
-        .cat-ocasiao-label { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:#888; font-weight:400; margin-bottom:0.5rem; display:block; }
-        .cat-ocasiao { display:flex; gap:0.45rem; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:0.75rem; scrollbar-width:none; }
-        .cat-ocasiao::-webkit-scrollbar { display:none; }
-        .ocasiao-btn { font-size:0.62rem; letter-spacing:0.05em; padding:0.42rem 0.85rem; border-radius:999px; border:1px solid var(--grey-200); background:var(--white); color:#3a3835; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.15s; }
-        .ocasiao-btn.active { background:#c4748a; color:#fff; border-color:#c4748a; }
-        .cat-filters { padding:0 1rem 1rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); margin-bottom:1rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
-        .filter-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.9rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; }
-        .filter-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
-        .filter-sep { width:1px; height:16px; background:var(--grey-200); flex-shrink:0; }
-        .filter-select { font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.5rem 0.7rem; border:1px solid var(--grey-200); background:var(--white); color:#1a1a18; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; }
+        /* Filtros */
+        .filtros-bloco { border-top:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200); margin-bottom:1.5rem; }
+        .filtros-linha { display:flex; align-items:center; gap:0; border-bottom:1px solid var(--grey-200); }
+        .filtros-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex:1; }
+        .filtros-scroll::-webkit-scrollbar { display:none; }
+        .filter-btn { font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; padding:0.7rem 1rem; border:none; border-right:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; transition:background 0.12s,color 0.12s; }
+        .filter-btn:first-child { padding-left:1rem; }
+        .filter-btn.active { background:var(--black); color:var(--white); }
+        .filter-select { font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.7rem 1rem; border:none; border-left:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; appearance:none; -webkit-appearance:none; }
+        .filtros-linha-2 { display:flex; align-items:flex-start; flex-wrap:wrap; gap:0; }
+        .filtros-grupo { display:flex; align-items:center; gap:0.5rem; padding:0.55rem 1rem; flex-wrap:wrap; }
+        .filtros-grupo + .filtros-grupo { border-left:1px solid var(--grey-200); }
+        .filtros-grupo-label { font-size:0.52rem; letter-spacing:0.22em; text-transform:uppercase; color:#aaa9a6; font-family:var(--sans); white-space:nowrap; flex-shrink:0; }
+        .filtros-tags { display:flex; gap:0.3rem; flex-wrap:wrap; overflow-x:auto; scrollbar-width:none; }
+        .filtros-tags::-webkit-scrollbar { display:none; }
+        .tag-btn { font-size:0.58rem; letter-spacing:0.08em; padding:0.28rem 0.65rem; border:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.12s; }
+        .tag-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .cat-grid { padding:0 1rem 4rem; display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
         .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--serif); font-size:1.3rem; font-weight:300; color:#3a3835; font-style:italic; }
         .cat-loading { padding:4rem; text-align:center; font-size:0.78rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; }
@@ -248,23 +254,21 @@ export default function Catalogo() {
         @media (min-width:600px) {
           .cat-nav { padding:1.1rem 2rem; }
           .cat-header { padding:6rem 2rem 2rem; }
-          .cat-ocasiao-wrap { padding:0.75rem 2rem 0; }
-          .cat-filters { padding:0 2rem 1.5rem; flex-wrap:wrap; overflow-x:visible; }
           .cat-grid { padding:0 2rem 5rem; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
+          .filter-btn:first-child { padding-left:2rem; }
+          .filtros-grupo { padding:0.55rem 2rem; }
         }
         /* DESKTOP */
         @media (min-width:960px) {
           .cat-nav { padding:1.25rem 3rem; }
           .cat-header { padding:7rem 3rem 2.5rem; }
-          .cat-ocasiao-wrap { padding:0.75rem 3rem 0; }
-          .cat-ocasiao { overflow-x:visible; flex-wrap:wrap; }
-          .ocasiao-btn { font-size:0.68rem; padding:0.48rem 1rem; }
-          .ocasiao-btn:hover:not(.active) { border-color:#c4748a; color:#c4748a; }
-          .cat-filters { padding:0 3rem 2rem; }
           .cat-grid { padding:0 3rem 6rem; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
-          .filter-btn { font-size:0.72rem; padding:0.6rem 1.1rem; }
-          .filter-btn:hover { border-color:var(--black); color:var(--black); }
-          .filter-select { font-size:0.72rem; }
+          .filter-btn { font-size:0.65rem; padding:0.75rem 1.1rem; }
+          .filter-btn:first-child { padding-left:3rem; }
+          .filter-btn:hover:not(.active) { color:var(--black); }
+          .filter-select { font-size:0.65rem; padding:0.75rem 3rem 0.75rem 1.1rem; }
+          .filtros-grupo { padding:0.6rem 3rem; }
+          .tag-btn:hover:not(.active) { border-color:#aaa; color:var(--black); }
         }
         @media (min-width:1280px) {
           .cat-grid { grid-template-columns:repeat(4,1fr); }
@@ -283,38 +287,43 @@ export default function Catalogo() {
         <h1 className="cat-header-title">{t.subtitulo}</h1>
       </div>
 
-      <div className="cat-ocasiao-wrap">
-        <span className="cat-ocasiao-label">{t.ocasiao}</span>
-        <div className="cat-ocasiao">
-          <button className={`ocasiao-btn${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
-          {(OCASIOES[lang] || OCASIOES.pt).map(o => (
-            <button key={o.key} className={`ocasiao-btn${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
-          ))}
+      {/* Bloco de filtros unificado */}
+      <div className="filtros-bloco">
+        {/* Linha 1: Categorias + ordenar */}
+        <div className="filtros-linha">
+          <div className="filtros-scroll">
+            <button className={`filter-btn${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
+            {t.categorias.map(cat => (
+              <button key={cat} className={`filter-btn${filtroCategoria === cat ? " active" : ""}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
+            ))}
+          </div>
+          <select className="filter-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
+            <option value="recentes">{t.recentes}</option>
+            <option value="precoAsc">{t.precoAsc}</option>
+            <option value="precoDesc">{t.precoDesc}</option>
+          </select>
         </div>
-      </div>
 
-      {/* Filtro de fonte (Nora Grei / Lojistas) */}
-      <div style={{padding:"0 1rem 0.75rem",display:"flex",gap:"0.4rem",overflowX:"auto",scrollbarWidth:"none"}}>
-        {[["todas", t.todasFontes], ["ng", t.noraGrei], ["lojista", t.lojistas]].map(([key, label]) => (
-          <button key={key}
-            onClick={() => setFiltroFonte(key)}
-            style={{fontSize:"0.6rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.38rem 0.8rem",border:`1px solid ${filtroFonte===key?"#080808":"#e2dfda"}`,background:filtroFonte===key?"#080808":"transparent",color:filtroFonte===key?"#f8f7f5":"#5a5855",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap",flexShrink:0,fontWeight:400}}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <div className="cat-filters">
-        <button className={`filter-btn${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
-        {t.categorias.map(cat => (
-          <button key={cat} className={`filter-btn${filtroCategoria === cat ? " active" : ""}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
-        ))}
-        <div className="filter-sep"></div>
-        <select className="filter-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
-          <option value="recentes">{t.recentes}</option>
-          <option value="precoAsc">{t.precoAsc}</option>
-          <option value="precoDesc">{t.precoDesc}</option>
-        </select>
+        {/* Linha 2: Ocasião + Fonte — mais subtil */}
+        <div className="filtros-linha-2">
+          <div className="filtros-grupo">
+            <span className="filtros-grupo-label">{t.ocasiao}</span>
+            <div className="filtros-tags">
+              <button className={`tag-btn${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
+              {(OCASIOES[lang] || OCASIOES.pt).map(o => (
+                <button key={o.key} className={`tag-btn${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="filtros-grupo">
+            <span className="filtros-grupo-label">{t.fonte}</span>
+            <div className="filtros-tags">
+              {[["todas", t.todasFontes], ["ng", t.noraGrei], ["lojista", t.lojistas]].map(([key, label]) => (
+                <button key={key} className={`tag-btn${filtroFonte === key ? " active" : ""}`} onClick={() => setFiltroFonte(key)}>{label}</button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {loading ? (
