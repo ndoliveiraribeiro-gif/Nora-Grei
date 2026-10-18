@@ -555,6 +555,16 @@ export default function PecaLojaPage() {
             </div>
           )}
 
+          {/* Link externo — compra nova noutra marca */}
+          {peca.link_externo_ativo && peca.link_compra_externa && (
+            <a href={peca.link_compra_externa} target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.5rem",width:"100%",marginBottom:"0.75rem",padding:"0.75rem 1rem",border:"1.5px solid #c4a882",background:"#faf8f5",color:"#8a6a2a",textDecoration:"none",fontFamily:"var(--sans)",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,boxSizing:"border-box"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";e.currentTarget.style.color="#fff";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";e.currentTarget.style.color="#8a6a2a";}}>
+              {peca.marca ? `Comprar nova na ${peca.marca} ↗` : "Comprar nova ↗"}
+            </a>
+          )}
+
           {/* Botão contactar */}
           <button className="btn-contactar" onClick={contactarLojista} disabled={contactando}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>

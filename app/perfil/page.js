@@ -981,7 +981,7 @@ export default function Perfil() {
   const [codigoLoja, setCodigoLoja] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
@@ -1197,6 +1197,8 @@ export default function Perfil() {
       material: novaPeca.material||null,
       marca: novaPeca.marca||null,
       ocasioes: novaPeca.ocasioes,
+      link_compra_externa: novaPeca.link_compra_externa||null,
+      link_externo_ativo: false,
       estado: "disponivel",
       codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(pecasLoja.length + 1).padStart(3, "0")}`,
     }).select().single();
@@ -1220,7 +1222,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
-    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
     setFotosLojista([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
@@ -1238,6 +1240,7 @@ export default function Perfil() {
       material: editarPeca.material || null,
       marca: editarPeca.marca || null,
       ocasioes: editarPeca.ocasioes || [],
+      link_compra_externa: editarPeca.link_compra_externa || null,
     }).eq("id", editarPeca.id);
     // reload peças
     const { data: { session } } = await supabase.auth.getSession();
@@ -2008,6 +2011,34 @@ export default function Perfil() {
                       </div>
                     </div>
                   )}
+                  {/* Painel links externos */}
+                  {(() => {
+                    const pecasComLink = pecasLoja.filter(p=>p.link_compra_externa);
+                    if(!pecasComLink.length) return null;
+                    const ativas = pecasComLink.filter(p=>p.link_externo_ativo).length;
+                    const pendentes = pecasComLink.filter(p=>!p.link_externo_ativo).length;
+                    const custoTotal = pecasComLink.length * 15;
+                    return (
+                      <div style={{background:"#faf8f5",border:"1.5px solid #e8d5a3",padding:"1.1rem",marginTop:"0.6rem"}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.75rem"}}>
+                          <div style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#8a6a2a",fontWeight:600}}>Links externos ↗</div>
+                          <span style={{fontSize:"0.65rem",color:"#8a6a2a",fontWeight:600}}>{custoTotal}€/mês</span>
+                        </div>
+                        {pecasComLink.map(p=>(
+                          <div key={p.id} style={{display:"flex",gap:"0.75rem",alignItems:"center",marginBottom:"0.5rem",padding:"0.5rem",background:"#fff",border:"1px solid #e8d5a3"}}>
+                            {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:32,height:40,objectFit:"cover",flexShrink:0}} alt=""/>:<div style={{width:32,height:40,background:"#e8d5a3",flexShrink:0}}/>}
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{fontSize:"0.75rem",fontFamily:"var(--serif)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
+                              <div style={{fontSize:"0.58rem",color:"var(--g4)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.link_compra_externa}</div>
+                            </div>
+                            <span style={{fontSize:"0.58rem",fontWeight:600,whiteSpace:"nowrap",color:p.link_externo_ativo?"#27ae60":"#e67e22"}}>{p.link_externo_ativo?"✓ Ativo":"⏳ Pendente"}</span>
+                          </div>
+                        ))}
+                        {pendentes>0 && <div style={{fontSize:"0.62rem",color:"#8a6a2a",marginTop:"0.5rem"}}>⏳ {pendentes} link{pendentes!==1?"s":""} pendente{pendentes!==1?"s":""} de ativação — contacta a Nora Grei para ativar.</div>}
+                        {ativas>0 && <div style={{fontSize:"0.62rem",color:"#27ae60",marginTop:"0.35rem"}}>✓ {ativas} link{ativas!==1?"s":""} ativo{ativas!==1?"s":""}</div>}
+                      </div>
+                    );
+                  })()}
                   {diasTeste>0 && <div style={{marginTop:"0.6rem",fontSize:"0.65rem",color:"var(--g4)",textAlign:"center",padding:"0.6rem",background:"var(--g1)"}}>{diasTeste} dias de período teste restantes</div>}
                 </div>
               );
@@ -2379,6 +2410,21 @@ export default function Perfil() {
               <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
             </div>
 
+            {/* Link externo para compra nova */}
+            <div className="fg" style={{marginBottom:"1rem",padding:"1rem",background:"#faf8f5",border:"1.5px solid #e8d5a3"}}>
+              <label className="lbl" style={{color:"#8a6a2a",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                Link para comprar nova ↗
+                <span style={{fontSize:"0.55rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
+              </label>
+              <input className="inp" type="url" value={editarPeca.link_compra_externa||""} onChange={e=>setEditarPeca(p=>({...p,link_compra_externa:e.target.value}))} placeholder="https://www.zara.com/produto/..." style={{marginBottom:"0.4rem"}} />
+              {editarPeca.link_externo_ativo
+                ? <span style={{fontSize:"0.62rem",color:"#27ae60",display:"flex",alignItems:"center",gap:"0.3rem"}}>✓ Link ativo</span>
+                : editarPeca.link_compra_externa
+                  ? <span style={{fontSize:"0.62rem",color:"#e67e22"}}>⏳ Pendente ativação — após pagamento de 15€/mês a Nora Grei ativa o link</span>
+                  : <span style={{fontSize:"0.62rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. Custo: 15€/mês por peça.</span>
+              }
+            </div>
+
             <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
               <button onClick={guardarEdicaoPeca} disabled={!editarPeca.nome||editarLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:!editarPeca.nome?0.5:1}}>{editarLoading?"...":"Guardar"}</button>
               <button onClick={()=>setEditarPeca(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
@@ -2468,6 +2514,16 @@ export default function Perfil() {
                 </div>
               ))}
               <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
+            </div>
+
+            {/* Link externo para compra nova */}
+            <div className="fg" style={{marginBottom:"1rem",padding:"1rem",background:"#faf8f5",border:"1.5px solid #e8d5a3"}}>
+              <label className="lbl" style={{color:"#8a6a2a",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                Link para comprar nova ↗
+                <span style={{fontSize:"0.55rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
+              </label>
+              <input className="inp" type="url" value={novaPeca.link_compra_externa} onChange={e=>setNovaPeca(p=>({...p,link_compra_externa:e.target.value}))} placeholder="https://www.zara.com/produto/..." style={{marginBottom:"0.4rem"}} />
+              <span style={{fontSize:"0.62rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. A Nora Grei ativa após pagamento de 15€/mês.</span>
             </div>
 
             {uploadProgressLoja && <p style={{fontSize:"0.82rem",color:"var(--g4)",margin:"0.5rem 0",fontStyle:"italic"}}>{uploadProgressLoja}</p>}
