@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 function Timer({ dataFim, lang }) {
   const [tempo, setTempo] = useState("");
@@ -37,6 +38,35 @@ export default function PecaCard({ peca, lang = "pt" }) {
   const l = labels[lang] || labels.pt;
   const disponivel = peca.estado === "disponivel";
 
+  const [naWishlist, setNaWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      const uid = data.session.user.id;
+      setUserId(uid);
+      supabase.from("wishlist").select("id").eq("cliente_id", uid).eq("peca_id", peca.id).maybeSingle()
+        .then(({ data: w }) => { if (w) setNaWishlist(true); });
+    });
+  }, [peca.id]);
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!userId) { window.location.href = "/entrar"; return; }
+    setWishlistLoading(true);
+    if (naWishlist) {
+      await supabase.from("wishlist").delete().eq("cliente_id", userId).eq("peca_id", peca.id);
+      setNaWishlist(false);
+    } else {
+      await supabase.from("wishlist").insert({ cliente_id: userId, peca_id: peca.id });
+      setNaWishlist(true);
+    }
+    setWishlistLoading(false);
+  };
+
   return (
     <div style={{display:'flex',flexDirection:'column',background:'#f8f7f5',position:'relative',borderRadius:'2px',overflow:'hidden'}}>
       <style>{`@keyframes pcpulse{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
@@ -55,6 +85,30 @@ export default function PecaCard({ peca, lang = "pt" }) {
               <span style={{fontFamily:"'Cormorant',serif",fontSize:'2.5rem',fontWeight:300,color:'rgba(0,0,0,0.06)',fontStyle:'italic'}}>NG</span>
             </div>
           )}
+
+          {/* Botão wishlist — canto superior esquerdo */}
+          <button
+            onClick={toggleWishlist}
+            disabled={wishlistLoading}
+            style={{
+              position:'absolute', top:'0.5rem', left:'0.5rem', zIndex:4,
+              background: naWishlist ? 'rgba(196,116,138,0.92)' : 'rgba(248,247,245,0.85)',
+              border:'none', borderRadius:'50%',
+              width:'32px', height:'32px',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              cursor:'pointer', backdropFilter:'blur(4px)',
+              transition:'background 0.2s, transform 0.15s',
+              transform: wishlistLoading ? 'scale(0.9)' : 'scale(1)',
+            }}
+            aria-label={naWishlist ? "Remover dos guardados" : "Guardar"}
+          >
+            <svg viewBox="0 0 24 24" width="15" height="15"
+              fill={naWishlist ? "#fff" : "none"}
+              stroke={naWishlist ? "#fff" : "#5a5855"}
+              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+          </button>
 
           {/* Badge disponibilidade — canto superior direito, discreto */}
           {!disponivel && (
