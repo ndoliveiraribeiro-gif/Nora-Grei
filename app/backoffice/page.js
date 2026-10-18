@@ -1064,6 +1064,8 @@ export default function Backoffice() {
   const [aiLoading, setAiLoading] = useState(false);
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
   const [alugueresLojista, setAlugueresLojista] = useState([]);
+  const [candidaturasLojista, setCandidaturasLojista] = useState([]);
+  const [subTabCandidaturas, setSubTabCandidaturas] = useState(false); // toggle detalhe
   const [subTabLojistas, setSubTabLojistas] = useState("depositos");
   const chatRef = useRef(null);
 
@@ -1247,6 +1249,12 @@ export default function Backoffice() {
         .select("*, clientes(nome, email, telefone), pecas_lojista(nome), stock_lojista(tamanho)")
         .order("created_at", { ascending: false });
       if (al) setAlugueresLojista(al);
+      const { data: cands } = await supabase
+        .from("clientes")
+        .select("id, nome, email, telefone, nif, codigo_cliente, candidatura_lojista, lojista_candidatura_dados, modo_lojista")
+        .eq("candidatura_lojista", "pendente")
+        .eq("modo_lojista", false);
+      if (cands) setCandidaturasLojista(cands);
     }
     if (tab === "estatisticas") await carregarEstatisticas();
   };
@@ -2967,6 +2975,30 @@ export default function Backoffice() {
         )}
 
         {tab === "lojistas" && (() => {
+
+          const aprovarCandidatura = async (cliente) => {
+            if (!confirm(`Aprovar candidatura de ${cliente.nome}?`)) return;
+            // Gera código de loja baseado no nome
+            const codigoBase = (cliente.lojista_candidatura_dados?.nome_loja || cliente.nome || "loja")
+              .toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"-").replace(/-+/g,"-").substring(0,20);
+            const codigo = `${codigoBase}-${Math.random().toString(36).substring(2,6)}`;
+            await supabase.from("clientes").update({
+              modo_lojista: true,
+              candidatura_lojista: "aprovada",
+              lojista_estado: "teste",
+              lojista_desde: new Date().toISOString(),
+              codigo_cliente: cliente.codigo_cliente || codigo,
+              lojista_iban: cliente.lojista_candidatura_dados?.iban || "",
+            }).eq("id", cliente.id);
+            setCandidaturasLojista(prev => prev.filter(c => c.id !== cliente.id));
+          };
+
+          const recusarCandidatura = async (cliente) => {
+            if (!confirm(`Recusar candidatura de ${cliente.nome}?`)) return;
+            await supabase.from("clientes").update({ candidatura_lojista: "recusada" }).eq("id", cliente.id);
+            setCandidaturasLojista(prev => prev.filter(c => c.id !== cliente.id));
+          };
+
           const depositos = alugueresLojista.filter(a => a.deposito_estado === "a_devolver");
           const pagamentos = alugueresLojista.filter(a => a.estado === "devolvido" && !a.liquidado_em);
           const disputas = alugueresLojista.filter(a => a.deposito_estado === "em_disputa");
@@ -3000,6 +3032,39 @@ export default function Backoffice() {
 
           return (
             <>
+              {/* CANDIDATURAS PENDENTES */}
+              {candidaturasLojista.length > 0 && (
+                <div style={{ ...CARD, border:"2px solid #f39c12", background:"#fffbf0" }}>
+                  <p style={{ ...CARD_T, color:"#f39c12" }}>⏳ Candidaturas pendentes ({candidaturasLojista.length})</p>
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead>
+                      <tr>{["Nome","Email","Loja","IBAN","Pagamento","NIF","Ações"].map(h => <th key={h} style={TH}>{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {candidaturasLojista.map(c => (
+                        <tr key={c.id} style={{ background:"#fff",borderBottom:"1px solid #f0eeeb" }}>
+                          <td style={TD}><div style={{ fontWeight:500 }}>{c.nome}</div><div style={{ fontSize:"0.7rem",color:"#888" }}>{c.telefone||"—"}</div></td>
+                          <td style={TD}><span style={{ fontSize:"0.82rem" }}>{c.email}</span></td>
+                          <td style={TD}>
+                            <div style={{ fontWeight:500,fontSize:"0.85rem" }}>{c.lojista_candidatura_dados?.nome_loja||"—"}</div>
+                            {c.lojista_candidatura_dados?.descricao && <div style={{ fontSize:"0.72rem",color:"#888",maxWidth:"180px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{c.lojista_candidatura_dados.descricao}</div>}
+                          </td>
+                          <td style={TD}><span style={{ fontFamily:"monospace",fontSize:"0.78rem" }}>{c.lojista_candidatura_dados?.iban||"—"}</span></td>
+                          <td style={TD}><span style={BADGE("blue")}>{c.lojista_candidatura_dados?.tipo_pagamento||"—"}</span></td>
+                          <td style={TD}>{c.nif||"—"}</td>
+                          <td style={TD}>
+                            <div style={{ display:"flex",gap:"0.4rem",flexWrap:"wrap" }}>
+                              <button style={BTN("green","sm")} onClick={() => aprovarCandidatura(c)}>✓ Aprovar</button>
+                              <button style={BTN("red","sm")} onClick={() => recusarCandidatura(c)}>✗ Recusar</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
               <div style={CARD}>
                 <p style={CARD_T}>Gestão de Lojistas</p>
                 <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap",marginBottom:"1.5rem" }}>
