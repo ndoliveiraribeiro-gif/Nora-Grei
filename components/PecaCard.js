@@ -24,7 +24,7 @@ function Timer({ dataFim, lang }) {
   return (
     <div style={{position:'absolute',bottom:0,left:0,right:0,background:'rgba(8,8,8,0.72)',backdropFilter:'blur(4px)',padding:'0.45rem 0.75rem',display:'flex',alignItems:'center',gap:'0.4rem',zIndex:3}}>
       <div style={{width:5,height:5,borderRadius:'50%',background:'#f39c12',flexShrink:0,animation:'pcpulse 2s infinite'}}/>
-      <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.55rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.9)'}}>{labels[lang]||labels.pt} <strong>{tempo}</strong></span>
+      <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.9)'}}>{labels[lang]||labels.pt} <strong>{tempo}</strong></span>
     </div>
   );
 }
@@ -112,7 +112,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
 
           {/* Badge disponibilidade — canto superior direito, discreto */}
           {!disponivel && (
-            <div style={{position:'absolute',top:'0.6rem',right:'0.6rem',fontSize:'0.48rem',letterSpacing:'0.18em',textTransform:'uppercase',background:'rgba(248,247,245,0.92)',color:'#5a5855',padding:'0.25rem 0.55rem',fontFamily:"'Jost',sans-serif",fontWeight:400,zIndex:2}}>
+            <div style={{position:'absolute',top:'0.6rem',right:'0.6rem',fontSize:'0.58rem',letterSpacing:'0.14em',textTransform:'uppercase',background:'rgba(248,247,245,0.92)',color:'#5a5855',padding:'0.28rem 0.6rem',fontFamily:"'Jost',sans-serif",fontWeight:400,zIndex:2}}>
               {l.indisponivel}
             </div>
           )}
@@ -124,24 +124,24 @@ export default function PecaCard({ peca, lang = "pt" }) {
         {/* INFO */}
         <div style={{padding:'0.65rem 0.7rem 0.3rem'}}>
           {peca.categoria && (
-            <p style={{fontSize:'0.48rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#b0ada6',fontFamily:"'Jost',sans-serif",marginBottom:'0.15rem'}}>{peca.categoria}</p>
+            <p style={{fontSize:'0.6rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#b0ada6',fontFamily:"'Jost',sans-serif",marginBottom:'0.2rem'}}>{peca.categoria}</p>
           )}
-          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1rem',fontWeight:300,lineHeight:1.15,marginBottom:'0.3rem',color:'#080808'}}>{peca.nome}</h3>
+          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.05rem',fontWeight:300,lineHeight:1.15,marginBottom:'0.3rem',color:'#080808'}}>{peca.nome}</h3>
 
           {/* Tamanhos disponíveis */}
           {peca.tamanhos && peca.tamanhos.length > 0 && (
-            <div style={{display:'flex',gap:'0.25rem',flexWrap:'wrap',marginBottom:'0.3rem'}}>
+            <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap',marginBottom:'0.3rem'}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:'0.47rem',letterSpacing:'0.06em',border:'1px solid #dedad4',padding:'0.12rem 0.35rem',color:'#6b6960',fontFamily:"'Jost',sans-serif"}}>{t}</span>
+                <span key={t} style={{fontSize:'0.6rem',letterSpacing:'0.04em',border:'1px solid #dedad4',padding:'0.14rem 0.4rem',color:'#6b6960',fontFamily:"'Jost',sans-serif"}}>{t}</span>
               ))}
-              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.47rem',color:'#b0ada6',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
+              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.6rem',color:'#b0ada6',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
             </div>
           )}
 
           {/* Preço */}
           <div style={{display:'flex',alignItems:'baseline',gap:'0.3rem',paddingTop:'0.4rem',borderTop:'1px solid #ece9e4'}}>
             <span style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.2rem',fontWeight:300,color:'#080808'}}>{peca.preco_aluguer_dia}€</span>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.55rem',color:'#b0ada6',fontWeight:300}}>/dia</span>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',color:'#b0ada6',fontWeight:300}}>/dia</span>
           </div>
         </div>
       </a>
@@ -154,7 +154,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
             display:'block',
             margin:'0 0.7rem 0.7rem',
             padding:'0.72rem',
-            fontSize:'0.58rem',
+            fontSize:'0.68rem',
             letterSpacing:'0.14em',
             textTransform:'uppercase',
             background:'#080808',
@@ -180,8 +180,8 @@ export default function PecaCard({ peca, lang = "pt" }) {
             justifyContent:'center',
             margin:'0 0.7rem 0.7rem',
             padding:'0.72rem',
-            fontSize:'0.55rem',
-            letterSpacing:'0.12em',
+            fontSize:'0.65rem',
+            letterSpacing:'0.1em',
             textTransform:'uppercase',
             background:'transparent',
             color:'#5a5855',

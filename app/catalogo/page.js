@@ -23,33 +23,33 @@ function PecaCardLojista({ peca, lang }) {
             </div>
           )}
           {/* Badge Lojista */}
-          <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.44rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.22rem 0.5rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
+          <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.55rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.25rem 0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
         </div>
         <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
           {peca.categoria && (
-            <p style={{fontSize:"0.48rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"'Jost',sans-serif",marginBottom:"0.15rem"}}>{peca.categoria}</p>
+            <p style={{fontSize:"0.6rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"'Jost',sans-serif",marginBottom:"0.2rem"}}>{peca.categoria}</p>
           )}
-          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.15rem",color:"#080808"}}>{peca.nome}</h3>
+          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1.05rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.2rem",color:"#080808"}}>{peca.nome}</h3>
           {peca.lojistaNome && (
-            <p style={{fontSize:"0.46rem",letterSpacing:"0.08em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{peca.lojistaNome}</p>
+            <p style={{fontSize:"0.6rem",letterSpacing:"0.06em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{peca.lojistaNome}</p>
           )}
           {peca.tamanhos && peca.tamanhos.length > 0 && (
-            <div style={{display:"flex",gap:"0.25rem",flexWrap:"wrap",marginBottom:"0.3rem"}}>
+            <div style={{display:"flex",gap:"0.3rem",flexWrap:"wrap",marginBottom:"0.3rem"}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:"0.47rem",letterSpacing:"0.06em",border:"1px solid #dedad4",padding:"0.12rem 0.35rem",color:"#6b6960",fontFamily:"'Jost',sans-serif"}}>{t}</span>
+                <span key={t} style={{fontSize:"0.6rem",letterSpacing:"0.04em",border:"1px solid #dedad4",padding:"0.14rem 0.4rem",color:"#6b6960",fontFamily:"'Jost',sans-serif"}}>{t}</span>
               ))}
             </div>
           )}
           <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
             <span style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1.2rem",fontWeight:300,color:"#080808"}}>{peca.preco_aluguer_dia}€</span>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.55rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.65rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
           </div>
         </div>
       </a>
       {disponivel ? (
-        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:400,minHeight:"44px"}}>{lbl}</a>
+        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.68rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:400,minHeight:"44px"}}>{lbl}</a>
       ) : (
-        <div style={{margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"1px solid #dedad4",color:"#b0ada6",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"44px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
+        <div style={{margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",border:"1px solid #dedad4",color:"#b0ada6",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"44px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
       )}
     </div>
   );
@@ -267,17 +267,17 @@ export default function Catalogo() {
         .filtros-linha { display:flex; align-items:center; gap:0; border-bottom:1px solid var(--grey-200); }
         .filtros-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex:1; }
         .filtros-scroll::-webkit-scrollbar { display:none; }
-        .filter-btn { font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; padding:0.7rem 1rem; border:none; border-right:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; transition:background 0.12s,color 0.12s; }
+        .filter-btn { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.85rem 1rem; border:none; border-right:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; transition:background 0.12s,color 0.12s; }
         .filter-btn:first-child { padding-left:1rem; }
         .filter-btn.active { background:var(--black); color:var(--white); }
-        .filter-select { font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.7rem 1rem; border:none; border-left:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; appearance:none; -webkit-appearance:none; }
-        .filtros-linha-2 { display:flex; align-items:flex-start; flex-wrap:wrap; gap:0; }
-        .filtros-grupo { display:flex; align-items:center; gap:0.5rem; padding:0.55rem 1rem; flex-wrap:wrap; }
-        .filtros-grupo + .filtros-grupo { border-left:1px solid var(--grey-200); }
-        .filtros-grupo-label { font-size:0.52rem; letter-spacing:0.22em; text-transform:uppercase; color:#aaa9a6; font-family:var(--sans); white-space:nowrap; flex-shrink:0; }
-        .filtros-tags { display:flex; gap:0.3rem; flex-wrap:wrap; overflow-x:auto; scrollbar-width:none; }
-        .filtros-tags::-webkit-scrollbar { display:none; }
-        .tag-btn { font-size:0.58rem; letter-spacing:0.08em; padding:0.28rem 0.65rem; border:1px solid var(--grey-200); background:transparent; color:#6b6860; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.12s; }
+        .filter-select { font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.85rem 0.85rem; border:none; border-left:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; appearance:none; -webkit-appearance:none; }
+        /* Linha 2: ocasião + fonte em blocos empilhados no mobile */
+        .filtros-linha-2 { display:flex; flex-direction:column; gap:0; }
+        .filtros-grupo { display:flex; align-items:center; gap:0.6rem; padding:0.65rem 1rem; border-bottom:1px solid var(--grey-200); flex-wrap:wrap; }
+        .filtros-grupo:last-child { border-bottom:none; }
+        .filtros-grupo-label { font-size:0.64rem; letter-spacing:0.2em; text-transform:uppercase; color:#888580; font-family:var(--sans); white-space:nowrap; flex-shrink:0; min-width:56px; }
+        .filtros-tags { display:flex; gap:0.4rem; flex-wrap:wrap; }
+        .tag-btn { font-size:0.7rem; letter-spacing:0.06em; padding:0.38rem 0.75rem; border:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.12s; min-height:36px; display:flex; align-items:center; }
         .tag-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .cat-grid { padding:0 1rem 4rem; display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
         .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--serif); font-size:1.3rem; font-weight:300; color:#3a3835; font-style:italic; }
@@ -288,18 +288,20 @@ export default function Catalogo() {
           .cat-header { padding:6rem 2rem 2rem; }
           .cat-grid { padding:0 2rem 5rem; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
           .filter-btn:first-child { padding-left:2rem; }
-          .filtros-grupo { padding:0.55rem 2rem; }
+          .filtros-linha-2 { flex-direction:row; }
+          .filtros-grupo { border-bottom:none; border-left:1px solid var(--grey-200); padding:0.65rem 1.5rem; }
+          .filtros-grupo:first-child { border-left:none; }
         }
         /* DESKTOP */
         @media (min-width:960px) {
           .cat-nav { padding:1.25rem 3rem; }
           .cat-header { padding:7rem 3rem 2.5rem; }
           .cat-grid { padding:0 3rem 6rem; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
-          .filter-btn { font-size:0.65rem; padding:0.75rem 1.1rem; }
+          .filter-btn { font-size:0.72rem; padding:0.85rem 1.2rem; }
           .filter-btn:first-child { padding-left:3rem; }
           .filter-btn:hover:not(.active) { color:var(--black); }
-          .filter-select { font-size:0.65rem; padding:0.75rem 3rem 0.75rem 1.1rem; }
-          .filtros-grupo { padding:0.6rem 3rem; }
+          .filter-select { font-size:0.72rem; padding:0.85rem 1.2rem; }
+          .filtros-grupo { padding:0.65rem 2rem; }
           .tag-btn:hover:not(.active) { border-color:#aaa; color:var(--black); }
         }
         @media (min-width:1280px) {
