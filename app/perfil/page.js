@@ -314,7 +314,7 @@ const t = {
     reservaPrazoTempo: "Tempo restante para confirmar:",
     verTalao: "Ver talão",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -369,7 +369,7 @@ const t = {
     reservaPrazoTempo: "Temps restant pour confirmer :",
     verTalao: "Voir le reçu",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -424,7 +424,7 @@ const t = {
     reservaPrazoTempo: "Laikas patvirtinti:",
     verTalao: "Žiūrėti kvitą",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.",
   },
 };
 
@@ -1074,8 +1074,8 @@ export default function Perfil() {
           <div style={{padding:"0 0 2rem"}}>
             {alugueresAtivos.length === 0 && alugueresHistorico.length === 0 ? (
               <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
-                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>Ainda não tens pedidos.</p>
-                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>Explorar catálogo →</a>
+                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>{i.semPedidos}</p>
+                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>{i.explorarCatalogo}</a>
               </div>
             ) : (
               <>
@@ -1142,11 +1142,11 @@ export default function Perfil() {
         {/* TAB GUARDADOS */}
         {tabAtiva === "guardados" && (
           <div style={{padding:"0 0 2rem"}}>
-            <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>Peças guardadas</p>
+            <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>{i.pecasGuardadas}</p>
             {wishlistPecas.length === 0 ? (
               <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
-                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>Ainda não guardaste nenhuma peça.</p>
-                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>Explorar catálogo →</a>
+                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>{i.semGuardados}</p>
+                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>{i.explorarCatalogo}</a>
               </div>
             ) : (
               <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"1px",background:"var(--g2)"}}>
@@ -1159,7 +1159,7 @@ export default function Perfil() {
                     <div style={{padding:"0.75rem"}}>
                       <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",fontWeight:300,marginBottom:"0.2rem"}}>{p.nome}</div>
                       {p.preco_aluguer_dia && <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia}€/dia</div>}
-                      {p.estado !== "disponivel" && <div style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",marginTop:"0.2rem"}}>Indisponível</div>}
+                      {p.estado !== "disponivel" && <div style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",marginTop:"0.2rem"}}>{i.indisponivel}</div>}
                     </div>
                   </a>
                 ))}
@@ -1290,7 +1290,7 @@ export default function Perfil() {
                 <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>
                 <div className="fg"><label className="lbl">{i.comoTeVes}</label>
                   <select className="inp" value={perfil.profissao} onChange={e => set("profissao", e.target.value)}>
-                    <option value="">— Selecionar —</option>
+                    <option value="">{i.selecionar}</option>
                     {i.comoTeVesOpcoes.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
@@ -1310,8 +1310,8 @@ export default function Perfil() {
         <div className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => setSecaoAberta(s => s==="morada"?null:"morada")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <div>
-              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>Morada de entrega</p>
-              {secaoAberta !== "morada" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.morada ? `${perfil.morada} ${perfil.numero_porta}, ${perfil.cidade}` : "Não preenchida"}</p>}
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.moradaEntrega}</p>
+              {secaoAberta !== "morada" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.morada ? `${perfil.morada} ${perfil.numero_porta}, ${perfil.cidade}` : i.moradaVazia}</p>}
             </div>
             <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="morada"?"▲":"▼"}</span>
           </div>
@@ -1338,14 +1338,14 @@ export default function Perfil() {
         <div className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => setSecaoAberta(s => s==="docs"?null:"docs")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <div>
-              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>Documentos de identidade</p>
-              {secaoAberta !== "docs" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nif ? `NIF: ${perfil.nif}` : "Não preenchidos"}</p>}
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.documentosIdentidade}</p>
+              {secaoAberta !== "docs" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nif ? `NIF: ${perfil.nif}` : i.docsVazios}</p>}
             </div>
             <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="docs"?"▲":"▼"}</span>
           </div>
           {secaoAberta === "docs" && (
             <div style={{padding:"0 2rem 2rem"}}>
-              <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.25rem",lineHeight:1.5}}>Necessários para verificação de identidade e caução.</p>
+              <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.25rem",lineHeight:1.5}}>{i.docsDesc}</p>
               <div className="grid2">
                 <div className="fg"><label className="lbl">{i.nif} *</label><input className="inp" value={perfil.nif} onChange={e => set("nif", e.target.value)} placeholder={i.nifPlaceholder} /></div>
                 <div className="fg"><label className="lbl">{i.numeroCC} *</label><input className="inp" value={perfil.numero_cc} onChange={e => set("numero_cc", e.target.value)} placeholder={i.numeroCCPlaceholder} /></div>
