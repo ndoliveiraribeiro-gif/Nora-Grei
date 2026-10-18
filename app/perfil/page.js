@@ -671,6 +671,7 @@ export default function Perfil() {
   const [novaRec, setNovaRec] = useState({ assunto: "", mensagem: "", aluguer_id: "" });
   const [recMsg, setRecMsg] = useState("");
   const [recLoading, setRecLoading] = useState(false);
+  const [secaoAberta, setSecaoAberta] = useState("pessoal"); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
   const fileRef = useRef();
 
   useEffect(() => {
@@ -960,7 +961,7 @@ export default function Perfil() {
         .avatar-wrap{position:relative;flex-shrink:0}
         .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover}
         .avatar-ph{width:96px;height:96px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--g6)}
-        .avatar-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--black);color:var(--white);border:2px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem}
+        .avatar-btn{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);border:2.5px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.1;margin-bottom:0.3rem;color:var(--black)}
         .hero-email{font-size:0.92rem;color:var(--g6)}
         .alerta-perfil{background:#fff8e1;border-left:3px solid #b8860b;padding:1.25rem 1.5rem}
@@ -1055,12 +1056,17 @@ export default function Perfil() {
 
         {!modoLojista && (
           <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
-            {[{id:"perfil",label:"O meu perfil"},{id:"guardados",label:"Guardados"}].map(tab => (
-              <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.5rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap"}}>
-                {tab.label}{tab.id==="guardados" && wishlistPecas.length>0 ? ` (${wishlistPecas.length})` : ""}
+            {[
+              {id:"perfil",label:"Perfil"},
+              {id:"pedidos",label:"Pedidos", badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
+              {id:"guardados",label:"Guardados", badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
+                {tab.label}
+                {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
               </button>
             ))}
-            <a href="/mensagens" style={{padding:"0.85rem 1.5rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
+            <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
               Mensagens
               {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
             </a>
@@ -1068,6 +1074,75 @@ export default function Perfil() {
         )}
 
         <div style={{display:modoLojista && tabAtiva==="loja"?"none":"block"}}>
+
+        {/* TAB PEDIDOS */}
+        {!modoLojista && tabAtiva === "pedidos" && (
+          <div style={{padding:"0 0 2rem"}}>
+            {alugueresAtivos.length === 0 && alugueresHistorico.length === 0 ? (
+              <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
+                <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>Ainda não tens pedidos.</p>
+                <a href="/catalogo" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>Explorar catálogo →</a>
+              </div>
+            ) : (
+              <>
+                {alugueresAtivos.length > 0 && (
+                  <div className="card" style={{padding:0,overflow:"hidden",marginBottom:"1px"}}>
+                    <p className="card-t" style={{padding:"2rem 2.5rem 0",border:"none",marginBottom:"1rem"}}>{i.emCurso}</p>
+                    {alugueresAtivos.map(a => {
+                      const peca = a.stock_tamanhos?.pecas;
+                      const ei = estadoInfo[a.estado] || estadoInfo.pendente;
+                      return (
+                        <div key={a.id} className="aluguer-card">
+                          <div className="aluguer-row">
+                            <div className="aluguer-img">
+                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",color:"rgba(0,0,0,0.15)",fontStyle:"italic"}}>NG</span>}
+                            </div>
+                            <div style={{flex:1}}>
+                              <div className="aluguer-nome">{peca?.nome || "—"}</div>
+                              {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
+                              <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
+                              <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
+                              <TimerInfo aluguer={a} lang={lang} />
+                              {a.estado === "enviado" && <BotaoConfirmarRecepcao aluguer={a} i={i} onConfirmado={carregarPerfil} />}
+                              <BotaoVerTalao aluguer={a} i={i} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {alugueresHistorico.length > 0 && (
+                  <div className="card" style={{padding:0,overflow:"hidden"}}>
+                    <p className="card-t" style={{padding:"2rem 2.5rem 0",border:"none",marginBottom:"1rem"}}>{i.historico}</p>
+                    {alugueresHistorico.slice(0,10).map(a => {
+                      const peca = a.stock_tamanhos?.pecas;
+                      const ei = estadoInfo[a.estado] || estadoInfo.devolvido;
+                      return (
+                        <div key={a.id} className="aluguer-card">
+                          <div className="aluguer-row">
+                            <div className="aluguer-img">
+                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",color:"rgba(0,0,0,0.15)",fontStyle:"italic"}}>NG</span>}
+                            </div>
+                            <div style={{flex:1}}>
+                              <div className="aluguer-nome">{peca?.nome || "—"}</div>
+                              {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
+                              <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
+                              <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
+                              <BotaoVerTalao aluguer={a} i={i} />
+                              {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {alugueresHistorico.length > 10 && <div style={{padding:"0"}}><a href="/pedidos" className="btn-pedidos">{i.verPedidos} →</a></div>}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* TAB GUARDADOS */}
         {!modoLojista && tabAtiva === "guardados" && (
@@ -1098,8 +1173,8 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* PERFIL NORMAL — oculto na tab guardados */}
-        <div style={{display: (!modoLojista && tabAtiva === "guardados") ? "none" : "block"}}>
+        {/* PERFIL NORMAL — oculto nas tabs guardados e pedidos */}
+        <div style={{display: (!modoLojista && (tabAtiva === "guardados" || tabAtiva === "pedidos")) ? "none" : "block"}}>
         <div className="hero">
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
@@ -1188,121 +1263,116 @@ export default function Perfil() {
         </div>
 
         {alugueresAtivos.length > 0 && (
-          <div className="card" style={{padding:0,overflow:'hidden'}}>
-            <p className="card-t" style={{padding:'2rem 2.5rem 0',border:'none',marginBottom:'1rem'}}>{i.emCurso}</p>
-            {alugueresAtivos.map(a => {
-              const peca = a.stock_tamanhos?.pecas;
-              const ei = estadoInfo[a.estado] || estadoInfo.pendente;
-              return (
-                <div key={a.id} className="aluguer-card">
-                  <div className="aluguer-row">
-                    <div className="aluguer-img">
-                      {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.5rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div className="aluguer-nome">{peca?.nome || "—"}</div>
-                      {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
-                      <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
-                      <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
-                      <TimerInfo aluguer={a} lang={lang} />
-                      {a.estado === "enviado" && <BotaoConfirmarRecepcao aluguer={a} i={i} onConfirmado={carregarPerfil} />}
-                      <BotaoVerTalao aluguer={a} i={i} />
-                    </div>
-                  </div>
+          <div className="card" style={{padding:"1rem 1.5rem",background:"#f0f7f0",border:"1px solid #b8dbb8",cursor:"pointer"}} onClick={() => setTabAtiva("pedidos")}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"0.75rem"}}>
+                <span style={{fontSize:"1.2rem"}}>📦</span>
+                <div>
+                  <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",color:"var(--black)"}}>{alugueresAtivos.length} pedido{alugueresAtivos.length>1?"s":""} activo{alugueresAtivos.length>1?"s":""}</div>
+                  <div style={{fontSize:"0.72rem",color:"#4a7a4a",marginTop:"0.1rem"}}>{i.emCurso}</div>
                 </div>
-              );
-            })}
+              </div>
+              <span style={{color:"#4a7a4a",fontSize:"0.8rem",letterSpacing:"0.05em"}}>Ver →</span>
+            </div>
           </div>
         )}
 
-        <div className="card">
-          <p className="card-t">{i.dadosPessoais}</p>
-          <div className="grid2">
-            <div className="fg"><label className="lbl">{i.nome} *</label><input className="inp" value={perfil.nome} onChange={e => set("nome", e.target.value)} placeholder="Maria Silva" /></div>
-            <div className="fg"><label className="lbl">{i.email}</label><input className="inp" value={user?.email||""} disabled /></div>
-            <div className="fg"><label className="lbl">{i.telefone} *</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
-            <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>
-            <div className="fg"><label className="lbl">{i.comoTeVes}</label>
-              <select className="inp" value={perfil.profissao} onChange={e => set("profissao", e.target.value)}>
-                <option value="">— Selecionar —</option>
-                {i.comoTeVesOpcoes.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+        {/* SECÇÃO: Dados pessoais */}
+        <div className="card" style={{padding:0,overflow:"hidden"}}>
+          <div onClick={() => setSecaoAberta(s => s==="pessoal"?null:"pessoal")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+            <div>
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.dadosPessoais}</p>
+              {secaoAberta !== "pessoal" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nome || "—"} · {perfil.telefone || "—"}</p>}
             </div>
-            <div className="fg"><label className="lbl">{i.genero}</label>
-              <select className="inp" value={perfil.genero} onChange={e => set("genero", e.target.value)}>
-                <option value="">—</option>
-                {i.generosOpcoes.map(g => <option key={g} value={g}>{g}</option>)}
-              </select>
+            <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="pessoal"?"▲":"▼"}</span>
+          </div>
+          {secaoAberta === "pessoal" && (
+            <div style={{padding:"0 2rem 2rem"}}>
+              <div className="grid2">
+                <div className="fg"><label className="lbl">{i.nome} *</label><input className="inp" value={perfil.nome} onChange={e => set("nome", e.target.value)} placeholder="Maria Silva" /></div>
+                <div className="fg"><label className="lbl">{i.email}</label><input className="inp" value={user?.email||""} disabled /></div>
+                <div className="fg"><label className="lbl">{i.telefone} *</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
+                <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>
+                <div className="fg"><label className="lbl">{i.comoTeVes}</label>
+                  <select className="inp" value={perfil.profissao} onChange={e => set("profissao", e.target.value)}>
+                    <option value="">— Selecionar —</option>
+                    {i.comoTeVesOpcoes.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div className="fg"><label className="lbl">{i.genero}</label>
+                  <select className="inp" value={perfil.genero} onChange={e => set("genero", e.target.value)}>
+                    <option value="">—</option>
+                    {i.generosOpcoes.map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="save-row" style={{marginTop:"1.25rem",paddingTop:"1.25rem"}}><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
             </div>
-            <div className="fg"><label className="lbl">{i.nif} *</label><input className="inp" value={perfil.nif} onChange={e => set("nif", e.target.value)} placeholder={i.nifPlaceholder} /></div>
-            <div className="fg"><label className="lbl">{i.numeroCC} *</label><input className="inp" value={perfil.numero_cc} onChange={e => set("numero_cc", e.target.value)} placeholder={i.numeroCCPlaceholder} /></div>
-          </div>
-          <div className="divider" />
-          <p className="card-t" style={{marginBottom:'1rem'}}>{i.localizacao}</p>
-          <div className="grid2">
-            <div className="fg full"><button className="loc-btn" onClick={detectarLocalizacao} disabled={detectandoLoc}>{detectandoLoc?"...":locDetectada?i.localizacaoOk:i.detectarLocalizacao}</button></div>
-            <div className="fg"><label className="lbl">{i.cidade} *</label><input className="inp" value={perfil.cidade} onChange={e => set("cidade", e.target.value)} placeholder="Lisboa" /></div>
-            <div className="fg"><label className="lbl">{i.codigoPostal} *</label><input className="inp" value={perfil.codigo_postal} onChange={e => set("codigo_postal", e.target.value)} placeholder="1000-001" /></div>
-            <div className="fg"><label className="lbl">{i.pais}</label><input className="inp" value={perfil.pais} onChange={e => set("pais", e.target.value)} /></div>
-            <div className="fg"><label className="lbl">{i.morada} *</label><input className="inp" value={perfil.morada} onChange={e => set("morada", e.target.value)} placeholder="Rua das Flores" /></div>
-          </div>
-          <div className="grid3" style={{marginTop:'1.25rem'}}>
-            <div className="fg"><label className="lbl">{i.numeroPorta} *</label><input className="inp" value={perfil.numero_porta} onChange={e => set("numero_porta", e.target.value)} placeholder="123" /></div>
-            <div className="fg"><label className="lbl">{i.andar}</label><input className="inp" value={perfil.andar} onChange={e => set("andar", e.target.value)} placeholder="2º Esq." /></div>
-          </div>
-          <p className="nota-obrigatorio">{i.camposObrigatorios}</p>
-          <div className="save-row"><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
-        </div>
-
-        <div className="card" style={{padding:0,overflow:'hidden'}}>
-          <p className="card-t" style={{padding:'2rem 2.5rem 0',border:'none',marginBottom: alugueresHistorico.length ? '1rem' : '2rem'}}>{i.historico}</p>
-          {alugueresHistorico.length === 0 ? (
-            <div style={{textAlign:'center',padding:'0 2.5rem 2rem'}}>
-              <p style={{color:'var(--g6)',marginBottom:'1.25rem'}}>{i.semHistorico}</p>
-              <a href="/catalogo" style={{display:'inline-block',padding:'0.9rem 2rem',background:'var(--black)',color:'var(--white)',textDecoration:'none',fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",fontWeight:600}}>{i.verCatalogo}</a>
-            </div>
-          ) : (
-            <>
-              {alugueresHistorico.slice(0,5).map(a => {
-                const peca = a.stock_tamanhos?.pecas;
-                const ei = estadoInfo[a.estado] || estadoInfo.devolvido;
-                return (
-                  <div key={a.id} className="aluguer-card">
-                    <div className="aluguer-row">
-                      <div className="aluguer-img">
-                        {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.5rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
-                      </div>
-                      <div style={{flex:1}}>
-                        <div className="aluguer-nome">{peca?.nome || "—"}</div>
-                        {peca?.codigo_referencia && <div className="aluguer-ref">{i.referencia} {peca.codigo_referencia}</div>}
-                        <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
-                        <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
-                        <BotaoVerTalao aluguer={a} i={i} />
-                        {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-              <div style={{padding:'0 0 0'}}><a href="/pedidos" className="btn-pedidos">{i.verPedidos} →</a></div>
-            </>
           )}
         </div>
 
-        {alugueresHistorico.filter(a => a.estado === "devolvido" || a.estado === "devolvido_danificado").length > 0 && (
-          <div className="card" style={{padding:0,overflow:"hidden"}}>
-            <p className="card-t" style={{padding:"2rem 2.5rem 1.5rem",border:"none",marginBottom:0}}>{i.avaliacoes}</p>
-            {alugueresHistorico.filter(a => a.estado === "devolvido" || a.estado === "devolvido_danificado").map(a => (
-              <CartaoAvaliacao key={a.id} aluguer={a} i={i} />
-            ))}
+        {/* SECÇÃO: Morada de entrega */}
+        <div className="card" style={{padding:0,overflow:"hidden"}}>
+          <div onClick={() => setSecaoAberta(s => s==="morada"?null:"morada")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+            <div>
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>Morada de entrega</p>
+              {secaoAberta !== "morada" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.morada ? `${perfil.morada} ${perfil.numero_porta}, ${perfil.cidade}` : "Não preenchida"}</p>}
+            </div>
+            <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="morada"?"▲":"▼"}</span>
+          </div>
+          {secaoAberta === "morada" && (
+            <div style={{padding:"0 2rem 2rem"}}>
+              <div className="grid2">
+                <div className="fg full"><button className="loc-btn" onClick={detectarLocalizacao} disabled={detectandoLoc}>{detectandoLoc?"...":locDetectada?i.localizacaoOk:i.detectarLocalizacao}</button></div>
+                <div className="fg"><label className="lbl">{i.cidade} *</label><input className="inp" value={perfil.cidade} onChange={e => set("cidade", e.target.value)} placeholder="Lisboa" /></div>
+                <div className="fg"><label className="lbl">{i.codigoPostal} *</label><input className="inp" value={perfil.codigo_postal} onChange={e => set("codigo_postal", e.target.value)} placeholder="1000-001" /></div>
+                <div className="fg"><label className="lbl">{i.pais}</label><input className="inp" value={perfil.pais} onChange={e => set("pais", e.target.value)} /></div>
+                <div className="fg"><label className="lbl">{i.morada} *</label><input className="inp" value={perfil.morada} onChange={e => set("morada", e.target.value)} placeholder="Rua das Flores" /></div>
+              </div>
+              <div className="grid3" style={{marginTop:"1rem"}}>
+                <div className="fg"><label className="lbl">{i.numeroPorta} *</label><input className="inp" value={perfil.numero_porta} onChange={e => set("numero_porta", e.target.value)} placeholder="123" /></div>
+                <div className="fg"><label className="lbl">{i.andar}</label><input className="inp" value={perfil.andar} onChange={e => set("andar", e.target.value)} placeholder="2º Esq." /></div>
+              </div>
+              <p className="nota-obrigatorio">{i.camposObrigatorios}</p>
+              <div className="save-row" style={{marginTop:"1.25rem",paddingTop:"1.25rem"}}><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
+            </div>
+          )}
+        </div>
+
+        {/* SECÇÃO: Documentos */}
+        <div className="card" style={{padding:0,overflow:"hidden"}}>
+          <div onClick={() => setSecaoAberta(s => s==="docs"?null:"docs")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+            <div>
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>Documentos de identidade</p>
+              {secaoAberta !== "docs" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nif ? `NIF: ${perfil.nif}` : "Não preenchidos"}</p>}
+            </div>
+            <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="docs"?"▲":"▼"}</span>
+          </div>
+          {secaoAberta === "docs" && (
+            <div style={{padding:"0 2rem 2rem"}}>
+              <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.25rem",lineHeight:1.5}}>Necessários para verificação de identidade e caução.</p>
+              <div className="grid2">
+                <div className="fg"><label className="lbl">{i.nif} *</label><input className="inp" value={perfil.nif} onChange={e => set("nif", e.target.value)} placeholder={i.nifPlaceholder} /></div>
+                <div className="fg"><label className="lbl">{i.numeroCC} *</label><input className="inp" value={perfil.numero_cc} onChange={e => set("numero_cc", e.target.value)} placeholder={i.numeroCCPlaceholder} /></div>
+              </div>
+              <div className="save-row" style={{marginTop:"1.25rem",paddingTop:"1.25rem"}}><button className={`btn-save${guardado?" btn-ok":""}`} onClick={guardarPerfil}>{guardado?i.guardado:i.guardar}</button></div>
+            </div>
+          )}
+        </div>
+
+        {alugueresHistorico.length > 0 && (
+          <div style={{textAlign:"center",padding:"0.5rem 0"}}>
+            <a href="/pedidos" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>{i.verPedidos} →</a>
           </div>
         )}
-        <div className="card">
-          <p className="card-t" style={{cursor:"pointer",userSelect:"none"}} onClick={() => { setShowPassword(!showPassword); setPassMsg(""); }}>
-            {i.mudarPassword} {showPassword ? "▲" : "▼"}
-          </p>
-          {showPassword && (
-            <div style={{padding:"0 0 1rem"}}>
+        {/* SECÇÃO: Segurança */}
+        <div className="card" style={{padding:0,overflow:"hidden"}}>
+          <div onClick={() => { setSecaoAberta(s => s==="seguranca"?null:"seguranca"); setPassMsg(""); }} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+            <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.mudarPassword}</p>
+            <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="seguranca"?"▲":"▼"}</span>
+          </div>
+          {secaoAberta === "seguranca" && (
+            <div style={{padding:"0 2rem 2rem"}}>
               <div className="fg"><label className="lbl">{i.novaPassword}</label>
                 <input className="inp" type="password" value={novaPass} onChange={e=>setNovaPass(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
               </div>
@@ -1310,49 +1380,61 @@ export default function Perfil() {
                 <input className="inp" type="password" value={confirmarPass} onChange={e=>setConfirmarPass(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
               </div>
               {passMsg && <p style={{fontSize:"0.85rem",color:passMsgTipo==="ok"?"#27ae60":"#e74c3c",margin:"0.5rem 0 1rem",fontWeight:500}}>{passMsg}</p>}
-              <button className="btn-guardar" onClick={mudarPassword} disabled={passLoading} style={{opacity:passLoading?0.6:1}}>
+              <button className="btn-guardar" onClick={mudarPassword} disabled={passLoading} style={{padding:"0.9rem 2rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600,opacity:passLoading?0.6:1,marginTop:"0.5rem"}}>
                 {passLoading ? "..." : i.guardarPassword}
               </button>
             </div>
           )}
         </div>
 
-        <div className="card">
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={() => setShowNovaReclamacao(!showNovaReclamacao)}>
-            <p className="card-t" style={{border:"none",marginBottom:0}}>{i.reclamacoes}</p>
-            <span style={{fontSize:"0.8rem",color:"#c4748a",fontWeight:500}}>+ {i.novaReclamacao}</span>
+        {/* SECÇÃO: Suporte */}
+        <div className="card" style={{padding:0,overflow:"hidden"}}>
+          <div onClick={() => setSecaoAberta(s => s==="suporte"?null:"suporte")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+            <div>
+              <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.reclamacoes}</p>
+              {secaoAberta !== "suporte" && reclamacoes.length > 0 && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{reclamacoes.length} pedido{reclamacoes.length>1?"s":""}</p>}
+            </div>
+            <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="suporte"?"▲":"▼"}</span>
           </div>
-          {recMsg && <p style={{fontSize:"0.85rem",color:"#27ae60",padding:"0.5rem 0",fontWeight:500}}>{recMsg}</p>}
-          {showNovaReclamacao && (
-            <div style={{padding:"1rem 0"}}>
-              <div className="fg">
-                <label className="lbl">{i.assunto}</label>
-                <input className="inp" value={novaRec.assunto} onChange={e=>setNovaRec(r=>({...r,assunto:e.target.value}))} placeholder={i.assuntoPlaceholder} />
-              </div>
-              <div className="fg">
-                <label className="lbl">{i.mensagem}</label>
-                <textarea className="inp" value={novaRec.mensagem} onChange={e=>setNovaRec(r=>({...r,mensagem:e.target.value}))} placeholder={i.mensagemPlaceholder} style={{resize:"vertical",minHeight:"100px"}} />
-              </div>
-              <button className="btn-guardar" onClick={enviarReclamacao} disabled={recLoading||!novaRec.assunto||!novaRec.mensagem} style={{opacity:recLoading?0.6:1}}>
-                {recLoading ? "..." : i.enviarReclamacao}
+          {secaoAberta === "suporte" && (
+            <div style={{padding:"0 2rem 2rem"}}>
+              {recMsg && <p style={{fontSize:"0.85rem",color:"#27ae60",padding:"0.5rem 0",fontWeight:500}}>{recMsg}</p>}
+              <button onClick={() => setShowNovaReclamacao(!showNovaReclamacao)} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:500,marginBottom:"1rem",padding:0}}>
+                {showNovaReclamacao ? "▲ Fechar" : `+ ${i.novaReclamacao}`}
               </button>
-            </div>
-          )}
-          {reclamacoes.length > 0 && (
-            <div style={{marginTop:"1rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-              {reclamacoes.map(r => (
-                <div key={r.id} style={{padding:"0.75rem 1rem",background:"var(--g1)",borderLeft:`3px solid ${r.estado==="resolvida"?"#27ae60":"#f39c12"}`}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.3rem"}}>
-                    <span style={{fontSize:"0.82rem",fontWeight:500}}>{r.assunto}</span>
-                    <span style={{fontSize:"0.62rem",letterSpacing:"0.1em",textTransform:"uppercase",color:r.estado==="resolvida"?"#27ae60":"#f39c12"}}>{r.estado==="resolvida"?i.reclamacaoResolvida:i.reclamacaoPendente}</span>
+              {showNovaReclamacao && (
+                <div style={{marginBottom:"1.25rem"}}>
+                  <div className="fg">
+                    <label className="lbl">{i.assunto}</label>
+                    <input className="inp" value={novaRec.assunto} onChange={e=>setNovaRec(r=>({...r,assunto:e.target.value}))} placeholder={i.assuntoPlaceholder} />
                   </div>
-                  <p style={{fontSize:"0.78rem",color:"var(--g4)"}}>{r.mensagem}</p>
-                  {r.resposta && <p style={{fontSize:"0.78rem",color:"#080808",marginTop:"0.5rem",fontStyle:"italic",borderTop:"1px solid var(--g2)",paddingTop:"0.5rem"}}>↳ {r.resposta}</p>}
+                  <div className="fg">
+                    <label className="lbl">{i.mensagem}</label>
+                    <textarea className="inp" value={novaRec.mensagem} onChange={e=>setNovaRec(r=>({...r,mensagem:e.target.value}))} placeholder={i.mensagemPlaceholder} style={{resize:"vertical",minHeight:"100px"}} />
+                  </div>
+                  <button onClick={enviarReclamacao} disabled={recLoading||!novaRec.assunto||!novaRec.mensagem} style={{padding:"0.8rem 1.8rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600,opacity:recLoading?0.6:1}}>
+                    {recLoading ? "..." : i.enviarReclamacao}
+                  </button>
                 </div>
-              ))}
+              )}
+              {reclamacoes.length > 0 ? (
+                <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+                  {reclamacoes.map(r => (
+                    <div key={r.id} style={{padding:"0.75rem 1rem",background:"var(--g1)",borderLeft:`3px solid ${r.estado==="resolvida"?"#27ae60":"#f39c12"}`}}>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.3rem"}}>
+                        <span style={{fontSize:"0.82rem",fontWeight:500}}>{r.assunto}</span>
+                        <span style={{fontSize:"0.62rem",letterSpacing:"0.1em",textTransform:"uppercase",color:r.estado==="resolvida"?"#27ae60":"#f39c12"}}>{r.estado==="resolvida"?i.reclamacaoResolvida:i.reclamacaoPendente}</span>
+                      </div>
+                      <p style={{fontSize:"0.78rem",color:"var(--g4)"}}>{r.mensagem}</p>
+                      {r.resposta && <p style={{fontSize:"0.78rem",color:"#080808",marginTop:"0.5rem",fontStyle:"italic",borderTop:"1px solid var(--g2)",paddingTop:"0.5rem"}}>↳ {r.resposta}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                !showNovaReclamacao && <p style={{fontSize:"0.8rem",color:"var(--g4)"}}>{i.semReclamacoes}</p>
+              )}
             </div>
           )}
-          {reclamacoes.length === 0 && !showNovaReclamacao && <p style={{fontSize:"0.8rem",color:"var(--g4)",paddingTop:"0.5rem"}}>{i.semReclamacoes}</p>}
         </div>
 
         <div style={{textAlign:'center',padding:'1rem 0 2rem'}}>
