@@ -160,8 +160,8 @@ function BotaoVerTalao({ aluguer, i }) {
               <span style={{ fontSize:"0.68rem",color:"#3f3e3c",fontFamily:"monospace" }}>{recibo.numero}</span>
             </div>
             {[
-              ["Data", new Date(recibo.created_at).toLocaleString("pt-PT")],
-              ["Método", recibo.metodo_pagamento],
+              [i.dataLabel, new Date(recibo.created_at).toLocaleString("pt-PT")],
+              [i.metodoLabel, recibo.metodo_pagamento],
             ].map(([k,v]) => (
               <div key={k} style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{k}</span><span style={{textTransform:"capitalize"}}>{v}</span></div>
             ))}
@@ -181,58 +181,272 @@ function BotaoVerTalao({ aluguer, i }) {
   );
 }
 
-function GeradorCodigo({ aluguer, i }) {
-  const [codigo, setCodigo] = useState(null);
-  const [copiado, setCopiado] = useState(false);
-  const [aberto, setAberto] = useState(false);
+const PORTES_PERFIL = 6.90;
+const PRECO_USADA_PERFIL = 200;
+const COMISSAO_PERFIL = 0.20;
+const METODOS_PAG_PERFIL = {
+  pt: [
+    { id: "mb", label: "Referência MB", desc: "Paga em qualquer ATM ou app bancária", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Confirmação imediata", auto: true },
+    { id: "cartao", label: "Cartão crédito/débito", desc: "Confirmação imediata", auto: true },
+    { id: "transferencia", label: "Transferência bancária", desc: "Confirmamos em até 1 dia útil", auto: false },
+  ],
+  fr: [
+    { id: "mb", label: "Référence MB", desc: "Payez dans n'importe quel ATM ou app bancaire", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Confirmation immédiate", auto: true },
+    { id: "cartao", label: "Carte crédit/débit", desc: "Confirmation immédiate", auto: true },
+    { id: "transferencia", label: "Virement bancaire", desc: "Confirmé sous 1 jour ouvré", auto: false },
+  ],
+  lt: [
+    { id: "mb", label: "MB nuoroda", desc: "Mokėkite bet kuriame bankomate ar banko programėlėje", auto: false },
+    { id: "mbway", label: "MB Way", desc: "Patvirtinama iš karto", auto: true },
+    { id: "cartao", label: "Kredito/debeto kortelė", desc: "Patvirtinama iš karto", auto: true },
+    { id: "transferencia", label: "Bankinis pervedimas", desc: "Patvirtinsime per 1 darbo dieną", auto: false },
+  ],
+};
+
+function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
+  const [fase, setFase] = useState("botao");
+  const [metodoPag, setMetodoPag] = useState("mb");
   const [loading, setLoading] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+  const [codigo, setCodigo] = useState(null);
+  const [compra, setCompra] = useState(null);
+  const [dadosCartao, setDadosCartao] = useState({ numero: "", nome: "", validade: "", cvc: "" });
+  const [telMbway, setTelMbway] = useState("");
+  const [comprovativo, setComprovativo] = useState(null);
 
-  const verificarCodigo = async () => {
-    const { data } = await supabase.from("codigos_desconto").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
-    if (data) setCodigo(data);
-  };
+  const totalUsada = PRECO_USADA_PERFIL + PORTES_PERFIL;
+  const metodos = METODOS_PAG_PERFIL[lang] || METODOS_PAG_PERFIL.pt;
+  const metodoSel = metodos.find(m => m.id === metodoPag);
 
-  useEffect(() => { verificarCodigo(); }, []);
+  useEffect(() => {
+    supabase.from("codigos_desconto").select("*").eq("aluguer_id", aluguer.id).maybeSingle().then(({ data }) => { if (data) setCodigo(data); });
+  }, []);
 
-  const gerar = async () => {
+  const confirmarPagamento = async () => {
+    if (metodoPag === "cartao" && (!dadosCartao.numero || !dadosCartao.nome || !dadosCartao.validade || !dadosCartao.cvc)) return;
+    if (metodoPag === "mbway" && !telMbway) return;
+    if (metodoPag === "transferencia" && !comprovativo) return;
     setLoading(true);
-    if (codigo) { setAberto(true); setLoading(false); return; }
-    const cod = "NORA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const { data } = await supabase.from("codigos_desconto").insert({
-      aluguer_id: aluguer.id,
-      cliente_id: aluguer.cliente_id,
-      codigo: cod,
-      valor: aluguer.valor_aluguer || 0,
-      estado: "ativo",
-      expires_at: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+    const { data: existente } = await supabase.from("compras_usadas").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    if (existente) { setCompra(existente); setFase("pagamento_usada"); setLoading(false); return; }
+    const entidade = "21666";
+    const ref = Math.floor(100000000 + Math.random() * 900000000).toString();
+    const validade = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const automatico = metodoSel?.auto || false;
+    const { data: nova } = await supabase.from("compras_usadas").insert({
+      aluguer_id: aluguer.id, cliente_id: aluguer.cliente_id,
+      peca_id: aluguer.stock_tamanhos?.pecas?.id || null,
+      valor: totalUsada, estado: automatico ? "pago" : "aguarda_pagamento",
+      metodo_pagamento: metodoPag,
+      mb_entidade: metodoPag === "mb" ? entidade : null,
+      mb_referencia: metodoPag === "mb" ? ref : null,
+      mb_montante: metodoPag === "mb" ? totalUsada : null,
+      mb_validade: metodoPag === "mb" ? validade : null,
     }).select().single();
-    if (data) { setCodigo(data); setAberto(true); }
+    if (nova) setCompra(nova);
+    setFase("pagamento_usada");
     setLoading(false);
   };
 
-  const copiar = () => {
-    navigator.clipboard.writeText(codigo.codigo);
+  const gerarVoucherNova = async () => {
+    setLoading(true);
+    const { data: existente } = await supabase.from("codigos_desconto").select("*").eq("aluguer_id", aluguer.id).maybeSingle();
+    if (existente) { setCodigo(existente); setFase("voucher_nova"); setLoading(false); return; }
+    const cod = "NORA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const { data: novo } = await supabase.from("codigos_desconto").insert({
+      aluguer_id: aluguer.id, cliente_id: aluguer.cliente_id, codigo: cod,
+      valor: aluguer.valor_aluguer || 0, estado: "ativo",
+      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    }).select().single();
+    if (novo) setCodigo(novo);
+    setFase("voucher_nova");
+    setLoading(false);
+  };
+
+  const copiar = (txt) => {
+    navigator.clipboard.writeText(txt);
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
   };
 
-  if (aberto && codigo) return (
-    <div style={{background:'#2a1820',border:'1px solid #4a2530',padding:'0.9rem',marginTop:'0.5rem'}}>
-      <p style={{fontSize:'0.58rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#e8a4b8',fontWeight:700,marginBottom:'0.4rem'}}>{i.codigoDesconto}</p>
-      <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:400,letterSpacing:'0.15em',marginBottom:'0.3rem',color:'#fff'}}>{codigo.codigo}</div>
-      <p style={{fontSize:'0.7rem',color:'#e8d5db',marginBottom:'0.6rem'}}>{i.descontoInfo} <strong>{codigo.valor}€</strong></p>
-      <div style={{display:'flex',gap:'0.4rem'}}>
-        <button onClick={copiar} style={{flex:1,padding:'0.5rem',background:copiado?'#1e7e3e':'#fff',color:copiado?'#fff':'#080808',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif",fontWeight:700}}>{copiado?i.copiado:i.copiar}</button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.5rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',textDecoration:'none',textAlign:'center',fontFamily:"'Jost',sans-serif",fontWeight:700}}>{i.irLoja}</a>
+  const sty = {
+    sec: { fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
+    opt: (on) => ({ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.85rem 1rem',border:`1.5px solid ${on?'#080808':'#e2dfda'}`,background:on?'#f0eeeb':'#fff',cursor:'pointer',marginBottom:'0.5rem' }),
+    radio: (on) => ({ width:16,height:16,borderRadius:'50%',border:`2px solid ${on?'#080808':'#ccc'}`,background:on?'#080808':'transparent',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center' }),
+    radioDot: { width:6,height:6,borderRadius:'50%',background:'#fff' },
+    badge: (auto) => ({ fontSize:'0.5rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
+    inp: { width:'100%',padding:'0.7rem 0.9rem',border:'1.5px solid #e2dfda',background:'#fff',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',color:'#080808',outline:'none',marginBottom:'0.5rem',boxSizing:'border-box' },
+    row2: { display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:'0.5rem' },
+    ibanBox: { background:'#f0eeeb',padding:'1rem',marginBottom:'0.75rem' },
+    ibanLabel: { fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
+    ibanVal: { fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
+    aviso: { fontSize:'0.72rem',color:'#946200',background:'#fff8e1',padding:'0.75rem 1rem',borderLeft:'3px solid #f39c12',lineHeight:1.5,marginTop:'0.5rem' },
+    uploadBox: { display:'block',padding:'0.85rem',border:'2px dashed #e2dfda',background:'#f0eeeb',cursor:'pointer',textAlign:'center',fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem' },
+    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
+    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
+    mbRow: { display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb' },
+    mbLabel: { fontSize:'0.68rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase' },
+    mbVal: { fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808' },
+  };
+
+  if (fase === "botao") return (
+    <button onClick={() => setFase("modal")}
+      style={{width:'100%',padding:'0.7rem',marginTop:'0.75rem',background:'#fff0f3',color:'#c4748a',border:'1.5px solid #f0c0cc',fontSize:'0.68rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500}}>
+      🏷️ {i.comprarPeca}
+    </button>
+  );
+
+  if (fase === "modal") return (
+    <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
+      <p style={{...sty.sec,color:'#c4748a'}}>{i.comprarModal}</p>
+      <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
+          <div>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarUsada}</p>
+            <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarUsadaDesc}</p>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#080808'}}>{PRECO_USADA_PERFIL}€</p>
+            <p style={{fontSize:'0.65rem',color:'#888'}}>+ {PORTES_PERFIL.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
+          </div>
+        </div>
+        <button onClick={() => setFase("escolher_pag")} style={{...sty.btnPrimary,marginTop:'0.5rem'}}>{i.pagarReferencia}</button>
+      </div>
+      <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
+          <div>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarNova}</p>
+            <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarNovaDesc}</p>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
+            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
+          </div>
+        </div>
+        <button onClick={gerarVoucherNova} disabled={loading} style={{...sty.btnPrimary,background:'#c4748a',marginTop:'0.5rem'}}>{loading ? "..." : i.irLoja}</button>
+      </div>
+      <button onClick={() => setFase("botao")} style={sty.btnSecondary}>{i.cancelar}</button>
+    </div>
+  );
+
+  if (fase === "escolher_pag") return (
+    <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
+      <p style={{...sty.sec,color:'#080808'}}>{i.metodoPagamento}</p>
+      <div style={{background:'#fff',padding:'0.75rem 1rem',marginBottom:'1rem',border:'1px solid #e2dfda'}}>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.82rem',color:'#5a5855',marginBottom:'0.3rem'}}>
+          <span>{i.comprarUsada}</span><span>{PRECO_USADA_PERFIL}€</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.82rem',color:'#5a5855',marginBottom:'0.3rem'}}>
+          <span>{i.portesEnvio}</span><span>{PORTES_PERFIL.toFixed(2).replace('.',',')}€</span>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:'1rem',fontWeight:600,color:'#080808',paddingTop:'0.4rem',borderTop:'1px solid #f0eeeb'}}>
+          <span>{i.totalUsada}</span><span>{totalUsada.toFixed(2).replace('.',',')}€</span>
+        </div>
+      </div>
+      {metodos.map(m => (
+        <div key={m.id} style={sty.opt(metodoPag === m.id)} onClick={() => setMetodoPag(m.id)}>
+          <div style={sty.radio(metodoPag === m.id)}>{metodoPag === m.id && <div style={sty.radioDot} />}</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'0.9rem',fontWeight:500,color:'#080808',display:'flex',alignItems:'center'}}>
+              {m.label}<span style={sty.badge(m.auto)}>{m.auto ? i.imediato : i.manual}</span>
+            </div>
+            <div style={{fontSize:'0.75rem',color:'#5a5855'}}>{m.desc}</div>
+          </div>
+        </div>
+      ))}
+      {metodoPag === "mb" && (
+        <div style={{background:'#f0eeeb',padding:'1rem',marginTop:'0.75rem'}}>
+          <p style={{...sty.ibanLabel,marginBottom:'0.25rem'}}>{i.refGerada}</p>
+          <p style={{fontSize:'0.72rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
+        </div>
+      )}
+      {metodoPag === "mbway" && (
+        <div style={{marginTop:'0.75rem'}}>
+          <p style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>{i.telMbway}</p>
+          <input style={sty.inp} placeholder="+351 912 345 678" value={telMbway} onChange={e => setTelMbway(e.target.value)} />
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {i.simPag}</p>
+        </div>
+      )}
+      {metodoPag === "cartao" && (
+        <div style={{marginTop:'0.75rem',display:'flex',flexDirection:'column',gap:'0.5rem'}}>
+          <input style={sty.inp} placeholder="1234 5678 9012 3456" value={dadosCartao.numero}
+            onChange={e => { const v=e.target.value.replace(/\D/g,"").slice(0,16).replace(/(\d{4})(?=\d)/g,"$1 ").trim(); setDadosCartao(d=>({...d,numero:v})); }} maxLength={19} />
+          <input style={sty.inp} placeholder="NOME NO CARTÃO" value={dadosCartao.nome}
+            onChange={e => setDadosCartao(d=>({...d,nome:e.target.value.toUpperCase()}))} />
+          <div style={sty.row2}>
+            <input style={{...sty.inp,marginBottom:0}} placeholder="MM/AA" value={dadosCartao.validade}
+              onChange={e => { const l=e.target.value.replace(/\D/g,"").slice(0,4); setDadosCartao(d=>({...d,validade:l.length>=3?l.slice(0,2)+"/"+l.slice(2):l})); }} maxLength={5} />
+            <input style={{...sty.inp,marginBottom:0}} placeholder="CVC" value={dadosCartao.cvc}
+              onChange={e => setDadosCartao(d=>({...d,cvc:e.target.value.replace(/\D/g,"").slice(0,3)}))} maxLength={3} />
+          </div>
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {i.simPag}</p>
+        </div>
+      )}
+      {metodoPag === "transferencia" && (
+        <div style={{marginTop:'0.75rem'}}>
+          <div style={sty.ibanBox}>
+            <p style={sty.ibanLabel}>IBAN Nora Grei</p>
+            <p style={sty.ibanVal}>PT50 0000 0000 0000 0000 0000 0</p>
+            <p style={sty.ibanLabel}>{i.montanteVirer}</p>
+            <p style={sty.ibanVal}>{totalUsada.toFixed(2).replace('.',',')}€</p>
+            <p style={sty.ibanLabel}>{i.referencia}</p>
+            <p style={sty.ibanVal}>{i.nomeCompleto}</p>
+          </div>
+          <label style={sty.uploadBox}>
+            <input type="file" accept="image/*,.pdf" style={{display:'none'}} onChange={e => setComprovativo(e.target.files?.[0]||null)} />
+            {comprovativo ? <span style={{color:'#27ae60',fontWeight:500}}>✓ {comprovativo.name}</span> : <span>{i.anexarComp}</span>}
+          </label>
+          <p style={sty.aviso}>{i.reservado24h}</p>
+        </div>
+      )}
+      <button onClick={confirmarPagamento} disabled={loading} style={{...sty.btnPrimary,marginTop:'1rem'}}>{loading ? "..." : i.confirmarCompra}</button>
+      <button onClick={() => setFase("modal")} style={sty.btnSecondary}>{i.cancelar}</button>
+    </div>
+  );
+
+  if (fase === "pagamento_usada") return (
+    <div style={{marginTop:'0.75rem',background:'#f0eeeb',border:'1px solid #e2dfda',padding:'1.25rem'}}>
+      {compra?.metodo_pagamento === "mb" ? (
+        <>
+          <p style={{...sty.sec,color:'#080808'}}>{i.referenciaGerada}</p>
+          <div style={{background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.entidade}</span><span style={sty.mbVal}>{compra?.mb_entidade}</span></div>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.referencia}</span><span style={{...sty.mbVal,letterSpacing:'0.1em'}}>{compra?.mb_referencia}</span></div>
+            <div style={sty.mbRow}><span style={sty.mbLabel}>{i.montante}</span><span style={{...sty.mbVal,fontSize:'1rem'}}>{compra?.mb_montante}€</span></div>
+            <div style={{...sty.mbRow,borderBottom:'none'}}><span style={sty.mbLabel}>{i.validadeRef}</span><span style={{fontSize:'0.82rem',color:'#5a5855'}}>{compra?.mb_validade}</span></div>
+          </div>
+          <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem',lineHeight:1.5}}>{i.pecaEnviada}</p>
+          <button onClick={() => copiar(`${compra?.mb_entidade} ${compra?.mb_referencia}`)}
+            style={{...sty.btnPrimary,background:copiado?'#27ae60':'#080808'}}>
+            {copiado ? i.copiado : "📋 Copiar dados MB"}
+          </button>
+        </>
+      ) : (
+        <div style={{textAlign:'center',padding:'1.5rem 0'}}>
+          <div style={{fontSize:'2.5rem',marginBottom:'0.75rem'}}>{compra?.metodo_pagamento === "transferencia" ? "⏳" : "✅"}</div>
+          <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,color:'#080808',marginBottom:'0.5rem'}}>
+            {compra?.metodo_pagamento === "transferencia" ? i.aguardarPagamento : i.pago}
+          </p>
+          <p style={{fontSize:'0.78rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
+        </div>
+      )}
+    </div>
+  );
+
+  if (fase === "voucher_nova" && codigo) return (
+    <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
+      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
+      <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
+      <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
+      <div style={{display:'flex',gap:'0.5rem'}}>
+        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irLoja}</a>
       </div>
     </div>
   );
 
-  return (
-    <button onClick={gerar} disabled={loading} style={{width:'100%',padding:'0.6rem',marginTop:'0.5rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.64rem',letterSpacing:'0.12em',textTransform:'uppercase',cursor:'pointer',fontWeight:600,fontFamily:"'Jost',sans-serif"}}>
-    {loading ? "..." : i.comprarPeca}
-    </button>
-  );
+  return null;
 }
 
 function ReservaDisponivelCard({ reserva, i }) {
@@ -302,6 +516,31 @@ const t = {
     copiar: "Copiar",
     irLoja: "Ir à loja ↗",
     comprarPeca: "Comprar esta peça",
+    comprarModal: "Como queres comprar esta peça?",
+    comprarUsada: "Comprar usada",
+    comprarUsadaDesc: "A peça que alugaste, inspeccionada e em bom estado",
+    comprarNova: "Voucher para peça nova",
+    comprarNovaDesc: "Usa o valor do teu aluguer como desconto em noragrei.com",
+    comprarNovaValor: "Desconto de",
+    cancelar: "Cancelar",
+    pagarReferencia: "Gerar referência MB",
+    portesEnvio: "Portes de envio",
+    totalUsada: "Total a pagar",
+    referenciaGerada: "Referência MB",
+    entidade: "Entidade",
+    montante: "Montante",
+    validadeRef: "Válida até",
+    pecaEnviada: "A Nora Grei enviará a peça após confirmação do pagamento.",
+    metodoPagamento: "Método de pagamento",
+    imediato: "Imediato", manual: "Manual",
+    refGerada: "Referência gerada após confirmação",
+    telMbway: "Número de telefone MB Way",
+    simPag: "Pagamento simulado.",
+    montanteVirer: "Montante a transferir",
+    nomeCompleto: "O teu nome completo",
+    anexarComp: "📎 Anexar comprovativo",
+    reservado24h: "O pedido fica reservado 24h até confirmarmos o comprovativo.",
+    confirmarCompra: "Confirmar compra",
     voltarInicio: "← Início",
     confirmarRecepcao: "Confirmar receção",
     confirmandoRecepcao: "A confirmar...",
@@ -313,6 +552,7 @@ const t = {
     reservaConfirmar: "Confirmar e pagar",
     reservaPrazoTempo: "Tempo restante para confirmar:",
     verTalao: "Ver talão",
+    dataLabel: "Data", metodoLabel: "Método",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
     pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", caucaoLabel: "Caução", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.",
   },
@@ -357,6 +597,31 @@ const t = {
     copiar: "Copier",
     irLoja: "Aller à la boutique ↗",
     comprarPeca: "Acheter cette pièce",
+    comprarModal: "Comment souhaitez-vous acheter cette pièce ?",
+    comprarUsada: "Acheter d'occasion",
+    comprarUsadaDesc: "La pièce que vous avez louée, inspectée et en bon état",
+    comprarNova: "Bon pour une pièce neuve",
+    comprarNovaDesc: "Utilisez votre montant de location comme remise sur noragrei.com",
+    comprarNovaValor: "Réduction de",
+    cancelar: "Annuler",
+    pagarReferencia: "Générer référence MB",
+    portesEnvio: "Frais de port",
+    totalUsada: "Total à payer",
+    referenciaGerada: "Référence MB",
+    entidade: "Entité",
+    montante: "Montant",
+    validadeRef: "Valable jusqu'au",
+    pecaEnviada: "Nora Grei enverra la pièce après confirmation du paiement.",
+    metodoPagamento: "Méthode de paiement",
+    imediato: "Immédiat", manual: "Manuel",
+    refGerada: "Référence générée après confirmation",
+    telMbway: "Numéro de téléphone MB Way",
+    simPag: "Simulation de paiement.",
+    montanteVirer: "Montant à virer",
+    nomeCompleto: "Votre nom complet",
+    anexarComp: "📎 Joindre le justificatif",
+    reservado24h: "Votre commande sera réservée 24h en attendant confirmation.",
+    confirmarCompra: "Confirmer l'achat",
     voltarInicio: "← Accueil",
     confirmarRecepcao: "Confirmer la réception",
     confirmandoRecepcao: "Confirmation...",
@@ -368,6 +633,7 @@ const t = {
     reservaConfirmar: "Confirmer et payer",
     reservaPrazoTempo: "Temps restant pour confirmer :",
     verTalao: "Voir le reçu",
+    dataLabel: "Date", metodoLabel: "Méthode",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
     pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", caucaoLabel: "Dépôt", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.",
   },
@@ -412,6 +678,31 @@ const t = {
     copiar: "Kopijuoti",
     irLoja: "Eiti į parduotuvę ↗",
     comprarPeca: "Pirkti šį drabužį",
+    comprarModal: "Kaip norite įsigyti šį drabužį?",
+    comprarUsada: "Pirkti naudotą",
+    comprarUsadaDesc: "Drabužis, kurį nuomojotės, patikrintas ir geros būklės",
+    comprarNova: "Kuponas naujam drabužiui",
+    comprarNovaDesc: "Naudokite nuomos sumą kaip nuolaidą noragrei.com",
+    comprarNovaValor: "Nuolaida",
+    cancelar: "Atšaukti",
+    pagarReferencia: "Generuoti MB nuorodą",
+    portesEnvio: "Pristatymo mokestis",
+    totalUsada: "Iš viso mokėti",
+    referenciaGerada: "MB nuoroda",
+    entidade: "Įmonė",
+    montante: "Suma",
+    validadeRef: "Galioja iki",
+    pecaEnviada: "Nora Grei išsiųs drabužį po mokėjimo patvirtinimo.",
+    metodoPagamento: "Mokėjimo būdas",
+    imediato: "Iš karto", manual: "Rankinis",
+    refGerada: "Nuoroda bus sugeneruota po patvirtinimo",
+    telMbway: "MB Way telefono numeris",
+    simPag: "Mokėjimo simuliacija.",
+    montanteVirer: "Suma pervedimui",
+    nomeCompleto: "Jūsų vardas ir pavardė",
+    anexarComp: "📎 Pridėti įrodymą",
+    reservado24h: "Jūsų užsakymas bus rezervuotas 24h, kol patvirtinsime.",
+    confirmarCompra: "Patvirtinti pirkimą",
     voltarInicio: "← Pradžia",
     confirmarRecepcao: "Patvirtinti gavimą",
     confirmandoRecepcao: "Tvirtinama...",
@@ -423,6 +714,7 @@ const t = {
     reservaConfirmar: "Patvirtinti ir mokėti",
     reservaPrazoTempo: "Laikas patvirtinti:",
     verTalao: "Žiūrėti kvitą",
+    dataLabel: "Data", metodoLabel: "Mokėjimo būdas",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
     pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", caucaoLabel: "Užstatas", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.",
   },
@@ -1124,7 +1416,7 @@ export default function Perfil() {
                               <div className="aluguer-meta">{a.data_inicio} → {a.data_fim} · {a.valor_aluguer}€</div>
                               <span className="estado-badge" style={{background:ei.bg,color:ei.cor}}>{ei.label}</span>
                               <BotaoVerTalao aluguer={a} i={i} />
-                              {a.estado === "devolvido" && <GeradorCodigo aluguer={a} i={i} />}
+                              {a.estado === "devolvido" && <BotaoComprarPecaPerfil aluguer={a} i={i} lang={lang} />}
                               {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && <CartaoAvaliacao aluguer={a} i={i} />}
                             </div>
                           </div>
