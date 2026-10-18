@@ -1321,9 +1321,21 @@ export default function Perfil() {
         <div style={{textAlign:'center',padding:'1rem 0 2rem'}}>
           <button className="btn-sair" onClick={sair}>{i.sair}</button>
         </div>
+
       </div>
         </div>{/* fim display:none guardados */}
         </div>{/* fim display:none loja */}
+
+        {/* CTA TORNAR-ME LOJISTA — visível apenas para clientes normais */}
+        {!modoLojista && (
+          <div style={{margin:"2rem 0 3rem",padding:"2rem",background:"#f8f5f0",border:"1px solid #e8e3dc",textAlign:"center"}}>
+            <div style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Abre a tua loja na Nora Grei</div>
+            <p style={{fontSize:"0.82rem",color:"var(--g6)",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>Aluga as tuas peças de moda a outras mulheres. Sem compromissos — 180 dias de período de teste gratuito.</p>
+            <a href="/backoffice" style={{display:"inline-block",padding:"0.9rem 2.5rem",background:"var(--black)",color:"var(--white)",textDecoration:"none",fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
+              Tornar-me Lojista →
+            </a>
+          </div>
+        )}
 
         {modoLojista && tabAtiva === "loja" && (
           <div style={{padding:"1rem 0"}}>
