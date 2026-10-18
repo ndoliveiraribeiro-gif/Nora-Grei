@@ -981,7 +981,7 @@ export default function Perfil() {
   const [codigoLoja, setCodigoLoja] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
@@ -1195,6 +1195,7 @@ export default function Perfil() {
       preco_venda: novaPeca.preco_venda ? parseFloat(novaPeca.preco_venda) : null,
       valor_peca: novaPeca.valor_peca ? parseFloat(novaPeca.valor_peca) : null,
       material: novaPeca.material||null,
+      marca: novaPeca.marca||null,
       ocasioes: novaPeca.ocasioes,
       estado: "disponivel",
       codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(pecasLoja.length + 1).padStart(3, "0")}`,
@@ -1219,7 +1220,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
-    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
+    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }] });
     setFotosLojista([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
@@ -1235,6 +1236,7 @@ export default function Perfil() {
       preco_venda: editarPeca.preco_venda ? parseFloat(editarPeca.preco_venda) : null,
       valor_peca: editarPeca.valor_peca ? parseFloat(editarPeca.valor_peca) : null,
       material: editarPeca.material || null,
+      marca: editarPeca.marca || null,
       ocasioes: editarPeca.ocasioes || [],
     }).eq("id", editarPeca.id);
     // reload peças
@@ -2301,27 +2303,67 @@ export default function Perfil() {
       )}
       {editarPeca && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
-          <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"520px",width:"100%",marginTop:"2rem",marginBottom:"2rem"}}>
             <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>Editar peça</h3>
-            <div className="fg"><label className="lbl">Nome *</label><input className="inp" value={editarPeca.nome||""} onChange={e=>setEditarPeca(p=>({...p,nome:e.target.value}))} /></div>
-            <div className="fg"><label className="lbl">Descrição</label><textarea className="inp" value={editarPeca.descricao||""} onChange={e=>setEditarPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"80px"}} /></div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
-              <div className="fg"><label className="lbl">Preço aluguer/dia (€)</label><input className="inp" type="number" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="25" /></div>
-              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" value={editarPeca.preco_venda||""} onChange={e=>setEditarPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+
+            {/* Nome + Marca */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg"><label className="lbl">Nome da peça *</label><input className="inp" value={editarPeca.nome||""} onChange={e=>setEditarPeca(p=>({...p,nome:e.target.value}))} /></div>
+              <div className="fg"><label className="lbl">Marca / Designer</label><input className="inp" value={editarPeca.marca||""} onChange={e=>setEditarPeca(p=>({...p,marca:e.target.value}))} placeholder="Zara, Mango, Gucci..." /></div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
-              <div className="fg"><label className="lbl">Valor da peça (€)</label><input className="inp" type="number" value={editarPeca.valor_peca||""} onChange={e=>setEditarPeca(p=>({...p,valor_peca:e.target.value}))} placeholder="200" /></div>
-              <div className="fg"><label className="lbl">Material</label><input className="inp" value={editarPeca.material||""} onChange={e=>setEditarPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+
+            {/* Descrição */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Descrição</label>
+              <textarea className="inp" value={editarPeca.descricao||""} onChange={e=>setEditarPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"70px"}} placeholder="Conta a história desta peça — ocasião ideal, como usar..." />
             </div>
-            <div className="fg">
-              <label className="lbl">Ocasiões</label>
-              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
-                {["Festa","Trabalho","Férias","Jantar","Dia a dia","Casamento","Gala"].map(oc => (
-                  <button key={oc} type="button" onClick={()=>setEditarPeca(p=>({...p,ocasioes:(p.ocasioes||[]).includes(oc)?(p.ocasioes||[]).filter(x=>x!==oc):[...(p.ocasioes||[]),oc]}))} style={{padding:"0.3rem 0.75rem",fontSize:"0.7rem",border:"1.5px solid",borderColor:(editarPeca.ocasioes||[]).includes(oc)?"var(--black)":"var(--g2)",background:(editarPeca.ocasioes||[]).includes(oc)?"var(--black)":"transparent",color:(editarPeca.ocasioes||[]).includes(oc)?"#fff":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)"}}>{oc}</button>
-                ))}
+
+            {/* Valor nova + sugestão aluguer */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
+              <div className="fg">
+                <label className="lbl">Valor peça nova (€)</label>
+                <input className="inp" type="number" min="0" value={editarPeca.valor_peca||""}
+                  onChange={e=>{
+                    const v=e.target.value;
+                    const sugestao=v&&parseFloat(v)>0?Math.round(parseFloat(v)*0.08):"";
+                    setEditarPeca(p=>({...p,valor_peca:v,preco_aluguer_dia:p.preco_aluguer_dia||sugestao}));
+                  }}
+                  placeholder="200" />
+              </div>
+              <div className="fg">
+                <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                  Aluguer / dia (€)
+                  {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
+                </label>
+                <input className="inp" type="number" min="0" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
               </div>
             </div>
-            <div style={{display:"flex",gap:"0.75rem",marginTop:"1.5rem"}}>
+            {editarPeca.valor_peca&&editarPeca.preco_aluguer_dia&&parseFloat(editarPeca.valor_peca)>0&&parseFloat(editarPeca.preco_aluguer_dia)>0&&(
+              <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
+                A cliente poupa {Math.round((1-parseFloat(editarPeca.preco_aluguer_dia)/parseFloat(editarPeca.valor_peca))*100)}% vs comprar nova
+              </p>
+            )}
+
+            {/* Preço venda + Material */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" min="0" value={editarPeca.preco_venda||""} onChange={e=>setEditarPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+              <div className="fg"><label className="lbl">Material</label><input className="inp" value={editarPeca.material||""} onChange={e=>setEditarPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+            </div>
+
+            {/* Ocasiões — select múltiplo */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Ocasiões (seleciona todas que se aplicam)</label>
+              <select multiple value={editarPeca.ocasioes||[]}
+                onChange={e=>setEditarPeca(p=>({...p,ocasioes:Array.from(e.target.selectedOptions,o=>o.value)}))}
+                style={{width:"100%",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)",fontSize:"0.85rem",padding:"0.25rem",background:"#fff",minHeight:"120px",outline:"none"}}>
+                {["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"].map(oc=>(
+                  <option key={oc} value={oc} style={{padding:"0.4rem 0.6rem",fontSize:"0.85rem"}}>{oc}</option>
+                ))}
+              </select>
+              <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
+            </div>
+
+            <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
               <button onClick={guardarEdicaoPeca} disabled={!editarPeca.nome||editarLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:!editarPeca.nome?0.5:1}}>{editarLoading?"...":"Guardar"}</button>
               <button onClick={()=>setEditarPeca(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
@@ -2330,46 +2372,90 @@ export default function Perfil() {
       )}
       {showNovaPeca && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1rem",overflowY:"auto"}}>
-          <div style={{background:"#fff",padding:"2rem",maxWidth:"480px",width:"100%",marginTop:"2rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"520px",width:"100%",marginTop:"2rem",marginBottom:"2rem"}}>
             <h3 style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem"}}>{lang==="fr"?"Nouvelle pièce":lang==="lt"?"Naujas drabužis":"Nova peça"}</h3>
-            <div className="fg">
+
+            {/* Fotos */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
               <label className="lbl">{lang==="fr"?"Photos":lang==="lt"?"Nuotraukos":"Fotos"}</label>
               <input type="file" accept="image/*" multiple onChange={e=>setFotosLojista(Array.from(e.target.files))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",width:"100%",fontFamily:"var(--sans)",fontSize:"0.82rem"}} />
-              {fotosLojista.length > 0 && <div style={{display:"flex",gap:"0.5rem",marginTop:"0.5rem",flexWrap:"wrap"}}>{fotosLojista.map((f,i)=><span key={i} style={{fontSize:"0.7rem",color:"var(--g4)",background:"var(--g1)",padding:"0.2rem 0.5rem"}}>{f.name}</span>)}</div>}
+              {fotosLojista.length > 0 && <div style={{display:"flex",gap:"0.5rem",marginTop:"0.5rem",flexWrap:"wrap"}}>{fotosLojista.map((f,idx2)=><span key={idx2} style={{fontSize:"0.7rem",color:"var(--g4)",background:"var(--g1)",padding:"0.2rem 0.5rem"}}>{f.name}</span>)}</div>}
             </div>
-            <div className="fg"><label className="lbl">Nome *</label><input className="inp" value={novaPeca.nome} onChange={e=>setNovaPeca(p=>({...p,nome:e.target.value}))} placeholder="Ex: Vestido de festa azul" /></div>
-            <div className="fg"><label className="lbl">Descrição</label><textarea className="inp" value={novaPeca.descricao} onChange={e=>setNovaPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"80px"}} /></div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
-              <div className="fg"><label className="lbl">Preço aluguer/dia (€) *</label><input className="inp" type="number" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="25" /></div>
-              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" value={novaPeca.preco_venda} onChange={e=>setNovaPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+
+            {/* Nome + Marca */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg"><label className="lbl">Nome da peça *</label><input className="inp" value={novaPeca.nome} onChange={e=>setNovaPeca(p=>({...p,nome:e.target.value}))} placeholder="Ex: Vestido midi azul" /></div>
+              <div className="fg"><label className="lbl">Marca / Designer</label><input className="inp" value={novaPeca.marca} onChange={e=>setNovaPeca(p=>({...p,marca:e.target.value}))} placeholder="Zara, Mango, Gucci..." /></div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
-              <div className="fg"><label className="lbl">Valor da peça (€)</label><input className="inp" type="number" value={novaPeca.valor_peca} onChange={e=>setNovaPeca(p=>({...p,valor_peca:e.target.value}))} placeholder="200" /></div>
-              <div className="fg"><label className="lbl">Material</label><input className="inp" value={novaPeca.material} onChange={e=>setNovaPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+
+            {/* Descrição */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Descrição</label>
+              <textarea className="inp" value={novaPeca.descricao} onChange={e=>setNovaPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"70px"}} placeholder="Conta a história desta peça — ocasião ideal, como usar..." />
             </div>
-            <div className="fg">
-              <label className="lbl">Ocasiões</label>
-              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
-                {["Festa","Trabalho","Férias","Jantar","Dia a dia","Casamento","Gala"].map(oc => (
-                  <button key={oc} type="button" onClick={() => setNovaPeca(p=>({...p,ocasioes:p.ocasioes.includes(oc)?p.ocasioes.filter(x=>x!==oc):[...p.ocasioes,oc]}))} style={{padding:"0.3rem 0.75rem",fontSize:"0.7rem",border:"1.5px solid",borderColor:novaPeca.ocasioes.includes(oc)?"var(--black)":"var(--g2)",background:novaPeca.ocasioes.includes(oc)?"var(--black)":"transparent",color:novaPeca.ocasioes.includes(oc)?"#fff":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)"}}>{oc}</button>
-                ))}
+
+            {/* Valor nova + sugestão aluguer */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
+              <div className="fg">
+                <label className="lbl">Valor peça nova (€)</label>
+                <input className="inp" type="number" min="0" value={novaPeca.valor_peca}
+                  onChange={e=>{
+                    const v=e.target.value;
+                    const sugestao=v&&parseFloat(v)>0?Math.round(parseFloat(v)*0.08):"";
+                    setNovaPeca(p=>({...p,valor_peca:v,preco_aluguer_dia:p.preco_aluguer_dia||sugestao}));
+                  }}
+                  placeholder="200" />
+              </div>
+              <div className="fg">
+                <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                  Aluguer / dia (€) *
+                  {novaPeca.valor_peca&&parseFloat(novaPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>sugerido: {Math.round(parseFloat(novaPeca.valor_peca)*0.08)}€</span>}
+                </label>
+                <input className="inp" type="number" min="0" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
               </div>
             </div>
-            <div className="fg">
-              <label className="lbl">Tamanhos</label>
-              {novaPeca.tamanhos.map((t,idx) => (
+            {novaPeca.valor_peca&&novaPeca.preco_aluguer_dia&&parseFloat(novaPeca.valor_peca)>0&&parseFloat(novaPeca.preco_aluguer_dia)>0&&(
+              <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
+                A cliente poupa {Math.round((1-parseFloat(novaPeca.preco_aluguer_dia)/parseFloat(novaPeca.valor_peca))*100)}% vs comprar nova
+              </p>
+            )}
+
+            {/* Preço venda + Material */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
+              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" min="0" value={novaPeca.preco_venda} onChange={e=>setNovaPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+              <div className="fg"><label className="lbl">Material</label><input className="inp" value={novaPeca.material} onChange={e=>setNovaPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
+            </div>
+
+            {/* Ocasiões — select múltiplo */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Ocasiões (seleciona todas que se aplicam)</label>
+              <select multiple value={novaPeca.ocasioes}
+                onChange={e=>setNovaPeca(p=>({...p,ocasioes:Array.from(e.target.selectedOptions,o=>o.value)}))}
+                style={{width:"100%",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)",fontSize:"0.85rem",padding:"0.25rem",background:"#fff",minHeight:"120px",outline:"none"}}>
+                {["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"].map(oc=>(
+                  <option key={oc} value={oc} style={{padding:"0.4rem 0.6rem",fontSize:"0.85rem"}}>{oc}</option>
+                ))}
+              </select>
+              <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
+            </div>
+
+            {/* Tamanhos */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Tamanhos disponíveis</label>
+              {novaPeca.tamanhos.map((t,idx)=>(
                 <div key={idx} style={{display:"flex",gap:"0.5rem",marginBottom:"0.5rem",alignItems:"center"}}>
-                  <select value={t.tamanho} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,tamanho:e.target.value}:x)}))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)",flex:1}}>
-                    {["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46"].map(s=><option key={s}>{s}</option>)}
+                  <select value={t.tamanho} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,tamanho:e.target.value}:x)}))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)",flex:1,background:"#fff"}}>
+                    {["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","48","Único"].map(s=><option key={s}>{s}</option>)}
                   </select>
-                  <input type="number" value={t.quantidade} min={1} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,quantidade:parseInt(e.target.value)||1}:x)}))} style={{width:"70px",padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)"}} />
-                  {novaPeca.tamanhos.length > 1 && <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.filter((_,i)=>i!==idx)}))} style={{background:"none",border:"none",color:"#e74c3c",cursor:"pointer",fontSize:"1rem"}}>✕</button>}
+                  <input type="number" value={t.quantidade} min={1} onChange={e=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.map((x,i)=>i===idx?{...x,quantidade:parseInt(e.target.value)||1}:x)}))} style={{width:"70px",padding:"0.5rem",border:"1.5px solid var(--g2)",fontFamily:"var(--sans)"}} title="Quantidade" />
+                  {novaPeca.tamanhos.length>1&&<button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.filter((_,i)=>i!==idx)}))} style={{background:"none",border:"none",color:"#e74c3c",cursor:"pointer",fontSize:"1rem",lineHeight:1}}>✕</button>}
                 </div>
               ))}
               <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
             </div>
+
             {uploadProgressLoja && <p style={{fontSize:"0.82rem",color:"var(--g4)",margin:"0.5rem 0",fontStyle:"italic"}}>{uploadProgressLoja}</p>}
-            <div style={{display:"flex",gap:"0.75rem",marginTop:"1rem"}}>
+            <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
               <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||!novaPeca.preco_aluguer_dia||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||!novaPeca.preco_aluguer_dia)?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
               <button onClick={()=>setShowNovaPeca(false)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
