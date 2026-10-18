@@ -2,75 +2,43 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-const T = {
-  pt: {
-    titulo:"Publicar no Feed", voltar:"← Voltar",
-    passo1:"Fotos", passo2:"Detalhes", passo3:"Boost",
-    addFoto:"Toca para adicionar foto", addMais:"+ Adicionar outra foto",
-    titulo_label:"Título *", titulo_ph:"Ex: Vestido Seda Verde — Disponível agora",
-    desc_label:"Descrição", desc_ph:"Conta a história desta peça — ocasião, como usar, porquê a escolheste...",
-    peca_label:"Peça do catálogo (opcional)", peca_ph:"Ligar a uma peça para alugar",
-    tipo_label:"Tipo de post",
-    tipos: [{ v:"peca", l:"Peça disponível" }, { v:"look", l:"Inspiração / Look" }, { v:"promocao", l:"Promoção especial" }],
-    publicar:"Publicar agora", publicando:"A publicar...",
-    boostTitulo:"Destaca este post 🚀", boostSub:"O teu post aparece no topo do feed durante 7 dias e é visto por mais clientes.",
-    boostValor:"10€ por 7 dias de destaque",
-    boostSim:"Destacar por 10€", boostNao:"Publicar sem destaque",
-    boostInfo:"Podes destacar mais tarde no teu perfil.",
-    sucessoTitulo:"Post publicado! 🎉", sucessoSub:"O teu post está em revisão. Será publicado em breve.",
-    verFeed:"Ver feed", publicarOutro:"Publicar outro",
-    semFotos:"Adiciona pelo menos uma foto.",
-    semTitulo:"O título é obrigatório.",
-    erroUpload:"Erro ao fazer upload da foto. Tenta de novo.",
-    login:"Precisas de estar autenticado para publicar.",
-    entrar:"Entrar",
-    boost_pendente:"Pedido de boost enviado! A Nora Grei irá confirmar o pagamento.",
-  },
-  fr: {
-    titulo:"Publier sur le Feed", voltar:"← Retour",
-    passo1:"Photos", passo2:"Détails", passo3:"Boost",
-    addFoto:"Appuyez pour ajouter une photo", addMais:"+ Ajouter une autre photo",
-    titulo_label:"Titre *", titulo_ph:"Ex: Robe en soie verte — Disponible maintenant",
-    desc_label:"Description", desc_ph:"Racontez l'histoire de cette pièce...",
-    peca_label:"Pièce du catalogue (optionnel)", peca_ph:"Lier à une pièce à louer",
-    tipo_label:"Type de post",
-    tipos: [{ v:"peca", l:"Pièce disponible" }, { v:"look", l:"Inspiration / Look" }, { v:"promocao", l:"Promotion spéciale" }],
-    publicar:"Publier maintenant", publicando:"Publication en cours...",
-    boostTitulo:"Mettez ce post en avant 🚀", boostSub:"Votre post apparaît en haut du feed pendant 7 jours.",
-    boostValor:"10€ pour 7 jours de mise en avant",
-    boostSim:"Mettre en avant pour 10€", boostNao:"Publier sans mise en avant",
-    boostInfo:"Vous pouvez mettre en avant plus tard.",
-    sucessoTitulo:"Post publié! 🎉", sucessoSub:"Votre post est en cours de révision.",
-    verFeed:"Voir le feed", publicarOutro:"Publier un autre",
-    semFotos:"Ajoutez au moins une photo.", semTitulo:"Le titre est obligatoire.",
-    erroUpload:"Erreur lors du téléchargement.", login:"Vous devez être connecté pour publier.", entrar:"Se connecter",
-    boost_pendente:"Demande de boost envoyée!",
-  },
+const CATEGORIAS_VESTUARIO = ["Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans"];
+const CATEGORIAS_ACESSORIOS = ["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"];
+const CATEGORIAS_SEM_TAMANHO = ["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
+const TAMANHOS = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","48","Único"];
+const OCASIOES = ["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"];
+const CORES = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
+
+const PECA_VAZIA = {
+  nome: "", categoria: "", marca: "", cor: "", condicao: "como_novo",
+  tipo: "alugar", descricao: "", material: "",
+  preco_aluguer_dia: "", preco_venda: "", valor_peca: "",
+  tem_defeito: false, descricao_defeito: "",
+  ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }],
+  link_compra_externa: "",
 };
 
 export default function PublicarPage() {
-  const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
-  const [passo, setPasso] = useState(1); // 1=fotos, 2=detalhes, 3=boost/sucesso
+  const [cliente, setCliente] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [passo, setPasso] = useState(1); // 1=fotos, 2=detalhes, 3=preços, 4=sucesso
   const [fotos, setFotos] = useState([]); // { file, url }
-  const [titulo, setTitulo] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [tipo, setTipo] = useState("peca");
-  const [pecaId, setPecaId] = useState("");
-  const [pecas, setPecas] = useState([]);
-  const [publicando, setPublicando] = useState(false);
+  const [peca, setPeca] = useState(PECA_VAZIA);
+  const [enviando, setEnviando] = useState(false);
+  const [progresso, setProgresso] = useState("");
   const [erro, setErro] = useState("");
-  const [postCriado, setPostCriado] = useState(null);
-  const [sucesso, setSucesso] = useState(false);
-  const [boostPedido, setBoostPedido] = useState(false);
-  const inputRef = useRef();
-  const t = T[lang] || T.pt;
+  const [pecaCriada, setPecaCriada] = useState(null);
+  const inputFotoRef = useRef();
 
   useEffect(() => {
-    const l = localStorage.getItem("ng_lang") || "pt";
-    setLang(["pt","fr"].includes(l) ? l : "pt");
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null));
-    supabase.from("pecas").select("id, nome, fotos, preco_aluguer_dia").eq("ativo", true).order("nome").limit(50).then(({ data }) => setPecas(data || []));
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { setLoading(false); return; }
+      setUser(session.user);
+      const { data: cli } = await supabase.from("clientes").select("*").eq("id", session.user.id).single();
+      setCliente(cli);
+      setLoading(false);
+    });
   }, []);
 
   const adicionarFotos = (files) => {
@@ -81,218 +49,650 @@ export default function PublicarPage() {
 
   const removerFoto = (i) => setFotos(prev => prev.filter((_, j) => j !== i));
 
+  const setP = (k, v) => setPeca(prev => ({ ...prev, [k]: v }));
+
+  const validarPasso2 = () => {
+    if (!peca.nome.trim()) { setErro("O nome da peça é obrigatório."); return false; }
+    if (!peca.categoria) { setErro("Seleciona uma categoria."); return false; }
+    setErro(""); return true;
+  };
+
+  const validarPasso3 = () => {
+    const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
+    const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
+    if (precisaAluguer && !peca.preco_aluguer_dia) { setErro("Indica o preço de aluguer por dia."); return false; }
+    if (precisaVenda && !peca.preco_venda) { setErro("Indica o preço de venda."); return false; }
+    setErro(""); return true;
+  };
+
   const publicar = async () => {
-    setErro("");
-    if (!fotos.length) { setErro(t.semFotos); return; }
-    if (!titulo.trim()) { setErro(t.semTitulo); return; }
-    if (!user) { setErro(t.login); return; }
-    setPublicando(true);
+    if (!validarPasso3()) return;
+    setEnviando(true);
+    setProgresso("A criar peça...");
     try {
-      // Upload fotos
-      const fotoUrls = [];
-      for (const f of fotos) {
-        const ext = f.file.name.split(".").pop();
-        const path = `feed/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("feed").upload(path, f.file, { contentType: f.file.type });
-        if (upErr) throw new Error(t.erroUpload);
-        const { data: { publicUrl } } = supabase.storage.from("feed").getPublicUrl(path);
-        fotoUrls.push(publicUrl);
-      }
-      // Criar post
-      const { data: post, error: postErr } = await supabase.from("feed_posts").insert({
-        lojista_id: user.id,
-        peca_id: pecaId || null,
-        titulo: titulo.trim(),
-        descricao: descricao.trim(),
-        fotos: fotoUrls,
-        tipo,
-        estado: "pendente",
-        publicado_em: new Date().toISOString(),
+      const pecasExistentes = await supabase.from("pecas_lojista").select("id", { count: "exact" }).eq("cliente_id", user.id);
+      const count = pecasExistentes.count || 0;
+      const { data: novaPeca, error: pecaErr } = await supabase.from("pecas_lojista").insert({
+        cliente_id: user.id,
+        nome: peca.nome.trim(),
+        descricao: peca.descricao.trim() || null,
+        tipo: peca.tipo,
+        preco_aluguer_dia: peca.preco_aluguer_dia ? parseFloat(peca.preco_aluguer_dia) : null,
+        preco_venda: peca.preco_venda ? parseFloat(peca.preco_venda) : null,
+        valor_peca: peca.valor_peca ? parseFloat(peca.valor_peca) : null,
+        material: peca.material.trim() || null,
+        marca: peca.marca.trim() || null,
+        cor: peca.cor.trim() || null,
+        categoria: peca.categoria || null,
+        condicao: peca.condicao || "como_novo",
+        tem_defeito: peca.tem_defeito || false,
+        descricao_defeito: peca.tem_defeito ? (peca.descricao_defeito || null) : null,
+        ocasioes: peca.ocasioes,
+        link_compra_externa: peca.link_compra_externa.trim() || null,
+        link_externo_ativo: false,
+        estado: "disponivel",
+        codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(count + 1).padStart(3, "0")}`,
       }).select().single();
-      if (postErr) throw postErr;
-      setPostCriado(post);
-      setPasso(3);
+
+      if (pecaErr) throw pecaErr;
+
+      // Tamanhos
+      for (const t of peca.tamanhos) {
+        await supabase.from("stock_lojista").insert({
+          peca_id: novaPeca.id,
+          tamanho: t.tamanho,
+          quantidade_total: t.quantidade,
+          quantidade_disponivel: t.quantidade,
+        });
+      }
+
+      // Upload fotos
+      if (fotos.length > 0) {
+        const urls = [];
+        for (const foto of fotos) {
+          const ext = foto.file.name.split(".").pop();
+          const path = `${novaPeca.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+          setProgresso(`A fazer upload: ${foto.file.name}...`);
+          const { error: upErr } = await supabase.storage
+            .from("pecas_lojista")
+            .upload(path, foto.file, { upsert: true });
+          if (!upErr) {
+            const { data } = supabase.storage.from("pecas_lojista").getPublicUrl(path);
+            urls.push(data.publicUrl);
+          }
+        }
+        if (urls.length > 0) {
+          await supabase.from("pecas_lojista").update({ fotos: urls }).eq("id", novaPeca.id);
+        }
+      }
+
+      setPecaCriada(novaPeca);
+      setPasso(4);
     } catch (e) {
-      setErro(e.message || "Erro ao publicar.");
+      setErro("Erro ao publicar: " + (e.message || "tenta de novo."));
     }
-    setPublicando(false);
+    setEnviando(false);
+    setProgresso("");
   };
 
-  const pedirBoost = async () => {
-    if (!postCriado) return;
-    await supabase.from("boost_pagamentos").insert({
-      post_id: postCriado.id,
-      lojista_id: user.id,
-      valor: 10,
-      dias: 7,
-      metodo: "mbway",
-      estado: "pendente",
-    });
-    setBoostPedido(true);
-    setSucesso(true);
+  const reiniciar = () => {
+    setFotos([]);
+    setPeca(PECA_VAZIA);
+    setPasso(1);
+    setErro("");
+    setPecaCriada(null);
   };
 
-  const semBoost = () => setSucesso(true);
-
-  if (!user) return (
-    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"1rem", fontFamily:"'Jost',sans-serif", background:"#f7f5f2" }}>
-      <p style={{ fontSize:"0.9rem", color:"#5a5855" }}>{t.login}</p>
-      <a href="/entrar" style={{ background:"#1a1a1a", color:"#fff", padding:"0.75rem 2rem", borderRadius:"8px", textDecoration:"none", fontSize:"0.85rem", fontWeight:600 }}>{t.entrar}</a>
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif", fontSize: "0.8rem", letterSpacing: "0.2em", color: "#888" }}>
+      ...
     </div>
   );
 
+  if (!user) return (
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2" }}>
+      <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
+      <p style={{ fontSize: "0.82rem", color: "#5a5855" }}>Precisas de estar autenticado para publicar uma peça.</p>
+      <a href="/entrar" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>Entrar</a>
+    </div>
+  );
+
+  const isModoLojista = cliente?.candidatura_lojista === "aprovada";
+  if (!isModoLojista) return (
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2", padding: "2rem", textAlign: "center" }}>
+      <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
+      <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.</p>
+      <a href="/perfil" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>Ir para o perfil</a>
+    </div>
+  );
+
+  const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
+  const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
+
   return (
-    <div style={{ minHeight:"100vh", background:"#f7f5f2", fontFamily:"'Jost',sans-serif", maxWidth:"500px", margin:"0 auto" }}>
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        .pub-header{background:#fff;padding:0.75rem 1rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid #e8e4df;position:sticky;top:0;z-index:10}
-        .pub-steps{display:flex;gap:0;margin-left:auto}
-        .pub-step{width:28px;height:4px;border-radius:2px;background:#e8e4df;margin:0 2px;transition:background 0.3s}
-        .pub-step.done{background:#1a1a1a}
-        .pub-step.active{background:#c4a882}
-        .pub-body{padding:1rem}
-        .pub-section{background:#fff;border-radius:12px;padding:1rem;margin-bottom:1rem}
-        .pub-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:#9c9894;font-weight:600;margin-bottom:0.5rem;display:block}
-        .pub-input{width:100%;border:1.5px solid #e8e4df;border-radius:8px;padding:0.65rem 0.85rem;font-size:0.9rem;font-family:'Jost',sans-serif;background:#fff;outline:none;transition:border 0.15s}
-        .pub-input:focus{border-color:#1a1a1a}
-        .pub-textarea{min-height:90px;resize:vertical}
-        .pub-btn{width:100%;background:#1a1a1a;color:#fff;border:none;padding:0.9rem;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Jost',sans-serif;letter-spacing:0.03em;margin-top:0.5rem}
-        .pub-btn:disabled{opacity:0.5}
-        .pub-btn-outline{background:#fff;color:#1a1a1a;border:1.5px solid #1a1a1a}
-        .fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.5rem}
-        .foto-thumb{aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;background:#e8e4df}
-        .foto-thumb img{width:100%;height:100%;object-fit:cover}
-        .foto-remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-        .foto-add{aspect-ratio:1;border-radius:8px;border:2px dashed #c8c4bf;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:0.3rem;color:#9c9894;font-size:0.72rem;text-align:center;padding:0.5rem;transition:border-color 0.15s}
-        .foto-add:hover{border-color:#1a1a1a;color:#1a1a1a}
-        .tipo-btns{display:flex;gap:0.4rem;flex-wrap:wrap}
-        .tipo-btn{padding:0.4rem 0.75rem;border-radius:20px;border:1.5px solid #e8e4df;font-size:0.75rem;cursor:pointer;font-family:'Jost',sans-serif;background:#fff;color:#5a5855;transition:all 0.15s}
-        .tipo-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
-        .boost-card{background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-radius:16px;padding:1.5rem;color:#fff;text-align:center;margin-bottom:1rem}
-        .boost-icon{font-size:2rem;margin-bottom:0.75rem}
-        .boost-titulo{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem}
-        .boost-sub{font-size:0.8rem;color:#c8c4bf;line-height:1.5;margin-bottom:1.2rem}
-        .boost-valor{background:rgba(196,168,130,0.2);border:1px solid #c4a882;border-radius:8px;padding:0.6rem;color:#c4a882;font-size:0.85rem;font-weight:600;margin-bottom:1rem}
-        .btn-boost{width:100%;background:#c4a882;color:#1a1a1a;border:none;padding:0.9rem;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:'Jost',sans-serif;margin-bottom:0.6rem}
-        .btn-sem-boost{width:100%;background:transparent;color:#9c9894;border:1px solid #444;padding:0.75rem;border-radius:10px;font-size:0.8rem;cursor:pointer;font-family:'Jost',sans-serif}
-        .sucesso-card{text-align:center;padding:2rem 1rem}
-        .sucesso-icon{font-size:3rem;margin-bottom:1rem}
-        .sucesso-titulo{font-family:'Playfair Display',serif;font-size:1.4rem;color:#1a1a1a;margin-bottom:0.5rem}
-        .sucesso-sub{font-size:0.85rem;color:#5a5855;line-height:1.5;margin-bottom:1.5rem}
-        .select-peca{width:100%;border:1.5px solid #e8e4df;border-radius:8px;padding:0.65rem 0.85rem;font-size:0.85rem;font-family:'Jost',sans-serif;background:#fff;outline:none;appearance:none}
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400&family=Jost:wght@300;400;500;600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --black: #080808; --white: #f8f7f5; --g1: #f0eeeb; --g2: #e2dfda; --g3: #c8c4bc; --g4: #7a776f; --rosa: #c4748a; --ouro: #c4a882; --sans: 'Jost', Arial, sans-serif; --serif: 'Cormorant', Georgia, serif; }
+        body { background: var(--g1); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+        .pub-nav { background: #fff; border-bottom: 1px solid var(--g2); padding: 0.9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .pub-logo { font-family: var(--serif); font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; color: var(--black); }
+        .pub-voltar { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--g4); text-decoration: none; }
+        .pub-steps { display: flex; align-items: center; gap: 0.3rem; }
+        .pub-step { width: 28px; height: 3px; border-radius: 2px; background: var(--g2); transition: background 0.3s; }
+        .pub-step.done { background: var(--black); }
+        .pub-step.active { background: var(--rosa); }
+
+        .pub-body { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .pub-titulo { font-family: var(--serif); font-size: 1.8rem; font-weight: 300; color: var(--black); margin-bottom: 0.3rem; }
+        .pub-subtitulo { font-size: 0.8rem; color: var(--g4); margin-bottom: 2rem; }
+
+        .pub-card { background: #fff; padding: 1.5rem; margin-bottom: 1rem; }
+        .pub-card-t { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--g4); font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--g1); }
+
+        .pub-label { display: block; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: #3a3936; font-weight: 600; margin-bottom: 0.4rem; }
+        .pub-input { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--g2); background: #fff; font-size: 0.92rem; font-family: var(--sans); color: var(--black); outline: none; transition: border-color 0.2s; }
+        .pub-input:focus { border-color: var(--black); }
+        .pub-select { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--g2); background: #fff; font-size: 0.92rem; font-family: var(--sans); color: var(--black); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a776f' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; }
+        .pub-textarea { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--g2); background: #fff; font-size: 0.92rem; font-family: var(--sans); color: var(--black); outline: none; resize: vertical; min-height: 80px; }
+        .pub-textarea:focus { border-color: var(--black); }
+        .pub-fg { display: flex; flex-direction: column; gap: 0.4rem; }
+        .pub-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .pub-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+        .pub-full { grid-column: 1 / -1; }
+
+        /* Fotos */
+        .fotos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
+        .foto-thumb { aspect-ratio: 3/4; border-radius: 4px; overflow: hidden; position: relative; background: var(--g1); }
+        .foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .foto-remove { position: absolute; top: 4px; right: 4px; background: rgba(8,8,8,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .foto-add { aspect-ratio: 3/4; border-radius: 4px; border: 2px dashed var(--g3); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 0.4rem; color: var(--g4); font-size: 0.65rem; text-align: center; padding: 0.5rem; transition: border-color 0.15s; }
+        .foto-add:hover { border-color: var(--black); color: var(--black); }
+        .foto-add svg { opacity: 0.5; }
+
+        /* Tipo btns */
+        .tipo-btn { padding: 0.6rem; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; text-align: center; }
+        .tipo-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+
+        /* Tamanhos */
+        .tamanho-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+        .tamanho-sel { flex: 1; padding: 0.6rem 0.75rem; border: 1.5px solid var(--g2); font-family: var(--sans); font-size: 0.88rem; background: #fff; outline: none; }
+        .tamanho-qty { width: 70px; padding: 0.6rem 0.75rem; border: 1.5px solid var(--g2); font-family: var(--sans); font-size: 0.88rem; text-align: center; }
+        .tamanho-rm { background: none; border: none; color: var(--rosa); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0.2rem; }
+
+        /* Ocasiões */
+        .ocasiao-btn { padding: 0.35rem 0.6rem; font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; }
+        .ocasiao-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+
+        /* Upload area */
+        .upload-area { border: 2px dashed var(--g2); padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; background: var(--g1); }
+        .upload-area:hover { border-color: var(--rosa); }
+
+        /* Botões */
+        .pub-btn { width: 100%; padding: 0.9rem; border: none; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-family: var(--sans); font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .pub-btn-black { background: var(--black); color: #fff; }
+        .pub-btn-black:hover { background: #2a2926; }
+        .pub-btn-black:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pub-btn-outline { background: #fff; color: var(--black); border: 1.5px solid var(--g2); }
+        .pub-btn-outline:hover { border-color: var(--black); }
+        .pub-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+        .pub-actions .pub-btn { flex: 1; }
+        .pub-actions .pub-btn-outline { flex: 0 0 auto; padding: 0.9rem 1.25rem; width: auto; }
+
+        .pub-erro { background: #fff5f5; border-left: 3px solid #e74c3c; padding: 0.75rem 1rem; font-size: 0.8rem; color: #c0392b; margin-top: 0.5rem; }
+        .pub-sugestao { font-size: 0.68rem; color: #27ae60; margin-top: 0.25rem; }
+        .pub-hint { font-size: 0.65rem; color: var(--g4); margin-top: 0.25rem; }
+
+        .defeito-box { padding: 0.85rem 1rem; border: 1.5px solid var(--g2); background: #fafafa; margin-bottom: 1rem; }
+        .defeito-box.ativo { border-color: #e74c3c; background: #fff5f5; }
+        .defeito-label { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: var(--g4); }
+        .defeito-box.ativo .defeito-label { color: #c0392b; }
+
+        .link-externo-box { padding: 1rem; background: #faf8f5; border: 1.5px solid #e8d5a3; margin-bottom: 1rem; }
+        .link-externo-badge { font-size: 0.55rem; background: var(--ouro); color: #fff; padding: 0.1rem 0.4rem; font-weight: 600; letter-spacing: 0.08em; margin-left: 0.4rem; }
+
+        /* Sucesso */
+        .sucesso-wrap { text-align: center; padding: 3rem 2rem; }
+        .sucesso-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .sucesso-titulo { font-family: var(--serif); font-size: 1.8rem; font-weight: 300; color: var(--black); margin-bottom: 0.5rem; }
+        .sucesso-sub { font-size: 0.85rem; color: var(--g4); line-height: 1.6; margin-bottom: 1.5rem; }
+        .sucesso-acoes { display: flex; flex-direction: column; gap: 0.75rem; }
+        .sucesso-btn { padding: 0.9rem; text-align: center; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-family: var(--sans); font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
+
+        @media (max-width: 600px) {
+          .pub-body { padding: 1.25rem 1rem 6rem; }
+          .pub-grid2 { grid-template-columns: 1fr; }
+          .pub-grid3 { grid-template-columns: 1fr 1fr; }
+          .fotos-grid { grid-template-columns: repeat(3, 1fr); }
+        }
       `}</style>
 
-      <header className="pub-header">
-        <a href="/feed" style={{ color:"#5a5855", textDecoration:"none", fontSize:"0.8rem" }}>{t.voltar}</a>
-        <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"#1a1a1a" }}>{t.titulo}</span>
+      {/* NAV */}
+      <nav className="pub-nav">
+        <a href="/perfil" className="pub-logo">Nora Grei</a>
         <div className="pub-steps">
-          {[1,2,3].map(s => <div key={s} className={`pub-step${passo > s ? " done" : passo === s ? " active" : ""}`} />)}
+          {[1,2,3].map(s => (
+            <div key={s} className={`pub-step${passo > s ? " done" : passo === s ? " active" : ""}`} />
+          ))}
         </div>
-      </header>
+        <a href="/perfil" className="pub-voltar">← Voltar</a>
+      </nav>
 
       <div className="pub-body">
 
-        {/* PASSO 1 — FOTOS */}
+        {/* ── PASSO 1 — FOTOS ── */}
         {passo === 1 && (
           <>
-            <div className="pub-section">
-              <span className="pub-label">{t.passo1}</span>
-              <div className="fotos-grid">
-                {fotos.map((f, i) => (
-                  <div key={i} className="foto-thumb">
-                    <img src={f.url} alt="" />
-                    <button className="foto-remove" onClick={() => removerFoto(i)}>✕</button>
-                  </div>
-                ))}
-                {fotos.length < 5 && (
-                  <div className="foto-add" onClick={() => inputRef.current?.click()}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    <span>{fotos.length === 0 ? t.addFoto : t.addMais}</span>
-                  </div>
-                )}
-              </div>
-              <input ref={inputRef} type="file" accept="image/*" multiple capture="environment" style={{ display:"none" }} onChange={e => adicionarFotos(e.target.files)} />
+            <h1 className="pub-titulo">Adicionar peça</h1>
+            <p className="pub-subtitulo">Começa pelas fotos — até 5 imagens da peça.</p>
+
+            <div className="pub-card">
+              <p className="pub-card-t">Fotos da peça</p>
+
+              {/* Área drag-and-drop */}
+              {fotos.length === 0 && (
+                <div className="upload-area" onClick={() => inputFotoRef.current?.click()}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8c4bc" strokeWidth="1.2" style={{marginBottom:"0.75rem"}}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <p style={{fontSize:"0.9rem",color:"#5a5855",fontWeight:500,marginBottom:"0.25rem"}}>Toca para adicionar fotos</p>
+                  <p style={{fontSize:"0.72rem",color:"#9c9894"}}>JPG, PNG, WEBP — até 5 fotos</p>
+                </div>
+              )}
+
+              {/* Grid de miniaturas */}
+              {fotos.length > 0 && (
+                <div className="fotos-grid">
+                  {fotos.map((f, i) => (
+                    <div key={i} className="foto-thumb">
+                      <img src={f.url} alt="" />
+                      <button className="foto-remove" onClick={() => removerFoto(i)} title="Remover">✕</button>
+                    </div>
+                  ))}
+                  {fotos.length < 5 && (
+                    <div className="foto-add" onClick={() => inputFotoRef.current?.click()}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                      <span>Adicionar</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <input
+                ref={inputFotoRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: "none" }}
+                onChange={e => adicionarFotos(e.target.files)}
+              />
+
+              {fotos.length > 0 && (
+                <p style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.5rem"}}>
+                  {fotos.length} foto{fotos.length > 1 ? "s" : ""} selecionada{fotos.length > 1 ? "s" : ""}. A primeira será a imagem principal.
+                </p>
+              )}
             </div>
-            {erro && <p style={{ color:"#e74c3c", fontSize:"0.8rem", marginBottom:"0.75rem", textAlign:"center" }}>{erro}</p>}
-            <button className="pub-btn" onClick={() => { if (!fotos.length) { setErro(t.semFotos); return; } setErro(""); setPasso(2); }}
-              disabled={fotos.length === 0}>
-              Continuar →
-            </button>
-          </>
-        )}
 
-        {/* PASSO 2 — DETALHES */}
-        {passo === 2 && (
-          <>
-            <div className="pub-section">
-              <label className="pub-label">{t.titulo_label}</label>
-              <input className="pub-input" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder={t.titulo_ph} maxLength={80} />
-            </div>
+            {erro && <div className="pub-erro">{erro}</div>}
 
-            <div className="pub-section">
-              <label className="pub-label">{t.desc_label}</label>
-              <textarea className="pub-input pub-textarea" value={descricao} onChange={e => setDescricao(e.target.value)} placeholder={t.desc_ph} maxLength={500} />
-            </div>
-
-            <div className="pub-section">
-              <label className="pub-label">{t.tipo_label}</label>
-              <div className="tipo-btns">
-                {t.tipos.map(tp => (
-                  <button key={tp.v} className={`tipo-btn${tipo === tp.v ? " active" : ""}`} onClick={() => setTipo(tp.v)}>{tp.l}</button>
-                ))}
-              </div>
-            </div>
-
-            {pecas.length > 0 && (
-              <div className="pub-section">
-                <label className="pub-label">{t.peca_label}</label>
-                <select className="select-peca" value={pecaId} onChange={e => setPecaId(e.target.value)}>
-                  <option value="">{t.peca_ph}</option>
-                  {pecas.map(p => <option key={p.id} value={p.id}>{p.nome}{p.preco_aluguer_dia ? ` — ${p.preco_aluguer_dia}€/dia` : ""}</option>)}
-                </select>
-              </div>
-            )}
-
-            {erro && <p style={{ color:"#e74c3c", fontSize:"0.8rem", marginBottom:"0.75rem", textAlign:"center" }}>{erro}</p>}
-
-            <div style={{ display:"flex", gap:"0.5rem" }}>
-              <button className="pub-btn pub-btn-outline" style={{ flex:"0 0 auto", width:"auto", padding:"0.9rem 1.2rem" }} onClick={() => setPasso(1)}>←</button>
-              <button className="pub-btn" style={{ flex:1 }} onClick={publicar} disabled={publicando}>
-                {publicando ? t.publicando : t.publicar}
+            <div className="pub-actions">
+              <button
+                className="pub-btn pub-btn-black"
+                onClick={() => {
+                  if (!fotos.length) { setErro("Adiciona pelo menos uma foto."); return; }
+                  setErro(""); setPasso(2);
+                }}
+                disabled={fotos.length === 0}
+              >
+                Continuar →
               </button>
             </div>
           </>
         )}
 
-        {/* PASSO 3 — BOOST ou SUCESSO */}
-        {passo === 3 && !sucesso && (
+        {/* ── PASSO 2 — DETALHES ── */}
+        {passo === 2 && (
           <>
-            <div className="boost-card">
-              <div className="boost-icon">🚀</div>
-              <p className="boost-titulo">{t.boostTitulo}</p>
-              <p className="boost-sub">{t.boostSub}</p>
-              <div className="boost-valor">{t.boostValor}</div>
-              <button className="btn-boost" onClick={pedirBoost}>{t.boostSim}</button>
-              <button className="btn-sem-boost" onClick={semBoost}>{t.boostNao}</button>
+            <h1 className="pub-titulo">Detalhes da peça</h1>
+            <p className="pub-subtitulo">Informação sobre a peça — quanto mais detalhes, melhor para a cliente.</p>
+
+            {/* Categoria */}
+            <div className="pub-card">
+              <p className="pub-card-t">Categoria</p>
+              <div className="pub-fg">
+                <label className="pub-label">Categoria *</label>
+                <select
+                  className="pub-select"
+                  value={peca.categoria}
+                  onChange={e => {
+                    const cat = e.target.value;
+                    const semTam = CATEGORIAS_SEM_TAMANHO.includes(cat);
+                    setPeca(prev => ({ ...prev, categoria: cat, tamanhos: semTam ? [{ tamanho: "Único", quantidade: 1 }] : prev.tamanhos }));
+                  }}
+                >
+                  <option value="">Selecionar categoria...</option>
+                  <optgroup label="Vestuário">
+                    {CATEGORIAS_VESTUARIO.map(c => <option key={c}>{c}</option>)}
+                  </optgroup>
+                  <optgroup label="Acessórios">
+                    {CATEGORIAS_ACESSORIOS.map(c => <option key={c}>{c}</option>)}
+                  </optgroup>
+                  <optgroup label="Relógios">
+                    <option>Relógios</option>
+                  </optgroup>
+                  <optgroup label="Calçado">
+                    {["Saltos","Sandálias","Botas","Sapatilhas","Calçado"].map(c => <option key={c}>{c}</option>)}
+                  </optgroup>
+                </select>
+              </div>
             </div>
-            <p style={{ fontSize:"0.72rem", color:"#9c9894", textAlign:"center" }}>{t.boostInfo}</p>
+
+            {/* Nome + Marca */}
+            <div className="pub-card">
+              <p className="pub-card-t">Identificação</p>
+              <div className="pub-grid2">
+                <div className="pub-fg">
+                  <label className="pub-label">Nome da peça *</label>
+                  <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder="Ex: Vestido midi azul marinho" />
+                </div>
+                <div className="pub-fg">
+                  <label className="pub-label">Marca / Designer</label>
+                  <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder="Zara, Mango, Gucci..." />
+                </div>
+                <div className="pub-fg">
+                  <label className="pub-label">Cor principal</label>
+                  <input className="pub-input" value={peca.cor} onChange={e => setP("cor", e.target.value)} placeholder="Azul marinho" list="cores-lista" />
+                  <datalist id="cores-lista">
+                    {CORES.map(c => <option key={c} value={c} />)}
+                  </datalist>
+                </div>
+                <div className="pub-fg">
+                  <label className="pub-label">Material</label>
+                  <input className="pub-input" value={peca.material} onChange={e => setP("material", e.target.value)} placeholder="100% seda natural" />
+                </div>
+                <div className="pub-fg pub-full">
+                  <label className="pub-label">Condição</label>
+                  <select className="pub-select" value={peca.condicao} onChange={e => setP("condicao", e.target.value)}>
+                    <option value="novo">Novo (com etiqueta)</option>
+                    <option value="como_novo">Como novo (nunca usado)</option>
+                    <option value="muito_bom">Muito bom estado</option>
+                    <option value="bom">Bom estado</option>
+                    <option value="usado">Usado</option>
+                  </select>
+                </div>
+                <div className="pub-fg pub-full">
+                  <label className="pub-label">Descrição</label>
+                  <textarea className="pub-textarea" value={peca.descricao} onChange={e => setP("descricao", e.target.value)} placeholder="Conta a história desta peça — ocasião ideal, como usar, porquê é especial..." />
+                </div>
+              </div>
+            </div>
+
+            {/* Defeito */}
+            <div className="pub-card">
+              <p className="pub-card-t">Estado de conservação</p>
+              <div className={`defeito-box${peca.tem_defeito ? " ativo" : ""}`}>
+                <label className="defeito-label">
+                  <input
+                    type="checkbox"
+                    checked={peca.tem_defeito}
+                    onChange={e => setP("tem_defeito", e.target.checked)}
+                    style={{ width: "1rem", height: "1rem", cursor: "pointer", accentColor: "#e74c3c" }}
+                  />
+                  A peça tem defeito
+                </label>
+                {peca.tem_defeito ? (
+                  <textarea
+                    className="pub-textarea"
+                    value={peca.descricao_defeito}
+                    onChange={e => setP("descricao_defeito", e.target.value)}
+                    style={{ marginTop: "0.75rem", border: "1.5px solid #e74c3c" }}
+                    placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..."
+                  />
+                ) : (
+                  <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
+                    A peça está em perfeitas condições.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Tamanhos */}
+            <div className="pub-card">
+              <p className="pub-card-t">Tamanhos disponíveis</p>
+              {peca.tamanhos.map((t, idx) => (
+                <div key={idx} className="tamanho-row">
+                  <select
+                    className="tamanho-sel"
+                    value={t.tamanho}
+                    onChange={e => setPeca(prev => ({ ...prev, tamanhos: prev.tamanhos.map((x, i) => i === idx ? { ...x, tamanho: e.target.value } : x) }))}
+                  >
+                    {TAMANHOS.map(s => <option key={s}>{s}</option>)}
+                  </select>
+                  <input
+                    type="number"
+                    className="tamanho-qty"
+                    value={t.quantidade}
+                    min={1}
+                    onChange={e => setPeca(prev => ({ ...prev, tamanhos: prev.tamanhos.map((x, i) => i === idx ? { ...x, quantidade: parseInt(e.target.value) || 1 } : x) }))}
+                    title="Quantidade"
+                  />
+                  {peca.tamanhos.length > 1 && (
+                    <button
+                      className="tamanho-rm"
+                      onClick={() => setPeca(prev => ({ ...prev, tamanhos: prev.tamanhos.filter((_, i) => i !== idx) }))}
+                    >✕</button>
+                  )}
+                </div>
+              ))}
+              <button
+                onClick={() => setPeca(prev => ({ ...prev, tamanhos: [...prev.tamanhos, { tamanho: "M", quantidade: 1 }] }))}
+                style={{ fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "none", border: "1.5px solid var(--g2)", padding: "0.4rem 0.75rem", cursor: "pointer", fontFamily: "var(--sans)", color: "var(--g4)" }}
+              >
+                + Tamanho
+              </button>
+            </div>
+
+            {/* Ocasiões */}
+            <div className="pub-card">
+              <p className="pub-card-t">Ocasiões</p>
+              <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                {OCASIOES.map(oc => (
+                  <button
+                    key={oc}
+                    type="button"
+                    className={`ocasiao-btn${peca.ocasioes.includes(oc) ? " active" : ""}`}
+                    onClick={() => {
+                      const next = peca.ocasioes.includes(oc)
+                        ? peca.ocasioes.filter(o => o !== oc)
+                        : [...peca.ocasioes, oc];
+                      setP("ocasioes", next);
+                    }}
+                  >
+                    {oc}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {erro && <div className="pub-erro">{erro}</div>}
+
+            <div className="pub-actions">
+              <button className="pub-btn pub-btn-outline" onClick={() => { setErro(""); setPasso(1); }}>←</button>
+              <button
+                className="pub-btn pub-btn-black"
+                onClick={() => { if (validarPasso2()) setPasso(3); }}
+              >
+                Continuar →
+              </button>
+            </div>
           </>
         )}
 
-        {sucesso && (
-          <div className="pub-section sucesso-card">
+        {/* ── PASSO 3 — PREÇOS ── */}
+        {passo === 3 && (
+          <>
+            <h1 className="pub-titulo">Preços e disponibilidade</h1>
+            <p className="pub-subtitulo">Define como a peça estará disponível — para alugar, vender, ou ambos.</p>
+
+            {/* Tipo */}
+            <div className="pub-card">
+              <p className="pub-card-t">Disponível para</p>
+              <div className="pub-grid3">
+                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val, label]) => (
+                  <button
+                    key={val}
+                    className={`tipo-btn${peca.tipo === val ? " active" : ""}`}
+                    onClick={() => setP("tipo", val)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Preços */}
+            <div className="pub-card">
+              <p className="pub-card-t">Preços</p>
+              <div className="pub-grid2">
+
+                {/* Valor nova */}
+                <div className="pub-fg">
+                  <label className="pub-label">Valor peça nova (€)</label>
+                  <input
+                    className="pub-input"
+                    type="number"
+                    min="0"
+                    value={peca.valor_peca}
+                    onChange={e => {
+                      const v = e.target.value;
+                      const sugestao = v && parseFloat(v) > 0 ? Math.round(parseFloat(v) * 0.08) : "";
+                      setPeca(prev => ({ ...prev, valor_peca: v, preco_aluguer_dia: prev.preco_aluguer_dia || sugestao.toString() }));
+                    }}
+                    placeholder="200"
+                  />
+                  <span className="pub-hint">Valor original de compra — usado para calcular a caução.</span>
+                </div>
+
+                {/* Preço aluguer */}
+                {precisaAluguer && (
+                  <div className="pub-fg">
+                    <label className="pub-label" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      Aluguer / dia (€) *
+                      {peca.valor_peca && parseFloat(peca.valor_peca) > 0 && (
+                        <span style={{ fontSize: "0.55rem", background: "#e8f5e9", color: "#27ae60", padding: "0.1rem 0.35rem", fontWeight: 600 }}>
+                          sugerido: {Math.round(parseFloat(peca.valor_peca) * 0.08)}€
+                        </span>
+                      )}
+                    </label>
+                    <input
+                      className="pub-input"
+                      type="number"
+                      min="0"
+                      value={peca.preco_aluguer_dia}
+                      onChange={e => setP("preco_aluguer_dia", e.target.value)}
+                      placeholder="16"
+                    />
+                    {peca.valor_peca && peca.preco_aluguer_dia && parseFloat(peca.valor_peca) > 0 && parseFloat(peca.preco_aluguer_dia) > 0 && (
+                      <span className="pub-sugestao">
+                        A cliente poupa {Math.round((1 - parseFloat(peca.preco_aluguer_dia) / parseFloat(peca.valor_peca)) * 100)}% vs comprar nova
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Preço venda usada */}
+                {precisaVenda && (
+                  <div className="pub-fg">
+                    <label className="pub-label">Preço de venda usada (€) *</label>
+                    <input
+                      className="pub-input"
+                      type="number"
+                      min="0"
+                      value={peca.preco_venda}
+                      onChange={e => setP("preco_venda", e.target.value)}
+                      placeholder="150"
+                    />
+                    <span className="pub-hint">Preço de venda da peça em segunda mão.</span>
+                  </div>
+                )}
+
+              </div>
+            </div>
+
+            {/* Link externo */}
+            <div className="pub-card">
+              <p className="pub-card-t">Link para comprar nova <span style={{opacity:0.5}}>(opcional)</span></p>
+              <div className="link-externo-box">
+                <label className="pub-label" style={{ color: "#8a6a2a" }}>
+                  Link para comprar nova ↗
+                  <span className="link-externo-badge">15€/mês</span>
+                </label>
+                <input
+                  className="pub-input"
+                  type="url"
+                  value={peca.link_compra_externa}
+                  onChange={e => setP("link_compra_externa", e.target.value)}
+                  placeholder="https://www.zara.com/produto/..."
+                  style={{ marginTop: "0.5rem" }}
+                />
+                <p style={{ fontSize: "0.65rem", color: "#8a6a2a", marginTop: "0.5rem", lineHeight: 1.5 }}>
+                  Direciona as clientes para comprarem a peça nova noutro site. A Nora Grei ativa este link após pagamento de 15€/mês.
+                </p>
+              </div>
+            </div>
+
+            {progresso && (
+              <p style={{ fontSize: "0.8rem", color: "#c4748a", fontStyle: "italic", marginBottom: "0.75rem" }}>{progresso}</p>
+            )}
+            {erro && <div className="pub-erro">{erro}</div>}
+
+            <div className="pub-actions">
+              <button className="pub-btn pub-btn-outline" onClick={() => { setErro(""); setPasso(2); }}>←</button>
+              <button
+                className="pub-btn pub-btn-black"
+                onClick={publicar}
+                disabled={enviando}
+              >
+                {enviando ? "A publicar..." : "Publicar peça"}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── PASSO 4 — SUCESSO ── */}
+        {passo === 4 && (
+          <div className="pub-card sucesso-wrap">
             <div className="sucesso-icon">🎉</div>
-            <p className="sucesso-titulo">{t.sucessoTitulo}</p>
-            <p className="sucesso-sub">{boostPedido ? t.boost_pendente + " " : ""}{t.sucessoSub}</p>
-            <a href="/feed" style={{ display:"block", background:"#1a1a1a", color:"#fff", padding:"0.85rem", borderRadius:"10px", textDecoration:"none", fontWeight:600, fontSize:"0.9rem", textAlign:"center", marginBottom:"0.6rem" }}>{t.verFeed}</a>
-            <button style={{ width:"100%", background:"#fff", border:"1.5px solid #e8e4df", padding:"0.75rem", borderRadius:"10px", font:"600 0.85rem 'Jost',sans-serif", cursor:"pointer", color:"#1a1a1a" }}
-              onClick={() => { setFotos([]); setTitulo(""); setDescricao(""); setTipo("peca"); setPecaId(""); setPasso(1); setSucesso(false); setPostCriado(null); setBoostPedido(false); }}>
-              {t.publicarOutro}
-            </button>
+            <h2 className="sucesso-titulo">Peça publicada!</h2>
+            <p className="sucesso-sub">
+              A tua peça foi adicionada ao teu catálogo e ficará visível na tua loja após aprovação.
+            </p>
+            <div className="sucesso-acoes">
+              {cliente?.codigo_cliente && (
+                <a
+                  href={`/loja/${cliente.codigo_cliente}`}
+                  className="sucesso-btn"
+                  style={{ background: "#080808", color: "#fff" }}
+                >
+                  Ver a minha loja ↗
+                </a>
+              )}
+              <button
+                className="sucesso-btn"
+                onClick={reiniciar}
+                style={{ background: "#fff", border: "1.5px solid #e2dfda", color: "#080808" }}
+              >
+                Adicionar outra peça
+              </button>
+              <a href="/perfil" className="sucesso-btn" style={{ color: "#7a776f", textDecoration: "none", fontSize: "0.7rem" }}>
+                Ir para o perfil
+              </a>
+            </div>
           </div>
         )}
+
       </div>
-    </div>
+    </>
   );
 }
