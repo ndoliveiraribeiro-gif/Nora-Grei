@@ -981,7 +981,7 @@ export default function Perfil() {
   const [codigoLoja, setCodigoLoja] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
@@ -1183,7 +1183,11 @@ export default function Perfil() {
   };
 
   const guardarNovaPeca = async () => {
-    if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) return;
+    const precisaAluguer = novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos";
+    const precisaVenda = novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos";
+    if (!novaPeca.nome) return;
+    if (precisaAluguer && !novaPeca.preco_aluguer_dia) return;
+    if (precisaVenda && !novaPeca.preco_venda) return;
     setNovaPecaLoading(true);
     setUploadProgressLoja("A criar peça...");
     const { data: { session } } = await supabase.auth.getSession();
@@ -1191,7 +1195,8 @@ export default function Perfil() {
       cliente_id: session.user.id,
       nome: novaPeca.nome,
       descricao: novaPeca.descricao||null,
-      preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia),
+      tipo: novaPeca.tipo||"alugar",
+      preco_aluguer_dia: novaPeca.preco_aluguer_dia ? parseFloat(novaPeca.preco_aluguer_dia) : null,
       preco_venda: novaPeca.preco_venda ? parseFloat(novaPeca.preco_venda) : null,
       valor_peca: novaPeca.valor_peca ? parseFloat(novaPeca.valor_peca) : null,
       material: novaPeca.material||null,
@@ -1227,7 +1232,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
-    setNovaPeca({ nome: "", descricao: "", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+    setNovaPeca({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
     setFotosLojista([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
@@ -1239,6 +1244,7 @@ export default function Perfil() {
     await supabase.from("pecas_lojista").update({
       nome: editarPeca.nome,
       descricao: editarPeca.descricao || null,
+      tipo: editarPeca.tipo || "alugar",
       preco_aluguer_dia: editarPeca.preco_aluguer_dia ? parseFloat(editarPeca.preco_aluguer_dia) : null,
       preco_venda: editarPeca.preco_venda ? parseFloat(editarPeca.preco_venda) : null,
       valor_peca: editarPeca.valor_peca ? parseFloat(editarPeca.valor_peca) : null,
@@ -2433,6 +2439,19 @@ export default function Perfil() {
               <textarea className="inp" value={editarPeca.descricao||""} onChange={e=>setEditarPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"70px"}} placeholder="Conta a história desta peça — ocasião ideal, como usar..." />
             </div>
 
+            {/* Tipo — alugar / vender / ambos */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Disponível para</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
+                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
+                  <button key={val} type="button" onClick={()=>setEditarPeca(p=>({...p,tipo:val}))}
+                    style={{padding:"0.6rem 0.4rem",fontSize:"0.65rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:(editarPeca.tipo||"alugar")===val?"var(--black)":"#e2dfda",background:(editarPeca.tipo||"alugar")===val?"var(--black)":"#fff",color:(editarPeca.tipo||"alugar")===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Valor nova + sugestão aluguer */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
               <div className="fg">
@@ -2445,13 +2464,15 @@ export default function Perfil() {
                   }}
                   placeholder="200" />
               </div>
-              <div className="fg">
-                <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
-                  Aluguer / dia (€)
-                  {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
-                </label>
-                <input className="inp" type="number" min="0" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
-              </div>
+              {((editarPeca.tipo||"alugar")==="alugar"||(editarPeca.tipo||"alugar")==="ambos") && (
+                <div className="fg">
+                  <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                    Aluguer / dia (€)
+                    {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
+                  </label>
+                  <input className="inp" type="number" min="0" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
+                </div>
+              )}
             </div>
             {editarPeca.valor_peca&&editarPeca.preco_aluguer_dia&&parseFloat(editarPeca.valor_peca)>0&&parseFloat(editarPeca.preco_aluguer_dia)>0&&(
               <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
@@ -2461,7 +2482,7 @@ export default function Perfil() {
 
             {/* Preço venda + Material */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
-              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" min="0" value={editarPeca.preco_venda||""} onChange={e=>setEditarPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+              {((editarPeca.tipo||"alugar")==="comprar"||(editarPeca.tipo||"alugar")==="ambos") && <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" min="0" value={editarPeca.preco_venda||""} onChange={e=>setEditarPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>}
               <div className="fg"><label className="lbl">Material</label><input className="inp" value={editarPeca.material||""} onChange={e=>setEditarPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
             </div>
 
@@ -2582,6 +2603,19 @@ export default function Perfil() {
               <textarea className="inp" value={novaPeca.descricao} onChange={e=>setNovaPeca(p=>({...p,descricao:e.target.value}))} style={{resize:"vertical",minHeight:"70px"}} placeholder="Conta a história desta peça — ocasião ideal, como usar..." />
             </div>
 
+            {/* Tipo — alugar / vender / ambos */}
+            <div className="fg" style={{marginBottom:"1rem"}}>
+              <label className="lbl">Disponível para *</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
+                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
+                  <button key={val} type="button" onClick={()=>setNovaPeca(p=>({...p,tipo:val}))}
+                    style={{padding:"0.6rem 0.4rem",fontSize:"0.65rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:novaPeca.tipo===val?"var(--black)":"#e2dfda",background:novaPeca.tipo===val?"var(--black)":"#fff",color:novaPeca.tipo===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Valor nova + sugestão aluguer */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
               <div className="fg">
@@ -2594,13 +2628,15 @@ export default function Perfil() {
                   }}
                   placeholder="200" />
               </div>
-              <div className="fg">
-                <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
-                  Aluguer / dia (€) *
-                  {novaPeca.valor_peca&&parseFloat(novaPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>sugerido: {Math.round(parseFloat(novaPeca.valor_peca)*0.08)}€</span>}
-                </label>
-                <input className="inp" type="number" min="0" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
-              </div>
+              {(novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos") && (
+                <div className="fg">
+                  <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                    Aluguer / dia (€) *
+                    {novaPeca.valor_peca&&parseFloat(novaPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>sugerido: {Math.round(parseFloat(novaPeca.valor_peca)*0.08)}€</span>}
+                  </label>
+                  <input className="inp" type="number" min="0" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
+                </div>
+              )}
             </div>
             {novaPeca.valor_peca&&novaPeca.preco_aluguer_dia&&parseFloat(novaPeca.valor_peca)>0&&parseFloat(novaPeca.preco_aluguer_dia)>0&&(
               <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
@@ -2610,7 +2646,7 @@ export default function Perfil() {
 
             {/* Preço venda + Material */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
-              <div className="fg"><label className="lbl">Preço venda (€)</label><input className="inp" type="number" min="0" value={novaPeca.preco_venda} onChange={e=>setNovaPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>
+              {(novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos") && <div className="fg"><label className="lbl">Preço venda (€) *</label><input className="inp" type="number" min="0" value={novaPeca.preco_venda} onChange={e=>setNovaPeca(p=>({...p,preco_venda:e.target.value}))} placeholder="150" /></div>}
               <div className="fg"><label className="lbl">Material</label><input className="inp" value={novaPeca.material} onChange={e=>setNovaPeca(p=>({...p,material:e.target.value}))} placeholder="Seda, algodão..." /></div>
             </div>
 
@@ -2654,7 +2690,7 @@ export default function Perfil() {
 
             {uploadProgressLoja && <p style={{fontSize:"0.82rem",color:"var(--g4)",margin:"0.5rem 0",fontStyle:"italic"}}>{uploadProgressLoja}</p>}
             <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
-              <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||!novaPeca.preco_aluguer_dia||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||!novaPeca.preco_aluguer_dia)?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
+              <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||((novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_aluguer_dia)||((novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_venda)||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||((novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_aluguer_dia)||((novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_venda))?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
               <button onClick={()=>setShowNovaPeca(false)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
           </div>
