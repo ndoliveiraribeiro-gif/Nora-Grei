@@ -655,6 +655,11 @@ export default function Perfil() {
   const fotosLojistaRef = typeof window !== "undefined" ? { current: null } : { current: null };
   const [lojaIban, setLojaIban] = useState("");
   const [lojaEstado, setLojaEstado] = useState("inativo");
+  const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
+  const [showFormLojista, setShowFormLojista] = useState(false);
+  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", aceita_termos: false });
+  const [formLojistaMsg, setFormLojistaMsg] = useState("");
+  const [formLojistaLoading, setFormLojistaLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [novaPass, setNovaPass] = useState("");
   const [confirmarPass, setConfirmarPass] = useState("");
@@ -693,6 +698,7 @@ export default function Perfil() {
         setLojaEstado(c.lojista_estado||"teste");
         if (c.codigo_cliente) setCodigoLoja(c.codigo_cliente);
         setLojaIban(c.lojista_iban||"");
+        if (c.candidatura_lojista) setCandidaturaLojista(c.candidatura_lojista);
         if (c.lojista_desde) {
           const diasPassados = Math.floor((new Date() - new Date(c.lojista_desde)) / 86400000);
           setDiasTeste(Math.max(0, 180 - diasPassados));
@@ -703,6 +709,9 @@ export default function Perfil() {
           const { data: als } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone, cidade), pecas_lojista(nome, fotos, preco_aluguer_dia), stock_lojista(tamanho)").eq("lojista_id", user.id).order("created_at", { ascending: false });
           if (als) setAlugueresLoja(als);
         }
+      } else {
+        // Não é lojista — verificar se tem candidatura pendente
+        if (c.candidatura_lojista) setCandidaturaLojista(c.candidatura_lojista);
       }
     }
 
@@ -782,6 +791,34 @@ export default function Perfil() {
   };
 
   const sair = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
+
+  const submeterCandidaturaLojista = async () => {
+    if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
+    if (!formLojista.iban.trim()) { setFormLojistaMsg("Indica o teu IBAN ou NIB para receberes pagamentos."); return; }
+    if (!formLojista.aceita_termos) { setFormLojistaMsg("Tens de aceitar os termos para continuar."); return; }
+    setFormLojistaLoading(true);
+    setFormLojistaMsg("");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setFormLojistaLoading(false); return; }
+    const candidatura = {
+      nome_loja: formLojista.nome_loja.trim(),
+      descricao: formLojista.descricao.trim(),
+      iban: formLojista.iban.trim().toUpperCase(),
+      tipo_pagamento: formLojista.tipo_pagamento,
+      submetida_em: new Date().toISOString(),
+    };
+    const { error } = await supabase.from("clientes").update({
+      candidatura_lojista: "pendente",
+      lojista_candidatura_dados: candidatura,
+    }).eq("id", user.id);
+    setFormLojistaLoading(false);
+    if (error) {
+      setFormLojistaMsg("Erro ao submeter. Tenta novamente.");
+    } else {
+      setCandidaturaLojista("pendente");
+      setShowFormLojista(false);
+    }
+  };
 
   const guardarNovaPeca = async () => {
     if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) return;
@@ -1326,14 +1363,106 @@ export default function Perfil() {
         </div>{/* fim display:none guardados */}
         </div>{/* fim display:none loja */}
 
-        {/* CTA TORNAR-ME LOJISTA — visível apenas para clientes normais */}
+        {/* BLOCO LOJISTA — CTA / formulário / estado candidatura */}
         {!modoLojista && (
-          <div style={{margin:"2rem 0 3rem",padding:"2rem",background:"#f8f5f0",border:"1px solid #e8e3dc",textAlign:"center"}}>
-            <div style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Abre a tua loja na Nora Grei</div>
-            <p style={{fontSize:"0.82rem",color:"var(--g6)",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>Aluga as tuas peças de moda a outras mulheres. Sem compromissos — 180 dias de período de teste gratuito.</p>
-            <a href="/backoffice" style={{display:"inline-block",padding:"0.9rem 2.5rem",background:"var(--black)",color:"var(--white)",textDecoration:"none",fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
-              Tornar-me Lojista →
-            </a>
+          <div style={{margin:"2rem 0 3rem"}}>
+
+            {/* Estado: candidatura pendente */}
+            {candidaturaLojista === "pendente" && (
+              <div style={{padding:"2rem",background:"#f0f7f0",border:"1px solid #b8dbb8",textAlign:"center"}}>
+                <div style={{fontSize:"1.5rem",marginBottom:"0.75rem"}}>⏳</div>
+                <div style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Candidatura em análise</div>
+                <p style={{fontSize:"0.82rem",color:"#4a7a4a",lineHeight:1.6,maxWidth:"380px",margin:"0 auto"}}>Recebemos o teu pedido para abrir loja. A equipa Nora Grei irá rever os teus dados e entrar em contacto em breve. Normalmente em 1–2 dias úteis.</p>
+              </div>
+            )}
+
+            {/* Estado: candidatura recusada */}
+            {candidaturaLojista === "recusada" && (
+              <div style={{padding:"2rem",background:"#fff5f5",border:"1px solid #f5c6c6",textAlign:"center"}}>
+                <div style={{fontSize:"1.5rem",marginBottom:"0.75rem"}}>✗</div>
+                <div style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:400,marginBottom:"0.5rem",color:"#c0392b"}}>Candidatura não aprovada</div>
+                <p style={{fontSize:"0.82rem",color:"#888",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>A tua candidatura não foi aprovada desta vez. Podes contactar-nos para mais informações.</p>
+                <button onClick={() => { setCandidaturaLojista(null); setShowFormLojista(true); }} style={{padding:"0.7rem 1.8rem",background:"var(--black)",color:"var(--white)",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
+                  Submeter nova candidatura
+                </button>
+              </div>
+            )}
+
+            {/* Estado: sem candidatura — botão inicial */}
+            {!candidaturaLojista && !showFormLojista && (
+              <div style={{padding:"2rem",background:"#f8f5f0",border:"1px solid #e8e3dc",textAlign:"center"}}>
+                <div style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Abre a tua loja na Nora Grei</div>
+                <p style={{fontSize:"0.82rem",color:"var(--g6)",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>Aluga as tuas peças de moda a outras mulheres. Sem compromissos — 180 dias de período de teste gratuito.</p>
+                <button onClick={() => setShowFormLojista(true)} style={{display:"inline-block",padding:"0.9rem 2.5rem",background:"var(--black)",color:"var(--white)",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
+                  Tornar-me Lojista →
+                </button>
+              </div>
+            )}
+
+            {/* Formulário de candidatura */}
+            {!candidaturaLojista && showFormLojista && (
+              <div style={{padding:"2rem",background:"#f8f5f0",border:"1px solid #e8e3dc"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.5rem"}}>
+                  <div style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:400,color:"var(--black)"}}>Candidatura a Lojista</div>
+                  <button onClick={() => setShowFormLojista(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"var(--g4)",lineHeight:1}}>✕</button>
+                </div>
+
+                {/* Dados da loja */}
+                <div style={{marginBottom:"1.25rem"}}>
+                  <div style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Sobre a tua loja</div>
+                  <div style={{marginBottom:"0.75rem"}}>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da loja *</label>
+                    <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => setFormLojista(f => ({...f, nome_loja: e.target.value}))} placeholder="ex: Atelier da Maria" />
+                  </div>
+                  <div>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Descrição breve (opcional)</label>
+                    <textarea style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box",resize:"vertical",minHeight:"80px"}} value={formLojista.descricao} onChange={e => setFormLojista(f => ({...f, descricao: e.target.value}))} placeholder="Que tipo de peças tens para alugar? Qual é o teu estilo?" />
+                  </div>
+                </div>
+
+                {/* Dados bancários */}
+                <div style={{marginBottom:"1.25rem"}}>
+                  <div style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Dados para receber pagamentos</div>
+                  <div style={{marginBottom:"0.75rem"}}>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>IBAN / NIB *</label>
+                    <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}} value={formLojista.iban} onChange={e => setFormLojista(f => ({...f, iban: e.target.value}))} placeholder="PT50 0002 0000 0000 0000 0000 0" />
+                    <p style={{fontSize:"0.72rem",color:"var(--g4)",marginTop:"0.3rem",lineHeight:1.5}}>Usado para transferir os teus ganhos (90% de cada aluguer).</p>
+                  </div>
+                  <div>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Preferência de pagamento *</label>
+                    <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
+                      {[["transferencia","Transferência bancária"],["mbway","MB Way"],["cheque","Cheque"]].map(([val,label]) => (
+                        <button key={val} onClick={() => setFormLojista(f => ({...f, tipo_pagamento: val}))} style={{padding:"0.5rem 1rem",fontSize:"0.68rem",letterSpacing:"0.08em",border:"1.5px solid",borderColor:formLojista.tipo_pagamento===val?"var(--black)":"#e2dfda",background:formLojista.tipo_pagamento===val?"var(--black)":"#fff",color:formLojista.tipo_pagamento===val?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",transition:"all 0.15s"}}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Termos */}
+                <div style={{marginBottom:"1.5rem",padding:"1rem",background:"#fff",border:"1px solid #e8e3dc"}}>
+                  <label style={{display:"flex",gap:"0.75rem",alignItems:"flex-start",cursor:"pointer"}}>
+                    <input type="checkbox" checked={formLojista.aceita_termos} onChange={e => setFormLojista(f => ({...f, aceita_termos: e.target.checked}))} style={{marginTop:"0.2rem",accentColor:"var(--black)",width:"16px",height:"16px",flexShrink:0}} />
+                    <span style={{fontSize:"0.78rem",color:"var(--g6)",lineHeight:1.6}}>
+                      Aceito os <a href="/termos-lojista" target="_blank" style={{color:"var(--black)",fontWeight:500}}>termos e condições para lojistas</a>. Entendo que recebo 90% do valor de cada aluguer, após higienização (9€ por peça). O período de teste é de 180 dias gratuitos.
+                    </span>
+                  </label>
+                </div>
+
+                {formLojistaMsg && (
+                  <p style={{fontSize:"0.8rem",color:"#c0392b",marginBottom:"1rem",padding:"0.75rem",background:"#fff5f5",border:"1px solid #f5c6c6"}}>{formLojistaMsg}</p>
+                )}
+
+                <div style={{display:"flex",gap:"0.75rem",alignItems:"center"}}>
+                  <button onClick={submeterCandidaturaLojista} disabled={formLojistaLoading} style={{padding:"0.9rem 2rem",background:formLojistaLoading?"#ccc":"var(--black)",color:"#fff",border:"none",cursor:formLojistaLoading?"not-allowed":"pointer",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600,transition:"background 0.2s"}}>
+                    {formLojistaLoading ? "A enviar..." : "Enviar candidatura →"}
+                  </button>
+                  <button onClick={() => { setShowFormLojista(false); setFormLojistaMsg(""); }} style={{padding:"0.9rem 1.5rem",background:"none",color:"var(--g4)",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"var(--sans)"}}>Cancelar</button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
