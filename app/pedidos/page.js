@@ -43,6 +43,17 @@ const TRADUCOES = {
     montante: "Montante",
     validadeRef: "Válida até",
     pecaEnviada: "A Nora Grei enviará a peça após confirmação do pagamento.",
+    aChegar: "A chegar a qualquer momento",
+    metodoPagamento: "Método de pagamento",
+    imediato: "Imediato", manual: "Manual",
+    refGerada: "Referência gerada após confirmação",
+    telMbway: "Número de telefone MB Way",
+    simPag: "Pagamento simulado.",
+    montanteVirer: "Montante a transferir",
+    nomeCompleto: "O teu nome completo",
+    anexarComp: "📎 Anexar comprovativo",
+    reservado24h: "O pedido fica reservado 24h até confirmarmos o comprovativo.",
+    confirmarCompra: "Confirmar compra",
   },
   fr: {
     titulo: "Mes commandes",
@@ -82,6 +93,17 @@ const TRADUCOES = {
     montante: "Montant",
     validadeRef: "Valable jusqu'au",
     pecaEnviada: "Nora Grei enverra la pièce après confirmation du paiement.",
+    aChegar: "Arrive à tout moment",
+    metodoPagamento: "Méthode de paiement",
+    imediato: "Immédiat", manual: "Manuel",
+    refGerada: "Référence générée après confirmation",
+    telMbway: "Numéro de téléphone MB Way",
+    simPag: "Simulation de paiement.",
+    montanteVirer: "Montant à virer",
+    nomeCompleto: "Votre nom complet",
+    anexarComp: "📎 Joindre le justificatif",
+    reservado24h: "Votre commande sera réservée 24h en attendant confirmation.",
+    confirmarCompra: "Confirmer l'achat",
   },
   lt: {
     titulo: "Mano užsakymai",
@@ -121,6 +143,17 @@ const TRADUCOES = {
     montante: "Suma",
     validadeRef: "Galioja iki",
     pecaEnviada: "Nora Grei išsiųs drabužį po mokėjimo patvirtinimo.",
+    aChegar: "Atvyks bet kada",
+    metodoPagamento: "Mokėjimo būdas",
+    imediato: "Iš karto", manual: "Rankinis",
+    refGerada: "Nuoroda bus sugeneruota po patvirtinimo",
+    telMbway: "MB Way telefono numeris",
+    simPag: "Mokėjimo simuliacija.",
+    montanteVirer: "Suma pervedimui",
+    nomeCompleto: "Jūsų vardas ir pavardė",
+    anexarComp: "📎 Pridėti įrodymą",
+    reservado24h: "Jūsų užsakymas bus rezervuotas 24h, kol patvirtinsime.",
+    confirmarCompra: "Patvirtinti pirkimą",
   },
 };
 
@@ -148,7 +181,7 @@ function TimerEntrega({ i, dataEnvio }) {
       <div>
         <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'#1976d2',fontWeight:600}}>{i.timerEntrega}</div>
         <div style={{fontSize:'0.72rem',color:'#1565c0'}}>
-          {tempo ? <>{i.entregaEm} <strong>{tempo}</strong></> : "A chegar a qualquer momento"}
+          {tempo ? <>{i.entregaEm} <strong>{tempo}</strong></> : i.aChegar}
         </div>
       </div>
     </div>
@@ -354,7 +387,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
   if (fase === "escolher_pag") return (
     <div style={{marginTop:'0.75rem',background:'#fdf6f8',border:'1px solid #f0c0cc',padding:'1.25rem'}}>
       <p style={{...sty.sec,color:'#080808'}}>
-        {lang === "fr" ? "Méthode de paiement" : lang === "lt" ? "Mokėjimo būdas" : "Método de pagamento"}
+        {i.metodoPagamento}
       </p>
 
       {/* Resumo do valor */}
@@ -379,7 +412,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
           <div style={{flex:1}}>
             <div style={{fontSize:'0.9rem',fontWeight:500,color:'#080808',display:'flex',alignItems:'center'}}>
               {m.label}
-              <span style={sty.badge(m.auto)}>{m.auto ? (lang==="fr"?"Immédiat":lang==="lt"?"Iš karto":"Imediato") : (lang==="fr"?"Manuel":lang==="lt"?"Rankinis":"Manual")}</span>
+              <span style={sty.badge(m.auto)}>{m.auto ? i.imediato : i.manual}</span>
             </div>
             <div style={{fontSize:'0.75rem',color:'#5a5855'}}>{m.desc}</div>
           </div>
@@ -389,17 +422,17 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
       {/* Formulários por método */}
       {metodoPag === "mb" && (
         <div style={{background:'#f0eeeb',padding:'1rem',marginTop:'0.75rem'}}>
-          <p style={{...sty.ibanLabel,marginBottom:'0.25rem'}}>{lang==="fr"?"Référence générée après confirmation":lang==="lt"?"Nuoroda bus sugeneruota po patvirtinimo":"Referência gerada após confirmação"}</p>
+          <p style={{...sty.ibanLabel,marginBottom:'0.25rem'}}>{i.refGerada}</p>
           <p style={{fontSize:'0.72rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
         </div>
       )}
       {metodoPag === "mbway" && (
         <div style={{marginTop:'0.75rem'}}>
           <p style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>
-            {lang==="fr"?"Numéro de téléphone MB Way":lang==="lt"?"MB Way telefono numeris":"Número de telefone MB Way"}
+            {i.telMbway}
           </p>
           <input style={sty.inp} placeholder="+351 912 345 678" value={telMbway} onChange={e => setTelMbway(e.target.value)} />
-          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {lang==="fr"?"Simulation de paiement.":lang==="lt"?"Mokėjimo simuliacija.":"Pagamento simulado."}</p>
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {i.simPag}</p>
         </div>
       )}
       {metodoPag === "cartao" && (
@@ -421,7 +454,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
               onChange={e => setDadosCartao(d=>({...d,cvc:e.target.value.replace(/\D/g,"").slice(0,3)}))}
               maxLength={3} />
           </div>
-          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {lang==="fr"?"Simulation de paiement.":lang==="lt"?"Mokėjimo simuliacija.":"Pagamento simulado."}</p>
+          <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {i.simPag}</p>
         </div>
       )}
       {metodoPag === "transferencia" && (
@@ -429,24 +462,24 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
           <div style={sty.ibanBox}>
             <p style={sty.ibanLabel}>IBAN Nora Grei</p>
             <p style={sty.ibanVal}>PT50 0000 0000 0000 0000 0000 0</p>
-            <p style={sty.ibanLabel}>{lang==="fr"?"Montant à virer":lang==="lt"?"Suma pervedimui":i.totalUsada}</p>
+            <p style={sty.ibanLabel}>{i.montanteVirer}</p>
             <p style={sty.ibanVal}>{totalUsada.toFixed(2).replace('.',',')}€</p>
-            <p style={sty.ibanLabel}>{lang==="fr"?"Référence":lang==="lt"?"Nuoroda":i.referencia}</p>
-            <p style={sty.ibanVal}>{lang==="fr"?"Votre nom complet":lang==="lt"?"Jūsų vardas ir pavardė":"O teu nome completo"}</p>
+            <p style={sty.ibanLabel}>{i.referencia}</p>
+            <p style={sty.ibanVal}>{i.nomeCompleto}</p>
           </div>
           <label style={sty.uploadBox}>
             <input type="file" accept="image/*,.pdf" style={{display:'none'}} onChange={e => setComprovativo(e.target.files?.[0]||null)} />
             {comprovativo
               ? <span style={{color:'#27ae60',fontWeight:500}}>✓ {comprovativo.name}</span>
-              : <span>{lang==="fr"?"📎 Joindre le justificatif":lang==="lt"?"📎 Pridėti įrodymą":"📎 Anexar comprovativo"}</span>
+              : <span>{i.anexarComp}</span>
             }
           </label>
-          <p style={sty.aviso}>{lang==="fr"?"Votre commande sera réservée 24h en attendant confirmation.":lang==="lt"?"Jūsų užsakymas bus rezervuotas 24h, kol patvirtinsime.":"O pedido fica reservado 24h até confirmarmos o comprovativo."}</p>
+          <p style={sty.aviso}>{i.reservado24h}</p>
         </div>
       )}
 
       <button onClick={confirmarPagamento} disabled={loading} style={{...sty.btnPrimary,marginTop:'1rem'}}>
-        {loading ? "..." : (lang==="fr"?"Confirmer l'achat":lang==="lt"?"Patvirtinti pirkimą":"Confirmar compra")}
+        {loading ? "..." : i.confirmarCompra}
       </button>
       <button onClick={() => setFase("modal")} style={sty.btnSecondary}>{i.cancelar}</button>
     </div>
@@ -474,9 +507,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
           <div style={{textAlign:'center',padding:'1.5rem 0'}}>
             <div style={{fontSize:'2.5rem',marginBottom:'0.75rem'}}>{compra?.metodo_pagamento === "transferencia" ? "⏳" : "✅"}</div>
             <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,color:'#080808',marginBottom:'0.5rem'}}>
-              {compra?.metodo_pagamento === "transferencia"
-                ? (lang==="fr"?"En attente de confirmation":lang==="lt"?"Laukiama patvirtinimo":"A aguardar confirmação")
-                : (lang==="fr"?"Paiement confirmé !":lang==="lt"?"Mokėjimas patvirtintas !":"Pagamento confirmado!")}
+              {compra?.metodo_pagamento === "transferencia" ? i.talaoAguarda : i.talaoPago}
             </p>
             <p style={{fontSize:'0.78rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
           </div>

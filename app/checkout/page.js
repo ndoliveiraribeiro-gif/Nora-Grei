@@ -78,6 +78,8 @@ const t = {
     semCaucao: "Caução mínima",
     poupas: "Poupas",
     platinaSemCaucao: "💎 Platina — caução mínima garantida (8%)",
+    datasIndisponiveis: "⚠️ Algumas datas estão indisponíveis para este tamanho. As datas bloqueadas não podem ser selecionadas.",
+    faltamPara: (n, nome) => `Faltam ${n} para ${nome}`,
   },
   fr: {
     peca: "Votre pièce",
@@ -153,6 +155,8 @@ const t = {
     semCaucao: "Dépôt minimal",
     poupas: "Vous économisez",
     platinaSemCaucao: "💎 Platine — dépôt minimal garanti (8%)",
+    datasIndisponiveis: "⚠️ Certaines dates sont indisponibles pour cette taille. Les dates bloquées ne peuvent pas être sélectionnées.",
+    faltamPara: (n, nome) => `${n} location${n !== 1 ? "s" : ""} pour ${nome}`,
   },
   lt: {
     peca: "Jūsų drabužis",
@@ -228,6 +232,8 @@ const t = {
     semCaucao: "Minimalus užstatas",
     poupas: "Sutaupote",
     platinaSemCaucao: "💎 Platina — minimalus užstatas (8%)",
+    datasIndisponiveis: "⚠️ Kai kurios datos neprieinamos šiam dydžiui. Užblokuotų datų pasirinkti negalima.",
+    faltamPara: (n, nome) => `Dar ${n} iki ${nome}`,
   },
 };
 
@@ -236,11 +242,17 @@ const TAXA_SINISTRO = 0.03;   // 3% de probabilidade de sinistro por aluguer
 const FATOR_SEGURANCA = 1.5;  // margem de segurança actuarial
 const CAUCAO_PISO = 0.08;     // piso mínimo absoluto (8%) mesmo em Platina
 
-const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
-  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12" };
-  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6" };
-  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32" };
+const NIVEL_NOMES_CHECKOUT = {
+  pt: { platina:"Platina", ouro:"Ouro", prata:"Prata", bronze:"Bronze" },
+  fr: { platina:"Platine", ouro:"Or",   prata:"Argent", bronze:"Bronze" },
+  lt: { platina:"Platina", ouro:"Auksas", prata:"Sidabras", bronze:"Bronza" },
+};
+const NIVEL = (n, lang = "pt") => {
+  const nm = NIVEL_NOMES_CHECKOUT[lang] || NIVEL_NOMES_CHECKOUT.pt;
+  if (n >= 20) return { nome: nm.platina, sigla: "PLT", icon: "💎", caucao: 8,  cor: "#6c5ce7" };
+  if (n >= 10) return { nome: nm.ouro,    sigla: "OUR", icon: "🥇", caucao: 50, cor: "#f39c12" };
+  if (n >= 5)  return { nome: nm.prata,   sigla: "PRT", icon: "🥈", caucao: 75, cor: "#95a5a6" };
+  return             { nome: nm.bronze,   sigla: "BRZ", icon: "🥉", caucao: 100, cor: "#cd7f32" };
 };
 
 // Fórmula actuarial: MAX(risco_calculado, caucao_nivel, piso_minimo)
@@ -554,7 +566,7 @@ function CheckoutContent() {
   };
 
   const i = t[lang] || t.pt;
-  const nv = NIVEL(totalAlugueres);
+  const nv = NIVEL(totalAlugueres, lang);
 
   const numDias = dataInicio && dataFim
     ? Math.max(1, Math.ceil((new Date(dataFim) - new Date(dataInicio)) / 86400000))
@@ -804,19 +816,18 @@ function CheckoutContent() {
                 <span style={{ fontSize: "1.2rem" }}>{nv.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 500, fontSize: "0.88rem" }}>{i.nivel} {nv.nome}</div>
-                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.nome === "Platina" ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
+                  <div style={{ fontSize: "0.75rem", color: nv.cor }}>{nv.sigla === "PLT" ? i.semCaucao : `${i.badgeCaucaoDesconto} ${nv.caucao}%`}</div>
                   {/* Progresso até próximo nível */}
-                  {nv.nome !== "Platina" && (() => {
-                    const proxLimite = nv.nome === "Bronze" ? 5 : nv.nome === "Prata" ? 10 : 20;
-                    const proxNome   = nv.nome === "Bronze" ? "Prata 🥈" : nv.nome === "Prata" ? "Ouro 🥇" : "Platina 💎";
+                  {nv.sigla !== "PLT" && (() => {
+                    const nm = NIVEL_NOMES_CHECKOUT[lang] || NIVEL_NOMES_CHECKOUT.pt;
+                    const proxLimite = nv.sigla === "BRZ" ? 5 : nv.sigla === "PRT" ? 10 : 20;
+                    const proxNome   = nv.sigla === "BRZ" ? `${nm.prata} 🥈` : nv.sigla === "PRT" ? `${nm.ouro} 🥇` : `${nm.platina} 💎`;
                     const faltam = proxLimite - totalAlugueres;
                     const pct = Math.min(100, (totalAlugueres / proxLimite) * 100);
                     return (
                       <div style={{ marginTop: "0.5rem" }}>
                         <div style={{ fontSize: "0.65rem", color: "#888", marginBottom: "0.2rem" }}>
-                          {lang === "fr" ? `${faltam} location${faltam !== 1 ? "s" : ""} pour ${proxNome}`
-                           : lang === "lt" ? `Dar ${faltam} iki ${proxNome}`
-                           : `Faltam ${faltam} para ${proxNome}`}
+                          {i.faltamPara(faltam, proxNome)}
                         </div>
                         <div style={{ height: "3px", background: "#e2dfda", borderRadius: "2px", overflow: "hidden" }}>
                           <div style={{ height: "100%", width: `${pct}%`, background: nv.cor, borderRadius: "2px", transition: "width 0.4s" }} />
@@ -834,7 +845,7 @@ function CheckoutContent() {
             <p className="sec-t">{i.datas}</p>
             {datasOcupadas.length > 0 && (
               <div style={{fontSize:"0.75rem",color:"#946200",background:"#fff8e1",padding:"0.6rem 0.85rem",borderLeft:"3px solid #f39c12",marginBottom:"1rem",lineHeight:1.5}}>
-                ⚠️ Algumas datas estão indisponíveis para este tamanho. As datas bloqueadas não podem ser selecionadas.
+                {i.datasIndisponiveis}
               </div>
             )}
             <div className="dates">

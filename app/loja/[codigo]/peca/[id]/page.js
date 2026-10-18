@@ -3,8 +3,64 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
 
+const t = {
+  pt: {
+    pecaNaoEncontrada: "Peça não encontrada.",
+    tamanho: "Tamanho",
+    dispEmBreve: "Disponível em breve",
+    dispEm: "Disponível em",
+    garantirReserva: "Garantir reserva quando disponível",
+    comprar: "Comprar",
+    reservarAlugar: "Reservar / Alugar",
+    adicionarCesto: "🛍 Adicionar ao cesto",
+    partilhar: "Partilhar",
+    estaPeca: "Esta peça",
+    aLojaToda: "A loja toda",
+    linkCopiado: "✓ Link copiado!",
+    instagramTitle: "Copia o link e partilha no Instagram",
+    preco: (p) => `${p}€ / dia`,
+    precoCompra: (p) => `Compra: ${p}€`,
+  },
+  fr: {
+    pecaNaoEncontrada: "Pièce introuvable.",
+    tamanho: "Taille",
+    dispEmBreve: "Disponible bientôt",
+    dispEm: "Disponible le",
+    garantirReserva: "Réserver pour quand c'est disponible",
+    comprar: "Acheter",
+    reservarAlugar: "Réserver / Louer",
+    adicionarCesto: "🛍 Ajouter au panier",
+    partilhar: "Partager",
+    estaPeca: "Cette pièce",
+    aLojaToda: "Toute la boutique",
+    linkCopiado: "✓ Lien copié !",
+    instagramTitle: "Copiez le lien et partagez sur Instagram",
+    preco: (p) => `${p}€ / jour`,
+    precoCompra: (p) => `Achat : ${p}€`,
+  },
+  lt: {
+    pecaNaoEncontrada: "Drabužis nerastas.",
+    tamanho: "Dydis",
+    dispEmBreve: "Greitai bus prieinama",
+    dispEm: "Prieinama nuo",
+    garantirReserva: "Rezervuoti kai bus prieinama",
+    comprar: "Pirkti",
+    reservarAlugar: "Rezervuoti / Nuomoti",
+    adicionarCesto: "🛍 Pridėti į krepšelį",
+    partilhar: "Dalintis",
+    estaPeca: "Šis drabužis",
+    aLojaToda: "Visa parduotuvė",
+    linkCopiado: "✓ Nuoroda nukopijuota!",
+    instagramTitle: "Nukopijuokite nuorodą ir pasidalinkite Instagram",
+    preco: (p) => `${p}€ / dieną`,
+    precoCompra: (p) => `Pirkti: ${p}€`,
+  },
+};
+
 export default function PecaLojaPage() {
   const { codigo, id } = useParams();
+  const lang = typeof window !== "undefined" ? (localStorage.getItem("ng_lang") || "pt") : "pt";
+  const i = t[lang] || t.pt;
   const [peca, setPeca] = useState(null);
   const [lojista, setLojista] = useState(null);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
@@ -104,7 +160,7 @@ export default function PecaLojaPage() {
       if (!dataFim) return;
       const calc = () => {
         const diff = new Date(dataFim) - new Date();
-        if (diff <= 0) { setTempo("Disponível em breve"); return; }
+        if (diff <= 0) { setTempo(i.dispEmBreve); return; }
         const d = Math.floor(diff / 86400000);
         const h = Math.floor((diff % 86400000) / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
@@ -128,7 +184,7 @@ export default function PecaLojaPage() {
   if (!peca) return (
     <>
       <style>{ESTILOS}</style>
-      <div className="loading">Peça não encontrada.</div>
+      <div className="loading">{i.pecaNaoEncontrada}</div>
     </>
   );
 
@@ -169,10 +225,10 @@ export default function PecaLojaPage() {
           <h1 className="peca-nome">{peca.nome}</h1>
 
           {peca.tipo === "ambos" || peca.tipo === "alugar" ? (
-            <p className="preco-aluguer">{peca.preco_aluguer_dia}€ / dia</p>
+            <p className="preco-aluguer">{i.preco(peca.preco_aluguer_dia)}</p>
           ) : null}
           {peca.tipo === "ambos" || peca.tipo === "comprar" ? (
-            <p className="preco-compra">Compra: {peca.preco_venda}€</p>
+            <p className="preco-compra">{i.precoCompra(peca.preco_venda)}</p>
           ) : null}
 
           {peca.descricao && (
@@ -182,7 +238,7 @@ export default function PecaLojaPage() {
           {/* Tamanhos */}
           {stockDisponivel.length > 0 && (
             <div className="sec-tamanho">
-              <p className="sec-label">Tamanho</p>
+              <p className="sec-label">{i.tamanho}</p>
               <div className="tamanhos">
                 {peca.stock_lojista?.map(s => (
                   <button
@@ -203,7 +259,7 @@ export default function PecaLojaPage() {
             <div className="esgotado-bloco">
               {dataFimTimer && (
                 <div className="timer-bloco">
-                  <p className="timer-label">Disponível em</p>
+                  <p className="timer-label">{i.dispEm}</p>
                   <Timer dataFim={dataFimTimer} />
                 </div>
               )}
@@ -211,7 +267,7 @@ export default function PecaLojaPage() {
                 href={`/reserva?peca=${id}&loja=${codigo}`}
                 className="btn-reservar-disponivel"
               >
-                Garantir reserva quando disponível
+                {i.garantirReserva}
               </a>
             </div>
           ) : (
@@ -221,7 +277,7 @@ export default function PecaLojaPage() {
                 onClick={irParaCheckout}
                 disabled={!tamanhoSelecionado}
               >
-                {peca.tipo === "comprar" ? "Comprar" : "Reservar / Alugar"}
+                {peca.tipo === "comprar" ? i.comprar : i.reservarAlugar}
               </button>
               {peca.tipo !== "comprar" && (
                 <button
@@ -229,7 +285,7 @@ export default function PecaLojaPage() {
                   onClick={adicionarAoCesto}
                   disabled={!tamanhoSelecionado}
                 >
-                  🛍 Adicionar ao cesto
+                  {i.adicionarCesto}
                 </button>
               )}
             </>
@@ -237,18 +293,18 @@ export default function PecaLojaPage() {
 
           {/* Botões de partilha */}
           <div className="partilha-sec">
-            <p className="partilha-label">Partilhar</p>
+            <p className="partilha-label">{i.partilhar}</p>
             <div className="partilha-btns">
               <button className="btn-partilhar" onClick={partilharPeca}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
-                Esta peça
+                {i.estaPeca}
               </button>
               <button className="btn-partilhar" onClick={partilharLoja}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                A loja toda
+                {i.aLojaToda}
               </button>
             </div>
-            {partilhado && <p className="copiado">✓ Link copiado!</p>}
+            {partilhado && <p className="copiado">{i.linkCopiado}</p>}
           </div>
 
           {/* Links diretos para redes sociais */}
@@ -265,7 +321,7 @@ export default function PecaLojaPage() {
               href={`https://www.instagram.com/`}
               target="_blank" rel="noopener"
               className="rede-link instagram"
-              title="Copia o link e partilha no Instagram"
+              title={i.instagramTitle}
               onClick={partilharPeca}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>

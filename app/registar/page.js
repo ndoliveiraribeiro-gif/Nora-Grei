@@ -24,6 +24,7 @@ const t = {
     paisPlaceholder: "Selecionar país",
     cidade: "Cidade",
     cidadePlaceholder: "Lisboa, Porto, Paris...",
+    paises: { pt:"Portugal", fr:"França", lt:"Lituânia", es:"Espanha", br:"Brasil", outro:"Outro" },
   },
   fr: {
     titulo: "Créer un compte",
@@ -46,6 +47,7 @@ const t = {
     paisPlaceholder: "Sélectionner le pays",
     cidade: "Ville",
     cidadePlaceholder: "Lisbonne, Paris...",
+    paises: { pt:"Portugal", fr:"France", lt:"Lituanie", es:"Espagne", br:"Brésil", outro:"Autre" },
   },
   lt: {
     titulo: "Sukurti paskyrą",
@@ -68,6 +70,7 @@ const t = {
     paisPlaceholder: "Pasirinkite šalį",
     cidade: "Miestas",
     cidadePlaceholder: "Vilnius, Kaunas...",
+    paises: { pt:"Portugalija", fr:"Prancūzija", lt:"Lietuva", es:"Ispanija", br:"Brazilija", outro:"Kita" },
   },
 };
 
@@ -232,12 +235,12 @@ export default function Registar() {
                   <label className="form-label">{i.pais}</label>
                   <select className="form-input" value={pais} onChange={e => setPais(e.target.value)} style={{cursor:'pointer'}}>
                     <option value="">{i.paisPlaceholder}</option>
-                    <option value="Portugal">🇵🇹 Portugal</option>
-                    <option value="França">🇫🇷 França</option>
-                    <option value="Lituânia">🇱🇹 Lituânia</option>
-                    <option value="Espanha">🇪🇸 Espanha</option>
-                    <option value="Brasil">🇧🇷 Brasil</option>
-                    <option value="Outro">Outro</option>
+                    <option value="Portugal">🇵🇹 {i.paises.pt}</option>
+                    <option value="França">🇫🇷 {i.paises.fr}</option>
+                    <option value="Lituânia">🇱🇹 {i.paises.lt}</option>
+                    <option value="Espanha">🇪🇸 {i.paises.es}</option>
+                    <option value="Brasil">🇧🇷 {i.paises.br}</option>
+                    <option value="Outro">{i.paises.outro}</option>
                   </select>
                 </div>
                 <div className="form-group">

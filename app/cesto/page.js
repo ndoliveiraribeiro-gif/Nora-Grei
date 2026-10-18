@@ -7,11 +7,17 @@ const TAXA_SINISTRO = 0.03;
 const FATOR_SEGURANCA = 1.5;
 const CAUCAO_PISO = 0.08;
 
-const NIVEL = (n) => {
-  if (n >= 20) return { nome: "Platina", icon: "💎", caucao: 8,  cor: "#6c5ce7", descontoAluguer: 10 };
-  if (n >= 10) return { nome: "Ouro",    icon: "🥇", caucao: 50, cor: "#f39c12", descontoAluguer: 8  };
-  if (n >= 5)  return { nome: "Prata",   icon: "🥈", caucao: 75, cor: "#95a5a6", descontoAluguer: 5  };
-  return             { nome: "Bronze",   icon: "🥉", caucao: 100, cor: "#cd7f32", descontoAluguer: 3  };
+const NIVEL_NOMES_CESTO = {
+  pt: { platina:"Platina", ouro:"Ouro", prata:"Prata", bronze:"Bronze" },
+  fr: { platina:"Platine", ouro:"Or",   prata:"Argent", bronze:"Bronze" },
+  lt: { platina:"Platina", ouro:"Auksas", prata:"Sidabras", bronze:"Bronza" },
+};
+const NIVEL = (n, lang = "pt") => {
+  const nm = NIVEL_NOMES_CESTO[lang] || NIVEL_NOMES_CESTO.pt;
+  if (n >= 20) return { nome: nm.platina, sigla: "PLT", icon: "💎", caucao: 8,  cor: "#6c5ce7", descontoAluguer: 10 };
+  if (n >= 10) return { nome: nm.ouro,    sigla: "OUR", icon: "🥇", caucao: 50, cor: "#f39c12", descontoAluguer: 8  };
+  if (n >= 5)  return { nome: nm.prata,   sigla: "PRT", icon: "🥈", caucao: 75, cor: "#95a5a6", descontoAluguer: 5  };
+  return             { nome: nm.bronze,   sigla: "BRZ", icon: "🥉", caucao: 100, cor: "#cd7f32", descontoAluguer: 3  };
 };
 
 const calcularCaucao = (valorPeca, caucaoPct) => {
@@ -52,6 +58,7 @@ const T = {
     sucesso: "Pedidos registados!",
     verPedidos: "Ver os meus pedidos",
     semTamanho: "Sem tamanho",
+    resumo: "Resumo",
   },
   fr: {
     titulo: "Mon panier",
@@ -83,6 +90,7 @@ const T = {
     sucesso: "Commandes enregistrées !",
     verPedidos: "Voir mes commandes",
     semTamanho: "Sans taille",
+    resumo: "Récapitulatif",
   },
   lt: {
     titulo: "Mano krepšelis",
@@ -114,6 +122,7 @@ const T = {
     sucesso: "Užsakymai užregistruoti!",
     verPedidos: "Žiūrėti mano užsakymus",
     semTamanho: "Be dydžio",
+    resumo: "Suvestinė",
   },
 };
 
@@ -179,7 +188,7 @@ export default function CestoPage() {
   };
 
   const i = T[lang] || T.pt;
-  const nv = NIVEL(totalAlugueres);
+  const nv = NIVEL(totalAlugueres, lang);
   const temDesconto = cesto.length >= 3;
 
   // Cálculos
@@ -364,7 +373,7 @@ export default function CestoPage() {
         {/* Resumo lateral */}
         {cesto.length > 0 && (
           <div className="resumo">
-            <div className="resumo-titulo">{i.titulo === "O meu cesto" ? "Resumo" : i.titulo === "Mon panier" ? "Récapitulatif" : "Suvestinė"}</div>
+            <div className="resumo-titulo">{i.resumo}</div>
 
             {/* Nível fidelidade */}
             <div className="nivel-box">

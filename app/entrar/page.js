@@ -3,9 +3,9 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const t = {
-  pt: { titulo: "Entrar", email: "Email", password: "Password", btn: "Entrar", registar: "Ainda não tem conta?", link: "Criar conta", erro: "Email ou password incorretos.", esquecer: "Esqueceu a password?" },
-  fr: { titulo: "Connexion", email: "Email", password: "Mot de passe", btn: "Se connecter", registar: "Pas encore de compte ?", link: "Créer un compte", erro: "Email ou mot de passe incorrect.", esquecer: "Mot de passe oublié ?" },
-  lt: { titulo: "Prisijungti", email: "El. paštas", password: "Slaptažodis", btn: "Prisijungti", registar: "Dar neturite paskyros?", link: "Sukurti paskyrą", erro: "Neteisingas el. paštas arba slaptažodis.", esquecer: "Pamiršote slaptažodį?" },
+  pt: { titulo: "Entrar", email: "Email", password: "Password", btn: "Entrar", registar: "Ainda não tem conta?", link: "Criar conta", erro: "Email ou password incorretos.", esquecer: "Esqueceu a password?", logoTag: "Alugar ou Comprar", frase: "A peça certa, para o momento certo.", emailPrimeiro: "Introduz o teu email primeiro.", emailEnviado: "Email enviado! Verifica a tua caixa de entrada." },
+  fr: { titulo: "Connexion", email: "Email", password: "Mot de passe", btn: "Se connecter", registar: "Pas encore de compte ?", link: "Créer un compte", erro: "Email ou mot de passe incorrect.", esquecer: "Mot de passe oublié ?", logoTag: "Louer ou Acheter", frase: "La bonne pièce, pour le bon moment.", emailPrimeiro: "Entrez d'abord votre email.", emailEnviado: "Email envoyé ! Vérifiez votre boîte de réception." },
+  lt: { titulo: "Prisijungti", email: "El. paštas", password: "Slaptažodis", btn: "Prisijungti", registar: "Dar neturite paskyros?", link: "Sukurti paskyrą", erro: "Neteisingas el. paštas arba slaptažodis.", esquecer: "Pamiršote slaptažodį?", logoTag: "Nuomoti ar Pirkti", frase: "Tinkama detalė, tinkamu momentu.", emailPrimeiro: "Pirmiausia įveskite savo el. paštą.", emailEnviado: "El. laiškas išsiųstas! Patikrinkite savo pašto dėžutę." },
 };
 
 export default function Entrar() {
@@ -104,8 +104,8 @@ export default function Entrar() {
       <div className="page">
         <div className="left">
           <div className="left-logo">Nora Grei</div>
-          <div className="left-tag">Alugar ou Comprar</div>
-          <p className="left-quote">A peça certa, para o momento certo.</p>
+          <div className="left-tag">{i.logoTag}</div>
+          <p className="left-quote">{i.frase}</p>
         </div>
         <div className="right">
           <div className="form-wrap">
@@ -129,9 +129,9 @@ export default function Entrar() {
             </div>
             <a href="#" className="form-link-small" onClick={async (e) => {
               e.preventDefault();
-              if (!email) { alert("Introduz o teu email primeiro."); return; }
+              if (!email) { alert(i.emailPrimeiro); return; }
               await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/reset-password" });
-              alert("Email enviado! Verifica a tua caixa de entrada.");
+              alert(i.emailEnviado);
             }}>{i.esquecer}</a>
           </div>
         </div>

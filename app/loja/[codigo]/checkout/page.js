@@ -53,6 +53,9 @@ const t = {
     dinheiroAviso: "Paga em dinheiro no momento do levantamento presencial junto do lojista.",
     imediato: "Imediato", confirmacaoManual: "Confirmação manual", aProcessar: "A processar...",
     semCaucao: "Sem caução",
+    erroNumCartao: "Número de cartão inválido", erroNomeCartao: "Nome obrigatório",
+    erroValidadeCartao: "Validade inválida", erroCvcCartao: "CVC inválido",
+    erroTelefone: "Telefone inválido",
   },
   fr: {
     peca: "Votre pièce", datas: "Dates de location", dataInicio: "Date de début", dataFim: "Date de fin",
@@ -103,6 +106,9 @@ const t = {
     dinheiroAviso: "Payez en espèces lors du retrait chez le vendeur.",
     imediato: "Immédiat", confirmacaoManual: "Confirmation manuelle", aProcessar: "Traitement...",
     semCaucao: "Sans caution",
+    erroNumCartao: "Numéro de carte invalide", erroNomeCartao: "Nom obligatoire",
+    erroValidadeCartao: "Validité invalide", erroCvcCartao: "CVC invalide",
+    erroTelefone: "Téléphone invalide",
   },
   lt: {
     peca: "Jūsų drabužis", datas: "Nuomos datos", dataInicio: "Pradžios data", dataFim: "Pabaigos data",
@@ -153,6 +159,9 @@ const t = {
     dinheiroAviso: "Mokėkite grynaisiais atsiimant pas pardavėją.",
     imediato: "Iš karto", confirmacaoManual: "Rankinis patvirtinimas", aProcessar: "Apdorojama...",
     semCaucao: "Be užstato",
+    erroNumCartao: "Neteisingas kortelės numeris", erroNomeCartao: "Vardas privalomas",
+    erroValidadeCartao: "Neteisingas galiojimas", erroCvcCartao: "Neteisingas CVC",
+    erroTelefone: "Neteisingas telefono numeris",
   },
 };
 
@@ -316,13 +325,13 @@ function CheckoutLojaContent() {
 
   const validarFormularioPagamento = () => {
     if (pagamento === "cartao") {
-      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g,"").length < 16) { setErroCampo("Número de cartão inválido"); return false; }
-      if (!dadosCartao.nome) { setErroCampo("Nome obrigatório"); return false; }
-      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("Validade inválida"); return false; }
-      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("CVC inválido"); return false; }
+      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g,"").length < 16) { setErroCampo(i.erroNumCartao); return false; }
+      if (!dadosCartao.nome) { setErroCampo(i.erroNomeCartao); return false; }
+      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo(i.erroValidadeCartao); return false; }
+      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo(i.erroCvcCartao); return false; }
     }
     if (pagamento === "mbway") {
-      if (!telefoneMbway || telefoneMbway.replace(/\D/g,"").length < 9) { setErroCampo("Telefone inválido"); return false; }
+      if (!telefoneMbway || telefoneMbway.replace(/\D/g,"").length < 9) { setErroCampo(i.erroTelefone); return false; }
     }
     if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo(i.comprovativoErro); return false; }
     if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo(i.comprovativoErroDeposito); return false; }
