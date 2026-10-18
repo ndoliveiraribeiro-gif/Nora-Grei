@@ -139,9 +139,8 @@ export default function CestoPage() {
   const [totalAlugueres, setTotalAlugueres] = useState(0);
   const [opcaoDesconto, setOpcaoDesconto] = useState("A"); // "A" = desconto aluguer, "B" = desconto caução
   const [loading, setLoading] = useState(true);
-  const [processando, setProcessando] = useState(false);
-  const [sucesso, setSucesso] = useState(false);
-  const [erro, setErro] = useState("");
+  // Estado individual por peça: { [idx]: { processando, sucesso, erro } }
+  const [estadoItem, setEstadoItem] = useState({});
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -202,6 +201,7 @@ export default function CestoPage() {
   const i = T[lang] || T.pt;
   const nv = NIVEL(totalAlugueres, lang);
   const temDesconto = cesto.length >= 3;
+  const todosPedidos = cesto.length > 0 && cesto.every((_, idx) => estadoItem[idx]?.sucesso);
 
   // Cálculos
   const subtotalAluguer = cesto.reduce((s, item) => {
@@ -226,25 +226,81 @@ export default function CestoPage() {
 
   const totalAgora = totalAluguer + totalHigienizacao + totalCaucao;
 
-  const confirmar = async () => {
+  const setItemEstado = (idx, patch) =>
+    setEstadoItem(prev => ({ ...prev, [idx]: { ...(prev[idx] || {}), ...patch } }));
+
+  const confirmarItem = async (idx) => {
     if (!user) { window.location.href = "/entrar?redirect=/cesto"; return; }
-    if (cesto.length === 0) return;
-    setProcessando(true); setErro("");
+    const item = cesto[idx];
+    if (!item) return;
+    setItemEstado(idx, { processando: true, erro: "" });
 
     try {
-      // Criar um aluguer por cada peça no cesto
-      for (const item of cesto) {
-        const dias = item.dataInicio && item.dataFim
-          ? Math.max(1, Math.ceil((new Date(item.dataFim) - new Date(item.dataInicio)) / 86400000))
-          : 1;
-        const valorAluguerItem = (item.peca?.preco_aluguer_dia || 0) * dias * (1 - descontoAluguerPct / 100);
-        const valorCaucaoItem = calcularCaucao(item.peca?.valor_peca || 0, nv.caucao);
+      const hoje = new Date().toISOString().split("T")[0];
+      const daqui3dias = new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0];
+      // Desconto de volume só se 3+ peças ainda no cesto
+      const descontoAtual = cesto.length >= 3 && opcaoDesconto === "A" ? nv.descontoAluguer : 0;
 
+      const dias = item.dataInicio && item.dataFim
+        ? Math.max(1, Math.ceil((new Date(item.dataFim) - new Date(item.dataInicio)) / 86400000))
+        : 1;
+      const valorAluguerItem = (item.peca?.preco_aluguer_dia || 0) * dias * (1 - descontoAtual / 100);
+      const valorCaucaoItem = calcularCaucao(item.peca?.valor_peca || 0, nv.caucao);
+      const dataInicio = item.dataInicio || hoje;
+      const dataFim = item.dataFim || daqui3dias;
+      const numero = gerarNumeroRecibo();
+
+      if (item.origem === "lojista") {
+        // Peça de lojista → inserir em alugueres_lojista
+        const { data: novoAluguer } = await supabase.from("alugueres_lojista").insert({
+          cliente_id: user.id,
+          stock_lojista_id: item.stockId,
+          peca_lojista_id: item.pecaId,
+          lojista_id: item.lojistaId || null,
+          data_inicio: dataInicio,
+          data_fim: dataFim,
+          estado: "pendente",
+          metodo_pagamento: "cartao",
+          valor_aluguer: Math.round(valorAluguerItem * 100) / 100,
+          deposito_valor: valorCaucaoItem,
+          deposito_estado: "recebido",
+          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (cesto.length >= 3 ? "opcao_b_caucao" : null),
+        }).select().single();
+
+        if (novoAluguer) {
+          await supabase.from("recibos").insert({
+            numero,
+            aluguer_lojista_id: novoAluguer.id,
+            cliente_id: user.id,
+            metodo_pagamento: "cartao",
+            valor_aluguer: Math.round(valorAluguerItem * 100) / 100,
+            valor_higienizacao: HIGIENIZACAO,
+            valor_deposito: valorCaucaoItem,
+            valor_total: Math.round((valorAluguerItem + HIGIENIZACAO + valorCaucaoItem) * 100) / 100,
+            estado: "pago",
+            detalhes: { tamanho: item.tamanhoNome, peca_nome: item.peca?.nome, origem: "lojista", lojista_nome: item.lojistaNome, desconto: descontoAtual },
+          });
+        }
+
+        // Notificar lojista específico da peça
+        if (item.lojistaId) {
+          try {
+            const { data: convExistente } = await supabase.from("conversas").select("id, nao_lidas_lojista").eq("cliente_id", user.id).eq("lojista_id", item.lojistaId).maybeSingle();
+            const assunto = `Pedido: ${item.peca?.nome || "peça"}`;
+            if (convExistente) {
+              await supabase.from("conversas").update({ ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: (convExistente.nao_lidas_lojista || 0) + 1, assunto }).eq("id", convExistente.id);
+            } else {
+              await supabase.from("conversas").insert({ cliente_id: user.id, lojista_id: item.lojistaId, assunto, ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: 1 });
+            }
+          } catch (_) {}
+        }
+      } else {
+        // Peça Nora Grei → inserir em alugueres (fluxo existente)
         const { data: novoAluguer } = await supabase.from("alugueres").insert({
           cliente_id: user.id,
           stock_tamanho_id: item.stockId,
-          data_inicio: item.dataInicio || new Date().toISOString().split("T")[0],
-          data_fim: item.dataFim || new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0],
+          data_inicio: dataInicio,
+          data_fim: dataFim,
           tipo: "avulso",
           estado: "confirmado",
           metodo_entrega: "envio",
@@ -254,12 +310,12 @@ export default function CestoPage() {
           deposito_modalidade: "cartao",
           deposito_estado: "recebido",
           deposito_confirmado_em: new Date().toISOString(),
-          desconto_cesto: descontoAluguerPct > 0 ? `opcao_a_${descontoAluguerPct}pct` : (temDesconto ? "opcao_b_caucao" : null),
+          desconto_cesto: descontoAtual > 0 ? `opcao_a_${descontoAtual}pct` : (cesto.length >= 3 ? "opcao_b_caucao" : null),
         }).select().single();
 
         if (novoAluguer) {
           await supabase.from("recibos").insert({
-            numero: gerarNumeroRecibo(),
+            numero,
             aluguer_id: novoAluguer.id,
             cliente_id: user.id,
             metodo_pagamento: "cartao",
@@ -268,41 +324,45 @@ export default function CestoPage() {
             valor_deposito: valorCaucaoItem,
             valor_total: Math.round((valorAluguerItem + HIGIENIZACAO + valorCaucaoItem) * 100) / 100,
             estado: "pago",
-            detalhes: { tamanho: item.tamanhoNome, peca_nome: item.peca?.nome, desconto_cesto: descontoAluguerPct },
+            detalhes: { tamanho: item.tamanhoNome, peca_nome: item.peca?.nome, desconto: descontoAtual },
           });
         }
+
+        // Notificar Nora Grei
+        try {
+          const { data: lojistaNg } = await supabase.from("clientes").select("id").eq("modo_lojista", true).limit(1).single();
+          if (lojistaNg && lojistaNg.id !== user.id) {
+            const { data: convExistente } = await supabase.from("conversas").select("id, nao_lidas_lojista").eq("cliente_id", user.id).eq("lojista_id", lojistaNg.id).maybeSingle();
+            const assunto = `Pedido: ${item.peca?.nome || "peça"}`;
+            if (convExistente) {
+              await supabase.from("conversas").update({ ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: (convExistente.nao_lidas_lojista || 0) + 1, assunto }).eq("id", convExistente.id);
+            } else {
+              await supabase.from("conversas").insert({ cliente_id: user.id, lojista_id: lojistaNg.id, assunto, ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: 1 });
+            }
+          }
+        } catch (_) {}
       }
 
-      // Notificar lojista
-      try {
-        const { data: lojista } = await supabase.from("clientes").select("id").eq("modo_lojista", true).limit(1).single();
-        if (lojista && lojista.id !== user.id) {
-          const { data: convExistente } = await supabase.from("conversas").select("id, nao_lidas_lojista").eq("cliente_id", user.id).eq("lojista_id", lojista.id).maybeSingle();
-          const assunto = `Cesto: ${cesto.length} peças`;
-          if (convExistente) {
-            await supabase.from("conversas").update({ ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: (convExistente.nao_lidas_lojista || 0) + 1, assunto }).eq("id", convExistente.id);
-          } else {
-            await supabase.from("conversas").insert({ cliente_id: user.id, lojista_id: lojista.id, assunto, ultima_mensagem_em: new Date().toISOString(), nao_lidas_lojista: 1 });
-          }
-        }
-      } catch (_) {}
-
-      // Limpar cesto
-      localStorage.setItem("ng_cesto", "[]");
+      // Remover só esta peça do cesto
+      const novoCesto = cesto.filter((_, i) => i !== idx);
+      setCesto(novoCesto);
+      localStorage.setItem("ng_cesto", JSON.stringify(novoCesto.map(({ peca, ...rest }) => rest)));
       window.dispatchEvent(new Event("cesto-atualizado"));
-      setSucesso(true);
-    } catch (e) { setErro(e.message); }
-    setProcessando(false);
+      setItemEstado(prev => {
+        const next = { ...prev };
+        delete next[idx];
+        // reindexar: itens com idx > este passam a idx-1
+        const reindexed = {};
+        Object.entries(next).forEach(([k, v]) => {
+          const ki = parseInt(k);
+          reindexed[ki > idx ? ki - 1 : ki] = v;
+        });
+        return reindexed;
+      });
+      setItemEstado(idx, { sucesso: true });
+    } catch (e) { setItemEstado(idx, { erro: e.message, processando: false }); return; }
+    setItemEstado(idx, { processando: false });
   };
-
-  if (sucesso) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1.5rem", fontFamily: "'Jost',sans-serif", background: "#f8f7f5", padding: "2rem" }}>
-      <style>{ESTILOS}</style>
-      <div style={{ fontSize: "3rem" }}>🎉</div>
-      <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 300 }}>{i.sucesso}</h1>
-      <a href="/pedidos" style={{ background: "#080808", color: "#fff", padding: "1rem 2.5rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase" }}>{i.verPedidos}</a>
-    </div>
-  );
 
   return (
     <>
@@ -335,19 +395,44 @@ export default function CestoPage() {
                 const dias = item.dataInicio && item.dataFim
                   ? Math.max(1, Math.ceil((new Date(item.dataFim) - new Date(item.dataInicio)) / 86400000))
                   : 1;
-                const valorItem = (item.peca?.preco_aluguer_dia || 0) * dias;
+                const descontoAtual = temDesconto && opcaoDesconto === "A" ? nv.descontoAluguer : 0;
+                const valorItem = (item.peca?.preco_aluguer_dia || 0) * dias * (1 - descontoAtual / 100);
+                const caucaoItem = calcularCaucao(item.peca?.valor_peca || 0, nv.caucao);
+                const totalItem = valorItem + HIGIENIZACAO + caucaoItem;
+                const estado = estadoItem[idx] || {};
                 return (
-                  <div key={idx} className="item-card">
+                  <div key={idx} className="item-card" style={{ opacity: estado.processando ? 0.6 : 1 }}>
                     {item.peca?.fotos?.[0] && <img src={item.peca.fotos[0]} alt={item.peca.nome} className="item-foto" />}
-                    <div className="item-info">
+                    <div className="item-info" style={{ flex: 1 }}>
                       <div className="item-nome">{item.peca?.nome}</div>
+                      {item.origem === "lojista" && item.lojistaNome && (
+                        <div className="item-meta" style={{ color: "#b8964e", fontWeight: 500 }}>🏪 {item.lojistaNome}</div>
+                      )}
                       <div className="item-meta">{item.tamanhoNome || i.semTamanho}</div>
                       {item.dataInicio && item.dataFim && (
                         <div className="item-meta">{item.dataInicio} → {item.dataFim} · {i.dias(dias)}</div>
                       )}
-                      <div className="item-preco">{valorItem.toFixed(2)}€</div>
+                      <div className="item-preco">{valorItem.toFixed(2)}€ <span style={{ fontSize: "0.7rem", color: "#5a5855", fontWeight: 300 }}>+ {i.higienizacao} {HIGIENIZACAO}€ + {i.caucao} {caucaoItem}€</span></div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 500, marginTop: "0.25rem" }}>= {totalItem.toFixed(2)}€</div>
+
+                      {/* Botão confirmar por peça */}
+                      <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                        {!user ? (
+                          <a href="/entrar?redirect=/cesto" style={{ fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "#080808", color: "#fff", padding: "0.5rem 1rem", textDecoration: "none" }}>{i.fazerLogin}</a>
+                        ) : (
+                          <button
+                            className="btn-confirmar-item"
+                            onClick={() => confirmarItem(idx)}
+                            disabled={estado.processando}
+                            style={{ fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "#080808", color: "#fff", border: "none", cursor: estado.processando ? "default" : "pointer", padding: "0.5rem 1rem" }}
+                          >
+                            {estado.processando ? i.aProcessar : i.confirmar}
+                          </button>
+                        )}
+                        <button className="btn-remover" onClick={() => remover(idx)} disabled={estado.processando}>{i.remover}</button>
+                      </div>
+                      {estado.erro && <div className="erro" style={{ marginTop: "0.5rem" }}>{estado.erro}</div>}
                     </div>
-                    <button className="btn-remover" onClick={() => remover(idx)}>{i.remover}</button>
                   </div>
                 );
               })}
@@ -418,17 +503,12 @@ export default function CestoPage() {
             </div>
             <p className="r-nota">{i.caucaoNota}</p>
 
-            {erro && <div className="erro">{erro}</div>}
-
-            {!user ? (
-              <div className="login-box">
-                <p style={{ fontSize: "0.85rem", color: "#5a5855", marginBottom: "0.75rem" }}>{i.login}</p>
-                <a href="/entrar?redirect=/cesto" className="btn-confirmar">{i.fazerLogin}</a>
+            {todosPedidos && (
+              <div style={{ marginTop: "1rem", background: "#f0faf4", border: "1px solid #c3e6cb", borderRadius: "4px", padding: "1rem", textAlign: "center" }}>
+                <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>🎉</div>
+                <div style={{ fontSize: "0.8rem", fontWeight: 500, marginBottom: "0.75rem" }}>{i.sucesso}</div>
+                <a href="/pedidos" style={{ display: "block", background: "#080808", color: "#fff", padding: "0.75rem 1.5rem", textDecoration: "none", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase" }}>{i.verPedidos}</a>
               </div>
-            ) : (
-              <button className="btn-confirmar" onClick={confirmar} disabled={processando}>
-                {processando ? i.aProcessar : i.confirmar}
-              </button>
             )}
           </div>
         )}
