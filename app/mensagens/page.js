@@ -295,6 +295,8 @@ export default function MensagensPage() {
 
         /* Mobile */
         @media(max-width:767px){
+          .layout{height:calc(100vh - 57px - 65px)}
+          .chat-input{padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
           .lista-col{width:100%;min-width:0;display:flex}
           .chat-col{display:none}
           .layout.chat-aberto .lista-col{display:none}
