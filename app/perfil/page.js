@@ -1401,10 +1401,10 @@ export default function Perfil() {
         :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g3:#c8c4bc;--g4:#7a776f;--g5:#4a4844;--g6:#2b2a28;--rosa:#c4748a;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
         html,body{overflow-x:hidden;max-width:100%}
         body{background:var(--g1);font-family:var(--sans);font-size:17px;-webkit-font-smoothing:antialiased}
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);width:100%}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;padding-top:max(1.25rem,env(safe-area-inset-top));background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);width:100%}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
         .nav-back{font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g6);text-decoration:none}
-        .page{padding:6rem 2rem 4rem;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem;width:100%;box-sizing:border-box}
+        .page{padding:6rem 2rem 4rem;padding-top:calc(4.5rem + env(safe-area-inset-top, 0px));max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem;width:100%;box-sizing:border-box}
         .hero{background:var(--white);padding:2.5rem;display:flex;align-items:center;gap:2rem;min-width:0}
         .avatar-wrap{position:relative;flex-shrink:0}
         .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover}

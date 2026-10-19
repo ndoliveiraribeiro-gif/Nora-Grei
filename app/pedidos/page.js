@@ -966,7 +966,7 @@ function PedidosContent() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         body{background:#f0eeeb;font-family:'Jost',sans-serif;font-size:17px;-webkit-font-smoothing:antialiased;padding-bottom:80px}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid #e2dfda}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;padding-top:max(1rem,env(safe-area-inset-top));background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid #e2dfda}
         .nav-logo{font-family:'Cormorant',serif;font-size:1.2rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:#080808}
         .nav-back{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855;text-decoration:none}
         .page{padding:5rem 0 2rem;max-width:600px;margin:0 auto}
