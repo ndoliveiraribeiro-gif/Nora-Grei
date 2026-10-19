@@ -249,6 +249,15 @@ export default function PecaLojaPage() {
           .then(({ data: cli }) => { if (cli) setTotalAlugueres(cli.total_pecas_alugadas || 0); });
       }
     });
+    // Capturar ?ref= e guardar em localStorage (válido 30 dias)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        try { localStorage.setItem("ng_ref", JSON.stringify({ ref, expiry, peca: id })); } catch {}
+      }
+    }
   }, [codigo, id]);
 
   const carregarDados = async () => {
@@ -348,13 +357,17 @@ export default function PecaLojaPage() {
     } catch { setContactando(false); }
   };
 
-  const partilhar = async (rede) => {
+  const partilhar = async (rede, comRef = false) => {
     const urlBase = window.location.href.split("?")[0];
-    const urlPartilha = urlBase;
+    // Se comRef e utilizador logado, adiciona ?ref= ao link
+    const urlPartilha = comRef && userLogado
+      ? `${urlBase}?ref=${userLogado.id}`
+      : urlBase;
     const urlEnc = encodeURIComponent(urlPartilha);
     const texto = encodeURIComponent(`${peca?.nome} — ${lojista?.nome || "Nora Grei"}`);
     if (rede === "whatsapp") { window.open(`https://wa.me/?text=${texto}%20${urlEnc}`, "_blank"); return; }
     if (rede === "facebook") { window.open(`https://www.facebook.com/sharer/sharer.php?u=${urlEnc}`, "_blank"); return; }
+    if (rede === "tiktok") { window.open(`https://www.tiktok.com/`, "_blank"); return; }
     try { await navigator.clipboard.writeText(urlPartilha); } catch { }
     setPartilhado(true); setTimeout(() => setPartilhado(false), 2500);
   };
@@ -673,6 +686,39 @@ export default function PecaLojaPage() {
             </button>
           </div>
           {partilhado && <p style={{fontSize:"0.7rem",color:"#27ae60",marginTop:"0.35rem"}}>{i.linkCopiado}</p>}
+
+          {/* Partilhar e ganhar — disponível para todos */}
+          <div style={{marginTop:"0.75rem",padding:"0.9rem 1rem",background:"linear-gradient(135deg,#fdf6ee 0%,#faf0f4 100%)",border:"1px solid #e8d8c8",borderRadius:"2px"}}>
+            <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.5rem"}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4a882" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",fontWeight:600}}>
+                {userLogado ? "Partilha e ganha comissão" : "Partilha e ganha"}
+              </span>
+            </div>
+            <p style={{fontSize:"0.75rem",color:"#5a5855",margin:"0 0 0.65rem",lineHeight:1.5}}>
+              {userLogado
+                ? "O teu link tem o teu código. Se alguém comprar ou alugar através dele, recebes comissão."
+                : "Cria conta ou inicia sessão para gerar o teu link de referência e ganhar comissão em cada venda."}
+            </p>
+            {userLogado ? (
+              <div style={{display:"flex",gap:"0.5rem"}}>
+                <button onClick={() => partilhar("whatsapp", true)}
+                  style={{flex:1,padding:"0.55rem 0.5rem",background:"#25D366",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:"0.35rem"}}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.858L.057 23.998l6.305-1.654A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.64-.516-5.14-1.41l-.368-.218-3.812 1 1.021-3.727-.239-.385A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                  WhatsApp
+                </button>
+                <button onClick={() => partilhar("link", true)}
+                  style={{flex:1,padding:"0.55rem 0.5rem",background:"#c4748a",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:"0.35rem"}}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                  Copiar link
+                </button>
+              </div>
+            ) : (
+              <a href="/entrar" style={{display:"block",textAlign:"center",padding:"0.55rem",background:"#c4748a",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600}}>
+                Entrar e ganhar comissão
+              </a>
+            )}
+          </div>
 
           {/* Avaliações */}
           <div style={{marginTop:"2rem",paddingTop:"1.5rem",borderTop:"1px solid var(--g2)"}}>
