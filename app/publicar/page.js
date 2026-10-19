@@ -41,6 +41,49 @@ export default function PublicarPage() {
     });
   }, []);
 
+  // Share Target: receber fotos partilhadas de outras apps (câmara, galeria, etc.)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const processarFotosPartilhadas = (arquivos) => {
+      try {
+        const novasFotos = arquivos.map(a => {
+          const bytes = atob(a.base64);
+          const arr = new Uint8Array(bytes.length);
+          for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+          const file = new File([arr], a.name || "foto.jpg", { type: a.type || "image/jpeg" });
+          const url = URL.createObjectURL(file);
+          return { file, url, valida: null, validando: false, motivo: "" };
+        });
+        setFotos(novasFotos);
+      } catch (e) { /* ignorar */ }
+    };
+
+    // Ouvir postMessage do service worker
+    const onMessage = (e) => {
+      if (e.data?.type === "NG_SHARE_FOTOS" && e.data.fotos?.length) {
+        processarFotosPartilhadas(e.data.fotos);
+      }
+    };
+    navigator.serviceWorker?.addEventListener("message", onMessage);
+
+    // Fallback: verificar cache do SW (para quando a página abre nova)
+    const checkShareCache = async () => {
+      try {
+        const cache = await caches.open("ng-share-target");
+        const resp = await cache.match("/_share_fotos");
+        if (resp) {
+          const fotos = await resp.json();
+          await cache.delete("/_share_fotos");
+          if (fotos?.length) processarFotosPartilhadas(fotos);
+        }
+      } catch (e) { /* ignorar */ }
+    };
+    checkShareCache();
+
+    return () => navigator.serviceWorker?.removeEventListener("message", onMessage);
+  }, []);
+
   const validarFotoComIA = async (foto, index) => {
     try {
       // Converter File para base64

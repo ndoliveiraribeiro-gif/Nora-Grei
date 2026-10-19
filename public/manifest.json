@@ -8,6 +8,22 @@
   "background_color": "#f8f7f5",
   "theme_color": "#a8a8ac",
   "orientation": "portrait",
+  "share_target": {
+    "action": "/publicar",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "fotos",
+          "accept": ["image/png", "image/jpeg", "image/webp", "image/*"]
+        }
+      ]
+    }
+  },
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
