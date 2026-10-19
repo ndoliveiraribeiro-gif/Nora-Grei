@@ -750,7 +750,13 @@ export default function PecaLojaPage() {
                 {partilhado === "link" && <p style={{fontSize:"0.68rem",color:"#27ae60",margin:"0.25rem 0 0"}}>✓ Link copiado!</p>}
               </>
             ) : (
-              <a href="/entrar" style={{display:"block",textAlign:"center",padding:"0.6rem",background:"#c4748a",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,borderRadius:"2px"}}>
+              <a href="/entrar"
+                onClick={e => {
+                  e.preventDefault();
+                  try { localStorage.setItem("ng_redirect_apos_login", window.location.href); } catch {}
+                  window.location.href = "/entrar";
+                }}
+                style={{display:"block",textAlign:"center",padding:"0.6rem",background:"#c4748a",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,borderRadius:"2px"}}>
                 Entrar e ganhar comissão
               </a>
             )}

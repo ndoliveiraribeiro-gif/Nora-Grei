@@ -22,6 +22,14 @@ export default function Entrar() {
     setErro("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setErro(i.erro); setLoading(false); return; }
+    try {
+      const redirectPendente = localStorage.getItem("ng_redirect_apos_login");
+      if (redirectPendente) {
+        localStorage.removeItem("ng_redirect_apos_login");
+        window.location.href = redirectPendente;
+        return;
+      }
+    } catch {}
     window.location.href = "/";
   };
 
