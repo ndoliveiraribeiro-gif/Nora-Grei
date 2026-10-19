@@ -17,6 +17,7 @@ const T = {
     porque: { label: "A nossa missão", titulo: "Porque a moda deve acompanhar a tua vida,", tituloSub: "não ocupar o teu armário.", pontos: ["Menos desperdício.", "Mais exclusividade.", "Mais liberdade.", "Moda consciente."] },
     numeros: [{ val:"500+",label:"Alugueres realizados" },{ val:"120+",label:"Peças exclusivas" },{ val:"4.9★",label:"Avaliação média" },{ val:"48h",label:"Entrega rápida" }],
     sustentabilidade: { label:"Moda consciente", titulo:"Cada peça vive várias histórias.", stats:[{ val:"70%",label:"Água poupada vs comprar" },{ val:"5×",label:"Reutilizações por peça" },{ val:"60%",label:"Emissões reduzidas" }] },
+    lojista: { label:"Para quem tem peças", titulo:"Tens peças para alugar?", sub:"Abre a tua loja, define os teus preços e deixa a Nora Grei tratar do resto.", btnMain:"Abrir a minha loja", btnSec:"Explorar catálogo" },
     cta: { titulo:"O teu guarda-roupa infinito", sub:"começa aqui.", btn:"Explorar colecção", tag:"Moda exclusiva. Sem excessos." },
     strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspeccionadas", "Cancele quando quiser", "Moda consciente"],
     footer: {
@@ -64,6 +65,7 @@ const T = {
     porque: { label: "Notre mission", titulo: "Parce que la mode doit suivre votre vie,", tituloSub: "pas occuper votre placard.", pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode responsable."] },
     numeros: [{ val:"500+",label:"Locations réalisées" },{ val:"120+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
     sustentabilidade: { label:"Mode responsable", titulo:"Chaque pièce vit plusieurs histoires.", stats:[{ val:"70%",label:"Eau économisée vs achat" },{ val:"5×",label:"Réutilisations par pièce" },{ val:"60%",label:"Émissions réduites" }] },
+    lojista: { label:"Pour ceux qui ont des pièces", titulo:"Vous avez des pièces à louer ?", sub:"Ouvrez votre boutique, fixez vos prix et laissez Nora Grei s'occuper du reste.", btnMain:"Ouvrir ma boutique", btnSec:"Explorer le catalogue" },
     cta: { titulo:"Votre garde-robe infinie", sub:"commence ici.", btn:"Explorer la collection", tag:"Mode exclusive. Sans excès." },
     strip: ["Livraison gratuite", "Dépôt 100% remboursé", "Pièces inspectées", "Annulez à tout moment", "Mode responsable"],
     footer: {
@@ -111,6 +113,7 @@ const T = {
     porque: { label: "Mūsų misija", titulo: "Nes mada turi atitikti jūsų gyvenimą,", tituloSub: "o ne užimti jūsų spintą.", pontos: ["Mažiau švaistymo.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."] },
     numeros: [{ val:"500+",label:"Įvykdytų nuomų" },{ val:"120+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
     sustentabilidade: { label:"Sąmoninga mada", titulo:"Kiekvienas drabužis turi kelias istorijas.", stats:[{ val:"70%",label:"Sutaupyto vandens vs pirkimas" },{ val:"5×",label:"Pakartotiniai naudojimai" },{ val:"60%",label:"Sumažintos emisijos" }] },
+    lojista: { label:"Tiems, kurie turi drabužių", titulo:"Turite drabužių nuomoti?", sub:"Atidarykite parduotuvę, nustatykite kainas — Nora Grei pasirūpins likusiu.", btnMain:"Atidaryti parduotuvę", btnSec:"Naršyti katalogą" },
     cta: { titulo:"Jūsų begalinė spinta", sub:"prasideda čia.", btn:"Naršyti kolekciją", tag:"Išskirtinė mada. Be perteklių." },
     strip: ["Nemokamas pristatymas", "100% grąžinamas užstatas", "Patikrinti drabužiai", "Atšaukite bet kada", "Sąmoninga mada"],
     footer: {
@@ -417,6 +420,18 @@ export default function Home() {
         .sustent-label{font-size:0.78rem;color:var(--g4);text-align:right;max-width:20ch}
 
         /* CTA FINAL */
+        /* SECÇÃO LOJISTA */
+        .lojista-sec{padding:2.5rem 1.5rem;background:var(--rosa);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.25rem}
+        .lojista-sec-label{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.65);font-weight:500}
+        .lojista-sec-titulo{font-family:var(--serif);font-size:clamp(1.6rem,5vw,2.6rem);font-weight:300;color:#fff;line-height:1.2;margin:0}
+        .lojista-sec-sub{font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.6;max-width:360px;margin:0}
+        .lojista-sec-btns{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center}
+        .lojista-sec-btn-main{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;background:#fff;color:var(--rosa);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:700;transition:opacity 0.2s;border:none;cursor:pointer}
+        .lojista-sec-btn-main:hover{opacity:0.88}
+        .lojista-sec-btn-sec{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:rgba(255,255,255,0.8);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;border:1.5px solid rgba(255,255,255,0.4);transition:border-color 0.2s,color 0.2s}
+        .lojista-sec-btn-sec:hover{border-color:#fff;color:#fff}
+        @media(min-width:769px){.lojista-sec{padding:3.5rem 4rem}}
+
         .cta-final{padding:2.5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
         .cta-final-titulo{font-family:var(--serif);font-size:clamp(2rem,6vw,4rem);font-weight:300;line-height:1;color:#fff}
         .cta-final-sub{font-family:var(--serif);font-size:clamp(2rem,6vw,4rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.6rem}
@@ -844,6 +859,17 @@ export default function Home() {
               <div key={i} className="sustent-stat"><div className="sustent-val">{s.val}</div><div className="sustent-label">{s.label}</div></div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* SECÇÃO LOJISTA */}
+      <section className="lojista-sec">
+        <p className="lojista-sec-label">{t.lojista.label}</p>
+        <h2 className="lojista-sec-titulo">{t.lojista.titulo}</h2>
+        <p className="lojista-sec-sub">{t.lojista.sub}</p>
+        <div className="lojista-sec-btns">
+          <a href="/perfil" className="lojista-sec-btn-main">{t.lojista.btnMain}</a>
+          <a href="/catalogo" className="lojista-sec-btn-sec">{t.lojista.btnSec}</a>
         </div>
       </section>
 
