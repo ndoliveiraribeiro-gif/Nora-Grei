@@ -1359,6 +1359,8 @@ export default function Perfil() {
         .avatar-ph{width:96px;height:96px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--g6)}
         .avatar-btn{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);border:2.5px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.1;margin-bottom:0.3rem;color:var(--black)}
+        .tabs-scroll{display:flex;overflow-x:auto;border-bottom:2px solid var(--g2);margin-bottom:1.5rem;scrollbar-width:none;-ms-overflow-style:none}
+        .tabs-scroll::-webkit-scrollbar{display:none}
         .hero-email{font-size:0.92rem;color:var(--g6)}
         .alerta-perfil{background:#fff8e1;border-left:3px solid #b8860b;padding:1.25rem 1.5rem}
         .alerta-perfil-titulo{font-size:0.85rem;font-weight:700;color:#6b4500;margin-bottom:0.3rem}
@@ -1441,7 +1443,7 @@ export default function Perfil() {
 
       <div className="page">
 
-        <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto"}}>
+        <div className="tabs-scroll">
           {[
             {id:"perfil",label:i.tabPerfil},
             {id:"pedidos",label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
@@ -1943,7 +1945,7 @@ export default function Perfil() {
               )}
             </div>
             {/* Tabs da loja — scroll horizontal no mobile */}
-            <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
+            <div className="tabs-scroll">
               {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["avaliacoes","Avaliações"],["estatisticas","Estatísticas"]].map(([key,label]) => (
                 <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
               ))}

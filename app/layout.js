@@ -5,6 +5,14 @@ import ClientWidgets from "@/components/ClientWidgets";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata = {
   title: "Nora Grei",
   description: "Aluga ou compra peças exclusivas de moda.",
