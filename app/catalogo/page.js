@@ -47,7 +47,7 @@ function PecaCardLojista({ peca, lang }) {
         </div>
       </a>
       {disponivel ? (
-        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.78rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:500,minHeight:"46px"}}>{lbl}</a>
+        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.78rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #d5d2cd",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:400,minHeight:"46px"}}>{lbl}</a>
       ) : (
         <div style={{margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",border:"1.5px solid #ccc9c4",color:"#4a4845",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"46px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
       )}
