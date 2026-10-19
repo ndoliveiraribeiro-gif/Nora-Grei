@@ -337,11 +337,10 @@ export default function PecaLojaPage() {
     setContactando(true);
     try {
       let destinoId = lojista.id;
-      // Se é o próprio lojista, contactar a Nora Grei (admin)
+      // Se é o próprio lojista, ir direto para mensagens
       if (lojista.id === userLogado.id) {
-        const NORA_GREI_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
-        if (userLogado.id === NORA_GREI_ID) { setContactando(false); return; }
-        destinoId = NORA_GREI_ID;
+        window.location.href = "/mensagens";
+        return;
       }
       const { data: existente } = await supabase.from("conversas").select("id").eq("cliente_id", userLogado.id).eq("lojista_id", destinoId).maybeSingle();
       if (!existente) await supabase.from("conversas").insert({ cliente_id: userLogado.id, lojista_id: destinoId, assunto: peca?.nome });
