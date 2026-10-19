@@ -257,6 +257,7 @@ function CheckoutLojaContent() {
   const searchParams = useSearchParams();
   const pecaId = searchParams.get("peca");
   const tamanhoParam = searchParams.get("tamanho");
+  const modoCompra = searchParams.get("modo") === "comprar_usada";
 
   const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
@@ -340,7 +341,7 @@ function CheckoutLojaContent() {
   };
 
   const confirmar = async () => {
-    if (!dataInicio || !dataFim) { setErro(i.obrigatorio); return; }
+    if (!modoCompra && (!dataInicio || !dataFim)) { setErro(i.obrigatorio); return; }
     if (!user) { window.location.href = `/entrar?redirect=/loja/${codigo}/checkout?peca=${pecaId}&tamanho=${tamanhoParam}`; return; }
     if (pagamento === "mbway" && !qrAtivo) {
       if (!validarFormularioPagamento()) return;
@@ -369,21 +370,25 @@ function CheckoutLojaContent() {
         if (!upErr) { const { data } = supabase.storage.from("comprovativos").getPublicUrl(path); urlComprovativo = data.publicUrl; }
       }
 
+      const valorFinal = modoCompra ? (peca?.preco_avulso || 0) : valorAluguer;
+
       // Registar aluguer na tabela de alugueres do lojista
       const { data: novoAluguer, error } = await supabase.from("alugueres_lojista").insert({
         cliente_id: user.id,
         lojista_id: lojista?.id,
         peca_lojista_id: pecaId,
         stock_lojista_id: tamanhoParam || null,
-        data_inicio: dataInicio,
-        data_fim: dataFim,
+        ...(modoCompra ? {} : { data_inicio: dataInicio, data_fim: dataFim }),
+        tipo: modoCompra ? "compra_usada" : "avulso",
         estado: estadoInicial,
         metodo_entrega: entrega,
         metodo_pagamento: pagamento,
-        valor_aluguer: valorAluguer,
-        deposito_valor: valorDeposito,
-        deposito_modalidade: deposito,
-        deposito_estado: depositoAutomatico ? "recebido" : "pendente",
+        valor_aluguer: valorFinal,
+        ...(modoCompra ? { deposito_valor: 0, deposito_estado: "nao_aplicavel" } : {
+          deposito_valor: valorDeposito,
+          deposito_modalidade: deposito,
+          deposito_estado: depositoAutomatico ? "recebido" : "pendente",
+        }),
       }).select().single();
       if (error) throw error;
 
@@ -441,13 +446,16 @@ function CheckoutLojaContent() {
                   {lojista && <p className="peca-cat">Loja de {lojista.nome}</p>}
                   <p className="peca-nome">{peca.nome}</p>
                   {tamanhoNome && <p className="peca-tam">{i.tamanho}: {tamanhoNome}</p>}
-                  {peca.preco_aluguer_dia && <p style={{fontSize:"1rem",color:"var(--black)",fontWeight:500,marginTop:"0.3rem"}}>{peca.preco_aluguer_dia}€ {i.dias(1)}</p>}
+                  {modoCompra
+                    ? <p style={{fontSize:"1rem",color:"var(--black)",fontWeight:500,marginTop:"0.3rem"}}>{peca.preco_avulso}€ — peça usada</p>
+                    : peca.preco_aluguer_dia && <p style={{fontSize:"1rem",color:"var(--black)",fontWeight:500,marginTop:"0.3rem"}}>{peca.preco_aluguer_dia}€ {i.dias(1)}</p>
+                  }
                 </div>
               </div>
             )}
           </div>
 
-          <div className="sec">
+          {!modoCompra && <div className="sec">
             <p className="sec-t">{i.datas}</p>
             <div className="dates">
               <div>
@@ -460,7 +468,7 @@ function CheckoutLojaContent() {
               </div>
             </div>
             {numDias > 0 && <p style={{fontSize:"0.9rem",color:"#5a5855",marginTop:"0.75rem"}}>{i.dias(numDias)} — {valorAluguer.toFixed(2)}€</p>}
-          </div>
+          </div>}
 
           <div className="sec">
             <p className="sec-t">{i.entrega}</p>
@@ -493,7 +501,7 @@ function CheckoutLojaContent() {
             {pagamento==="dinheiro" && <InfoDinheiro i={i}/>}
           </div>
 
-          {valorDeposito > 0 && (
+          {!modoCompra && valorDeposito > 0 && (
             <div className="sec">
               <p className="sec-t">{i.deposito}</p>
               <div className="opts">
@@ -523,13 +531,23 @@ function CheckoutLojaContent() {
             <>
               {!tudoAutomatico && <div className="aviso-pendente">{i.avisoPendenteResumo}</div>}
               {qrAtivo && <div className="aviso-pendente" style={{background:"#e3f2fd",borderColor:"#1976d2",color:"#1565c0"}}>{i.avisoMbway}</div>}
-              <div className="r-linha"><span>{i.aluguer} {numDias>0?`(${i.dias(numDias)})`:""}</span><span>{valorAluguer.toFixed(2)}€</span></div>
-              <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
-              <div className="r-linha"><span>{i.depositoVal}</span><span>{valorDeposito}€</span></div>
-              <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
-              <p className="r-nota">{i.totalSemDeposito}</p>
+              {modoCompra ? (
+                <>
+                  <div className="r-linha"><span>Peça usada</span><span>{(peca?.preco_avulso||0).toFixed(2)}€</span></div>
+                  <div className="r-linha"><span>Entrega</span><span>{entrega==="envio"?"A calcular":"Grátis"}</span></div>
+                  <div className="r-total"><span>{i.total}</span><span>{(peca?.preco_avulso||0).toFixed(2)}€</span></div>
+                </>
+              ) : (
+                <>
+                  <div className="r-linha"><span>{i.aluguer} {numDias>0?`(${i.dias(numDias)})`:""}</span><span>{valorAluguer.toFixed(2)}€</span></div>
+                  <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
+                  <div className="r-linha"><span>{i.depositoVal}</span><span>{valorDeposito}€</span></div>
+                  <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
+                  <p className="r-nota">{i.totalSemDeposito}</p>
+                </>
+              )}
               {erro && <div className="erro">{erro}</div>}
-              <button className="btn" onClick={confirmar} disabled={loading||!dataInicio||!dataFim}>
+              <button className="btn" onClick={confirmar} disabled={loading||(!modoCompra&&(!dataInicio||!dataFim))}>
                 {loading ? i.aProcessar : (tudoAutomatico ? i.confirmar : i.confirmarPendente)}
               </button>
             </>
