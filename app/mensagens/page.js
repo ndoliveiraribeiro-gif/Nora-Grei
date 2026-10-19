@@ -18,6 +18,9 @@ const T = {
     voltar: "← Voltar",
     carregando: "...",
     nova: "Nova mensagem",
+    traduzir: "Traduzir",
+    verOriginal: "Ver original",
+    traduzindo: "...",
   },
   fr: {
     titulo: "Messages",
@@ -34,6 +37,9 @@ const T = {
     voltar: "← Retour",
     carregando: "...",
     nova: "Nouveau message",
+    traduzir: "Traduire",
+    verOriginal: "Voir l'original",
+    traduzindo: "...",
   },
   lt: {
     titulo: "Žinutės",
@@ -50,6 +56,9 @@ const T = {
     voltar: "← Atgal",
     carregando: "...",
     nova: "Nauja žinutė",
+    traduzir: "Versti",
+    verOriginal: "Žiūrėti originalą",
+    traduzindo: "...",
   },
 };
 
@@ -80,6 +89,7 @@ export default function MensagensPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [vistaChat, setVistaChat] = useState(false); // mobile: true = mostra chat
+  const [traducoes, setTraducoes] = useState({}); // { msgId: { texto, loading } }
   const chatRef = useRef(null);
   const subRef = useRef(null);
 
@@ -190,6 +200,27 @@ export default function MensagensPage() {
     setEnviando(false);
   };
 
+  const traduzirMensagem = async (id, conteudo) => {
+    // Já tem tradução: toggle para original
+    if (traducoes[id]?.texto) {
+      setTraducoes(prev => ({ ...prev, [id]: { ...prev[id], mostrar: !prev[id].mostrar } }));
+      return;
+    }
+    // Carregar tradução
+    setTraducoes(prev => ({ ...prev, [id]: { loading: true, texto: null, mostrar: true } }));
+    try {
+      const res = await fetch("/api/traduzir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto: conteudo, paraLingua: lang }),
+      });
+      const json = await res.json();
+      setTraducoes(prev => ({ ...prev, [id]: { loading: false, texto: json.traducao || null, mostrar: true } }));
+    } catch {
+      setTraducoes(prev => ({ ...prev, [id]: { loading: false, texto: null, mostrar: false } }));
+    }
+  };
+
   const handleKey = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -281,6 +312,9 @@ export default function MensagensPage() {
         .msg-wrap.enviada .msg-balao{background:var(--black);color:var(--white)}
         .msg-wrap.recebida .msg-balao{background:var(--g1);color:var(--black)}
         .msg-hora{font-size:0.58rem;color:var(--g4);margin-top:0.25rem;letter-spacing:0.05em}
+        .msg-traduzir{background:none;border:none;cursor:pointer;font-size:0.58rem;color:var(--g4);letter-spacing:0.08em;text-transform:uppercase;padding:0.1rem 0;margin-top:0.15rem;opacity:0.7;transition:opacity 0.15s}
+        .msg-traduzir:hover{opacity:1}
+        .msg-traducao{font-size:0.78rem;line-height:1.5;color:var(--g4);margin-top:0.4rem;padding:0.5rem 0.75rem;border-left:2px solid var(--rosa);font-style:italic;word-break:break-word;max-width:100%}
 
         .chat-input{border-top:1px solid var(--g2);padding:1rem 1.5rem;display:flex;gap:0.75rem;align-items:flex-end}
         .chat-textarea{flex:1;resize:none;border:1px solid var(--g2);background:var(--white);padding:0.75rem 1rem;font-family:var(--sans);font-size:0.82rem;color:var(--black);outline:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color 0.2s}
@@ -386,10 +420,28 @@ export default function MensagensPage() {
                     return <div key={`sep-${i}`} className="separador-dia">{formatData(item.data, t)}</div>;
                   }
                   const sou = item.remetente_id === cliente.id;
+                  const trad = traducoes[item.id];
                   return (
                     <div key={item.id} className={`msg-wrap ${sou ? "enviada" : "recebida"}`}>
-                      <div className="msg-balao">{item.conteudo}</div>
+                      <div className="msg-balao">
+                        {trad?.mostrar && trad?.texto ? trad.texto : item.conteudo}
+                      </div>
+                      {trad?.mostrar && trad?.texto && (
+                        <div className="msg-traducao">🌐 {item.conteudo}</div>
+                      )}
                       <div className="msg-hora">{formatHora(item.created_at)}</div>
+                      {!sou && (
+                        <button
+                          className="msg-traduzir"
+                          onClick={() => traduzirMensagem(item.id, item.conteudo)}
+                        >
+                          {trad?.loading
+                            ? t.traduzindo
+                            : trad?.mostrar && trad?.texto
+                              ? t.verOriginal
+                              : "🌐 " + t.traduzir}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
