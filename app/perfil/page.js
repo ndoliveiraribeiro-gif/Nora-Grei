@@ -2922,8 +2922,8 @@ export default function Perfil() {
         </div>
       )}
 
-      {/* Botão flutuante — acesso rápido a /publicar (só para lojistas) */}
-      {modoLojista && (
+      {/* Botão flutuante — acesso rápido a /publicar (para todos os utilizadores autenticados) */}
+      {user && (
         <button
           onClick={() => { window.location.href = "/publicar"; }}
           style={{
