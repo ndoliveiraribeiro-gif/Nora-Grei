@@ -1018,6 +1018,8 @@ export default function Perfil() {
   const [boostersLoja, setBoostersLoja] = useState([]);
   const [tiposBoosters, setTiposBoosters] = useState([]);
   const [boostersLoading, setBoostersLoading] = useState(false);
+  const [pagamentosBooster, setPagamentosBooster] = useState([]);
+  const [subTabCustos, setSubTabCustos] = useState("alugueres");
   const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
   const fileRef = useRef();
 
@@ -1162,12 +1164,14 @@ export default function Perfil() {
 
     // Boosters activos do lojista
     if (modoLojista) {
-      const [{ data: boosters }, { data: tipos }] = await Promise.all([
+      const [{ data: boosters }, { data: tipos }, { data: pagsBst }] = await Promise.all([
         supabase.from("boosters_lojista").select("*, booster_tipos(nome, descricao)").eq("cliente_id", user.id).eq("ativo", true).order("created_at", { ascending: false }),
-        supabase.from("booster_tipos").select("*").eq("ativo", true)
+        supabase.from("booster_tipos").select("*").eq("ativo", true),
+        supabase.from("pagamentos_booster").select("*").eq("cliente_id", user.id).order("created_at", { ascending: false })
       ]);
       if (boosters) setBoostersLoja(boosters);
       if (tipos) setTiposBoosters(tipos);
+      if (pagsBst) setPagamentosBooster(pagsBst);
     }
 
     setLoading(false);
@@ -2548,140 +2552,229 @@ export default function Perfil() {
               </div>
             )}
             {tabLoja === "custos" && (() => {
-              // ── Receita real: alugueres e vendas de peças do lojista ──
-              const aReceber = alugueresLoja.filter(a => a.estado === "devolvido" && !a.liquidado_em);
-              const saldoAlugueres = aReceber.reduce((s,a) => s + (a.valor_aluguer||0)*0.9, 0);
+              const METODO_LABEL = {
+                cartao: "Cartão",
+                saldo_alugueres: "Saldo alugueres",
+                creditos_afiliado: "Créditos afiliado",
+              };
+              const METODO_COR = {
+                cartao: "#c4748a",
+                saldo_alugueres: "#27ae60",
+                creditos_afiliado: "#c4a882",
+              };
 
-              // ── Créditos de afiliado (lojista como promotor de outras lojas) ──
-              // São créditos ganhos quando alguém usa o link/código do lojista para alugar noutras lojas
-              const creditosDisponiveis = creditosAfiliado.disponiveis || 0;
+              // ── Dados para cada sub-tab ──────────────────────────────
+              // 1. Ganhos de aluguer e venda (devolvidos)
+              const ganhosList = alugueresLoja
+                .filter(a => ["devolvido","devolvido_danificado"].includes(a.estado))
+                .map(a => ({
+                  id: a.id,
+                  nome: a.pecas_lojista?.nome || "—",
+                  data: a.data_fim || a.data_inicio,
+                  valor: (a.valor_aluguer||0)*0.9,
+                  tipo: a.tipo_transacao === "venda" ? "Venda" : "Aluguer",
+                  liquidado: !!a.liquidado_em,
+                }))
+                .sort((a,b) => (b.data||"").localeCompare(a.data||""));
+              const totalGanhos = ganhosList.reduce((s,g) => s+g.valor, 0);
+              const totalPendente = ganhosList.filter(g=>!g.liquidado).reduce((s,g) => s+g.valor, 0);
 
-              // Saldo total disponível para pagar custos
-              const saldoTotal = saldoAlugueres + creditosDisponiveis;
+              // 2. Ganhos de afiliado
+              const afiliadosList = (creditosAfiliado.lista||[])
+                .sort((a,b) => (b.created_at||"").localeCompare(a.created_at||""));
+              const totalAfiliados = creditosAfiliado.total || 0;
+              const totalAfiliadosDisp = creditosAfiliado.disponiveis || 0;
 
-              // ── Custos de boosters ──
-              const custoSemana = boostersLoja.reduce((s,b) => s + (b.preco_semana||0), 0);
-              const custoMes = custoSemana * 4;
+              // 3. Custos pagos de boosters
+              const totalCustosPagos = pagamentosBooster.reduce((s,p) => s+p.valor, 0);
 
-              // Lógica de cobertura
-              const saldoCobre = saldoTotal >= custoMes;
-              const falta = Math.max(0, custoMes - saldoTotal);
+              // Sub-tabs header
+              const SUB_TABS = [
+                { id:"alugueres", label:"Ganhos Aluguer & Venda", cor:"#27ae60" },
+                { id:"afiliado",  label:"Ganhos Afiliado",        cor:"#c4a882" },
+                { id:"boosters",  label:"Custos Boosters",        cor:"#c4748a" },
+              ];
 
               return (
                 <div>
-                  {/* Resumo financeiro — o que entra */}
-                  <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                    <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#27ae60",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>O que tens a receber</p>
-
-                    {/* Alugueres / vendas */}
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
-                      <div>
-                        <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.15rem"}}>Alugueres e vendas concluídos</div>
-                        <div style={{fontSize:"0.72rem",color:"#aaa"}}>Peças devolvidas, pagamento pendente de liquidação (90% do valor)</div>
-                        {aReceber.length > 0 && (
-                          <div style={{marginTop:"0.5rem"}}>
-                            {aReceber.map(a => (
-                              <div key={a.id} style={{fontSize:"0.75rem",color:"#888",display:"flex",justifyContent:"space-between",gap:"1rem",padding:"0.2rem 0"}}>
-                                <span>{a.pecas_lojista?.nome||"—"}</span>
-                                <span style={{color:"#27ae60",fontWeight:600,flexShrink:0}}>{((a.valor_aluguer||0)*0.9).toFixed(2)}€</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {aReceber.length === 0 && <div style={{fontSize:"0.75rem",color:"#bbb",marginTop:"0.25rem"}}>Sem alugueres pendentes de liquidação</div>}
-                      </div>
-                      <span style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,color:"#27ae60",flexShrink:0,marginLeft:"1rem"}}>{saldoAlugueres.toFixed(2)}€</span>
-                    </div>
-
-                    {/* Créditos de afiliado */}
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",padding:"0.65rem 0"}}>
-                      <div>
-                        <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.15rem"}}>Créditos de afiliado</div>
-                        <div style={{fontSize:"0.72rem",color:"#aaa"}}>Ganhos ao partilhar o teu link ou código com clientes de outras lojas na plataforma</div>
-                        <div style={{fontSize:"0.72rem",color:"#888",marginTop:"0.2rem"}}>Total acumulado: {(creditosAfiliado.total||0).toFixed(2)}€ · Já usados: {((creditosAfiliado.total||0) - creditosDisponiveis).toFixed(2)}€</div>
-                      </div>
-                      <span style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,color:"#c4a882",flexShrink:0,marginLeft:"1rem"}}>{creditosDisponiveis.toFixed(2)}€</span>
-                    </div>
-
-                    {/* Total disponível */}
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"0.75rem",marginTop:"0.25rem",borderTop:"2px solid var(--g2)"}}>
-                      <span style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,color:"var(--g6)"}}>Total disponível</span>
-                      <span style={{fontFamily:"var(--serif)",fontSize:"1.6rem",fontWeight:300,color:"#27ae60"}}>{saldoTotal.toFixed(2)}€</span>
-                    </div>
+                  {/* Sub-tab nav */}
+                  <div style={{display:"flex",gap:"1px",background:"var(--g2)",marginBottom:"1rem",overflowX:"auto"}}>
+                    {SUB_TABS.map(t => (
+                      <button key={t.id} onClick={() => setSubTabCustos(t.id)}
+                        style={{flex:"1 0 auto",padding:"0.6rem 0.75rem",background:subTabCustos===t.id?"var(--bg)":"var(--g1)",border:"none",cursor:"pointer",fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:subTabCustos===t.id?700:400,color:subTabCustos===t.id?t.cor:"#aaa",borderBottom:subTabCustos===t.id?`2px solid ${t.cor}`:"2px solid transparent",whiteSpace:"nowrap",transition:"all 0.15s"}}>
+                        {t.label}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Custos de boosters */}
-                  <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                    <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Ferramentas de destaque activas</p>
-                    {boostersLoja.length === 0 ? (
-                      <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"1.5rem 0"}}>Nenhuma ferramenta activa de momento.</p>
-                    ) : (
-                      boostersLoja.map(b => (
-                        <div key={b.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.7rem 0",borderBottom:"1px solid var(--g1)"}}>
-                          <div>
-                            <div style={{fontFamily:"var(--serif)",fontSize:"0.92rem",marginBottom:"0.1rem"}}>{b.booster_tipos?.nome||b.booster_id}</div>
-                            <div style={{fontSize:"0.72rem",color:"#aaa"}}>{b.booster_tipos?.descricao||""}</div>
-                            {b.inicio_em && <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Activo desde {new Date(b.inicio_em).toLocaleDateString("pt-PT")}</div>}
+                  {/* ── SUB-TAB 1: Ganhos de aluguer e venda ── */}
+                  {subTabCustos === "alugueres" && (
+                    <div>
+                      {/* Totais */}
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1rem"}}>
+                        {[
+                          {val:`${totalGanhos.toFixed(2)}€`, lbl:"Total acumulado", cor:"#27ae60"},
+                          {val:`${totalPendente.toFixed(2)}€`, lbl:"Pendente de liquidação", cor:"#b8860b"},
+                        ].map((k,i) => (
+                          <div key={i} style={{background:"var(--bg)",padding:"1rem"}}>
+                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.2rem"}}>{k.lbl}</div>
+                            <div style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,color:k.cor}}>{k.val}</div>
                           </div>
-                          <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
-                            <div style={{fontWeight:600,color:"#c4748a",fontSize:"0.95rem"}}>{(b.preco_semana||0).toFixed(2)}€<span style={{fontSize:"0.68rem",color:"#aaa",fontWeight:400}}>/sem</span></div>
-                            <div style={{fontSize:"0.7rem",color:"#aaa"}}>{((b.preco_semana||0)*4).toFixed(2)}€/mês</div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                    {boostersLoja.length > 0 && (
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"0.75rem",marginTop:"0.25rem",borderTop:"2px solid var(--g2)"}}>
-                        <div>
-                          <div style={{fontSize:"0.75rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888"}}>Total mensal estimado</div>
-                          <div style={{fontSize:"0.72rem",color:"#bbb"}}>{custoSemana.toFixed(2)}€/semana × 4</div>
-                        </div>
-                        <span style={{fontWeight:700,color:"#c4748a",fontSize:"1.2rem"}}>{custoMes.toFixed(2)}€</span>
+                        ))}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Catálogo de boosters disponíveis */}
-                  {tiposBoosters.length > 0 && (
-                    <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                      <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Ferramentas disponíveis</p>
-                      {tiposBoosters.map(t => {
-                        const jaActivo = boostersLoja.some(b => b.booster_id === t.id);
-                        return (
-                          <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
+                      {/* Lista */}
+                      <div className="card" style={{padding:"1.5rem"}}>
+                        <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#27ae60",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Histórico de ganhos</p>
+                        {ganhosList.length === 0 ? (
+                          <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não há alugueres ou vendas concluídos.</p>
+                        ) : ganhosList.map(g => (
+                          <div key={g.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
                             <div>
-                              <div style={{fontSize:"0.87rem",fontWeight:500,marginBottom:"0.1rem"}}>{t.nome}</div>
-                              <div style={{fontSize:"0.72rem",color:"#aaa"}}>{t.descricao}</div>
+                              <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{g.nome}</div>
+                              <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+                                <span style={{fontSize:"0.68rem",background:"var(--g1)",padding:"0.1rem 0.4rem",color:"#888"}}>{g.tipo}</span>
+                                {g.data && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(g.data).toLocaleDateString("pt-PT")}</span>}
+                                {g.liquidado
+                                  ? <span style={{fontSize:"0.68rem",color:"#27ae60"}}>✓ Liquidado</span>
+                                  : <span style={{fontSize:"0.68rem",color:"#b8860b"}}>Pendente</span>}
+                              </div>
                             </div>
-                            <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
-                              <div style={{fontWeight:600,color:jaActivo?"#27ae60":"var(--g6)",fontSize:"0.87rem"}}>{(t.preco_semana||0).toFixed(2)}€/sem</div>
-                              {jaActivo ? <div style={{fontSize:"0.68rem",color:"#27ae60"}}>✓ Activo</div> : <div style={{fontSize:"0.68rem",color:"#bbb"}}>Contacta o suporte</div>}
-                            </div>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"1.1rem",fontWeight:300,color:"#27ae60",flexShrink:0,marginLeft:"1rem"}}>{g.valor.toFixed(2)}€</span>
                           </div>
-                        );
-                      })}
+                        ))}
+                        <p style={{fontSize:"0.7rem",color:"#bbb",marginTop:"1rem",lineHeight:1.5}}>Valor líquido (90% do aluguer — 10% comissão Nora Grei). Liquidações até 10 dias úteis após verificação.</p>
+                      </div>
                     </div>
                   )}
 
-                  {/* Como são pagos os custos */}
-                  {custoMes > 0 && (
-                    <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                      <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Pagamento dos custos</p>
-                      {saldoCobre ? (
-                        <div style={{background:"#f0faf0",border:"1.5px solid #b8dbb8",padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#2d6a2d",lineHeight:1.6}}>
-                          ✓ O teu saldo disponível ({saldoTotal.toFixed(2)}€) cobre o custo mensal das ferramentas ({custoMes.toFixed(2)}€). O valor será descontado antes de cada liquidação — primeiro do saldo de alugueres/vendas{creditosDisponiveis > 0 ? ", depois dos créditos de afiliado" : ""}.
+                  {/* ── SUB-TAB 2: Ganhos de afiliado ── */}
+                  {subTabCustos === "afiliado" && (
+                    <div>
+                      {/* Totais */}
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1rem"}}>
+                        {[
+                          {val:`${totalAfiliados.toFixed(2)}€`, lbl:"Total acumulado", cor:"#c4a882"},
+                          {val:`${totalAfiliadosDisp.toFixed(2)}€`, lbl:"Disponível", cor:"#c4a882"},
+                        ].map((k,i) => (
+                          <div key={i} style={{background:"var(--bg)",padding:"1rem"}}>
+                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.2rem"}}>{k.lbl}</div>
+                            <div style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,color:k.cor}}>{k.val}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Lista */}
+                      <div className="card" style={{padding:"1.5rem"}}>
+                        <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,marginBottom:"0.5rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Comissões recebidas</p>
+                        <p style={{fontSize:"0.75rem",color:"#aaa",marginBottom:"1rem",lineHeight:1.5}}>Ganhos ao partilhar o teu link ou código com clientes de outras lojas na plataforma.</p>
+                        {afiliadosList.length === 0 ? (
+                          <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não há comissões de afiliado registadas.</p>
+                        ) : afiliadosList.map(c => (
+                          <div key={c.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
+                            <div>
+                              <div style={{fontSize:"0.82rem",fontWeight:500,marginBottom:"0.1rem"}}>{c.descricao||"Comissão de afiliado"}</div>
+                              <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+                                <span style={{fontSize:"0.68rem",background:"var(--g1)",padding:"0.1rem 0.4rem",color:"#888"}}>{c.tipo==="link_ref"?"Link ref":"Código"}</span>
+                                {c.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(c.created_at).toLocaleDateString("pt-PT")}</span>}
+                                {c.usado
+                                  ? <span style={{fontSize:"0.68rem",color:"#bbb"}}>Usado</span>
+                                  : <span style={{fontSize:"0.68rem",color:"#c4a882"}}>Disponível</span>}
+                              </div>
+                            </div>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"1.1rem",fontWeight:300,color:c.usado?"#bbb":"#c4a882",flexShrink:0,marginLeft:"1rem"}}>{(c.valor||0).toFixed(2)}€</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── SUB-TAB 3: Custos de boosters pagos ── */}
+                  {subTabCustos === "boosters" && (
+                    <div>
+                      {/* Totais + boosters activos */}
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1rem"}}>
+                        {[
+                          {val:`${totalCustosPagos.toFixed(2)}€`, lbl:"Total pago", cor:"#c4748a"},
+                          {val:`${boostersLoja.length}`, lbl:"Ferramentas activas", cor:"#c4748a"},
+                        ].map((k,i) => (
+                          <div key={i} style={{background:"var(--bg)",padding:"1rem"}}>
+                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.2rem"}}>{k.lbl}</div>
+                            <div style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,color:k.cor}}>{k.val}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Ferramentas activas actualmente */}
+                      {boostersLoja.length > 0 && (
+                        <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                          <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Ferramentas activas</p>
+                          {boostersLoja.map(b => (
+                            <div key={b.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
+                              <div>
+                                <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{b.booster_tipos?.nome||b.booster_id}</div>
+                                <div style={{fontSize:"0.72rem",color:"#aaa"}}>{b.booster_tipos?.descricao||""}</div>
+                                {b.inicio_em && <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Desde {new Date(b.inicio_em).toLocaleDateString("pt-PT")}</div>}
+                              </div>
+                              <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
+                                <div style={{fontWeight:600,color:"#c4748a",fontSize:"0.92rem"}}>{(b.preco_semana||0).toFixed(2)}€<span style={{fontSize:"0.68rem",color:"#aaa",fontWeight:400}}>/sem</span></div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ) : (
-                        <>
-                          <div style={{background:"#fff8e1",border:"1.5px solid #f39c12",padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#856404",lineHeight:1.6,marginBottom:"0.75rem"}}>
-                            ⚠ O teu saldo disponível ({saldoTotal.toFixed(2)}€) não cobre o custo mensal ({custoMes.toFixed(2)}€). A diferença de <strong>{falta.toFixed(2)}€</strong> será cobrada no cartão de crédito/débito associado à conta.
-                          </div>
-                          <div style={{fontSize:"0.75rem",color:"#aaa",lineHeight:1.6}}>
-                            Ordem de débito: 1.º saldo de alugueres e vendas · 2.º créditos de afiliado · 3.º cartão de crédito/débito
-                          </div>
-                        </>
                       )}
-                      <p style={{fontSize:"0.72rem",color:"#bbb",marginTop:"0.75rem",lineHeight:1.5}}>Cobrado semanalmente. Para cancelar ou alterar ferramentas, contacta o suporte da Nora Grei.</p>
+
+                      {/* Histórico de pagamentos */}
+                      <div className="card" style={{padding:"1.5rem"}}>
+                        <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Histórico de pagamentos</p>
+                        {pagamentosBooster.length === 0 ? (
+                          <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não há pagamentos de boosters registados.</p>
+                        ) : pagamentosBooster.map(p => (
+                          <div key={p.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
+                            <div>
+                              <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{p.booster_nome}</div>
+                              <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
+                                <span style={{fontSize:"0.68rem",padding:"0.1rem 0.5rem",background:METODO_COR[p.metodo]||"#888",color:"#fff",fontWeight:600}}>
+                                  {METODO_LABEL[p.metodo]||p.metodo}
+                                </span>
+                                {p.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(p.created_at).toLocaleDateString("pt-PT")}</span>}
+                                {p.periodo_inicio && p.periodo_fim && (
+                                  <span style={{fontSize:"0.68rem",color:"#bbb"}}>{new Date(p.periodo_inicio).toLocaleDateString("pt-PT")} – {new Date(p.periodo_fim).toLocaleDateString("pt-PT")}</span>
+                                )}
+                              </div>
+                              {p.descricao && <div style={{fontSize:"0.72rem",color:"#aaa",marginTop:"0.1rem"}}>{p.descricao}</div>}
+                            </div>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"1.1rem",fontWeight:300,color:"#c4748a",flexShrink:0,marginLeft:"1rem"}}>–{(p.valor||0).toFixed(2)}€</span>
+                          </div>
+                        ))}
+                        {pagamentosBooster.length > 0 && (
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"0.75rem",marginTop:"0.25rem",borderTop:"2px solid var(--g2)"}}>
+                            <span style={{fontSize:"0.75rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888"}}>Total pago</span>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:300,color:"#c4748a"}}>–{totalCustosPagos.toFixed(2)}€</span>
+                          </div>
+                        )}
+                        <p style={{fontSize:"0.7rem",color:"#bbb",marginTop:"0.75rem",lineHeight:1.5}}>Débito imediato por cartão, saldo de alugueres ou créditos de afiliado. Para cancelar ferramentas, contacta o suporte.</p>
+                      </div>
+
+                      {/* Catálogo disponível */}
+                      {tiposBoosters.length > 0 && (
+                        <div className="card" style={{padding:"1.5rem",marginTop:"1rem"}}>
+                          <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Ferramentas disponíveis</p>
+                          {tiposBoosters.map(t => {
+                            const jaActivo = boostersLoja.some(b => b.booster_id === t.id);
+                            return (
+                              <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
+                                <div>
+                                  <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{t.nome}</div>
+                                  <div style={{fontSize:"0.72rem",color:"#aaa"}}>{t.descricao}</div>
+                                </div>
+                                <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
+                                  <div style={{fontWeight:600,color:jaActivo?"#27ae60":"var(--g6)",fontSize:"0.85rem"}}>{(t.preco_semana||0).toFixed(2)}€/sem</div>
+                                  {jaActivo ? <div style={{fontSize:"0.68rem",color:"#27ae60"}}>✓ Activo</div> : <div style={{fontSize:"0.68rem",color:"#bbb"}}>Contacta o suporte</div>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
