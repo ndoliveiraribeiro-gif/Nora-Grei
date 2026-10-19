@@ -969,6 +969,7 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true);
   const [guardado, setGuardado] = useState(false);
   const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [showReferralBanner, setShowReferralBanner] = useState(false);
   const [detectandoLoc, setDetectandoLoc] = useState(false);
   const [locDetectada, setLocDetectada] = useState(false);
   const [lang, setLang] = useState("pt");
@@ -1013,6 +1014,15 @@ export default function Perfil() {
   const [secaoAberta, setSecaoAberta] = useState(null); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
   const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
   const fileRef = useRef();
+
+  // Lembrete de referral — aparece 45s após carregar, se não foi dispensado hoje
+  useEffect(() => {
+    const dispensado = localStorage.getItem("ng_referral_dispensado");
+    const hoje = new Date().toDateString();
+    if (dispensado === hoje) return;
+    const timer = setTimeout(() => setShowReferralBanner(true), 45000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -1791,7 +1801,9 @@ export default function Perfil() {
           ))}
           {/* 6º tile — convite lojista */}
           <div className="stat" onClick={() => setTabAtiva("ganhos")} style={{cursor:"pointer",background:"linear-gradient(135deg,#fdf6ee,#f5e9d8)"}}>
-            <div style={{fontSize:"1.3rem",marginBottom:"0.2rem"}}>🎁</div>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{marginBottom:"0.25rem"}}>
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#c4a882" stroke="#c4a882" strokeWidth="1" strokeLinejoin="round"/>
+            </svg>
             <div style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,lineHeight:1.3,textAlign:"center"}}>Convida<br/>e Ganha</div>
           </div>
         </div>
@@ -2923,6 +2935,25 @@ export default function Perfil() {
               <button onClick={guardarNovaPeca} disabled={!novaPeca.nome||((novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_aluguer_dia)||((novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_venda)||novaPecaLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:(!novaPeca.nome||((novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_aluguer_dia)||((novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos")&&!novaPeca.preco_venda))?0.5:1}}>{novaPecaLoading?"...":"Adicionar peça"}</button>
               <button onClick={()=>setShowNovaPeca(false)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Banner lembrete referral */}
+      {showReferralBanner && (
+        <div style={{position:"fixed",bottom:"5.5rem",left:"1rem",right:"1rem",zIndex:9998,background:"#fff",borderRadius:"14px",boxShadow:"0 8px 32px rgba(0,0,0,0.13)",padding:"1rem 1.25rem",display:"flex",alignItems:"center",gap:"1rem",border:"1px solid #f0e6d6"}}>
+          <div style={{flexShrink:0,width:40,height:40,borderRadius:"50%",background:"linear-gradient(135deg,#fdf6ee,#f5e9d8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#c4a882" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:"0.75rem",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",color:"var(--black)",fontFamily:"var(--sans)"}}>Convida e ganha</div>
+            <div style={{fontSize:"0.78rem",color:"var(--g6)",marginTop:"0.15rem",fontFamily:"var(--serif)"}}>Partilha a Nora Grei com uma amiga. Cada loja que abrir com o teu link dá-te créditos.</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:"0.4rem",flexShrink:0}}>
+            <button onClick={() => { setTabAtiva("ganhos"); setShowReferralBanner(false); }} style={{padding:"0.4rem 0.85rem",background:"#c4a882",color:"#fff",border:"none",borderRadius:"6px",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver mais</button>
+            <button onClick={() => { setShowReferralBanner(false); try{localStorage.setItem("ng_referral_dispensado", new Date().toDateString());}catch{} }} style={{padding:"0.4rem 0.85rem",background:"none",color:"var(--g6)",border:"none",fontSize:"0.7rem",cursor:"pointer",fontFamily:"var(--sans)"}}>Agora não</button>
           </div>
         </div>
       )}
