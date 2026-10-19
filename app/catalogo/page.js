@@ -169,7 +169,7 @@ export default function Catalogo() {
       // Peças Nora Grei
       const { data: ngData } = await supabase
         .from("pecas")
-        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total), cor, condicao")
+        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
         .order("created_at", { ascending: false });
 
       const { data: alugueresAtivos } = await supabase
