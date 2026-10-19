@@ -1789,6 +1789,11 @@ export default function Perfil() {
               <div className="stat-label">{s.label}</div>
             </div>
           ))}
+          {/* 6º tile — convite lojista */}
+          <div className="stat" onClick={() => setTabAtiva("ganhos")} style={{cursor:"pointer",background:"linear-gradient(135deg,#fdf6ee,#f5e9d8)"}}>
+            <div style={{fontSize:"1.3rem",marginBottom:"0.2rem"}}>🎁</div>
+            <div style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,lineHeight:1.3,textAlign:"center"}}>Convida<br/>e Ganha</div>
+          </div>
         </div>
 
         <div className="pontos-card">
@@ -2927,7 +2932,7 @@ export default function Perfil() {
         <button
           onClick={() => { window.location.href = "/publicar"; }}
           style={{
-            position:"fixed", bottom:"2rem", right:"1.25rem", zIndex:9999,
+            position:"fixed", bottom:"5.5rem", right:"1.25rem", zIndex:9999,
             width:56, height:56, borderRadius:"50%",
             background:"#c4a882", color:"#fff", border:"none",
             fontSize:"1.7rem", lineHeight:1, cursor:"pointer",
