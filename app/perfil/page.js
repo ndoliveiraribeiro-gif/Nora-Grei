@@ -2919,7 +2919,7 @@ export default function Perfil() {
         <button
           onClick={() => { window.location.href = "/publicar"; }}
           style={{
-            position:"fixed", bottom:"5rem", right:"1.25rem", zIndex:200,
+            position:"fixed", bottom:"6rem", right:"1.25rem", zIndex:9999,
             width:56, height:56, borderRadius:"50%",
             background:"#c4748a", color:"#fff", border:"none",
             fontSize:"1.7rem", lineHeight:1, cursor:"pointer",
