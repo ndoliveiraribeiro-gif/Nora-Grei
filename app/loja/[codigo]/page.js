@@ -202,8 +202,9 @@ export default function LojaPublica() {
 
         /* ── FILTROS ── */
         .filtros-wrap{border-bottom:1px solid var(--g2)}
-        .filtros{display:flex;justify-content:center;gap:0;padding:0 2rem}
-        .filtro-btn{padding:0.9rem 1.6rem;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.18s;white-space:nowrap}
+        .filtros{display:flex;justify-content:center;gap:0;padding:0 1rem;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+        .filtros::-webkit-scrollbar{display:none}
+        .filtro-btn{padding:0.9rem 1.2rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.18s;white-space:nowrap;flex-shrink:0}
         .filtro-btn:hover{color:var(--black)}
         .filtro-btn.on{color:var(--black);border-bottom-color:var(--rosa);font-weight:500}
         .ocasioes-wrap{padding:0.75rem 1.5rem 0.9rem;display:flex;gap:0.4rem;overflow-x:auto;WebkitOverflowScrolling:touch;scrollbar-width:none}

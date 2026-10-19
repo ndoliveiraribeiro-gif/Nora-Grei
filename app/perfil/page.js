@@ -1468,16 +1468,24 @@ export default function Perfil() {
         .btn-sair{font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g6);background:none;border:none;cursor:pointer;font-family:var(--sans);text-decoration:underline}
         .btn-sair:hover{color:#c0392b}
         @media(max-width:768px){
-          .nav{padding:1rem 1.25rem}
-          .page{padding:5rem 1.25rem 6rem;gap:1rem}
-          .hero{flex-direction:column;align-items:flex-start;padding:1.5rem;gap:1rem}
+          .nav{padding:0.85rem 1rem}
+          .page{padding:4.5rem 0.85rem 3rem;gap:1rem}
+          .hero{flex-direction:column;align-items:flex-start;gap:1rem;padding:1.25rem 1rem}
+          .hero-nome{font-size:1.4rem}
+          .nivel-card{padding:1.25rem 1rem}
+          .nivel-top{flex-direction:column;align-items:flex-start;gap:0.75rem}
           .stats{grid-template-columns:repeat(3,1fr)}
           .nivel-beneficios{grid-template-columns:1fr 1fr}
-          .card{padding:1.5rem}
+          .pontos-card{padding:1.25rem 1rem}
+          .card{padding:1.25rem 1rem}
+          .card-t{margin-bottom:1rem;padding-bottom:0.75rem}
           .grid2{grid-template-columns:1fr}
           .grid3{grid-template-columns:1fr}
           .full{grid-column:auto}
-          .aluguer-row{flex-direction:row}
+          .save-row{flex-direction:column;align-items:flex-start}
+          .btn-save{width:100%;text-align:center}
+          .aluguer-card{padding:1rem}
+          .aluguer-row{gap:1rem}
         }
       `}</style>
 
