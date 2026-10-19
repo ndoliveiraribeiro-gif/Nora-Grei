@@ -144,7 +144,7 @@ Responde em português europeu, formatado com secções claras.`;
         .an-periodo-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .an-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
         .an-stat { background:var(--white); padding:1.5rem; }
-        .an-stat-val { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.4rem; }
+        .an-stat-val { font-family:var(--sans); font-size:2.5rem; font-weight:700; color:var(--black); line-height:1; margin-bottom:0.4rem; }
         .an-stat-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
         .an-stat.destaque .an-stat-val { color:var(--rosa); }
         .an-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
@@ -180,7 +180,7 @@ Responde em português europeu, formatado com secções claras.`;
         .an-ai-btn:hover { background:#a85c72; }
         .an-ai-btn:disabled { opacity:0.6; cursor:not-allowed; }
         .an-ai-content { font-size:0.92rem; color:rgba(255,255,255,0.8); line-height:1.8; white-space:pre-wrap; font-family:var(--sans); }
-        .an-ai-placeholder { font-family:var(--serif); font-size:1rem; font-style:italic; color:rgba(255,255,255,0.3); }
+        .an-ai-placeholder { font-family:var(--sans); font-size:0.9rem; color:rgba(255,255,255,0.3); }
         .an-ai-loading { display:flex; gap:0.5rem; align-items:center; color:rgba(255,255,255,0.5); font-size:0.82rem; }
         .an-dot { width:6px; height:6px; border-radius:50%; background:var(--rosa); animation:pulse 1.2s infinite; }
         .an-dot:nth-child(2) { animation-delay:0.2s; }

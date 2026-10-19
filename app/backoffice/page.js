@@ -72,7 +72,7 @@ function ModalRecibo({ recibo, aluguer, peca, tamanho, onClose }) {
       <div style={{ background:"#fff",width:"100%",maxWidth:400,padding:"2rem",position:"relative" }}>
         <button onClick={onClose} style={{ position:"absolute",top:"1rem",right:"1rem",background:"none",border:"none",fontSize:"1.3rem",cursor:"pointer",color:"#888" }}>✕</button>
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:"1rem",paddingBottom:"0.75rem",borderBottom:"2px dashed #e2dfda" }}>
-          <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",letterSpacing:"0.15em",textTransform:"uppercase" }}>NORA GREI</span>
+          <span style={{ fontFamily:"var(--sans)",fontSize:"1.1rem",letterSpacing:"0.15em",textTransform:"uppercase" }}>NORA GREI</span>
           <span style={{ fontSize:"0.68rem",color:"#888",fontFamily:"monospace" }}>{recibo.numero}</span>
         </div>
         <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span>Data</span><span>{new Date(recibo.created_at).toLocaleString("pt-PT")}</span></div>
@@ -171,7 +171,7 @@ function SeeWhois() {
 
   return (
     <>
-      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>SeeWhois</h1>
+      <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>SeeWhois</h1>
       <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Pesquisa universal — quem é, o que pediu, o que pagou</p>
 
       <div style={CARD}>
@@ -195,7 +195,7 @@ function SeeWhois() {
             <p style={CARD_T}>Identidade</p>
             <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1.5rem" }}>
               <div>
-                <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:400 }}>{resultado.cliente.nome || "—"}</div>
+                <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600 }}>{resultado.cliente.nome || "—"}</div>
                 <div style={{ fontSize:"0.78rem",color:"#c4748a",fontWeight:600,marginTop:"0.2rem" }}>{resultado.cliente.codigo_cliente || "—"}</div>
               </div>
               <span style={{ ...BADGE(""),background:resultado.stats.nivel.cor+"22",color:resultado.stats.nivel.cor,fontSize:"0.72rem",padding:"0.4rem 0.8rem" }}>{resultado.stats.nivel.icon} {resultado.stats.nivel.nome}</span>
@@ -229,7 +229,7 @@ function SeeWhois() {
               { val: `${resultado.stats.nivel.caucao}%`, lbl: "Caução exigida", cor: resultado.stats.nivel.cor },
             ].map((s, i) => (
               <div key={i} style={{ background:"#fff",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
-                <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
+                <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor||"#080808" }}>{s.val}</div>
                 <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
               </div>
             ))}
@@ -364,7 +364,7 @@ function ModalEnvio({ aluguer, onClose, onEnviado }) {
   return (
     <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div style={{ background:"#fff",width:"100%",maxWidth:420,padding:"2rem" }}>
-        <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.25rem" }}>Marcar como enviado</h2>
+        <h2 style={{ fontFamily:"var(--sans)",fontSize:"1.2rem",fontWeight:600,marginBottom:"1.25rem" }}>Marcar como enviado</h2>
         <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1.25rem" }}>{aluguer.stock_tamanhos?.pecas?.nome} — {aluguer.clientes?.nome}</p>
         <div style={{ marginBottom:"1rem" }}>
           <label style={LBL}>Transportadora</label>
@@ -480,7 +480,7 @@ function Caixa() {
 
   return (
     <>
-      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Caixa</h1>
+      <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Caixa</h1>
       <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Livro de caixa diário — entradas e saídas reais</p>
 
       <div style={CARD}>
@@ -496,7 +496,7 @@ function Caixa() {
             { val: movimentosDoMes.length, lbl: "Movimentos" },
           ].map((s,i) => (
             <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
-              <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
+              <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor||"#080808" }}>{s.val}</div>
               <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
             </div>
           ))}
@@ -632,7 +632,7 @@ function FeedBackoffice() {
 
   return (
     <div>
-      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Feed</h1>
+      <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Feed</h1>
       <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1.5rem" }}>Moderar posts e gerir boosts pagos</p>
       <div style={{ display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap" }}>
         {["pendentes","publicados","boosts"].map(v => (
@@ -761,7 +761,7 @@ function AfiliadosTab() {
     <div style={{ maxWidth:900 }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.5rem" }}>
         <div>
-          <h1 style={{ fontFamily:"'Cormorant',serif", fontSize:"2rem", fontWeight:300, marginBottom:"0.1rem" }}>Afiliados</h1>
+          <h1 style={{ fontFamily:"var(--sans)", fontSize:"2rem", fontWeight:300, marginBottom:"0.1rem" }}>Afiliados</h1>
           <p style={{ fontSize:"0.75rem", color:"#888" }}>Criadores de conteúdo com código de desconto + comissão rastreável</p>
         </div>
         <div style={{ display:"flex", gap:"0.5rem" }}>
@@ -784,7 +784,7 @@ function AfiliadosTab() {
             { label:"Comissões por pagar", val: `${totalPorPagar.toFixed(2)}€` },
           ].map((s,i) => (
             <div key={i} style={{ background:"#faf9f7", padding:"1.25rem 1.5rem" }}>
-              <div style={{ fontFamily:"'Cormorant',serif", fontSize:"2rem", fontWeight:300, color:"#c4748a" }}>{s.val}</div>
+              <div style={{ fontFamily:"var(--sans)", fontSize:"2rem", fontWeight:300, color:"#c4748a" }}>{s.val}</div>
               <div style={{ fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#888" }}>{s.label}</div>
             </div>
           ))}
@@ -801,7 +801,7 @@ function AfiliadosTab() {
                 <div style={{ fontSize:"0.72rem", color:"#888" }}>{af.handle && `${af.handle} · `}{af.plataforma}</div>
               </div>
               <div style={{ textAlign:"center" }}>
-                <div style={{ fontFamily:"'Cormorant',serif", fontSize:"1.4rem", fontWeight:300, letterSpacing:"0.1em", color:"#080808" }}>{af.codigo}</div>
+                <div style={{ fontFamily:"var(--sans)", fontSize:"1.4rem", fontWeight:300, letterSpacing:"0.1em", color:"#080808" }}>{af.codigo}</div>
                 <div style={{ fontSize:"0.6rem", color:"#aaa", letterSpacing:"0.1em" }}>código</div>
               </div>
               <div style={{ textAlign:"center" }}>
@@ -857,7 +857,7 @@ function AfiliadosTab() {
 
       {vista === "novo" && (
         <div style={{ background:"#faf9f7", border:"1px solid #e0ddd8", padding:"2rem" }}>
-          <h2 style={{ fontFamily:"'Cormorant',serif", fontSize:"1.5rem", fontWeight:300, marginBottom:"1.5rem" }}>{editId ? "Editar afiliado" : "Novo afiliado"}</h2>
+          <h2 style={{ fontFamily:"var(--sans)", fontSize:"1.5rem", fontWeight:300, marginBottom:"1.5rem" }}>{editId ? "Editar afiliado" : "Novo afiliado"}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem", marginBottom:"1rem" }}>
             {[
               { label:"Nome *", key:"nome", placeholder:"Ex: Ana Silva" },
@@ -954,7 +954,7 @@ function MensagensBackoffice() {
 
   return (
     <>
-      <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Mensagens</h1>
+      <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Mensagens</h1>
       <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Conversas entre lojistas e clientes</p>
       <div style={{ display:"flex",gap:"1.5rem",height:"65vh" }}>
         {/* Lista */}
@@ -1709,7 +1709,7 @@ export default function Backoffice() {
 
         {tab === "dashboard" && (
           <>
-            <h1 style={{ fontFamily: "'Cormorant',serif", fontSize: "2rem", fontWeight: 300, marginBottom: "0.25rem" }}>Dashboard</h1>
+            <h1 style={{ fontFamily: "var(--sans)", fontSize: "1.6rem", fontWeight: 600, marginBottom: "0.25rem" }}>Dashboard</h1>
             <p style={{ fontSize: "0.82rem", color: "#3f3e3c", marginBottom: "1.5rem" }}>
               {new Date().toLocaleDateString("pt-PT", { weekday:"long", day:"numeric", month:"long", year:"numeric" })}
             </p>
@@ -1745,7 +1745,7 @@ export default function Backoffice() {
               ].map((s,idx) => (
                 <div key={idx} style={{ background:"#fff",padding:"1.5rem" }}>
                   <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#3f3e3c",marginBottom:"0.4rem" }}>{s.lbl}</div>
-                  <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:400,color:s.cor,lineHeight:1,marginBottom:"0.3rem" }}>{s.val}</div>
+                  <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:400,color:s.cor,lineHeight:1,marginBottom:"0.3rem" }}>{s.val}</div>
                   <div style={{ fontSize:"0.68rem",color:"#888" }}>{s.sub}</div>
                 </div>
               ))}
@@ -1762,7 +1762,7 @@ export default function Backoffice() {
                 <div key={idx} style={{ background:"#f8f8f6",padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:"0.75rem" }}>
                   <span style={{ fontSize:"1.4rem" }}>{s.icon}</span>
                   <div>
-                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:400,color:s.cor||"#080808",lineHeight:1 }}>{s.val}</div>
+                    <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:400,color:s.cor||"#080808",lineHeight:1 }}>{s.val}</div>
                     <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#3f3e3c",marginTop:"0.2rem" }}>{s.lbl}</div>
                   </div>
                 </div>
@@ -1775,11 +1775,11 @@ export default function Backoffice() {
                 <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🛍 Cestos este mês</div>
                 <div style={{ display:"flex",gap:"1.5rem",alignItems:"flex-end" }}>
                   <div>
-                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:300,color:"#c4748a",lineHeight:1 }}>{stats.desconto_cesto_mes||0}</div>
+                    <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:300,color:"#c4748a",lineHeight:1 }}>{stats.desconto_cesto_mes||0}</div>
                     <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>com desconto</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.2rem",fontWeight:300,color:"#27ae60",lineHeight:1 }}>{Number(stats.caucoes_mes||0).toFixed(0)}€</div>
+                    <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:300,color:"#27ae60",lineHeight:1 }}>{Number(stats.caucoes_mes||0).toFixed(0)}€</div>
                     <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>cauções recebidas</div>
                   </div>
                 </div>
@@ -1795,7 +1795,7 @@ export default function Backoffice() {
                     { n:"Platina", icon:"💎", cor:"#6c5ce7" },
                   ].map(lv => (
                     <div key={lv.n} style={{ textAlign:"center" }}>
-                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:400,color:lv.cor,lineHeight:1 }}>{(stats.niveis||{})[lv.n]||0}</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:400,color:lv.cor,lineHeight:1 }}>{(stats.niveis||{})[lv.n]||0}</div>
                       <div style={{ fontSize:"0.6rem",color:lv.cor,marginTop:"0.15rem" }}>{lv.icon} {lv.n}</div>
                     </div>
                   ))}
@@ -1805,7 +1805,7 @@ export default function Backoffice() {
 
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginTop:"1rem",marginBottom:"2rem" }}>
               <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #080808" }}>
-                <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300 }}>{stats.taxa_ocupacao}%</div>
+                <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300 }}>{stats.taxa_ocupacao}%</div>
                 <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Taxa de ocupação</div>
               </div>
               <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #c4748a",cursor:"pointer" }} onClick={() => setTab("seewhois")}>
@@ -2019,7 +2019,7 @@ export default function Backoffice() {
 
         {tab === "catalogo" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Catálogo</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Catálogo</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{pecas.length} peças</p>
 
             <div style={CARD}>
@@ -2125,7 +2125,7 @@ export default function Backoffice() {
               <div style={{ position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem" }} onClick={(e) => e.target === e.currentTarget && fecharEdicao()}>
                 <div style={{ background:"#fff",width:"100%",maxWidth:700,maxHeight:"90vh",overflowY:"auto",padding:"2rem" }}>
                   <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.5rem" }}>
-                    <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300 }}>Editar peça</h2>
+                    <h2 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:300 }}>Editar peça</h2>
                     <button onClick={fecharEdicao} style={{ background:"none",border:"none",fontSize:"1.5rem",cursor:"pointer",color:"#888" }}>✕</button>
                   </div>
 
@@ -2234,7 +2234,7 @@ export default function Backoffice() {
 
         {tab === "alugueres" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Alugueres</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Alugueres</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"1rem" }}>{alugueres.length} registados</p>
 
             {/* Filtros */}
@@ -2293,7 +2293,7 @@ export default function Backoffice() {
                           <td style={TD}>
                             <div style={{ display:"flex",gap:"0.6rem",alignItems:"center" }}>
                               <div style={{ width:44,height:56,flexShrink:0,background:"#f0eeeb",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                                {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
+                                {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"var(--sans)",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
                               </div>
                               <div>
                                 <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{peca?.nome||"—"}</div>
@@ -2360,7 +2360,7 @@ export default function Backoffice() {
 
         {tab === "clientes" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Clientes</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Clientes</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{clientes.length} registados</p>
             <div style={CARD}>
               {clientes.length === 0 ? (
@@ -2437,7 +2437,7 @@ export default function Backoffice() {
 
         {tab === "reservas" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Reservas em espera</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Reservas em espera</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>{reservas.length} pendentes — deteção e notificação automáticas</p>
             <div style={CARD}>
               <table style={{ width:"100%",borderCollapse:"collapse" }}>
@@ -2449,7 +2449,7 @@ export default function Backoffice() {
                         <td style={TD}>
                           <div style={{ display:"flex",gap:"0.6rem",alignItems:"center" }}>
                             <div style={{ width:44,height:56,flexShrink:0,background:"#f0eeeb",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                              {r.stock_tamanhos?.pecas?.fotos?.[0] ? <img src={r.stock_tamanhos.pecas.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"'Cormorant',serif",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
+                              {r.stock_tamanhos?.pecas?.fotos?.[0] ? <img src={r.stock_tamanhos.pecas.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }}/> : <span style={{ fontFamily:"var(--sans)",fontSize:"1.1rem",color:"#ccc",fontStyle:"italic" }}>NG</span>}
                             </div>
                             <div>
                               <div style={{ fontWeight:600 }}>{r.stock_tamanhos?.pecas?.nome||"—"}</div>
@@ -2487,7 +2487,7 @@ export default function Backoffice() {
 
         {tab === "campanhas" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Campanhas</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Campanhas</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Alertas e cupões para clientes</p>
             <div style={CARD}>
               <p style={CARD_T}>Nova campanha</p>
@@ -2568,7 +2568,7 @@ export default function Backoffice() {
 
         {tab === "landing" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Landing Page</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Landing Page</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Gerir vídeo e fotos da página inicial</p>
 
             <div style={CARD}>
@@ -2659,14 +2659,14 @@ export default function Backoffice() {
 
         {tab === "estatisticas" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Estatísticas & AI</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Estatísticas & AI</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Analytics completo + consultor inteligente</p>
             {!estatisticas?<div style={{ textAlign:"center",padding:"3rem",color:"#888" }}>A carregar dados...</div>:(
               <>
                 <div style={COL4}>
                   {[{val:`${estatisticas.totalReceita.toFixed(0)}€`,lbl:"Receita total",cor:"#c4748a"},{val:estatisticas.totalAlugueres,lbl:"Total alugueres"},{val:`${estatisticas.ltv.toFixed(0)}€`,lbl:"LTV médio"},{val:`${estatisticas.taxaCancelamento}%`,lbl:"Taxa cancelamento"}].map((s,i)=>(
                     <div key={i} style={{ background:"#fff",padding:"1.5rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
-                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
                       <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>{s.lbl}</div>
                     </div>
                   ))}
@@ -2724,7 +2724,7 @@ export default function Backoffice() {
                       { val: `${estatisticas.rotacoesMes}x`, lbl: "Rotações/mês", cor: "#c4748a" },
                     ].map((s,i) => (
                       <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
-                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
                         <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
@@ -2737,12 +2737,12 @@ export default function Backoffice() {
                   <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem" }}>
                     <div style={{ background:"#fff8f0",padding:"1.5rem",borderLeft:"4px solid #c4748a" }}>
                       <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Peças que geram 80% receita</div>
-                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"#c4748a" }}>{estatisticas.pareto20Pecas}</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"2.5rem",fontWeight:300,color:"#c4748a" }}>{estatisticas.pareto20Pecas}</div>
                       <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalPecas} peças totais ({estatisticas.totalPecas > 0 ? Math.round(estatisticas.pareto20Pecas/estatisticas.totalPecas*100) : 0}%)</div>
                     </div>
                     <div style={{ background:"#f0f8ff",padding:"1.5rem",borderLeft:"4px solid #080808" }}>
                       <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Clientes que geram 80% receita</div>
-                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"#080808" }}>{estatisticas.pareto20Clientes}</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"2.5rem",fontWeight:300,color:"#080808" }}>{estatisticas.pareto20Clientes}</div>
                       <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalClientes} clientes totais ({estatisticas.totalClientes > 0 ? Math.round(estatisticas.pareto20Clientes/estatisticas.totalClientes*100) : 0}%)</div>
                     </div>
                   </div>
@@ -2776,7 +2776,7 @@ export default function Backoffice() {
                       { val: `${estatisticas.margemOp||0}%`, lbl: "Margem operacional", cor: parseFloat(estatisticas.margemOp||0)>20?"#27ae60":parseFloat(estatisticas.margemOp||0)>0?"#f39c12":"#e74c3c" },
                     ].map((s,i)=>(
                       <div key={i} style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
-                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.8rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor }}>{s.val}</div>
                         <div style={{ fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
@@ -2787,7 +2787,7 @@ export default function Backoffice() {
                     {estatisticas.diaBreakeven ? (
                       <>
                         <div style={{ display:"flex",alignItems:"baseline",gap:"0.75rem",marginBottom:"0.75rem" }}>
-                          <div style={{ fontFamily:"'Cormorant',serif",fontSize:"3rem",fontWeight:300,color: estatisticas.diaBreakeven<=15?"#27ae60":estatisticas.diaBreakeven<=22?"#f39c12":"#e74c3c",lineHeight:1 }}>dia {estatisticas.diaBreakeven}</div>
+                          <div style={{ fontFamily:"var(--sans)",fontSize:"3rem",fontWeight:300,color: estatisticas.diaBreakeven<=15?"#27ae60":estatisticas.diaBreakeven<=22?"#f39c12":"#e74c3c",lineHeight:1 }}>dia {estatisticas.diaBreakeven}</div>
                           <div style={{ fontSize:"0.78rem",color:"#888" }}>
                             {estatisticas.diaBreakeven<=15?"Excelente — cobre custos na 1ª quinzena":estatisticas.diaBreakeven<=22?"Aceitável — cobre custos na 3ª semana":"Atenção — cobre custos tarde no mês"}
                           </div>
@@ -2853,7 +2853,7 @@ export default function Backoffice() {
                   <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem" }}>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
                       <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Idade média</div>
-                      <div style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300 }}>{estatisticas.idadeMediaPareto ? `${estatisticas.idadeMediaPareto} anos` : "—"}</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300 }}>{estatisticas.idadeMediaPareto ? `${estatisticas.idadeMediaPareto} anos` : "—"}</div>
                     </div>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
                       <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Género</div>
@@ -2889,7 +2889,7 @@ export default function Backoffice() {
                       { val: estatisticas.comprovativosPendentes.length, lbl: "Comprovativos a validar", cor: estatisticas.comprovativosPendentes.length > 0 ? "#e74c3c" : "#27ae60" },
                     ].map((s,i) => (
                       <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
-                        <div style={{ fontFamily:"'Cormorant',serif",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
+                        <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
                         <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
@@ -3130,7 +3130,7 @@ export default function Backoffice() {
 
         {tab === "config" && (
           <>
-            <h1 style={{ fontFamily:"'Cormorant',serif",fontSize:"2rem",fontWeight:300,marginBottom:"0.25rem" }}>Configurações</h1>
+            <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Configurações</h1>
             <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Preços e contactos</p>
             <div style={CARD}>
               <p style={CARD_T}>Preços e taxas</p>
@@ -3166,7 +3166,7 @@ export default function Backoffice() {
         <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",overflowY:"auto" }}>
           <div style={{ background:"#fff",padding:"2rem",maxWidth:"640px",width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative" }}>
             <button onClick={()=>{ setCampanhaEditando(null); setEditCampanha(null); }} style={{ position:"absolute",top:"1rem",right:"1rem",background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#888" }}>✕</button>
-            <h2 style={{ fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem" }}>Editar campanha</h2>
+            <h2 style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:300,marginBottom:"1.5rem" }}>Editar campanha</h2>
             <div style={COL2}>
               <div><label style={LBL}>Título * (PT)</label><input style={INP} value={editCampanha.titulo} onChange={e=>setEditCampanha(p=>({...p,titulo:e.target.value}))} /></div>
               <div><label style={LBL}>Tipo</label>
@@ -3206,7 +3206,7 @@ export default function Backoffice() {
       {modalAvaliacao && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
           <div style={{background:"#fff",padding:"2rem",maxWidth:"400px",width:"100%"}}>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
+            <h3 style={{fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:300,marginBottom:"0.5rem"}}>Avaliar cliente</h3>
             <p style={{fontSize:"0.8rem",color:"#5a5855",marginBottom:"1.5rem"}}>{modalAvaliacao.cliente_nome}</p>
             <div style={{display:"flex",gap:"0.5rem",marginBottom:"1rem"}}>
               {[1,2,3,4,5].map(s => (

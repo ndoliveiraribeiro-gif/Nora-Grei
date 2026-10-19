@@ -571,7 +571,7 @@ const ESTILOS = `
   .sec-t{font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#5a5855;font-weight:500;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
   .peca-row{display:flex;gap:1.25rem;align-items:center}
   .peca-img{width:72px;height:90px;object-fit:cover;background:var(--g1);flex-shrink:0}
-  .peca-nome{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--black);margin-bottom:0.3rem}
+  .peca-nome{font-family:var(--sans);font-size:1.2rem;font-weight:500;color:var(--black);margin-bottom:0.3rem}
   .peca-cat{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:#5a5855}
   .peca-tam{font-size:0.82rem;color:#5a5855;margin-top:0.3rem}
   .dates{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
@@ -611,7 +611,7 @@ const ESTILOS = `
   .qr-texto{font-size:0.82rem;color:#5a5855;text-align:center}
   .iban-box{background:var(--g1);padding:1.25rem}
   .iban-label{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855}
-  .iban-val{font-family:var(--serif);font-size:1.3rem;font-weight:400;color:var(--black);margin-top:0.2rem}
+  .iban-val{font-family:var(--sans);font-size:1.1rem;font-weight:500;color:var(--black);margin-top:0.2rem}
   .upload-box{display:block;padding:1rem;border:2px dashed var(--g2);background:var(--g1);cursor:pointer;text-align:center;transition:border-color 0.2s}
   .upload-box:hover{border-color:var(--black)}
   .upload-vazio{font-size:0.82rem;color:#5a5855}

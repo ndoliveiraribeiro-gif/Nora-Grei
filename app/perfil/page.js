@@ -281,7 +281,7 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
     row2: { display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:'0.5rem' },
     ibanBox: { background:'#f0eeeb',padding:'1rem',marginBottom:'0.75rem' },
     ibanLabel: { fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
-    ibanVal: { fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
+    ibanVal: { fontFamily:"var(--sans)",fontSize:'1rem',fontWeight:500,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
     aviso: { fontSize:'0.72rem',color:'#946200',background:'#fff8e1',padding:'0.75rem 1rem',borderLeft:'3px solid #f39c12',lineHeight:1.5,marginTop:'0.5rem' },
     uploadBox: { display:'block',padding:'0.85rem',border:'2px dashed #e2dfda',background:'#f0eeeb',cursor:'pointer',textAlign:'center',fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem' },
     btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
@@ -304,11 +304,11 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
       <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
           <div>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarUsada}</p>
+            <p style={{fontFamily:"var(--sans)",fontSize:'0.95rem',fontWeight:500,color:'#080808'}}>{i.comprarUsada}</p>
             <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarUsadaDesc}</p>
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#080808'}}>{PRECO_USADA_PERFIL}€</p>
+            <p style={{fontFamily:"var(--sans)",fontSize:'1.1rem',fontWeight:600,color:'#080808'}}>{PRECO_USADA_PERFIL}€</p>
             <p style={{fontSize:'0.65rem',color:'#888'}}>+ {PORTES_PERFIL.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
           </div>
         </div>
@@ -317,11 +317,11 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
       <div style={{border:'1.5px solid #e2dfda',background:'#fff',padding:'1rem',marginBottom:'0.75rem'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'0.4rem'}}>
           <div>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400,color:'#080808'}}>{i.comprarNova}</p>
+            <p style={{fontFamily:"var(--sans)",fontSize:'0.95rem',fontWeight:500,color:'#080808'}}>{i.comprarNova}</p>
             <p style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{i.comprarNovaDesc}</p>
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
-            <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
+            <p style={{fontFamily:"var(--sans)",fontSize:'1.1rem',fontWeight:600,color:'#c4748a'}}>{i.comprarNovaValor} {aluguer.valor_aluguer || 0}€</p>
           </div>
         </div>
         <button onClick={gerarVoucherNova} disabled={loading} style={{...sty.btnPrimary,background:'#c4748a',marginTop:'0.5rem'}}>{loading ? "..." : i.irLoja}</button>
@@ -425,7 +425,7 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
       ) : (
         <div style={{textAlign:'center',padding:'1.5rem 0'}}>
           <div style={{fontSize:'2.5rem',marginBottom:'0.75rem'}}>{compra?.metodo_pagamento === "transferencia" ? "⏳" : "✅"}</div>
-          <p style={{fontFamily:"'Cormorant',serif",fontSize:'1.4rem',fontWeight:300,color:'#080808',marginBottom:'0.5rem'}}>
+          <p style={{fontFamily:"var(--sans)",fontSize:'1.2rem',fontWeight:500,color:'#080808',marginBottom:'0.5rem'}}>
             {compra?.metodo_pagamento === "transferencia" ? i.aguardarPagamento : i.pago}
           </p>
           <p style={{fontSize:'0.78rem',color:'#5a5855',lineHeight:1.5}}>{i.pecaEnviada}</p>
@@ -437,7 +437,7 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
   if (fase === "voucher_nova" && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
       <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
-      <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
+      <div style={{fontFamily:"var(--sans)",fontSize:'1.6rem',fontWeight:600,letterSpacing:'0.15em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
       <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.5rem'}}>
         <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
@@ -458,10 +458,10 @@ function ReservaDisponivelCard({ reserva, i }) {
   return (
     <div style={{display:'flex',gap:'1rem',alignItems:'center',background:'#fff',padding:'1rem 1.25rem',marginBottom:'0.6rem',borderLeft:'3px solid #1e7e3e'}}>
       <div style={{width:48,height:60,flexShrink:0,background:'#f0eeeb',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:'1.3rem',color:'rgba(0,0,0,0.15)',fontStyle:'italic'}}>NG</span>}
+        {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <span style={{fontFamily:"var(--sans)",fontSize:'1rem',color:'rgba(0,0,0,0.12)'}}>NG</span>}
       </div>
       <div style={{flex:1,minWidth:0}}>
-        <div style={{fontFamily:"'Cormorant',serif",fontSize:'1.1rem',fontWeight:400}}>{peca?.nome || "—"}</div>
+        <div style={{fontFamily:"var(--sans)",fontSize:'1rem',fontWeight:500}}>{peca?.nome || "—"}</div>
         <div style={{fontSize:'0.78rem',color:'#3f3e3c'}}>{i.reservaTamanho} {tamanho} · {reserva.data_inicio_desejada} → {reserva.data_fim_desejada}</div>
         {tempo && (
           <div style={{fontSize:'0.72rem',color:'#1e7e3e',fontWeight:600,marginTop:'0.25rem'}}>{i.reservaPrazoTempo} {tempo}</div>
@@ -1471,7 +1471,7 @@ export default function Perfil() {
                         <div key={a.id} className="aluguer-card">
                           <div className="aluguer-row">
                             <div className="aluguer-img">
-                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",color:"rgba(0,0,0,0.15)",fontStyle:"italic"}}>NG</span>}
+                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"var(--sans)",fontSize:"1rem",color:"rgba(0,0,0,0.12)"}}>NG</span>}
                             </div>
                             <div style={{flex:1}}>
                               <div className="aluguer-nome">{peca?.nome || "—"}</div>
@@ -1498,7 +1498,7 @@ export default function Perfil() {
                         <div key={a.id} className="aluguer-card">
                           <div className="aluguer-row">
                             <div className="aluguer-img">
-                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"'Cormorant',serif",fontSize:"1.5rem",color:"rgba(0,0,0,0.15)",fontStyle:"italic"}}>NG</span>}
+                              {peca?.fotos?.[0] ? <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <span style={{fontFamily:"var(--sans)",fontSize:"1rem",color:"rgba(0,0,0,0.12)"}}>NG</span>}
                             </div>
                             <div style={{flex:1}}>
                               <div className="aluguer-nome">{peca?.nome || "—"}</div>

@@ -375,7 +375,7 @@ export default function Admin() {
         
         .ad-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
         .ad-stat { background:var(--white); padding:1.5rem; }
-        .ad-stat-val { font-family:var(--serif); font-size:2.5rem; font-weight:300; color:var(--black); line-height:1; margin-bottom:0.4rem; }
+        .ad-stat-val { font-family:var(--sans); font-size:2.5rem; font-weight:700; color:var(--black); line-height:1; margin-bottom:0.4rem; }
         .ad-stat-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
         .ad-stat.destaque .ad-stat-val { color:var(--rosa); }
         
@@ -794,7 +794,7 @@ export default function Admin() {
                         <div key={a.id} style={{padding:"1.25rem 1.5rem",borderBottom:"1px solid #f0eeeb",background:"#fff"}}>
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:"1rem",flexWrap:"wrap"}}>
                             <div>
-                              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1rem",marginBottom:"0.2rem"}}>{a.pecas_lojista?.nome||"—"}</div>
+                              <div style={{fontFamily:"var(--sans)",fontSize:"0.9rem",fontWeight:500,marginBottom:"0.2rem"}}>{a.pecas_lojista?.nome||"—"}</div>
                               <div style={{fontSize:"0.72rem",color:"#5a5855"}}>
                                 <strong>Lojista:</strong> {a.lojista?.nome} ({a.lojista?.codigo_cliente}) · <strong>Cliente:</strong> {a.clientes?.nome}
                               </div>

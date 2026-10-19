@@ -19,7 +19,7 @@ function PecaCardLojista({ peca, lang }) {
             <img src={peca.fotos[0]} alt={peca.nome} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
           ) : (
             <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{fontFamily:"'Cormorant',serif",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span>
+              <span style={{fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)"}}>NG</span>
             </div>
           )}
           {/* Badge Lojista */}
@@ -261,7 +261,7 @@ export default function Catalogo() {
         .cat-nav-back { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:#3a3835; text-decoration:none; font-weight:400; }
         .cat-header { padding:5rem 1rem 1.5rem; }
         .cat-header-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.5rem; font-weight:400; }
-        .cat-header-title { font-family:var(--serif); font-size:clamp(1.8rem,8vw,3rem); font-weight:300; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
+        .cat-header-title { font-family:var(--sans); font-size:clamp(1.5rem,6vw,2.5rem); font-weight:600; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
         /* Filtros */
         .filtros-bloco { border-top:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200); margin-bottom:1.5rem; }
         .filtros-linha { display:flex; align-items:center; gap:0; border-bottom:1px solid var(--grey-200); }
@@ -280,7 +280,7 @@ export default function Catalogo() {
         .tag-btn { font-size:0.7rem; letter-spacing:0.06em; padding:0.38rem 0.75rem; border:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.12s; min-height:36px; display:flex; align-items:center; }
         .tag-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .cat-grid { padding:0 1rem 4rem; display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
-        .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--serif); font-size:1.3rem; font-weight:300; color:#3a3835; font-style:italic; }
+        .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--sans); font-size:1.1rem; font-weight:400; color:#3a3835; }
         .cat-loading { padding:4rem; text-align:center; font-size:0.78rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; }
         /* TABLET */
         @media (min-width:600px) {

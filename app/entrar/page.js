@@ -42,7 +42,7 @@ export default function Entrar() {
         .right { display: flex; align-items: center; justify-content: center; padding: 4rem; background: #f8f7f5; }
         .form-wrap { width: 100%; max-width: 400px; }
 
-        .form-title { font-family: 'Cormorant', serif; font-size: 3.5rem; font-weight: 400; color: #080808; margin-bottom: 2.5rem; line-height: 1; }
+        .form-title { font-family: var(--sans); font-size: 2.5rem; font-weight: 600; color: #080808; margin-bottom: 2.5rem; line-height: 1; }
 
         .form-group { margin-bottom: 1.5rem; }
 

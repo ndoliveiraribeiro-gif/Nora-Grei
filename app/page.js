@@ -752,9 +752,9 @@ export default function Home() {
                     </div>
                     <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
                       {peca.categoria && <p style={{fontSize:"0.48rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
-                      <h3 style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.3rem",color:"#080808"}}>{peca.nome}</h3>
+                      <h3 style={{fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:500,lineHeight:1.2,marginBottom:"0.3rem",color:"#111"}}>{peca.nome}</h3>
                       <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
-                        <span style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:300,color:"#080808"}}>{peca.preco_aluguer_dia}€</span>
+                        <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
                         <span style={{fontFamily:"var(--sans)",fontSize:"0.55rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
                       </div>
                     </div>

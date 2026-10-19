@@ -561,14 +561,14 @@ const ESTILOS = `
   .nav-back{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
   .page{padding:6rem 2rem 4rem;max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start}
   .col-esquerda{display:flex;flex-direction:column;gap:1rem}
-  .titulo{font-family:var(--serif);font-size:2rem;font-weight:300;display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem}
+  .titulo{font-family:var(--sans);font-size:2rem;font-weight:600;display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem}
   .count{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);font-weight:400}
   .vazio{background:var(--white);padding:3rem 2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem;font-size:0.88rem;color:var(--g4)}
   .btn-cat{display:inline-block;padding:0.75rem 2rem;background:var(--black);color:#fff;text-decoration:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase}
   .item-card{background:var(--white);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start}
   .item-foto{width:64px;height:80px;object-fit:cover;flex-shrink:0;background:var(--g1)}
   .item-info{flex:1}
-  .item-nome{font-family:var(--serif);font-size:1.1rem;font-weight:300;margin-bottom:0.25rem}
+  .item-nome{font-family:var(--sans);font-size:1.1rem;font-weight:500;margin-bottom:0.25rem}
   .item-meta{font-size:0.72rem;color:var(--g4);margin-bottom:0.15rem}
   .item-preco{font-size:0.95rem;font-weight:500;margin-top:0.4rem}
   .btn-remover{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1px solid var(--g2);padding:0.3rem 0.65rem;cursor:pointer;color:var(--g4);font-family:var(--sans);white-space:nowrap;align-self:center;transition:border-color 0.2s}

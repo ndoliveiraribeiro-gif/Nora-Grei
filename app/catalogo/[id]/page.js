@@ -334,9 +334,9 @@ export default function PecaDetalhe() {
         .thumb img{width:100%;height:100%;object-fit:cover}
         .info{padding:3rem;overflow-y:auto}
         .badge-cat{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:#aaa89f;margin-bottom:0.5rem}
-        .nome{font-family:var(--serif);font-size:clamp(2rem,3vw,3rem);font-weight:300;line-height:1.1;margin-bottom:1rem}
+        .nome{font-family:var(--sans);font-size:clamp(1.6rem,3vw,2.5rem);font-weight:600;line-height:1.1;margin-bottom:1rem}
         .preco-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.75rem}
-        .preco-val{font-family:var(--serif);font-size:2rem;font-weight:300}
+        .preco-val{font-family:var(--sans);font-size:2rem;font-weight:600}
         .preco-unit{font-size:0.72rem;color:#aaa89f;letter-spacing:0.1em}
         .badge-estado{display:inline-block;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.75rem;margin-bottom:1.25rem}
         .secao{margin-bottom:1.75rem}
@@ -356,7 +356,7 @@ export default function PecaDetalhe() {
         .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--g1);font-size:0.85rem}
         .info-key{color:#5a5855;font-size:0.72rem;letter-spacing:0.1em}
         .deposito-box{background:var(--g1);padding:1rem 1.25rem;margin-bottom:1.5rem;border-left:3px solid var(--g2)}
-        .deposito-val{font-family:var(--serif);font-size:1.5rem;font-weight:300}
+        .deposito-val{font-family:var(--sans);font-size:1.5rem;font-weight:500}
         .deposito-desc{font-size:0.72rem;color:#5a5855;margin-top:0.2rem}
         .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
         .btn-alugar:hover{background:#2a2926}
@@ -409,7 +409,7 @@ export default function PecaDetalhe() {
           .sticky-preco{
             display:flex;flex-direction:column;flex-shrink:0;
           }
-          .sticky-preco-val{font-family:'Cormorant',Georgia,serif;font-size:1.4rem;font-weight:300;line-height:1;color:#080808}
+          .sticky-preco-val{font-family:var(--sans);font-size:1.4rem;font-weight:600;line-height:1;color:#080808}
           .sticky-preco-unit{font-family:'Jost',sans-serif;font-size:0.55rem;color:#b0ada6;letter-spacing:0.08em}
           .sticky-btn-alugar{
             flex:2;min-height:46px;
@@ -468,7 +468,7 @@ export default function PecaDetalhe() {
               <img src={fotos[fotoAtiva]} alt={peca.nome} />
             ) : (
               <div className="foto-placeholder">
-                <span style={{fontFamily:'var(--serif)',fontSize:'4rem',fontWeight:300,color:'rgba(0,0,0,0.08)',fontStyle:'italic'}}>NG</span>
+                <span style={{fontFamily:'var(--sans)',fontSize:'2rem',fontWeight:300,color:'rgba(0,0,0,0.08)'}}>NG</span>
               </div>
             )}
             {fotos.length > 1 && (
@@ -612,7 +612,7 @@ export default function PecaDetalhe() {
                   <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.1rem" }}>Comprar peça usada</div>
                   <div style={{ fontSize:"0.65rem", opacity:0.6 }}>Peça de segunda mão em bom estado</div>
                 </div>
-                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</span>
+                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--sans)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</span>
               </a>
             )}
 
@@ -625,7 +625,7 @@ export default function PecaDetalhe() {
                   <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.1rem" }}>Comprar nova</div>
                   <div style={{ fontSize:"0.65rem", color:"#888580" }}>noragrei.com ↗</div>
                 </div>
-                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--serif)", whiteSpace:"nowrap", color:"#c4a882" }}>{peca.valor_peca}€</span>
+                <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--sans)", whiteSpace:"nowrap", color:"#c4a882" }}>{peca.valor_peca}€</span>
               </a>
             )}
 

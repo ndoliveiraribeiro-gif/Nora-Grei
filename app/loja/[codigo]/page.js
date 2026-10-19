@@ -182,7 +182,7 @@ export default function LojaPublica() {
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
         .nav-back{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
         .hero-loja{padding:7rem 2rem 3rem;text-align:center;border-bottom:1px solid var(--g2)}
-        .loja-nome{font-family:var(--serif);font-size:clamp(2rem,6vw,4rem);font-weight:300;margin-bottom:0.5rem}
+        .loja-nome{font-family:var(--sans);font-size:clamp(2rem,6vw,4rem);font-weight:600;margin-bottom:0.5rem}
         .loja-local{font-size:0.78rem;color:var(--g4);letter-spacing:0.1em}
         .filtros{display:flex;justify-content:center;gap:0.5rem;padding:1.5rem 2rem;border-bottom:1px solid var(--g1)}
         .filtro-btn{padding:0.5rem 1.5rem;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;background:none;border:1.5px solid var(--g2);cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.2s}
@@ -195,7 +195,7 @@ export default function LojaPublica() {
         .peca-foto{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--g1);display:block}
         .peca-foto-ph{width:100%;aspect-ratio:3/4;background:var(--g1);display:flex;align-items:center;justify-content:center}
         .peca-info{padding:1rem}
-        .peca-nome{font-family:var(--serif);font-size:1rem;font-weight:300;margin-bottom:0.25rem}
+        .peca-nome{font-family:var(--sans);font-size:1rem;font-weight:500;margin-bottom:0.25rem}
         .peca-preco{font-size:0.78rem;color:var(--g4)}
         .peca-tags{display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap}
         .tag{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.2rem 0.5rem;background:var(--g1);color:var(--g4)}
@@ -289,7 +289,7 @@ export default function LojaPublica() {
         <div className="grid">
           {pecasFiltradas.map(p => (
             <a key={p.id} href={`/loja/${codigo}/peca/${p.id}`} className="peca-card">
-              {p.fotos?.[0] ? <img src={p.fotos[0]} className="peca-foto" alt={p.nome} /> : <div className="peca-foto-ph"><span style={{fontFamily:"var(--serif)",fontSize:"2rem",color:"rgba(0,0,0,0.08)",fontStyle:"italic"}}>NG</span></div>}
+              {p.fotos?.[0] ? <img src={p.fotos[0]} className="peca-foto" alt={p.nome} /> : <div className="peca-foto-ph"><span style={{fontFamily:"var(--sans)",fontSize:"1.5rem",color:"rgba(0,0,0,0.08)"}}>NG</span></div>}
               <div className="peca-info">
                 <div className="peca-nome">{p.nome}</div>
                 <div className="peca-preco">

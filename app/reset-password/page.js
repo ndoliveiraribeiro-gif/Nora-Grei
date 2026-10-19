@@ -87,7 +87,7 @@ export default function ResetPassword() {
         .left-quote { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-style: italic; color: rgba(255,255,255,0.5); margin-top: 4rem; text-align: center; line-height: 1.6; max-width: 28ch; }
         .right { display: flex; align-items: center; justify-content: center; padding: 4rem; background: #f8f7f5; }
         .form-wrap { width: 100%; max-width: 400px; }
-        .form-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 300; color: #080808; margin-bottom: 2.5rem; line-height: 1; }
+        .form-title { font-family: var(--sans); font-size: 2.5rem; font-weight: 600; color: #080808; margin-bottom: 2.5rem; line-height: 1; }
         .form-group { margin-bottom: 1.5rem; }
         .form-label { display: block; font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: #080808; margin-bottom: 0.6rem; font-weight: 500; }
         .form-input { width: 100%; padding: 1rem 1.1rem; border: 2px solid #2e2d2b; background: #f8f7f5; font-size: 1.1rem; font-family: 'Jost', sans-serif; font-weight: 400; color: #080808; outline: none; transition: border-color 0.2s; border-radius: 0; -webkit-appearance: none; }

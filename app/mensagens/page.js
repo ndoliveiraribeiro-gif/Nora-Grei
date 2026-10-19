@@ -249,13 +249,13 @@ export default function MensagensPage() {
         /* Lista conversas */
         .lista-col{width:340px;min-width:340px;border-right:1px solid var(--g2);display:flex;flex-direction:column;background:var(--white)}
         .lista-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between}
-        .lista-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;letter-spacing:0.05em}
+        .lista-titulo{font-family:var(--sans);font-size:1.2rem;font-weight:600}
         .badge-total{background:var(--rosa);color:#fff;font-size:0.55rem;letter-spacing:0.1em;padding:0.15rem 0.5rem;border-radius:10px}
         .lista-scroll{overflow-y:auto;flex:1}
         .conv-item{padding:1rem 1.5rem;border-bottom:1px solid var(--g1);cursor:pointer;transition:background 0.15s;display:flex;gap:0.75rem;align-items:flex-start}
         .conv-item:hover{background:var(--g1)}
         .conv-item.ativa{background:var(--g1)}
-        .conv-avatar{width:40px;height:40px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;color:var(--g4);flex-shrink:0}
+        .conv-avatar{width:40px;height:40px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:0.9rem;font-weight:500;color:var(--g4);flex-shrink:0}
         .conv-body{flex:1;min-width:0}
         .conv-nome{font-size:0.82rem;font-weight:500;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .conv-assunto{font-size:0.7rem;color:var(--g4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -267,7 +267,7 @@ export default function MensagensPage() {
         /* Área chat */
         .chat-col{flex:1;display:flex;flex-direction:column;min-width:0}
         .chat-header{padding:1rem 1.5rem;border-bottom:1px solid var(--g2);display:flex;align-items:center;gap:1rem}
-        .chat-nome{font-family:var(--serif);font-size:1.3rem;font-weight:300}
+        .chat-nome{font-family:var(--sans);font-size:1.1rem;font-weight:500}
         .chat-sub{font-size:0.65rem;color:var(--g4);letter-spacing:0.08em;margin-top:0.1rem}
         .chat-msgs{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:0.75rem}
         .chat-vazio{display:flex;align-items:center;justify-content:center;height:100%;font-size:0.78rem;color:var(--g4)}
@@ -290,7 +290,7 @@ export default function MensagensPage() {
         .btn-enviar:disabled{opacity:0.4;cursor:not-allowed}
 
         .sem-chat{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:1rem;color:var(--g4)}
-        .sem-chat-icon{font-family:var(--serif);font-size:3rem;font-style:italic;opacity:0.3}
+        .sem-chat-icon{font-family:var(--sans);font-size:2rem;opacity:0.3}
         .sem-chat-txt{font-size:0.78rem;letter-spacing:0.08em}
 
         /* Mobile */

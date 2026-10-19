@@ -152,16 +152,16 @@ function HeroTimer({ dataFim, labelDisponivel, labelEmBreve }) {
       <div style={{display:'flex',gap:'0.5rem',justifyContent:'center'}}>
         {tempo.dias > 0 && (
           <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
-            <div style={{fontFamily:"'Cormorant',serif",fontSize:'2.2rem',fontWeight:300,lineHeight:1}}>{tempo.dias}</div>
+            <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{tempo.dias}</div>
             <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>dias</div>
           </div>
         )}
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:'2.2rem',fontWeight:300,lineHeight:1}}>{String(tempo.horas).padStart(2,'0')}</div>
+          <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.horas).padStart(2,'0')}</div>
           <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>horas</div>
         </div>
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:'2.2rem',fontWeight:300,lineHeight:1}}>{String(tempo.mins).padStart(2,'0')}</div>
+          <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.mins).padStart(2,'0')}</div>
           <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>min</div>
         </div>
       </div>
@@ -319,7 +319,7 @@ function ReservaContent() {
         {/* Checkmark animado */}
         <div style={{width:64,height:64,borderRadius:'50%',background:'#080808',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 1.5rem',fontSize:'1.6rem',color:'#f8f7f5'}}>✓</div>
         <p style={{fontSize:'0.65rem',letterSpacing:'0.3em',textTransform:'uppercase',color:'#b0ada6',marginBottom:'0.5rem'}}>{i.sucesso}</p>
-        <h1 style={{fontFamily:"'Cormorant',serif",fontSize:'2.2rem',fontWeight:300,color:'#080808',marginBottom:'1rem',lineHeight:1.1}}>{i.sucessoTitulo}</h1>
+        <h1 style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,color:'#080808',marginBottom:'1rem',lineHeight:1.1}}>{i.sucessoTitulo}</h1>
         <p style={{fontSize:'0.92rem',color:'#5a5855',lineHeight:1.8,marginBottom:'2rem'}}>{i.sucessoDesc}</p>
 
         {/* Passos do que vai acontecer */}
@@ -385,7 +385,7 @@ function ReservaContent() {
         /* PEÇA */
         .peca-row { display:flex; gap:1rem; align-items:center; }
         .peca-img { width:60px; height:76px; object-fit:cover; background:var(--grey-100); flex-shrink:0; }
-        .peca-nome { font-family:var(--serif); font-size:1.25rem; font-weight:300; color:var(--black); margin-bottom:0.2rem; }
+        .peca-nome { font-family:var(--sans); font-size:1.1rem; font-weight:500; color:var(--black); margin-bottom:0.2rem; }
         .peca-cat { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#b0ada6; margin-bottom:0.2rem; }
 
         /* TAMANHOS */
@@ -484,12 +484,12 @@ function ReservaContent() {
               <div className="peca-row">
                 {peca.fotos?.[0]
                   ? <img src={peca.fotos[0]} alt={peca.nome} className="peca-img" />
-                  : <div style={{width:60,height:76,background:'#e8e5e0',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}><span style={{fontFamily:"'Cormorant',serif",fontSize:'1.2rem',fontWeight:300,color:'rgba(0,0,0,0.1)',fontStyle:'italic'}}>NG</span></div>
+                  : <div style={{width:60,height:76,background:'#e8e5e0',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}><span style={{fontFamily:"var(--sans)",fontSize:'1rem',fontWeight:300,color:'rgba(0,0,0,0.1)'}}>NG</span></div>
                 }
                 <div>
                   {peca.categoria && <p className="peca-cat">{peca.categoria}</p>}
                   <p className="peca-nome">{peca.nome}</p>
-                  <p style={{fontSize:'1.1rem',color:'var(--black)',fontFamily:"'Cormorant',serif",fontWeight:300,marginTop:'0.25rem'}}>{peca.preco_aluguer_dia}€<span style={{fontSize:'0.7rem',fontFamily:"'Jost',sans-serif",color:'#b0ada6'}}>/dia</span></p>
+                  <p style={{fontSize:'1.1rem',color:'var(--black)',fontFamily:"var(--sans)",fontWeight:600,marginTop:'0.25rem'}}>{peca.preco_aluguer_dia}€<span style={{fontSize:'0.7rem',fontFamily:"'Jost',sans-serif",color:'#b0ada6'}}>/dia</span></p>
                 </div>
               </div>
             </div>

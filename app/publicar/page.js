@@ -186,7 +186,7 @@ export default function PublicarPage() {
         .pub-step.active { background: var(--rosa); }
 
         .pub-body { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-        .pub-titulo { font-family: var(--serif); font-size: 1.8rem; font-weight: 300; color: var(--black); margin-bottom: 0.3rem; }
+        .pub-titulo { font-family: var(--sans); font-size: 1.5rem; font-weight: 600; color: var(--black); margin-bottom: 0.3rem; }
         .pub-subtitulo { font-size: 0.8rem; color: var(--g4); margin-bottom: 2rem; }
 
         .pub-card { background: #fff; padding: 1.5rem; margin-bottom: 1rem; }
@@ -256,7 +256,7 @@ export default function PublicarPage() {
         /* Sucesso */
         .sucesso-wrap { text-align: center; padding: 3rem 2rem; }
         .sucesso-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-        .sucesso-titulo { font-family: var(--serif); font-size: 1.8rem; font-weight: 300; color: var(--black); margin-bottom: 0.5rem; }
+        .sucesso-titulo { font-family: var(--sans); font-size: 1.5rem; font-weight: 600; color: var(--black); margin-bottom: 0.5rem; }
         .sucesso-sub { font-size: 0.85rem; color: var(--g4); line-height: 1.6; margin-bottom: 1.5rem; }
         .sucesso-acoes { display: flex; flex-direction: column; gap: 0.75rem; }
         .sucesso-btn { padding: 0.9rem; text-align: center; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-family: var(--sans); font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
