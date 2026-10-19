@@ -1015,6 +1015,7 @@ export default function Perfil() {
   const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
   const [codigoAfiliado, setCodigoAfiliado] = useState(null);
   const [creditosAfiliado, setCreditosAfiliado] = useState({ total: 0, disponiveis: 0, lista: [] });
+  const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
   const fileRef = useRef();
 
   // Lembrete de referral — aparece 45s após carregar, se não foi dispensado hoje
@@ -2330,13 +2331,62 @@ export default function Perfil() {
             {tabLoja === "pecas" && (
               <div className="card" style={{padding:0}}>
                 <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
-                {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>(
-                  <div key={p.id} style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center",borderBottom:"1px solid var(--g1)"}}>
-                    {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
-                    <div style={{flex:1}}><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{p.nome}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia ? `${p.preco_aluguer_dia}€/dia` : "—"}{p.preco_venda ? ` · ${p.preco_venda}€ venda` : ""}</div></div>
-                    <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
+                {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>{
+                  const urlPeca = typeof window !== "undefined" ? `${window.location.origin}/loja/${codigoLoja}/peca/${p.id}` : "";
+                  const urlAfiliado = user ? `${urlPeca}?ref=${user.id}` : urlPeca;
+                  return (
+                  <div key={p.id} style={{borderBottom:"1px solid var(--g1)"}}>
+                    <div style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center"}}>
+                      {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontFamily:"var(--serif)",fontSize:"1rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.nome}</div>
+                        <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{p.preco_aluguer_dia ? `${p.preco_aluguer_dia}€/dia` : "—"}{p.preco_venda ? ` · ${p.preco_venda}€ venda` : ""}</div>
+                      </div>
+                      <div style={{display:"flex",gap:"0.4rem",flexShrink:0}}>
+                        <button onClick={()=>setPecaLinksAberta(prev => prev===p.id ? null : p.id)}
+                          style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid #c4a882",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"#c4a882",whiteSpace:"nowrap",fontWeight:600}}>
+                          🔗 Links
+                        </button>
+                        <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
+                      </div>
+                    </div>
+                    {/* Painel de links da peça */}
+                    {pecaLinksAberta === p.id && (
+                      <div style={{padding:"0.85rem 1.5rem 1rem",background:"#fdf6ee",borderTop:"1px solid #e8d8c8"}}>
+                        <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#7a6a5a",fontWeight:600,marginBottom:"0.65rem"}}>Links desta peça</div>
+                        {/* Link afiliado (com ref) */}
+                        <div style={{marginBottom:"0.6rem"}}>
+                          <div style={{fontSize:"0.68rem",color:"#c4a882",fontWeight:600,marginBottom:"0.3rem"}}>🔗 Link afiliado — partilha e ganhas 10% em créditos</div>
+                          <div style={{display:"flex",gap:"0.4rem"}}>
+                            <div style={{flex:1,fontSize:"0.68rem",fontFamily:"monospace",background:"#fff",border:"1px solid #e8d8c8",padding:"0.4rem 0.6rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"#5a5855"}}>{urlAfiliado}</div>
+                            <button onClick={async()=>{try{await navigator.clipboard.writeText(urlAfiliado)}catch{} }}
+                              style={{padding:"0.4rem 0.65rem",background:"#c4a882",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,whiteSpace:"nowrap"}}>Copiar</button>
+                          </div>
+                        </div>
+                        {/* Link directo (sem ref) */}
+                        <div style={{marginBottom:"0.6rem"}}>
+                          <div style={{fontSize:"0.68rem",color:"#5a5855",fontWeight:600,marginBottom:"0.3rem"}}>🌐 Link directo da peça</div>
+                          <div style={{display:"flex",gap:"0.4rem"}}>
+                            <div style={{flex:1,fontSize:"0.68rem",fontFamily:"monospace",background:"#fff",border:"1px solid #e2dfda",padding:"0.4rem 0.6rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"#5a5855"}}>{urlPeca}</div>
+                            <button onClick={async()=>{try{await navigator.clipboard.writeText(urlPeca)}catch{} }}
+                              style={{padding:"0.4rem 0.65rem",background:"#080808",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,whiteSpace:"nowrap"}}>Copiar</button>
+                          </div>
+                        </div>
+                        {/* Partilha rápida */}
+                        <div style={{display:"flex",gap:"0.4rem",marginTop:"0.25rem"}}>
+                          <button onClick={()=>window.open(`https://wa.me/?text=${encodeURIComponent(p.nome+" — "+urlAfiliado)}`,"_blank")}
+                            style={{flex:1,padding:"0.45rem",background:"#25D366",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.6rem",letterSpacing:"0.08em",textTransform:"uppercase",fontWeight:600}}>WhatsApp</button>
+                          <button onClick={async()=>{try{await navigator.clipboard.writeText(urlAfiliado)}catch{} }}
+                            style={{flex:1,padding:"0.45rem",background:"linear-gradient(45deg,#f09433,#dc2743,#bc1888)",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.6rem",letterSpacing:"0.08em",textTransform:"uppercase",fontWeight:600}}>Instagram</button>
+                          <button onClick={async()=>{try{await navigator.clipboard.writeText(urlAfiliado)}catch{} }}
+                            style={{flex:1,padding:"0.45rem",background:"#010101",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.6rem",letterSpacing:"0.08em",textTransform:"uppercase",fontWeight:600}}>TikTok</button>
+                        </div>
+                        <div style={{fontSize:"0.65rem",color:"#9c9894",marginTop:"0.4rem"}}>Instagram e TikTok copiam o link — cola na bio ou caption.</div>
+                      </div>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             {tabLoja === "alugueres" && (
