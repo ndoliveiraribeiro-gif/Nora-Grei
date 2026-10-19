@@ -237,14 +237,9 @@ export default function PecaDetalhe() {
 
       // Se é o próprio lojista, contactar a Nora Grei (admin)
       if (lojistaId === userLogado.id) {
-        const { data: admin } = await supabase
-          .from("clientes")
-          .select("id")
-          .eq("is_admin", true)
-          .limit(1)
-          .single();
-        if (!admin || admin.id === userLogado.id) { setContactando(false); return; }
-        lojistaId = admin.id;
+        const NORA_GREI_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+        if (userLogado.id === NORA_GREI_ID) { setContactando(false); return; }
+        lojistaId = NORA_GREI_ID;
       }
 
       // Verificar se já existe uma conversa entre este cliente e este lojista
