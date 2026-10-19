@@ -405,6 +405,7 @@ function CheckoutContent() {
   const tamanhoParam = searchParams.get("tamanho");
   const stockId = searchParams.get("stock_id") || tamanhoParam;
   const refParam = searchParams.get("ref");
+  const modoCompra = searchParams.get("modo") === "comprar_usada";
 
   const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
@@ -626,8 +627,8 @@ function CheckoutContent() {
   };
 
   const confirmar = async () => {
-    if (!dataInicio || !dataFim) { setErro(i.obrigatorio); return; }
-    if (!stockId) { setErro("Tamanho não selecionado. Volta atrás e escolhe um tamanho."); return; }
+    if (!modoCompra && (!dataInicio || !dataFim)) { setErro(i.obrigatorio); return; }
+    if (!modoCompra && !stockId) { setErro("Tamanho não selecionado. Volta atrás e escolhe um tamanho."); return; }
     if (!user) { window.location.href = `/entrar?redirect=/checkout?peca=${pecaId}&tamanho=${tamanhoParam}`; return; }
 
     if (pagamento === "mbway" && !qrAtivo) {
@@ -675,20 +676,22 @@ function CheckoutContent() {
       }
       const urlComprovativoFinal = urlComprovativoPagamento || urlComprovativoDeposito;
 
+      const valorFinal = modoCompra ? (peca?.preco_avulso || 0) : valorAluguer;
       const { data: novoAluguer, error } = await supabase.from("alugueres").insert({
         cliente_id: user.id,
-        stock_tamanho_id: stockId,
-        data_inicio: dataInicio,
-        data_fim: dataFim,
-        tipo: temGratis ? "subscricao" : "avulso",
+        ...(stockId ? { stock_tamanho_id: stockId } : {}),
+        ...(modoCompra ? {} : { data_inicio: dataInicio, data_fim: dataFim }),
+        tipo: modoCompra ? "compra_usada" : (temGratis ? "subscricao" : "avulso"),
         estado: estadoInicial,
         metodo_entrega: entrega,
         metodo_pagamento: pagamento,
-        valor_aluguer: valorAluguer,
-        deposito_valor: valorDeposito,
-        deposito_modalidade: deposito,
-        deposito_estado: depositoEstadoInicial,
-        ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
+        valor_aluguer: valorFinal,
+        ...(modoCompra ? { deposito_valor: 0, deposito_estado: "nao_aplicavel" } : {
+          deposito_valor: valorDeposito,
+          deposito_modalidade: deposito,
+          deposito_estado: depositoEstadoInicial,
+          ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
+        }),
         ...(ocasiao ? { ocasiao } : {}),
         ...(afiliadoAtivo ? { codigo_afiliado: codigoAfiliado.trim().toUpperCase(), afiliado_id: afiliadoAtivo.id } : {}),
       }).select().single();
@@ -804,7 +807,9 @@ function CheckoutContent() {
                   {peca.categoria && <p className="peca-cat">{peca.categoria}</p>}
                   <p className="peca-nome">{peca.nome}</p>
                   {tamanhoNome && <p className="peca-tam">{i.tamanho}: {tamanhoNome}</p>}
-                  <p style={{ fontSize: "1rem", color: "var(--black)", fontWeight: 500, marginTop: "0.3rem" }}>{peca.preco_aluguer_dia}€ {i.dias(1)}</p>
+                  <p style={{ fontSize: "1rem", color: "var(--black)", fontWeight: 500, marginTop: "0.3rem" }}>
+                    {modoCompra ? `${peca.preco_avulso}€ — peça usada` : `${peca.preco_aluguer_dia}€ ${i.dias(1)}`}
+                  </p>
                 </div>
               </div>
             )}
@@ -841,7 +846,7 @@ function CheckoutContent() {
             </div>
           )}
 
-          <div className="sec">
+          {!modoCompra && <div className="sec">
             <p className="sec-t">{i.datas}</p>
             {datasOcupadas.length > 0 && (
               <div style={{fontSize:"0.75rem",color:"#946200",background:"#fff8e1",padding:"0.6rem 0.85rem",borderLeft:"3px solid #f39c12",marginBottom:"1rem",lineHeight:1.5}}>
@@ -897,7 +902,7 @@ function CheckoutContent() {
                 {i.dias(numDias)} {temGratis ? "" : `— ${(peca?.preco_aluguer_dia * numDias).toFixed(2)}€`}
               </p>
             )}
-          </div>
+          </div>}
 
           <div className="sec">
             <p className="sec-t">{i.entrega}</p>
@@ -930,7 +935,7 @@ function CheckoutContent() {
             {pagamento === "dinheiro" && <InfoDinheiro i={i} />}
           </div>
 
-          <div className="sec">
+          {!modoCompra && <div className="sec">
             <p className="sec-t">{i.deposito}</p>
             {nv.caucao < 100 && (
               <div style={{ padding: "0.75rem 1rem", background: nv.nome === "Platina" ? "#f8f4ff" : "#e8f5e9", borderLeft: `3px solid ${nv.nome === "Platina" ? "#6c5ce7" : "#27ae60"}`, marginBottom: "1rem", fontSize: "0.85rem", color: nv.nome === "Platina" ? "#6c5ce7" : "#27ae60" }}>
@@ -957,7 +962,7 @@ function CheckoutContent() {
                 )}
               </>
             )}
-          </div>
+          </div>}
         </div>
 
         {/* OCASIÃO DO ALUGUER */}
@@ -1005,17 +1010,27 @@ function CheckoutContent() {
                 {afiliadoErro && <p style={{fontSize:"0.75rem",color:"#e74c3c",marginTop:"0.3rem"}}>{afiliadoErro}</p>}
               </div>
 
-              <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguerBase.toFixed(2)}€`}</span></div>
-              {descontoAfiliado > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Desconto ({afiliadoAtivo?.desconto_pct}% — {codigoAfiliado})</span><span>−{descontoAfiliado.toFixed(2)}€</span></div>}
-              <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
-              <div className="r-linha">
-                <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
-                <span>{valorDeposito}€</span>
-              </div>
-              <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
-              <p className="r-nota">{i.totalSemDeposito}</p>
+              {modoCompra ? (
+                <>
+                  <div className="r-linha"><span>Peça usada</span><span>{peca?.preco_avulso?.toFixed(2)}€</span></div>
+                  <div className="r-linha"><span>Entrega</span><span>{entrega === "envio" ? "A calcular" : "Grátis"}</span></div>
+                  <div className="r-total"><span>{i.total}</span><span>{(peca?.preco_avulso || 0).toFixed(2)}€</span></div>
+                </>
+              ) : (
+                <>
+                  <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguerBase.toFixed(2)}€`}</span></div>
+                  {descontoAfiliado > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Desconto ({afiliadoAtivo?.desconto_pct}% — {codigoAfiliado})</span><span>−{descontoAfiliado.toFixed(2)}€</span></div>}
+                  <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
+                  <div className="r-linha">
+                    <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
+                    <span>{valorDeposito}€</span>
+                  </div>
+                  <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
+                  <p className="r-nota">{i.totalSemDeposito}</p>
+                </>
+              )}
               {erro && <div className="erro">{erro}</div>}
-              <button className="btn" onClick={confirmar} disabled={loading || !dataInicio || !dataFim}>
+              <button className="btn" onClick={confirmar} disabled={loading || (!modoCompra && (!dataInicio || !dataFim))}>
                 {loading ? i.aProcessar : (tudoAutomatico ? i.confirmar : i.confirmarPendente)}
               </button>
             </>
