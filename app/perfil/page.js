@@ -990,6 +990,7 @@ export default function Perfil() {
   const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
   const [fotosLojista, setFotosLojista] = useState([]);
   const [uploadProgressLoja, setUploadProgressLoja] = useState("");
+  const [fotoValidacao, setFotoValidacao] = useState([]); // [{ok, motivo, categoria}] por foto
   const fotosLojistaRef = typeof window !== "undefined" ? { current: null } : { current: null };
   const [lojaIban, setLojaIban] = useState("");
   const [lojaEstado, setLojaEstado] = useState("inativo");
@@ -1186,6 +1187,47 @@ export default function Perfil() {
     }
   };
 
+  const handleFotosLojista = async (files) => {
+    const arr = Array.from(files);
+    setFotosLojista(arr);
+    setFotoValidacao(arr.map(() => ({ estado: "a validar" })));
+    for (let idx = 0; idx < arr.length; idx++) {
+      const file = arr[idx];
+      try {
+        const reader = new FileReader();
+        const base64 = await new Promise((res, rej) => {
+          reader.onload = () => res(reader.result.split(",")[1]);
+          reader.onerror = rej;
+          reader.readAsDataURL(file);
+        });
+        const resp = await fetch("/api/validar-foto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imagem: base64, tipo: file.type }),
+        });
+        const resultado = await resp.json();
+        // Se a IA detetou categoria, pré-preenche automaticamente
+        if (resultado.valida && resultado.categoria && !novaPeca.categoria) {
+          const mapCat = { roupa: "Vestidos", acessorio: "Acessórios", calcado: "Saltos" };
+          if (mapCat[resultado.categoria]) {
+            setNovaPeca(p => ({ ...p, categoria: mapCat[resultado.categoria] }));
+          }
+        }
+        setFotoValidacao(prev => {
+          const next = [...prev];
+          next[idx] = resultado;
+          return next;
+        });
+      } catch {
+        setFotoValidacao(prev => {
+          const next = [...prev];
+          next[idx] = { valida: true, motivo: "" };
+          return next;
+        });
+      }
+    }
+  };
+
   const guardarNovaPeca = async () => {
     const precisaAluguer = novaPeca.tipo==="alugar"||novaPeca.tipo==="ambos";
     const precisaVenda = novaPeca.tipo==="comprar"||novaPeca.tipo==="ambos";
@@ -1247,6 +1289,7 @@ export default function Perfil() {
     setShowNovaPeca(false);
     setNovaPeca({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
     setFotosLojista([]);
+    setFotoValidacao([]);
     setUploadProgressLoja("");
     setNovaPecaLoading(false);
   };
@@ -2537,23 +2580,30 @@ export default function Perfil() {
             <div className="fg" style={{marginBottom:"1rem"}}>
               <label className="lbl">{lang==="fr"?"Photos":lang==="lt"?"Nuotraukos":"Fotos"}</label>
               <label style={{display:"block",cursor:"pointer"}}>
-                <input type="file" accept="image/*" multiple onChange={e=>setFotosLojista(Array.from(e.target.files))} style={{display:"none"}} />
+                <input type="file" accept="image/*" multiple onChange={e=>handleFotosLojista(e.target.files)} style={{display:"none"}} />
                 <div style={{border:"1.5px dashed var(--g2)",borderRadius:4,padding:"1.25rem 1rem",textAlign:"center",background:"var(--g1)",transition:"border-color 0.2s"}}>
                   <div style={{fontSize:"1.6rem",marginBottom:"0.3rem"}}>📷</div>
                   <div style={{fontFamily:"var(--sans)",fontSize:"0.82rem",color:"var(--g4)"}}>
                     {lang==="fr"?"Clique pour ajouter des photos":lang==="lt"?"Spustelėkite norėdami pridėti nuotraukas":"Clica para adicionar fotos"}
                   </div>
-                  <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g3)",marginTop:"0.2rem"}}>JPG, PNG · várias fotos</div>
+                  <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g3)",marginTop:"0.2rem"}}>JPG, PNG · várias fotos · IA valida automaticamente</div>
                 </div>
               </label>
               {fotosLojista.length > 0 && (
                 <div style={{display:"flex",gap:"0.5rem",marginTop:"0.75rem",flexWrap:"wrap"}}>
-                  {fotosLojista.map((f,idx2)=>(
-                    <div key={idx2} style={{position:"relative"}}>
-                      <img src={URL.createObjectURL(f)} alt="" style={{width:72,height:90,objectFit:"cover",border:"1.5px solid var(--g2)"}} />
-                      <button type="button" onClick={()=>setFotosLojista(prev=>prev.filter((_,i)=>i!==idx2))} style={{position:"absolute",top:2,right:2,width:18,height:18,background:"rgba(0,0,0,0.6)",border:"none",borderRadius:"50%",color:"#fff",fontSize:"0.6rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>✕</button>
-                    </div>
-                  ))}
+                  {fotosLojista.map((f,idx2)=>{
+                    const v = fotoValidacao[idx2];
+                    const cor = !v || v.estado==="a validar" ? "#e2dfda" : v.valida ? "#27ae60" : "#c0392b";
+                    return (
+                      <div key={idx2} style={{position:"relative"}}>
+                        <img src={URL.createObjectURL(f)} alt="" style={{width:72,height:90,objectFit:"cover",border:`2px solid ${cor}`}} />
+                        {v?.estado==="a validar" && <div style={{position:"absolute",inset:0,background:"rgba(255,255,255,0.6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.2rem"}}>⏳</div>}
+                        {v && v.estado!=="a validar" && !v.valida && <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(192,57,43,0.85)",color:"#fff",fontSize:"0.55rem",padding:"2px 3px",lineHeight:1.2,textAlign:"center"}}>❌ {v.motivo?.slice(0,30)}</div>}
+                        {v?.valida && <div style={{position:"absolute",top:2,left:2,background:"rgba(39,174,96,0.85)",borderRadius:"50%",width:16,height:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.6rem",color:"#fff"}}>✓</div>}
+                        <button type="button" onClick={()=>{setFotosLojista(prev=>prev.filter((_,i)=>i!==idx2));setFotoValidacao(prev=>prev.filter((_,i)=>i!==idx2));}} style={{position:"absolute",top:2,right:2,width:18,height:18,background:"rgba(0,0,0,0.6)",border:"none",borderRadius:"50%",color:"#fff",fontSize:"0.6rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>✕</button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
