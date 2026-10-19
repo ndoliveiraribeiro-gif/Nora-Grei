@@ -754,7 +754,7 @@ const ESTILOS = `
   .tam-wrap{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
   .tam-btn{padding:0.5rem 1rem;font-size:0.85rem;letter-spacing:0.1em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s;min-height:44px}
   .tam-btn:hover{border-color:var(--black)}
-  .tam-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+  .tam-btn.active{background:#c4748a;color:#fff;border-color:#c4748a}
   .tam-btn.sem-stock{opacity:0.4;cursor:not-allowed;text-decoration:line-through}
   .tam-data{font-size:0.68rem;color:var(--rosa);letter-spacing:0.08em;text-transform:uppercase}
   .tam-reservar{font-size:0.68rem;color:#5a5855;letter-spacing:0.08em;text-transform:uppercase;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans);padding:0}
@@ -769,7 +769,6 @@ const ESTILOS = `
   .deposito-desc{font-size:0.82rem;color:#5a5855;margin-top:0.2rem}
   .btn-alugar{width:100%;padding:1.1rem;background:#c4748a;color:#fff;border:none;font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
   .btn-alugar:hover{background:#b5637a}
-  .btn-alugar:hover{background:#2a2926}
   .btn-alugar:disabled{background:#ccc;cursor:not-allowed}
   .btn-cesto{width:100%;padding:0.85rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem}
   .btn-cesto:hover{background:var(--g1)}
