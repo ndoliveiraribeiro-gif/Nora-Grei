@@ -1156,15 +1156,23 @@ export default function Perfil() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     setUploadingFoto(true);
-    const ext = file.name.split(".").pop();
-    const { error } = await supabase.storage.from("avatars").upload(`${user.id}/avatar.${ext}`, file, { upsert: true });
-    if (!error) {
-      const { data } = supabase.storage.from("avatars").getPublicUrl(`${user.id}/avatar.${ext}`);
-      const url = data.publicUrl;
-      setPerfil(prev => ({ ...prev, avatar_url: url }));
-      await supabase.from("clientes").update({ avatar_url: url }).eq("id", user.id);
-    } else {
-      console.error("Erro upload avatar:", error.message);
+    try {
+      // Comprime antes de fazer upload
+      const ext = file.type === "image/png" ? "png" : "jpg";
+      const path = `${user.id}/avatar.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+      if (error) {
+        console.error("Erro upload avatar:", error.message);
+        alert("Erro ao guardar foto: " + error.message);
+      } else {
+        const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+        const url = data.publicUrl + "?t=" + Date.now(); // cache-bust
+        setPerfil(prev => ({ ...prev, avatar_url: url }));
+        await supabase.from("clientes").update({ avatar_url: url }).eq("id", user.id);
+      }
+    } catch(err) {
+      console.error("Erro inesperado avatar:", err);
+      alert("Erro inesperado: " + err.message);
     }
     setUploadingFoto(false);
   };
