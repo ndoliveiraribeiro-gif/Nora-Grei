@@ -1013,6 +1013,8 @@ export default function Perfil() {
   const [recLoading, setRecLoading] = useState(false);
   const [secaoAberta, setSecaoAberta] = useState(null); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
   const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
+  const [codigoAfiliado, setCodigoAfiliado] = useState(null);
+  const [creditosAfiliado, setCreditosAfiliado] = useState({ total: 0, disponiveis: 0, lista: [] });
   const fileRef = useRef();
 
   // Lembrete de referral — aparece 45s após carregar, se não foi dispensado hoje
@@ -1131,6 +1133,27 @@ export default function Perfil() {
       const pendente = refs.filter(r => !r.comissao_paga && r.status !== "cancelado").reduce((s, r) => s + (r.comissao_gerada || 0), 0);
       const pago = refs.filter(r => r.comissao_paga).reduce((s, r) => s + (r.comissao_gerada || 0), 0);
       setGanhos({ referrals: refs, config: cfgRef, totalPendente: pendente, totalPago: pago });
+    }
+
+    // Código de afiliado — gerar automaticamente se não existir
+    let { data: codAfil } = await supabase.from("codigos_afiliado").select("*").eq("cliente_id", user.id).maybeSingle();
+    if (!codAfil) {
+      // Gerar código baseado no nome: primeiras letras + 4 dígitos aleatórios
+      const { data: cli2 } = await supabase.from("clientes").select("nome").eq("id", user.id).maybeSingle();
+      const nomeParts = (cli2?.nome || "USER").toUpperCase().replace(/[^A-Z]/g,"").slice(0,4);
+      const sufixo = Math.floor(1000 + Math.random() * 9000);
+      const novoCodigo = `${nomeParts}${sufixo}`;
+      const { data: novo } = await supabase.from("codigos_afiliado").insert({ cliente_id: user.id, codigo: novoCodigo }).select().maybeSingle();
+      codAfil = novo;
+    }
+    if (codAfil) setCodigoAfiliado(codAfil.codigo);
+
+    // Créditos de afiliado
+    const { data: creds } = await supabase.from("creditos_afiliado").select("*").eq("cliente_id", user.id).order("created_at", { ascending: false });
+    if (creds) {
+      const disponiveis = creds.filter(c => !c.usado).reduce((s, c) => s + (c.valor || 0), 0);
+      const total = creds.reduce((s, c) => s + (c.valor || 0), 0);
+      setCreditosAfiliado({ total, disponiveis, lista: creds });
     }
 
     setLoading(false);
@@ -1666,19 +1689,47 @@ export default function Perfil() {
               </div>
             </div>
 
-            {/* Como funciona */}
-            {ganhos.config && (
-              <div style={{padding:"0.9rem 1rem",background:"#f8f7f5",border:"1px solid #e2dfda",marginBottom:"1.5rem",fontSize:"0.8rem",color:"#5a5855",lineHeight:1.6}}>
-                <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",fontWeight:600,marginBottom:"0.4rem"}}>Como funciona</div>
-                Partilha qualquer peça com o teu link. Quem comprar ou alugar recebe <strong>{ganhos.config.desconto_comprador}% de desconto</strong> e tu ganhas <strong>{ganhos.config.comissao_referidor}% de comissão</strong> sobre o valor.
+            {/* Créditos disponíveis */}
+            <div style={{padding:"1rem",background:"linear-gradient(135deg,#fdf6ee,#faf3e8)",border:"1.5px solid #c4a882",marginBottom:"1.25rem",display:"flex",alignItems:"center",gap:"1rem"}}>
+              <div style={{textAlign:"center",flex:1}}>
+                <div style={{fontSize:"1.8rem",fontFamily:"var(--serif)",color:"#c4a882",fontWeight:600,lineHeight:1}}>€{creditosAfiliado.disponiveis.toFixed(2)}</div>
+                <div style={{fontSize:"0.6rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",marginTop:"0.25rem",fontFamily:"var(--sans)"}}>Créditos disponíveis</div>
               </div>
-            )}
+              <div style={{width:"1px",height:"40px",background:"#e8d8c8"}}/>
+              <div style={{textAlign:"center",flex:1}}>
+                <div style={{fontSize:"1.8rem",fontFamily:"var(--serif)",color:"#9c9894",fontWeight:600,lineHeight:1}}>€{creditosAfiliado.total.toFixed(2)}</div>
+                <div style={{fontSize:"0.6rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#9c9894",marginTop:"0.25rem",fontFamily:"var(--sans)"}}>Total ganho</div>
+              </div>
+            </div>
 
-            {/* Link de referência rápido */}
+            {/* Como funciona */}
+            <div style={{padding:"0.9rem 1rem",background:"#f8f7f5",border:"1px solid #e2dfda",marginBottom:"1.25rem",fontSize:"0.78rem",color:"#5a5855",lineHeight:1.65}}>
+              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",fontWeight:600,marginBottom:"0.5rem"}}>Como funciona</div>
+              <div style={{marginBottom:"0.4rem"}}>🔗 <strong>Link partilhado</strong> — quem comprar ou alugar via o teu link, tu ganhas <strong style={{color:"#c4a882"}}>10% em créditos</strong>. Sem desconto para o comprador.</div>
+              <div>🏷️ <strong>Código pessoal</strong> — o comprador usa o teu código e recebe <strong>10% de desconto</strong>. Tu ganhas <strong style={{color:"#c4a882"}}>5% em créditos</strong>.</div>
+              <div style={{marginTop:"0.5rem",fontSize:"0.72rem",color:"#9c9894"}}>Os créditos são usados em alugueres ou compras de peças usadas na plataforma.</div>
+            </div>
+
+            {/* Código pessoal */}
+            <div style={{padding:"0.9rem 1rem",background:"#fff",border:"1.5px solid #080808",marginBottom:"1rem"}}>
+              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#3f3e3c",fontWeight:600,marginBottom:"0.5rem"}}>O teu código pessoal — para vídeos e stories</div>
+              <div style={{display:"flex",gap:"0.5rem",alignItems:"center",marginBottom:"0.4rem"}}>
+                <div style={{flex:1,fontSize:"1.1rem",fontWeight:700,fontFamily:"monospace",color:"#080808",background:"#f8f7f5",padding:"0.6rem 0.75rem",letterSpacing:"0.2em",border:"1px solid #e2dfda",textAlign:"center"}}>
+                  {codigoAfiliado || "A gerar…"}
+                </div>
+                <button onClick={async () => { try { await navigator.clipboard.writeText(codigoAfiliado||""); } catch {} }}
+                  style={{padding:"0.6rem 0.85rem",background:"#080808",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",whiteSpace:"nowrap",fontWeight:600}}>
+                  Copiar
+                </button>
+              </div>
+              <div style={{fontSize:"0.7rem",color:"#9c9894"}}>Diz no vídeo: <em>"usa o código {codigoAfiliado||"…"} para 10% de desconto"</em></div>
+            </div>
+
+            {/* Link de referência */}
             <div style={{padding:"0.9rem 1rem",background:"#fff",border:"1.5px solid #c4748a",marginBottom:"1.5rem"}}>
-              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link de referência</div>
+              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link — para bio, WhatsApp e mensagens</div>
               <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
-                <div style={{flex:1,fontSize:"0.75rem",color:"#5a5855",background:"#f8f7f5",padding:"0.5rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
+                <div style={{flex:1,fontSize:"0.72rem",color:"#5a5855",background:"#f8f7f5",padding:"0.5rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
                   {typeof window !== "undefined" ? `${window.location.origin}?ref=${user?.id?.slice(0,8)}…` : "noragrei.com?ref=…"}
                 </div>
                 <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}?ref=${user?.id}`); } catch {} }}
@@ -1686,7 +1737,7 @@ export default function Perfil() {
                   Copiar
                 </button>
               </div>
-              <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.4rem"}}>Funciona em qualquer peça — basta partilhar qualquer link do site.</div>
+              <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.4rem"}}>Funciona em qualquer página do site. Ganhas 10% de créditos por cada compra ou aluguer.</div>
             </div>
 
             {/* Lista de referrals */}
