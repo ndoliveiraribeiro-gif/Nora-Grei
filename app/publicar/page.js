@@ -252,7 +252,7 @@ export default function PublicarPage() {
 
         /* Tipo btns */
         .tipo-btn { padding: 0.6rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; text-align: center; }
-        .tipo-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+        .tipo-btn.active { background: #c4748a; color: #fff; border-color: #c4748a; }
 
         /* Tamanhos */
         .tamanho-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
@@ -262,7 +262,7 @@ export default function PublicarPage() {
 
         /* Ocasiões */
         .ocasiao-btn { padding: 0.35rem 0.6rem; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; }
-        .ocasiao-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+        .ocasiao-btn.active { background: #c4748a; color: #fff; border-color: #c4748a; }
 
         /* Upload area */
         .upload-area { border: 2px dashed var(--g2); padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; background: var(--g1); }
@@ -270,8 +270,8 @@ export default function PublicarPage() {
 
         /* Botões */
         .pub-btn { width: 100%; padding: 0.9rem; border: none; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-family: var(--sans); font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .pub-btn-black { background: var(--black); color: #fff; }
-        .pub-btn-black:hover { background: #2a2926; }
+        .pub-btn-black { background: #c4748a; color: #fff; }
+        .pub-btn-black:hover { background: #b5637a; }
         .pub-btn-black:disabled { opacity: 0.5; cursor: not-allowed; }
         .pub-btn-outline { background: #fff; color: var(--black); border: 1.5px solid var(--g2); }
         .pub-btn-outline:hover { border-color: var(--black); }

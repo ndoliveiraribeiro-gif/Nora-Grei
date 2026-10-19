@@ -391,7 +391,7 @@ function ReservaContent() {
         /* TAMANHOS */
         .tamanhos { display:flex; gap:0.5rem; flex-wrap:wrap; }
         .tam { min-width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.82rem; cursor:pointer; font-family:var(--sans); color:var(--black); padding:0 0.5rem; }
-        .tam.on { background:var(--black); color:var(--white); border-color:var(--black); }
+        .tam.on { background:#c4748a; color:#fff; border-color:#c4748a; }
         .tam.esgotado { color:#c4748a; border-color:#e8c4ce; }
         .tam-hint { font-size:0.72rem; color:#888; margin-top:0.6rem; }
 
@@ -419,9 +419,9 @@ function ReservaContent() {
 
         /* STICKY CTA */
         .sticky-bar { position:fixed; bottom:0; left:0; right:0; z-index:200; background:rgba(248,247,245,0.97); backdrop-filter:blur(16px); border-top:1px solid var(--grey-200); padding:0.85rem 1.25rem calc(0.85rem + env(safe-area-inset-bottom)); }
-        .btn-principal { width:100%; padding:1.05rem; background:var(--black); color:var(--white); border:none; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; min-height:48px; }
+        .btn-principal { width:100%; padding:1.05rem; background:#c4748a; color:#fff; border:none; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; min-height:48px; }
         .btn-principal:disabled { opacity:0.45; cursor:not-allowed; }
-        .btn-login { width:100%; padding:1.05rem; background:var(--black); color:var(--white); border:none; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; min-height:48px; text-decoration:none; display:flex; align-items:center; justify-content:center; }
+        .btn-login { width:100%; padding:1.05rem; background:#c4748a; color:#fff; border:none; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; font-family:var(--sans); font-weight:500; cursor:pointer; min-height:48px; text-decoration:none; display:flex; align-items:center; justify-content:center; }
         .nota-bar { font-size:0.68rem; color:#888; text-align:center; margin-bottom:0.5rem; letter-spacing:0.05em; }
         .erro { font-size:0.78rem; color:#c0392b; padding:0.6rem 0.9rem; background:#fff5f5; border:1px solid #f5c6cb; margin-bottom:0.6rem; }
 

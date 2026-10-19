@@ -345,7 +345,7 @@ export default function PecaDetalhe() {
         .tam-wrap{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
         .tam-btn{padding:0.6rem 1.1rem;font-size:0.85rem;letter-spacing:0.06em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s;min-height:44px}
         .tam-btn:hover{border-color:var(--black)}
-        .tam-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+        .tam-btn.active{background:#c4748a;color:#fff;border-color:#c4748a}
         .tam-btn.sem-stock{opacity:0.4;cursor:not-allowed;text-decoration:line-through}
         .tam-data{font-size:0.68rem;color:var(--rosa);letter-spacing:0.06em;text-transform:uppercase}
         .tam-reservar{font-size:0.68rem;color:#5a5855;letter-spacing:0.06em;text-transform:uppercase;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans);padding:0}
@@ -358,8 +358,8 @@ export default function PecaDetalhe() {
         .deposito-box{background:var(--g1);padding:1rem 1.25rem;margin-bottom:1.5rem;border-left:3px solid var(--g2)}
         .deposito-val{font-family:var(--sans);font-size:1.5rem;font-weight:500}
         .deposito-desc{font-size:0.82rem;color:#5a5855;margin-top:0.2rem}
-        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.82rem;letter-spacing:0.16em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
-        .btn-alugar:hover{background:#2a2926}
+        .btn-alugar{width:100%;padding:1.1rem;background:#c4748a;color:#fff;border:none;font-size:0.82rem;letter-spacing:0.16em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
+        .btn-alugar:hover{background:#b5637a}
         .btn-alugar:disabled{background:#ccc;cursor:not-allowed}
         .btn-cesto{width:100%;padding:0.9rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem}
         .btn-cesto:hover{background:var(--g1)}
@@ -413,7 +413,7 @@ export default function PecaDetalhe() {
           .sticky-preco-unit{font-family:'Jost',sans-serif;font-size:0.55rem;color:#b0ada6;letter-spacing:0.08em}
           .sticky-btn-alugar{
             flex:2;min-height:52px;
-            background:#080808;color:#f8f7f5;
+            background:#c4748a;color:#fff;
             border:none;
             font-family:'Jost',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;
             cursor:pointer;
@@ -503,11 +503,11 @@ export default function PecaDetalhe() {
           {peca.valor_peca > 0 && peca.preco_aluguer_dia > 0 && (() => {
             const economia = Math.round((1 - peca.preco_aluguer_dia / peca.valor_peca) * 100);
             return (
-              <div style={{background:'linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%)',borderRadius:'10px',padding:'0.75rem 1rem',margin:'0.5rem 0 1rem',display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
+              <div style={{background:'linear-gradient(135deg,#1a2e22 0%,#2d4a38 100%)',borderRadius:'10px',padding:'0.75rem 1rem',margin:'0.5rem 0 1rem',display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
                 <span style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4a882',fontWeight:700,whiteSpace:'nowrap'}}>{t.pecaNova}: {peca.valor_peca}€</span>
-                <span style={{color:'#555',fontSize:'0.8rem'}}>→</span>
-                <span style={{fontSize:'0.85rem',color:'#fff',fontWeight:600}}>{t.alugaPor} <strong style={{color:'#c4a882'}}>{peca.preco_aluguer_dia}€{t.porcDia}</strong></span>
-                <span style={{marginLeft:'auto',background:'#c4a882',color:'#1a1a1a',borderRadius:'20px',padding:'0.2rem 0.6rem',fontSize:'0.75rem',fontWeight:800,letterSpacing:'0.05em',whiteSpace:'nowrap'}}>{economia}% {t.economia}</span>
+                <span style={{color:'#c4a882',fontSize:'0.8rem'}}>→</span>
+                <span style={{fontSize:'0.85rem',color:'#f0f5f2',fontWeight:600}}>{t.alugaPor} <strong style={{color:'#c4a882'}}>{peca.preco_aluguer_dia}€{t.porcDia}</strong></span>
+                <span style={{marginLeft:'auto',background:'#3a7a52',color:'#f0f5f2',borderRadius:'4px',padding:'0.2rem 0.6rem',fontSize:'0.75rem',fontWeight:800,letterSpacing:'0.05em',whiteSpace:'nowrap'}}>{economia}% {t.economia}</span>
               </div>
             );
           })()}

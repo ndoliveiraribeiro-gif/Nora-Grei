@@ -564,7 +564,7 @@ const ESTILOS = `
   .titulo{font-family:var(--sans);font-size:2rem;font-weight:600;display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem}
   .count{font-family:var(--sans);font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);font-weight:400}
   .vazio{background:var(--white);padding:3rem 2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem;font-size:0.95rem;color:var(--g4)}
-  .btn-cat{display:inline-block;padding:0.75rem 2rem;background:var(--black);color:#fff;text-decoration:none;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase}
+  .btn-cat{display:inline-block;padding:0.75rem 2rem;background:#c4748a;color:#fff;text-decoration:none;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase}
   .item-card{background:var(--white);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start}
   .item-foto{width:64px;height:80px;object-fit:cover;flex-shrink:0;background:var(--g1)}
   .item-info{flex:1}
@@ -592,8 +592,8 @@ const ESTILOS = `
   .r-total{display:flex;justify-content:space-between;font-size:1.05rem;font-weight:500;padding:0.85rem 0 0;color:var(--black);border-top:2px solid var(--black);margin-top:0.4rem}
   .r-nota{font-size:0.82rem;color:var(--g4);margin-top:0.6rem;font-style:italic;line-height:1.5}
   .login-box{margin-top:1rem}
-  .btn-confirmar{display:block;width:100%;padding:1.1rem;background:var(--black);color:#fff;border:none;font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;margin-top:1.25rem;text-decoration:none;text-align:center;transition:background 0.2s}
-  .btn-confirmar:hover{background:#2a2926}
+  .btn-confirmar{display:block;width:100%;padding:1.1rem;background:#c4748a;color:#fff;border:none;font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;margin-top:1.25rem;text-decoration:none;text-align:center;transition:background 0.2s}
+  .btn-confirmar:hover{background:#b5637a}
   .btn-confirmar:disabled{opacity:0.6;cursor:not-allowed}
   .erro{color:#c0392b;font-size:0.85rem;margin-top:0.75rem;padding:0.65rem;background:#fff5f5;border:1px solid #f5c6cb}
   @media(max-width:768px){

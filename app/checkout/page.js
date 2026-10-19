@@ -1079,14 +1079,14 @@ const ESTILOS = `
   .r-linha:last-of-type{border-bottom:none}
   .r-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:500;padding:1rem 0 0;color:var(--black);border-top:2px solid var(--black);margin-top:0.5rem}
   .r-nota{font-size:0.75rem;color:#5a5855;margin-top:0.75rem;line-height:1.5;font-style:italic}
-  .btn{width:100%;padding:1.15rem;background:var(--black);color:var(--white);border:none;font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background 0.2s;margin-top:1.25rem}
-  .btn:hover{background:#2a2926}
+  .btn{width:100%;padding:1.15rem;background:#c4748a;color:#fff;border:none;font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;transition:background 0.2s;margin-top:1.25rem}
+  .btn:hover{background:#b5637a}
   .btn:disabled{opacity:0.6;cursor:not-allowed}
   .erro{color:#c0392b;font-size:0.9rem;margin-top:0.75rem;padding:0.75rem;background:#fff5f5;border:1px solid #f5c6cb}
   .erro-campo{color:#c0392b;font-size:0.82rem;margin-top:0.25rem}
   .login-box{text-align:center;padding:3rem}
   .login-box p{font-size:1rem;color:#5a5855;margin-bottom:1.5rem}
-  .login-box a{display:inline-block;padding:1rem 2.5rem;background:var(--black);color:var(--white);text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
+  .login-box a{display:inline-block;padding:1rem 2.5rem;background:#c4748a;color:#fff;text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
   .desconto-caucao{font-size:0.78rem;color:#27ae60;margin-top:0.25rem}
   .aviso-pendente{background:#fff8e1;padding:0.85rem 1rem;border-left:3px solid #f39c12;font-size:0.82rem;color:#946200;margin-bottom:1rem;line-height:1.5}
   .form-pag{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--g1);display:flex;flex-direction:column;gap:1rem}
@@ -1118,7 +1118,7 @@ const ESTILOS = `
   .aviso-final{max-width:380px;font-size:0.82rem;padding:0.85rem 1rem;line-height:1.5}
   .aviso-amarelo{background:#fff8e1;color:#946200;border-left:3px solid #f39c12}
   .aviso-cinza{background:#f0eeeb;color:#5a5855;border-left:3px solid #888}
-  .btn-pedidos{background:var(--black);color:var(--white);padding:1rem 2.5rem;text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;margin-top:0.5rem}
+  .btn-pedidos{background:#c4748a;color:#fff;padding:1rem 2.5rem;text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;margin-top:0.5rem}
   @media(max-width:768px){
     .nav{padding:1rem 1.25rem}
     .page{grid-template-columns:1fr;padding:5rem 1.25rem 6rem;gap:1rem}
