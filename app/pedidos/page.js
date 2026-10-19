@@ -315,20 +315,20 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
   };
 
   const sty = {
-    sec: { fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
+    sec: { fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
     opt: (on) => ({ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.85rem 1rem',border:`1.5px solid ${on?'#080808':'#e2dfda'}`,background:on?'#f0eeeb':'#fff',cursor:'pointer',marginBottom:'0.5rem' }),
     radio: (on) => ({ width:16,height:16,borderRadius:'50%',border:`2px solid ${on?'#080808':'#ccc'}`,background:on?'#080808':'transparent',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center' }),
     radioDot: { width:6,height:6,borderRadius:'50%',background:'#fff' },
-    badge: (auto) => ({ fontSize:'0.5rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
+    badge: (auto) => ({ fontSize:'0.68rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
     inp: { width:'100%',padding:'0.7rem 0.9rem',border:'1.5px solid #e2dfda',background:'#fff',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',color:'#080808',outline:'none',marginBottom:'0.5rem' },
     row2: { display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:'0.5rem' },
     ibanBox: { background:'#f0eeeb',padding:'1rem',marginBottom:'0.75rem' },
-    ibanLabel: { fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
+    ibanLabel: { fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
     ibanVal: { fontFamily:"var(--sans)",fontSize:'1rem',fontWeight:500,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
     aviso: { fontSize:'0.72rem',color:'#946200',background:'#fff8e1',padding:'0.75rem 1rem',borderLeft:'3px solid #f39c12',lineHeight:1.5,marginTop:'0.5rem' },
     uploadBox: { display:'block',padding:'0.85rem',border:'2px dashed #e2dfda',background:'#f0eeeb',cursor:'pointer',textAlign:'center',fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem' },
-    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
-    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
+    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
+    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
     mbRow: { display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb' },
     mbLabel: { fontSize:'0.68rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase' },
     mbVal: { fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808' },
@@ -354,7 +354,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
             <p style={{fontFamily:"var(--sans)",fontSize:'1.1rem',fontWeight:600,color:'#080808'}}>200€</p>
-            <p style={{fontSize:'0.65rem',color:'#888'}}>+ {PORTES.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
+            <p style={{fontSize:'0.75rem',color:'#888'}}>+ {PORTES.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
           </div>
         </div>
         <button onClick={() => setFase("escolher_pag")}
@@ -428,7 +428,7 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
       )}
       {metodoPag === "mbway" && (
         <div style={{marginTop:'0.75rem'}}>
-          <p style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>
+          <p style={{fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>
             {i.telMbway}
           </p>
           <input style={sty.inp} placeholder="+351 912 345 678" value={telMbway} onChange={e => setTelMbway(e.target.value)} />
@@ -518,12 +518,12 @@ function BotaoComprarPeca({ aluguer, i, lang, isLojista = false, lojista_id = nu
 
   if (fase === "voucher_nova" && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
-      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
+      <p style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
       <div style={{fontFamily:"var(--sans)",fontSize:'1.6rem',fontWeight:600,letterSpacing:'0.15em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
       <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.5rem'}}>
-        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irParaLoja}</a>
+        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irParaLoja}</a>
       </div>
     </div>
   );
@@ -613,7 +613,7 @@ function PedidosContent() {
       em_verificacao:{ bg:"#fff8e1",color:"#e67e22" }, devolvido_danificado:{ bg:"#fff5f5",color:"#e74c3c" },
     };
     const c = cores[estado] || cores.pendente;
-    return <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:c.bg,color:c.color}}>{i.estado[estado]||estado}</span>;
+    return <span style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:c.bg,color:c.color}}>{i.estado[estado]||estado}</span>;
   };
 
   const StarRating = ({ value, onChange, readonly }) => (
@@ -638,14 +638,14 @@ function PedidosContent() {
     };
     return (
       <>
-        <button onClick={buscar} disabled={loading} style={{marginTop:"0.5rem",padding:"0.45rem 1rem",background:"#f0eeeb",border:"none",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif",color:"#5a5855",display:"block"}}>
+        <button onClick={buscar} disabled={loading} style={{marginTop:"0.5rem",padding:"0.45rem 1rem",background:"#f0eeeb",border:"none",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif",color:"#5a5855",display:"block"}}>
           {loading ? "..." : i.verTalao}
         </button>
         {aberto && recibo && (
           <div onClick={() => setAberto(false)} style={{position:"fixed",inset:0,background:"rgba(8,8,8,0.6)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
             <div onClick={e => e.stopPropagation()} style={{background:"#fff",width:"100%",maxWidth:380,padding:"1.75rem",fontFamily:"'Jost',sans-serif"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1.25rem"}}>
-                <div><div style={{fontFamily:"'Cormorant',serif",fontSize:"1.4rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>NORA GREI</div><div style={{fontSize:"0.62rem",color:"#888",letterSpacing:"0.1em",marginTop:"0.15rem"}}>Recibo #{recibo.numero}</div></div>
+                <div><div style={{fontFamily:"'Cormorant',serif",fontSize:"1.4rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>NORA GREI</div><div style={{fontSize:"0.75rem",color:"#888",letterSpacing:"0.1em",marginTop:"0.15rem"}}>Recibo #{recibo.numero}</div></div>
                 <button onClick={() => setAberto(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"#888"}}>×</button>
               </div>
               <div style={{borderTop:"1px solid #f0eeeb",paddingTop:"1rem",display:"flex",flexDirection:"column",gap:"0.5rem"}}>
@@ -653,7 +653,7 @@ function PedidosContent() {
                   <div key={l} style={{display:"flex",justifyContent:"space-between",fontSize:"0.82rem",color:"#5a5855"}}><span>{l}</span><span>{v}</span></div>
                 ))}
                 <div style={{display:"flex",justifyContent:"space-between",fontSize:"1rem",fontWeight:600,borderTop:"1px solid #f0eeeb",paddingTop:"0.75rem",marginTop:"0.25rem"}}><span>{i.talaoTotal}</span><span>{recibo.valor_total}€</span></div>
-                <div style={{textAlign:"center",marginTop:"0.5rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:recibo.estado==="pago"?"#27ae60":"#e67e22",fontWeight:600}}>{recibo.estado==="pago"? i.talaoPago : i.talaoAguarda}</div>
+                <div style={{textAlign:"center",marginTop:"0.5rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",color:recibo.estado==="pago"?"#27ae60":"#e67e22",fontWeight:600}}>{recibo.estado==="pago"? i.talaoPago : i.talaoAguarda}</div>
               </div>
             </div>
           </div>
@@ -681,14 +681,14 @@ function PedidosContent() {
     };
     return (
       <div style={{marginTop:"0.75rem",padding:"0.85rem 1rem",background:"#fdf6f8",borderLeft:"3px solid #c4748a"}}>
-        <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>{enviado ? i.tuaAvaliacao : i.avaliarExperiencia}</div>
+        <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>{enviado ? i.tuaAvaliacao : i.avaliarExperiencia}</div>
         {enviado ? (
           <>
             <StarRating value={nota} readonly />
             {avaliacao?.comentario_cliente && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
             {avaliacao?.nota_empresa_cliente && (
               <div style={{marginTop:"0.75rem",paddingTop:"0.6rem",borderTop:"1px solid #f0d0da"}}>
-                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
+                <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
                 <StarRating value={avaliacao.nota_empresa_cliente} readonly />
                 {avaliacao.comentario_empresa && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_empresa}"</p>}
               </div>
@@ -701,7 +701,7 @@ function PedidosContent() {
               <>
                 <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder={i.comentarioPlaceholder}
                   style={{width:"100%",marginTop:"0.5rem",padding:"0.65rem",border:"1.5px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",color:"#080808",resize:"vertical",minHeight:"72px",outline:"none"}} />
-                <button onClick={enviar} disabled={loading} style={{marginTop:"0.4rem",padding:"0.55rem 1.25rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.62rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>
+                <button onClick={enviar} disabled={loading} style={{marginTop:"0.4rem",padding:"0.55rem 1.25rem",background:"#080808",color:"#fff",border:"none",fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>
                   {loading ? "..." : i.enviarAvaliacao}
                 </button>
               </>
@@ -731,7 +731,7 @@ function PedidosContent() {
                 <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#f0eeeb',padding:'0.5rem 0.75rem',marginTop:'0.4rem',borderLeft:'3px solid #080808'}}>
                   <span style={{fontSize:'0.68rem',color:'#3f3e3c'}}>Rastreio:</span>
                   <span style={{fontSize:'0.78rem',fontWeight:700,fontFamily:'monospace',color:'#080808'}}>{a.envios[0].codigo_rastreio}</span>
-                  <span style={{fontSize:'0.65rem',color:'#888'}}>({a.envios[0].transportadora})</span>
+                  <span style={{fontSize:'0.75rem',color:'#888'}}>({a.envios[0].transportadora})</span>
                 </div>
               )}
             {a.estado === "ativo" && a.data_fim && (
@@ -788,16 +788,16 @@ function PedidosContent() {
           <div style={{flex:1}}>
             <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.15rem"}}>
               <p style={{fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:500,color:"#080808"}}>{peca?.nome||"Peça"}</p>
-              <span style={{fontSize:"0.52rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.15rem 0.4rem",background:"#f0eeeb",color:"#888",fontFamily:"'Jost',sans-serif"}}>Loja</span>
+              <span style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.15rem 0.4rem",background:"#f0eeeb",color:"#888",fontFamily:"'Jost',sans-serif"}}>Loja</span>
             </div>
             <p style={{fontSize:"0.78rem",color:"#5a5855",marginBottom:"0.25rem"}}>Tam. {a.stock_lojista?.tamanho} · {a.valor_aluguer}€</p>
             <p style={{fontSize:"0.78rem",color:"#5a5855",marginBottom:"0.5rem"}}>{a.data_inicio} → {a.data_fim}</p>
-            <span style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.25rem 0.6rem",fontWeight:500,fontFamily:"'Jost',sans-serif",background:ec.bg,color:ec.color}}>{ec.label}</span>
+            <span style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.25rem 0.6rem",fontWeight:500,fontFamily:"'Jost',sans-serif",background:ec.bg,color:ec.color}}>{ec.label}</span>
 
             {/* TRACKING — visível quando enviado */}
             {a.estado === "enviado" && (
               <div style={{marginTop:"0.75rem",background:"#e3f2fd",borderLeft:"3px solid #1976d2",padding:"0.75rem 1rem"}}>
-                <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.4rem"}}>📦 A caminho</div>
+                <div style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.4rem"}}>📦 A caminho</div>
                 {a.tracking_numero ? (
                   <>
                     <div style={{display:"flex",alignItems:"center",gap:"0.5rem",flexWrap:"wrap"}}>
@@ -809,7 +809,7 @@ function PedidosContent() {
                       <span style={{fontSize:"0.85rem",fontWeight:700,fontFamily:"monospace",color:"#080808",letterSpacing:"0.05em"}}>{a.tracking_numero}</span>
                     </div>
                     {link ? (
-                      <a href={link} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",marginTop:"0.6rem",padding:"0.4rem 0.9rem",background:"#1976d2",color:"#fff",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",textDecoration:"none",fontWeight:500}}>
+                      <a href={link} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",marginTop:"0.6rem",padding:"0.4rem 0.9rem",background:"#1976d2",color:"#fff",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",textDecoration:"none",fontWeight:500}}>
                         Rastrear encomenda ↗
                       </a>
                     ) : (
@@ -878,14 +878,14 @@ function PedidosContent() {
 
     return (
       <div style={{marginTop:"0.75rem",padding:"0.85rem 1rem",background:"#fdf6f8",borderLeft:"3px solid #c4748a"}}>
-        <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>Avalia esta experiência</div>
+        <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.6rem"}}>Avalia esta experiência</div>
         {enviado ? (
           <>
             {estrelas(nota, null)}
             {avaliacao?.comentario_cliente && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
             {avaliacao?.nota_lojista_cliente && (
               <div style={{marginTop:"0.75rem",paddingTop:"0.6rem",borderTop:"1px solid #f0d0da"}}>
-                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>Avaliação do lojista</div>
+                <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>Avaliação do lojista</div>
                 {estrelas(avaliacao.nota_lojista_cliente, null)}
                 {avaliacao.comentario_lojista && <p style={{fontSize:"0.78rem",color:"#5a5855",fontStyle:"italic"}}>"{avaliacao.comentario_lojista}"</p>}
               </div>
@@ -900,7 +900,7 @@ function PedidosContent() {
                   placeholder="Deixa um comentário sobre o lojista (opcional)..."
                   style={{width:"100%",padding:"0.6rem",border:"1.5px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",color:"#080808",resize:"vertical",minHeight:"70px",outline:"none",marginBottom:"0.5rem"}} />
                 <button onClick={enviarAvaliacao} disabled={loadingAv}
-                  style={{padding:"0.55rem 1.25rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.62rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",cursor:"pointer",fontWeight:500}}>
+                  style={{padding:"0.55rem 1.25rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",cursor:"pointer",fontWeight:500}}>
                   {loadingAv ? "..." : "Enviar avaliação"}
                 </button>
               </>
@@ -929,10 +929,10 @@ function PedidosContent() {
             <p style={{fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem'}}>{i.dataDesejada}: {r.data_inicio_desejada} → {r.data_fim_desejada}</p>
 
             {disponivelAgora ? (
-              <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:600,fontFamily:"'Jost',sans-serif",background:'#e8f5e9',color:'#27ae60'}}>{i.reservaDisponivelTitulo}</span>
+              <span style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:600,fontFamily:"'Jost',sans-serif",background:'#e8f5e9',color:'#27ae60'}}>{i.reservaDisponivelTitulo}</span>
             ) : (
               <>
-                <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:'#fff8e1',color:'#f39c12'}}>{i.reservaEspera}</span>
+                <span style={{fontSize:'0.72rem',letterSpacing:'0.15em',textTransform:'uppercase',padding:'0.25rem 0.6rem',fontWeight:500,fontFamily:"'Jost',sans-serif",background:'#fff8e1',color:'#f39c12'}}>{i.reservaEspera}</span>
                 {tempo && (
                   <div style={{display:'flex',alignItems:'center',gap:'0.5rem',background:'#fff8e1',padding:'0.6rem 0.75rem',marginTop:'0.5rem',borderLeft:'3px solid #f39c12'}}>
                     <div style={{width:7,height:7,borderRadius:'50%',background:'#f39c12',flexShrink:0,animation:'pulse 2s infinite'}}/>

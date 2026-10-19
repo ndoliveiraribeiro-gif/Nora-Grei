@@ -976,7 +976,7 @@ function CheckoutContent() {
               </button>
             ))}
           </div>
-          <p style={{ fontSize:"0.62rem",color:"#aaa",marginTop:"0.4rem" }}>Opcional · Ajuda-nos a ter peças certas para as ocasiões certas</p>
+          <p style={{ fontSize:"0.75rem",color:"#aaa",marginTop:"0.4rem" }}>Opcional · Ajuda-nos a ter peças certas para as ocasiões certas</p>
         </div>
 
         <div className="resumo">
@@ -1004,7 +1004,7 @@ function CheckoutContent() {
                     placeholder="Código de desconto"
                     style={{flex:1,border:"1px solid #ddd",padding:"0.6rem 0.75rem",fontSize:"0.82rem",fontFamily:"var(--sans, sans-serif)",letterSpacing:"0.05em",textTransform:"uppercase",outline:"none"}}
                   />
-                  <button onClick={() => validarAfiliado()} style={{background:"#080808",color:"#fff",border:"none",padding:"0 1rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans, sans-serif)",whiteSpace:"nowrap"}}>Aplicar</button>
+                  <button onClick={() => validarAfiliado()} style={{background:"#080808",color:"#fff",border:"none",padding:"0 1rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans, sans-serif)",whiteSpace:"nowrap"}}>Aplicar</button>
                 </div>
                 {afiliadoOk && <p style={{fontSize:"0.75rem",color:"#27ae60",marginTop:"0.3rem"}}>✓ {afiliadoAtivo?.desconto_pct}% de desconto aplicado ({afiliadoAtivo?.nome})</p>}
                 {afiliadoErro && <p style={{fontSize:"0.75rem",color:"#e74c3c",marginTop:"0.3rem"}}>{afiliadoErro}</p>}

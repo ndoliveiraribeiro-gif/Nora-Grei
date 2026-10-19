@@ -148,21 +148,21 @@ function HeroTimer({ dataFim, labelDisponivel, labelEmBreve }) {
 
   return (
     <div style={{marginBottom:'2rem'}}>
-      <p style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'#888',marginBottom:'0.75rem',textAlign:'center'}}>{labelDisponivel}</p>
+      <p style={{fontFamily:"'Jost',sans-serif",fontSize:'0.75rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'#888',marginBottom:'0.75rem',textAlign:'center'}}>{labelDisponivel}</p>
       <div style={{display:'flex',gap:'0.5rem',justifyContent:'center'}}>
         {tempo.dias > 0 && (
           <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
             <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{tempo.dias}</div>
-            <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>dias</div>
+            <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>dias</div>
           </div>
         )}
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
           <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.horas).padStart(2,'0')}</div>
-          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>horas</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>horas</div>
         </div>
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
           <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.mins).padStart(2,'0')}</div>
-          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.52rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>min</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>min</div>
         </div>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
@@ -318,7 +318,7 @@ function ReservaContent() {
       <div style={{maxWidth:'420px',width:'100%'}}>
         {/* Checkmark animado */}
         <div style={{width:64,height:64,borderRadius:'50%',background:'#080808',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 1.5rem',fontSize:'1.6rem',color:'#f8f7f5'}}>✓</div>
-        <p style={{fontSize:'0.65rem',letterSpacing:'0.3em',textTransform:'uppercase',color:'#b0ada6',marginBottom:'0.5rem'}}>{i.sucesso}</p>
+        <p style={{fontSize:'0.75rem',letterSpacing:'0.3em',textTransform:'uppercase',color:'#b0ada6',marginBottom:'0.5rem'}}>{i.sucesso}</p>
         <h1 style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,color:'#080808',marginBottom:'1rem',lineHeight:1.1}}>{i.sucessoTitulo}</h1>
         <p style={{fontSize:'0.92rem',color:'#5a5855',lineHeight:1.8,marginBottom:'2rem'}}>{i.sucessoDesc}</p>
 
@@ -329,7 +329,7 @@ function ReservaContent() {
             { n:'2', t: i.passo3, d: i.passo3Desc },
           ].map(p => (
             <div key={p.n} style={{display:'flex',gap:'0.75rem',alignItems:'flex-start',marginBottom:'0.75rem'}}>
-              <div style={{width:22,height:22,borderRadius:'50%',background:'#080808',color:'#f8f7f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.58rem',fontWeight:500,flexShrink:0,marginTop:'0.1rem'}}>{p.n}</div>
+              <div style={{width:22,height:22,borderRadius:'50%',background:'#080808',color:'#f8f7f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.68rem',fontWeight:500,flexShrink:0,marginTop:'0.1rem'}}>{p.n}</div>
               <div>
                 <div style={{fontSize:'0.82rem',fontWeight:500,color:'#080808'}}>{p.t}</div>
                 <div style={{fontSize:'0.78rem',color:'#5a5855'}}>{p.d}</div>

@@ -498,7 +498,7 @@ export default function Catalogo() {
         </a>
         <a href="/cesto" className="cat-nav-icon" title="Cesto" style={{position:"relative"}}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          {cestoCont > 0 && <span style={{position:"absolute",top:"0px",right:"0px",background:"var(--rosa)",color:"#fff",fontSize:"0.5rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+          {cestoCont > 0 && <span style={{position:"absolute",top:"0px",right:"0px",background:"var(--rosa)",color:"#fff",fontSize:"0.68rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
         </a>
       </nav>
 
@@ -618,7 +618,7 @@ export default function Catalogo() {
         </a>
         <a href="/cesto" className="bn-item" style={{position:"relative"}}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          {cestoCont > 0 && <span style={{position:"absolute",top:"4px",right:"calc(50% - 14px)",background:"var(--rosa)",color:"#fff",fontSize:"0.48rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"13px",height:"13px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+          {cestoCont > 0 && <span style={{position:"absolute",top:"4px",right:"calc(50% - 14px)",background:"var(--rosa)",color:"#fff",fontSize:"0.68rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"13px",height:"13px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
           Cesto
         </a>
         <a href="/perfil" className="bn-item">

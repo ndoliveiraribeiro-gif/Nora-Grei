@@ -349,19 +349,19 @@ export default function PublicarPage() {
                       {f.validando && (
                         <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(8,8,8,0.7)",display:"flex",alignItems:"center",justifyContent:"center",padding:"0.3rem",gap:"0.3rem"}}>
                           <div style={{width:6,height:6,borderRadius:"50%",background:"#f39c12",animation:"pcpulse 1s infinite"}}/>
-                          <span style={{fontSize:"0.55rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em"}}>A analisar...</span>
+                          <span style={{fontSize:"0.68rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em"}}>A analisar...</span>
                         </div>
                       )}
                       {!f.validando && f.valida === true && (
                         <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(39,174,96,0.88)",display:"flex",alignItems:"center",justifyContent:"center",padding:"0.3rem",gap:"0.25rem"}}>
-                          <span style={{fontSize:"0.55rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>✓ {f.motivo}</span>
+                          <span style={{fontSize:"0.68rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>✓ {f.motivo}</span>
                         </div>
                       )}
                       {!f.validando && f.valida === false && (
                         <div style={{position:"absolute",inset:0,background:"rgba(200,50,50,0.82)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0.4rem",gap:"0.3rem"}}>
-                          <span style={{fontSize:"0.6rem",color:"#fff",fontFamily:"'Jost',sans-serif",fontWeight:600,letterSpacing:"0.06em",textAlign:"center"}}>✕ Foto rejeitada</span>
-                          <span style={{fontSize:"0.52rem",color:"rgba(255,255,255,0.85)",fontFamily:"'Jost',sans-serif",textAlign:"center",lineHeight:1.3}}>{f.motivo}</span>
-                          <button onClick={() => removerFoto(i)} style={{marginTop:"0.25rem",fontSize:"0.52rem",background:"rgba(255,255,255,0.2)",color:"#fff",border:"1px solid rgba(255,255,255,0.4)",padding:"0.2rem 0.5rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>Remover</button>
+                          <span style={{fontSize:"0.72rem",color:"#fff",fontFamily:"'Jost',sans-serif",fontWeight:600,letterSpacing:"0.06em",textAlign:"center"}}>✕ Foto rejeitada</span>
+                          <span style={{fontSize:"0.68rem",color:"rgba(255,255,255,0.85)",fontFamily:"'Jost',sans-serif",textAlign:"center",lineHeight:1.3}}>{f.motivo}</span>
+                          <button onClick={() => removerFoto(i)} style={{marginTop:"0.25rem",fontSize:"0.68rem",background:"rgba(255,255,255,0.2)",color:"#fff",border:"1px solid rgba(255,255,255,0.4)",padding:"0.2rem 0.5rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>Remover</button>
                         </div>
                       )}
                     </div>

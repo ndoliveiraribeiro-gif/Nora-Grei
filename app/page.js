@@ -605,7 +605,7 @@ export default function Home() {
           <a href={userLogado ? "/perfil" : "/entrar"} className="nb nb-o">{userLogado ? t.nav.perfil : t.nav.entrar}</a>
           <a href="/cesto" style={{position:"relative",display:"flex",alignItems:"center",padding:"0.45rem",color:"#080808",lineHeight:1}} title="Cesto">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            {cestoCont > 0 && <span style={{position:"absolute",top:"-2px",right:"-2px",background:"#c4748a",color:"#fff",fontSize:"0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"16px",height:"16px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+            {cestoCont > 0 && <span style={{position:"absolute",top:"-2px",right:"-2px",background:"#c4748a",color:"#fff",fontSize:"0.68rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"16px",height:"16px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
           </a>
           <a href="/catalogo" className="nb nb-f">{t.hero.cta1}</a>
         </div>
@@ -732,7 +732,7 @@ export default function Home() {
                         : <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span></div>
                       }
                       {!dispEstado && (
-                        <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
+                        <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
                           {t.destaque.reservar.split("—")[0].trim()}
                         </div>
                       )}
@@ -751,7 +751,7 @@ export default function Home() {
                       })()}
                     </div>
                     <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
-                      {peca.categoria && <p style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
+                      {peca.categoria && <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
                       <h3 style={{fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:500,lineHeight:1.2,marginBottom:"0.3rem",color:"#111"}}>{peca.nome}</h3>
                       <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
                         <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>

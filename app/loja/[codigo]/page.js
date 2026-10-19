@@ -219,7 +219,7 @@ export default function LojaPublica() {
         <div style={{display:"flex",alignItems:"center",gap:"1.5rem"}}>
           <div style={{display:"flex",gap:"0.4rem"}}>
             {["pt","fr","lt"].map(l => (
-              <button key={l} onClick={() => { localStorage.setItem("ng_lang",l); setLang(l); }} style={{fontSize:"0.56rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:lang===l?"var(--black)":"var(--g4)",fontWeight:lang===l?500:300}}>{l.toUpperCase()}</button>
+              <button key={l} onClick={() => { localStorage.setItem("ng_lang",l); setLang(l); }} style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:lang===l?"var(--black)":"var(--g4)",fontWeight:lang===l?500:300}}>{l.toUpperCase()}</button>
             ))}
           </div>
           <a href="/catalogo" className="nav-back">{t.voltar}</a>
@@ -254,7 +254,7 @@ export default function LojaPublica() {
             {seguindo ? "✓ A seguir" : "+ Seguir"}
           </button>
           {seguidores > 0 && (
-            <span style={{fontSize:"0.65rem",color:"var(--g4)",letterSpacing:"0.08em"}}>{seguidores} {seguidores === 1 ? "seguidor" : "seguidores"}</span>
+            <span style={{fontSize:"0.75rem",color:"var(--g4)",letterSpacing:"0.08em"}}>{seguidores} {seguidores === 1 ? "seguidor" : "seguidores"}</span>
           )}
         </div>
       </div>
@@ -274,11 +274,11 @@ export default function LojaPublica() {
 
       {/* Filtro por ocasião — pills */}
       <div style={{padding:"0 2rem 1rem",borderBottom:"1px solid var(--g1)"}}>
-        <span style={{fontSize:"0.58rem",letterSpacing:"0.22em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.5rem"}}>{t.ocasiao}</span>
+        <span style={{fontSize:"0.68rem",letterSpacing:"0.22em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.5rem"}}>{t.ocasiao}</span>
         <div style={{display:"flex",gap:"0.4rem",overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:"0.25rem",scrollbarWidth:"none"}}>
-          <button onClick={()=>setFiltroOcasiao("todas")} style={{fontSize:"0.62rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao==="todas"?"#c4748a":"var(--g2)",background:filtroOcasiao==="todas"?"#c4748a":"transparent",color:filtroOcasiao==="todas"?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{t.todasOcasiao}</button>
+          <button onClick={()=>setFiltroOcasiao("todas")} style={{fontSize:"0.75rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao==="todas"?"#c4748a":"var(--g2)",background:filtroOcasiao==="todas"?"#c4748a":"transparent",color:filtroOcasiao==="todas"?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{t.todasOcasiao}</button>
           {ocasioesDisponiveis.map(o => (
-            <button key={o.key} onClick={()=>setFiltroOcasiao(o.key)} style={{fontSize:"0.62rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao===o.key?"#c4748a":"var(--g2)",background:filtroOcasiao===o.key?"#c4748a":"transparent",color:filtroOcasiao===o.key?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{o.label}</button>
+            <button key={o.key} onClick={()=>setFiltroOcasiao(o.key)} style={{fontSize:"0.75rem",letterSpacing:"0.05em",padding:"0.38rem 0.85rem",borderRadius:"999px",border:"1px solid",borderColor:filtroOcasiao===o.key?"#c4748a":"var(--g2)",background:filtroOcasiao===o.key?"#c4748a":"transparent",color:filtroOcasiao===o.key?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>{o.label}</button>
           ))}
         </div>
       </div>
@@ -305,7 +305,7 @@ export default function LojaPublica() {
                   {p.preco_aluguer_dia && <span className="tag tag-rosa">{t.alugar}</span>}
                   {p.preco_venda && <span className="tag">{t.comprar}</span>}
                   {Array.isArray(p.ocasioes) && p.ocasioes[0] && (
-                    <span className="tag" style={{background:"transparent",border:"1px solid var(--g2)",color:"var(--g4)",fontSize:"0.55rem"}}>{p.ocasioes[0]}</span>
+                    <span className="tag" style={{background:"transparent",border:"1px solid var(--g2)",color:"var(--g4)",fontSize:"0.68rem"}}>{p.ocasioes[0]}</span>
                   )}
                   {p.stock_lojista?.every(s => s.quantidade_disponivel === 0) && (
                     timers[p.id]

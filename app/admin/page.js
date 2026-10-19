@@ -300,7 +300,7 @@ export default function Admin() {
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f0eeeb'}}>
       <div style={{background:'#fff',padding:'3rem',maxWidth:'360px',width:'100%',textAlign:'center'}}>
         <div style={{fontFamily:'Cormorant,Georgia,serif',fontSize:'1.8rem',fontWeight:300,letterSpacing:'0.2em',marginBottom:'0.5rem'}}>NORA GREI</div>
-        <div style={{fontSize:'0.6rem',letterSpacing:'0.3em',color:'#888',marginBottom:'2rem'}}>BACKOFFICE</div>
+        <div style={{fontSize:'0.72rem',letterSpacing:'0.3em',color:'#888',marginBottom:'2rem'}}>BACKOFFICE</div>
         <input
           type="password"
           placeholder="Password"
@@ -739,7 +739,7 @@ export default function Admin() {
                                 <button className="ad-btn ad-btn-sm ad-btn-black" onClick={() => confirmarVerificacao(a.id, false)}>
                                   ✓ Aprovada
                                 </button>
-                                <button className="ad-btn ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb',fontSize:'0.6rem',padding:'0.35rem 0.65rem'}} onClick={() => confirmarVerificacao(a.id, true)}>
+                                <button className="ad-btn ad-btn-sm" style={{background:'#fff5f5',color:'#e74c3c',border:'1px solid #f5c6cb',fontSize:'0.72rem',padding:'0.35rem 0.65rem'}} onClick={() => confirmarVerificacao(a.id, true)}>
                                   ✗ Danificada
                                 </button>
                               </>
@@ -750,7 +750,7 @@ export default function Admin() {
                               </button>
                             )}
                             {a.caucao_libertada_em && (
-                              <div style={{fontSize:'0.65rem',color:'#27ae60',fontWeight:500}}>✓ Caução libertada</div>
+                              <div style={{fontSize:'0.75rem',color:'#27ae60',fontWeight:500}}>✓ Caução libertada</div>
                             )}
                             <div style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.25rem'}}>{a.metodo_entrega}</div>
                           </div>
@@ -778,7 +778,7 @@ export default function Admin() {
               {/* sub-tabs */}
               <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
                 {[["depositos",`Depósitos a devolver (${depositos.length})`],["pagamentos",`Pagamentos pendentes (${pagamentos.length})`],["disputas",`Disputas (${disputas.length})`],["todos","Todos os alugueres"]].map(([k,l])=>(
-                  <button key={k} onClick={()=>setSubTabLojistas(k)} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1rem",border:"1.5px solid",borderColor:subTabLojistas===k?"#080808":"#e2dfda",background:subTabLojistas===k?"#080808":"transparent",color:subTabLojistas===k?"#fff":"#5a5855",cursor:"pointer",fontFamily:"inherit"}}>{l}</button>
+                  <button key={k} onClick={()=>setSubTabLojistas(k)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1rem",border:"1.5px solid",borderColor:subTabLojistas===k?"#080808":"#e2dfda",background:subTabLojistas===k?"#080808":"transparent",color:subTabLojistas===k?"#fff":"#5a5855",cursor:"pointer",fontFamily:"inherit"}}>{l}</button>
                 ))}
               </div>
               {/* lista */}
@@ -802,25 +802,25 @@ export default function Admin() {
                               {a.data_verificacao && <div style={{fontSize:"0.68rem",color:"#888"}}>Verificado em {new Date(a.data_verificacao).toLocaleDateString("pt-PT")}</div>}
                             </div>
                             <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"0.4rem"}}>
-                              <span style={{fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:estadoCor,color:"#fff"}}>{a.estado}</span>
-                              <span style={{fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:a.deposito_estado==="a_devolver"?"#27ae60":a.deposito_estado==="em_disputa"?"#e74c3c":a.deposito_estado==="devolvido"?"#888":"#f39c12",color:"#fff"}}>dep: {a.deposito_estado||"—"}</span>
+                              <span style={{fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:estadoCor,color:"#fff"}}>{a.estado}</span>
+                              <span style={{fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",background:a.deposito_estado==="a_devolver"?"#27ae60":a.deposito_estado==="em_disputa"?"#e74c3c":a.deposito_estado==="devolvido"?"#888":"#f39c12",color:"#fff"}}>dep: {a.deposito_estado||"—"}</span>
                             </div>
                           </div>
                           {/* ações admin */}
                           <div style={{display:"flex",gap:"0.5rem",marginTop:"0.85rem",flexWrap:"wrap"}}>
                             {a.deposito_estado === "a_devolver" && (
-                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido",deposito_devolvido_em:new Date().toISOString()}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>✓ Confirmar devolução depósito</button>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido",deposito_devolvido_em:new Date().toISOString()}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>✓ Confirmar devolução depósito</button>
                             )}
                             {a.estado === "devolvido" && !a.liquidado_em && (
-                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({liquidado_em:new Date().toISOString(),valor_liquidacao:parseFloat(liquidacao)}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#2980b9",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>💶 Pagar lojista {liquidacao}€</button>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({liquidado_em:new Date().toISOString(),valor_liquidacao:parseFloat(liquidacao)}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#2980b9",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>💶 Pagar lojista {liquidacao}€</button>
                             )}
-                            {a.liquidado_em && <span style={{fontSize:"0.65rem",color:"#27ae60"}}>✓ Pago em {new Date(a.liquidado_em).toLocaleDateString("pt-PT")} · {a.valor_liquidacao?.toFixed(2)}€</span>}
+                            {a.liquidado_em && <span style={{fontSize:"0.75rem",color:"#27ae60"}}>✓ Pago em {new Date(a.liquidado_em).toLocaleDateString("pt-PT")} · {a.valor_liquidacao?.toFixed(2)}€</span>}
                             {a.deposito_estado === "em_disputa" && <>
-                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"retido_lojista"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>Reter (lojista)</button>
-                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"inherit"}}>Devolver ao cliente</button>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"retido_lojista"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>Reter (lojista)</button>
+                              <button onClick={async()=>{await supabase.from("alugueres_lojista").update({deposito_estado:"devolvido"}).eq("id",a.id);carregarDados();}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"inherit"}}>Devolver ao cliente</button>
                             </>}
-                            {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Cliente</a>}
-                            {a.lojista?.email && <a href={`mailto:${a.lojista.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Lojista</a>}
+                            {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Cliente</a>}
+                            {a.lojista?.email && <a href={`mailto:${a.lojista.email}`} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e2dfda",color:"#5a5855",textDecoration:"none",fontFamily:"inherit"}}>✉ Lojista</a>}
                           </div>
                         </div>
                       );

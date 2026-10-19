@@ -214,7 +214,7 @@ function SeeWhois() {
                 ["Perfil completo", resultado.cliente.perfil_completo ? "✓ Sim" : "⚠️ Não"],
               ].map(([k, v]) => (
                 <div key={k} style={{ background:"#f8f8f6",padding:"0.85rem" }}>
-                  <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.25rem" }}>{k}</div>
+                  <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.25rem" }}>{k}</div>
                   <div style={{ fontSize:"0.85rem",fontWeight:500,wordBreak:"break-word" }}>{v}</div>
                 </div>
               ))}
@@ -230,7 +230,7 @@ function SeeWhois() {
             ].map((s, i) => (
               <div key={i} style={{ background:"#fff",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
                 <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor||"#080808" }}>{s.val}</div>
-                <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
               </div>
             ))}
           </div>
@@ -254,7 +254,7 @@ function SeeWhois() {
                               </div>
                               <div>
                                 <div style={{ fontWeight:600 }}>{peca?.nome || "—"}</div>
-                                <div style={{ fontSize:"0.6rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia || "—"}</div>
+                                <div style={{ fontSize:"0.72rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia || "—"}</div>
                               </div>
                             </div>
                           </td>
@@ -262,7 +262,7 @@ function SeeWhois() {
                           <td style={{ ...TD,whiteSpace:"nowrap",fontSize:"0.8rem" }}>{a.data_inicio} → {a.data_fim}</td>
                           <td style={TD}>
                             <strong>{a.valor_aluguer}€</strong>
-                            {a.desconto_cesto && <div style={{ fontSize:"0.58rem",color:"#c4748a",marginTop:"0.1rem" }}>🛍 {a.desconto_cesto.startsWith("opcao_a") ? a.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "desc. caução"}</div>}
+                            {a.desconto_cesto && <div style={{ fontSize:"0.68rem",color:"#c4748a",marginTop:"0.1rem" }}>🛍 {a.desconto_cesto.startsWith("opcao_a") ? a.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "desc. caução"}</div>}
                           </td>
                           <td style={TD}><span style={BADGE(a.estado==="devolvido"?"green":["devolvido_danificado","cancelado","nao_devolvido"].includes(a.estado)?"red":"orange")}>{ESTADO_LABEL_PT[a.estado] || a.estado}</span></td>
                           <td style={TD}>{reciboDoAluguer ? <button style={BTN("outline","sm")} onClick={() => abrirRecibo(reciboDoAluguer, a)}>🧾 Ver talão</button> : <span style={{ color:"#ccc",fontSize:"0.75rem" }}>—</span>}</td>
@@ -497,7 +497,7 @@ function Caixa() {
           ].map((s,i) => (
             <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
               <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor||"#080808" }}>{s.val}</div>
-              <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+              <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
             </div>
           ))}
         </div>
@@ -570,8 +570,8 @@ function RowDia({ linha, onApagarDespesa }) {
           <td colSpan={2} style={{ ...TD,fontSize:"0.78rem" }}>
             {item.descricao} <span style={{ color:"#888" }}>({item.categoria})</span>
             {item.nif && item.nif !== "—" && <span style={{ color:"#888",marginLeft:"0.5rem" }}>NIF {item.nif}</span>}
-            {item.desconto_cesto && <span style={{ marginLeft:"0.5rem",fontSize:"0.62rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem",borderRadius:2,fontWeight:600 }}>🛍 {item.desconto_cesto.startsWith("opcao_a") ? "Cesto " + item.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "Cesto desc. caução"}</span>}
-            {item.tipo === "saida" && item.id && <span style={{ marginLeft:"0.5rem",fontSize:"0.6rem",padding:"0.1rem 0.35rem",borderRadius:2,fontWeight:600,background:item.tipo_custo==="fixo"?"#f0f4ff":"#fff8f0",color:item.tipo_custo==="fixo"?"#3f5fa3":"#8a5a00" }}>{item.tipo_custo==="fixo"?"🏠 Fixo":"📦 Variável"}</span>}
+            {item.desconto_cesto && <span style={{ marginLeft:"0.5rem",fontSize:"0.75rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem",borderRadius:2,fontWeight:600 }}>🛍 {item.desconto_cesto.startsWith("opcao_a") ? "Cesto " + item.desconto_cesto.replace("opcao_a_","").replace("pct","% desc.") : "Cesto desc. caução"}</span>}
+            {item.tipo === "saida" && item.id && <span style={{ marginLeft:"0.5rem",fontSize:"0.72rem",padding:"0.1rem 0.35rem",borderRadius:2,fontWeight:600,background:item.tipo_custo==="fixo"?"#f0f4ff":"#fff8f0",color:item.tipo_custo==="fixo"?"#3f5fa3":"#8a5a00" }}>{item.tipo_custo==="fixo"?"🏠 Fixo":"📦 Variável"}</span>}
           </td>
           <td style={{ ...TD,fontSize:"0.78rem",color:item.tipo==="entrada"?"#27ae60":"#e74c3c",fontWeight:600 }}>{item.tipo==="entrada"?"+":"-"}{item.valor.toFixed(0)}€</td>
           <td style={TD}></td>
@@ -755,7 +755,7 @@ function AfiliadosTab() {
   const totalPorPagar = conversoes.filter(c => !c.comissao_paga).reduce((s, c) => s + (c.comissao_valor || 0), 0);
 
   const FLD = { border:"1px solid #e0ddd8", padding:"0.55rem 0.75rem", fontSize:"0.82rem", fontFamily:"inherit", width:"100%", background:"#faf9f7", outline:"none" };
-  const BTN = { fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", padding:"0.65rem 1.25rem", border:"none", cursor:"pointer", fontFamily:"inherit" };
+  const BTN = { fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", padding:"0.65rem 1.25rem", border:"none", cursor:"pointer", fontFamily:"inherit" };
 
   return (
     <div style={{ maxWidth:900 }}>
@@ -785,7 +785,7 @@ function AfiliadosTab() {
           ].map((s,i) => (
             <div key={i} style={{ background:"#faf9f7", padding:"1.25rem 1.5rem" }}>
               <div style={{ fontFamily:"var(--sans)", fontSize:"2rem", fontWeight:300, color:"#c4748a" }}>{s.val}</div>
-              <div style={{ fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#888" }}>{s.label}</div>
+              <div style={{ fontSize:"0.75rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#888" }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -802,28 +802,28 @@ function AfiliadosTab() {
               </div>
               <div style={{ textAlign:"center" }}>
                 <div style={{ fontFamily:"var(--sans)", fontSize:"1.4rem", fontWeight:300, letterSpacing:"0.1em", color:"#080808" }}>{af.codigo}</div>
-                <div style={{ fontSize:"0.6rem", color:"#aaa", letterSpacing:"0.1em" }}>código</div>
+                <div style={{ fontSize:"0.72rem", color:"#aaa", letterSpacing:"0.1em" }}>código</div>
               </div>
               <div style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"1rem", fontWeight:500, color:"#c4748a" }}>{af.desconto_pct}%</div>
-                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>desc. cliente</div>
+                <div style={{ fontSize:"0.72rem", color:"#aaa" }}>desc. cliente</div>
               </div>
               <div style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"1rem", fontWeight:500 }}>{af.comissao_pct}%</div>
-                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>comissão</div>
+                <div style={{ fontSize:"0.72rem", color:"#aaa" }}>comissão</div>
               </div>
               <div style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"1rem", fontWeight:500 }}>{af.total_conversoes || 0}</div>
-                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>conversões</div>
+                <div style={{ fontSize:"0.72rem", color:"#aaa" }}>conversões</div>
               </div>
               <div style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"1rem", fontWeight:500, color:"#27ae60" }}>{(af.total_comissao_gerada||0).toFixed(2)}€</div>
-                <div style={{ fontSize:"0.6rem", color:"#aaa" }}>gerado</div>
+                <div style={{ fontSize:"0.72rem", color:"#aaa" }}>gerado</div>
               </div>
               <div style={{ display:"flex", gap:"0.4rem", flexShrink:0 }}>
-                <button onClick={() => copiarLink(af.codigo)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.6rem" }} title="Copiar link de afiliado">🔗 Link</button>
-                <button onClick={() => editarAfiliado(af)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.6rem" }}>Editar</button>
-                <button onClick={() => toggleAtivo(af)} style={{ ...BTN, background: af.ativo?"#fdf0f2":"#eaf7ed", color: af.ativo?"#c0392b":"#27ae60", fontSize:"0.6rem" }}>{af.ativo ? "Pausar" : "Activar"}</button>
+                <button onClick={() => copiarLink(af.codigo)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.72rem" }} title="Copiar link de afiliado">🔗 Link</button>
+                <button onClick={() => editarAfiliado(af)} style={{ ...BTN, background:"#f0eeeb", color:"#080808", fontSize:"0.72rem" }}>Editar</button>
+                <button onClick={() => toggleAtivo(af)} style={{ ...BTN, background: af.ativo?"#fdf0f2":"#eaf7ed", color: af.ativo?"#c0392b":"#27ae60", fontSize:"0.72rem" }}>{af.ativo ? "Pausar" : "Activar"}</button>
               </div>
             </div>
           ))}
@@ -834,7 +834,7 @@ function AfiliadosTab() {
         <div>
           <div style={{ display:"flex", flexDirection:"column", gap:"1px", background:"#e0ddd8" }}>
             <div style={{ background:"#f0eeeb", padding:"0.6rem 1rem", display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr 1fr", gap:"0.5rem" }}>
-              {["Data","Afiliado","Código","Aluguer","Desconto","Comissão"].map(h => <span key={h} style={{ fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888" }}>{h}</span>)}
+              {["Data","Afiliado","Código","Aluguer","Desconto","Comissão"].map(h => <span key={h} style={{ fontSize:"0.72rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888" }}>{h}</span>)}
             </div>
             {conversoes.length === 0 && <div style={{ background:"#faf9f7", padding:"2rem", textAlign:"center", fontSize:"0.82rem", color:"#aaa" }}>Nenhuma conversão.</div>}
             {conversoes.map(c => (
@@ -846,8 +846,8 @@ function AfiliadosTab() {
                 <span style={{ fontSize:"0.8rem", color:"#c4748a" }}>−{c.desconto_aplicado?.toFixed(2)}€</span>
                 <div style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
                   <span style={{ fontSize:"0.8rem", fontWeight:500, color: c.comissao_paga?"#27ae60":"#e74c3c" }}>{c.comissao_valor?.toFixed(2)}€</span>
-                  {!c.comissao_paga && <button onClick={() => marcarPago(c.id)} style={{ ...BTN, background:"#eaf7ed", color:"#27ae60", fontSize:"0.55rem", padding:"0.25rem 0.5rem" }}>✓ Pagar</button>}
-                  {c.comissao_paga && <span style={{ fontSize:"0.6rem", color:"#27ae60" }}>pago</span>}
+                  {!c.comissao_paga && <button onClick={() => marcarPago(c.id)} style={{ ...BTN, background:"#eaf7ed", color:"#27ae60", fontSize:"0.68rem", padding:"0.25rem 0.5rem" }}>✓ Pagar</button>}
+                  {c.comissao_paga && <span style={{ fontSize:"0.72rem", color:"#27ae60" }}>pago</span>}
                 </div>
               </div>
             ))}
@@ -866,27 +866,27 @@ function AfiliadosTab() {
               { label:"Código único *", key:"codigo", placeholder:"EX: ANA15", upper:true },
             ].map(f => (
               <div key={f.key}>
-                <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>{f.label}</label>
+                <label style={{ fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>{f.label}</label>
                 <input value={form[f.key]} onChange={e => setForm(v => ({ ...v, [f.key]: f.upper ? e.target.value.toUpperCase() : e.target.value }))} placeholder={f.placeholder} style={FLD} />
               </div>
             ))}
             <div>
-              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Plataforma</label>
+              <label style={{ fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Plataforma</label>
               <select value={form.plataforma} onChange={e => setForm(v=>({...v, plataforma:e.target.value}))} style={FLD}>
                 {["instagram","tiktok","youtube","outro"].map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Desconto para o cliente (%)</label>
+              <label style={{ fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Desconto para o cliente (%)</label>
               <input type="number" min="0" max="50" value={form.desconto_pct} onChange={e => setForm(v=>({...v, desconto_pct:e.target.value}))} style={FLD} />
             </div>
             <div>
-              <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Comissão para o criador (%)</label>
+              <label style={{ fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Comissão para o criador (%)</label>
               <input type="number" min="0" max="50" value={form.comissao_pct} onChange={e => setForm(v=>({...v, comissao_pct:e.target.value}))} style={FLD} />
             </div>
           </div>
           <div style={{ marginBottom:"1.5rem" }}>
-            <label style={{ fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Notas internas</label>
+            <label style={{ fontSize:"0.75rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888", display:"block", marginBottom:"0.3rem" }}>Notas internas</label>
             <textarea value={form.notas} onChange={e => setForm(v=>({...v, notas:e.target.value}))} rows={2} style={{ ...FLD, resize:"vertical" }} />
           </div>
           {form.codigo && (
@@ -959,7 +959,7 @@ function MensagensBackoffice() {
       <div style={{ display:"flex",gap:"1.5rem",height:"65vh" }}>
         {/* Lista */}
         <div style={{ ...CARD_S, width:320, minWidth:280, display:"flex", flexDirection:"column" }}>
-          <div style={{ padding:"1rem",borderBottom:"1px solid #f0eeeb",fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888" }}>
+          <div style={{ padding:"1rem",borderBottom:"1px solid #f0eeeb",fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888" }}>
             {loading ? "..." : `${conversas.length} conversa${conversas.length!==1?"s":""}`}
           </div>
           <div style={{ overflowY:"auto",flex:1 }}>
@@ -971,9 +971,9 @@ function MensagensBackoffice() {
                   {conv.aluguer?.referencia ? `Ref. ${conv.aluguer.referencia}` : conv.assunto || "—"}
                 </div>
                 <div style={{ display:"flex",justifyContent:"space-between",marginTop:"0.25rem",alignItems:"center" }}>
-                  <span style={{ fontSize:"0.6rem",color:"#aaa" }}>{conv.ultima_mensagem_em ? new Date(conv.ultima_mensagem_em).toLocaleDateString("pt-PT") : ""}</span>
+                  <span style={{ fontSize:"0.72rem",color:"#aaa" }}>{conv.ultima_mensagem_em ? new Date(conv.ultima_mensagem_em).toLocaleDateString("pt-PT") : ""}</span>
                   {(conv.nao_lidas_lojista > 0 || conv.nao_lidas_cliente > 0) && (
-                    <span style={{ background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:10 }}>
+                    <span style={{ background:"#c4748a",color:"#fff",fontSize:"0.68rem",padding:"0.1rem 0.4rem",borderRadius:10 }}>
                       {conv.nao_lidas_lojista + conv.nao_lidas_cliente}
                     </span>
                   )}
@@ -1001,7 +1001,7 @@ function MensagensBackoffice() {
                       <div style={{ padding:"0.6rem 0.85rem",background:eLojista?"#080808":"#f0eeeb",color:eLojista?"#fff":"#080808",fontSize:"0.82rem",lineHeight:1.4,wordBreak:"break-word" }}>
                         {m.conteudo}
                       </div>
-                      <span style={{ fontSize:"0.58rem",color:"#aaa",marginTop:"0.2rem",alignSelf:eLojista?"flex-end":"flex-start" }}>
+                      <span style={{ fontSize:"0.68rem",color:"#aaa",marginTop:"0.2rem",alignSelf:eLojista?"flex-end":"flex-start" }}>
                         {eLojista?"Lojista":"Cliente"} · {new Date(m.created_at).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}
                       </span>
                     </div>
@@ -1012,7 +1012,7 @@ function MensagensBackoffice() {
                 <input value={texto} onChange={e=>setTexto(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();}}}
                   placeholder="Responder como lojista..."
                   style={{ flex:1,padding:"0.6rem 0.85rem",border:"1px solid #e2dfda",fontFamily:"'Jost',sans-serif",fontSize:"0.82rem",outline:"none" }} />
-                <button onClick={enviar} style={{ padding:"0.6rem 1rem",background:"#080808",color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Jost',sans-serif",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase" }}>Enviar</button>
+                <button onClick={enviar} style={{ padding:"0.6rem 1rem",background:"#080808",color:"#fff",border:"none",cursor:"pointer",fontFamily:"'Jost',sans-serif",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase" }}>Enviar</button>
               </div>
             </>
           )}
@@ -1751,7 +1751,7 @@ export default function Backoffice() {
                 { val: `${stats.taxa_ocupacao}%`, lbl: "Ocupação", cor: stats.taxa_ocupacao > 70 ? "#1e7e3e" : stats.taxa_ocupacao > 30 ? "#b8860b" : "#e74c3c", sub: "do stock total" },
               ].map((s,idx) => (
                 <div key={idx} style={{ background:"#fff",padding:"1.5rem" }}>
-                  <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#3f3e3c",marginBottom:"0.4rem" }}>{s.lbl}</div>
+                  <div style={{ fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#3f3e3c",marginBottom:"0.4rem" }}>{s.lbl}</div>
                   <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:400,color:s.cor,lineHeight:1,marginBottom:"0.3rem" }}>{s.val}</div>
                   <div style={{ fontSize:"0.68rem",color:"#888" }}>{s.sub}</div>
                 </div>
@@ -1770,7 +1770,7 @@ export default function Backoffice() {
                   <span style={{ fontSize:"1.4rem" }}>{s.icon}</span>
                   <div>
                     <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:400,color:s.cor||"#080808",lineHeight:1 }}>{s.val}</div>
-                    <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#3f3e3c",marginTop:"0.2rem" }}>{s.lbl}</div>
+                    <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#3f3e3c",marginTop:"0.2rem" }}>{s.lbl}</div>
                   </div>
                 </div>
               ))}
@@ -1779,21 +1779,21 @@ export default function Backoffice() {
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"#e2dfda",marginBottom:"1rem" }}>
               {/* Cesto deste mês */}
               <div style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
-                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🛍 Cestos este mês</div>
+                <div style={{ fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🛍 Cestos este mês</div>
                 <div style={{ display:"flex",gap:"1.5rem",alignItems:"flex-end" }}>
                   <div>
                     <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:300,color:"#c4748a",lineHeight:1 }}>{stats.desconto_cesto_mes||0}</div>
-                    <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>com desconto</div>
+                    <div style={{ fontSize:"0.68rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>com desconto</div>
                   </div>
                   <div>
                     <div style={{ fontFamily:"var(--sans)",fontSize:"2.2rem",fontWeight:300,color:"#27ae60",lineHeight:1 }}>{Number(stats.caucoes_mes||0).toFixed(0)}€</div>
-                    <div style={{ fontSize:"0.58rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>cauções recebidas</div>
+                    <div style={{ fontSize:"0.68rem",color:"#888",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:"0.2rem" }}>cauções recebidas</div>
                   </div>
                 </div>
               </div>
               {/* Fidelidade - distribuição de níveis */}
               <div style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
-                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🏆 Níveis de fidelidade</div>
+                <div style={{ fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>🏆 Níveis de fidelidade</div>
                 <div style={{ display:"flex",gap:"1rem",flexWrap:"wrap" }}>
                   {[
                     { n:"Bronze",  icon:"🥉", cor:"#cd7f32" },
@@ -1803,7 +1803,7 @@ export default function Backoffice() {
                   ].map(lv => (
                     <div key={lv.n} style={{ textAlign:"center" }}>
                       <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:400,color:lv.cor,lineHeight:1 }}>{(stats.niveis||{})[lv.n]||0}</div>
-                      <div style={{ fontSize:"0.6rem",color:lv.cor,marginTop:"0.15rem" }}>{lv.icon} {lv.n}</div>
+                      <div style={{ fontSize:"0.72rem",color:lv.cor,marginTop:"0.15rem" }}>{lv.icon} {lv.n}</div>
                     </div>
                   ))}
                 </div>
@@ -1813,11 +1813,11 @@ export default function Backoffice() {
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginTop:"1rem",marginBottom:"2rem" }}>
               <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #080808" }}>
                 <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300 }}>{stats.taxa_ocupacao}%</div>
-                <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Taxa de ocupação</div>
+                <div style={{ fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Taxa de ocupação</div>
               </div>
               <div style={{ background:"#fff",padding:"1.5rem",borderTop:"3px solid #c4748a",cursor:"pointer" }} onClick={() => setTab("seewhois")}>
                 <div style={{ fontSize:"1.5rem" }}>🔍</div>
-                <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Pesquisar cliente (SeeWhois) →</div>
+                <div style={{ fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>Pesquisar cliente (SeeWhois) →</div>
               </div>
             </div>
             <div style={CARD}>
@@ -1842,8 +1842,8 @@ export default function Backoffice() {
                           <td style={TD}><span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a" }}>{r.clientes?.codigo_cliente || "—"}</span></td>
                           <td style={TD}>
                             <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{r.stock_tamanhos?.pecas?.nome || "—"}</div>
-                            <div style={{ fontSize:"0.65rem",color:"#c4748a",fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
-                            <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div>
+                            <div style={{ fontSize:"0.75rem",color:"#c4748a",fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
+                            <div style={{ fontSize:"0.75rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div>
                           </td>
                           <td style={{ ...TD,fontSize:"0.82rem",whiteSpace:"nowrap" }}>{r.data_inicio_desejada} → {r.data_fim_desejada}</td>
                           <td style={TD}><span style={BADGE(r.estado==="notificado"?"green":"orange")}>{r.estado==="notificado"?"Notificado":"A aguardar"}</span></td>
@@ -1936,13 +1936,13 @@ export default function Backoffice() {
                             <td style={TD}><span style={{ fontFamily:"monospace",fontWeight:700,color:"#c4748a" }}>{a.clientes?.codigo_cliente || "—"}</span></td>
                             <td style={TD}>
                               <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{a.stock_tamanhos?.pecas?.nome || "—"}</div>
-                              <div style={{ fontSize:"0.65rem",color:"#c4748a",fontFamily:"monospace" }}>{a.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
-                              <div style={{ fontSize:"0.65rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
+                              <div style={{ fontSize:"0.75rem",color:"#c4748a",fontFamily:"monospace" }}>{a.stock_tamanhos?.pecas?.codigo_referencia || "—"}</div>
+                              <div style={{ fontSize:"0.75rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
                             </td>
                             <td style={TD}>
                               <span style={BADGE(a.estado==="ativo"?"green":a.estado==="enviado"?"orange":"gray")}>{ESTADO_LABEL_PT[a.estado]||a.estado}</span>
-                              {a.estado==="ativo" && emAtraso && <div style={{ marginTop:"0.25rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e74c3c",fontWeight:700 }}>⚠️ Atraso {calcularAtraso(a.data_fim)}d</div>}
-                              {a.estado==="enviado" && prazoEntrega && new Date(prazoEntrega) < new Date() && <div style={{ marginTop:"0.25rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e67e22",fontWeight:700 }}>⚠️ Entrega atrasada</div>}
+                              {a.estado==="ativo" && emAtraso && <div style={{ marginTop:"0.25rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e74c3c",fontWeight:700 }}>⚠️ Atraso {calcularAtraso(a.data_fim)}d</div>}
+                              {a.estado==="enviado" && prazoEntrega && new Date(prazoEntrega) < new Date() && <div style={{ marginTop:"0.25rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#e67e22",fontWeight:700 }}>⚠️ Entrega atrasada</div>}
                             </td>
                             <td style={TD}>
                               {a.estado === "enviado" && prazoEntrega && (
@@ -2108,7 +2108,7 @@ export default function Backoffice() {
                     {pecas.map(p => (
                       <tr key={p.id} style={{ background:"#fff" }}>
                         <td style={TD}>{p.fotos?.length>0?<img src={p.fotos[0]} alt="" style={{ width:48,height:60,objectFit:"cover" }}/>:<div style={{ width:48,height:60,background:"#f0eeeb",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc" }}>📷</div>}</td>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.6rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}<div style={{ fontSize:"0.65rem",color:"#c4748a",marginTop:"0.2rem",fontFamily:"monospace",fontWeight:600 }}>{p.codigo_referencia || p.id.slice(0,8)}</div></td>
+                        <td style={TD}><div style={{ fontWeight:600 }}>{p.nome}</div>{p.destaque&&<span style={{ fontSize:"0.72rem",background:"#fff0f3",color:"#c4748a",padding:"0.1rem 0.4rem" }}>★ DESTAQUE</span>}<div style={{ fontSize:"0.75rem",color:"#c4748a",marginTop:"0.2rem",fontFamily:"monospace",fontWeight:600 }}>{p.codigo_referencia || p.id.slice(0,8)}</div></td>
                         <td style={TD}>{p.categorias?.nome||"—"}</td>
                         <td style={TD}>{p.preco_aluguer_dia}€{p.preco_avulso?<div style={{ fontSize:"0.72rem",color:"#888" }}>{p.preco_avulso}€/oc.</div>:null}</td>
                         <td style={{ ...TD,maxWidth:120 }}><div style={{ fontSize:"0.72rem",color:"#888" }}>{(p.ocasioes||[]).slice(0,3).join(", ")||"—"}</div></td>
@@ -2189,11 +2189,11 @@ export default function Backoffice() {
                           {TAMANHOS.map(sz => <option key={sz} value={sz}>{sz}</option>)}
                         </select>
                         <div style={{ display:"flex",flexDirection:"column",gap:"0.2rem" }}>
-                          <span style={{ fontSize:"0.55rem",color:"#888" }}>Total</span>
+                          <span style={{ fontSize:"0.68rem",color:"#888" }}>Total</span>
                           <input style={{ ...INP,width:"80px" }} type="number" min="0" value={t.quantidade_total} onChange={e => atualizarTamanhoEdit(i, "quantidade_total", e.target.value)} />
                         </div>
                         <div style={{ display:"flex",flexDirection:"column",gap:"0.2rem" }}>
-                          <span style={{ fontSize:"0.55rem",color:"#888" }}>Disponível</span>
+                          <span style={{ fontSize:"0.68rem",color:"#888" }}>Disponível</span>
                           <input style={{ ...INP,width:"80px" }} type="number" min="0" value={t.quantidade_disponivel} onChange={e => atualizarTamanhoEdit(i, "quantidade_disponivel", e.target.value)} />
                         </div>
                         <button type="button" onClick={() => removerTamanhoEdit(i)} style={{ background:"none",border:"none",cursor:"pointer",color:"#e74c3c",fontSize:"1.2rem",marginTop:"1rem" }}>✕</button>
@@ -2257,7 +2257,7 @@ export default function Backoffice() {
                 { id:"devolvido", lbl:"Concluídos", estados:["devolvido","devolvido_danificado"] },
                 { id:"cancelado", lbl:"Cancelados", estados:["cancelado","nao_devolvido"] },
               ].map(f => (
-                <button key={f.id} onClick={() => setFiltroEstadoAl(f.id)} style={{ padding:"0.35rem 0.75rem",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",border:"none",background:filtroEstadoAl===f.id?"#080808":"#f0eeeb",color:filtroEstadoAl===f.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap" }}>
+                <button key={f.id} onClick={() => setFiltroEstadoAl(f.id)} style={{ padding:"0.35rem 0.75rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",border:"none",background:filtroEstadoAl===f.id?"#080808":"#f0eeeb",color:filtroEstadoAl===f.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap" }}>
                   {f.lbl}
                   {f.estados && <span style={{ marginLeft:"0.35rem",opacity:0.7 }}>({alugueres.filter(a=>f.estados.includes(a.estado)).length})</span>}
                 </button>
@@ -2304,21 +2304,21 @@ export default function Backoffice() {
                               </div>
                               <div>
                                 <div style={{ fontWeight:600,fontSize:"0.85rem" }}>{peca?.nome||"—"}</div>
-                                <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia||"—"}</div>
+                                <div style={{ fontSize:"0.75rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{peca?.codigo_referencia||"—"}</div>
                                 <div style={{ fontSize:"0.72rem",color:"#888" }}>Tam: {a.stock_tamanhos?.tamanho}</div>
                               </div>
                             </div>
                           </td>
                           <td style={TD}>
                             <div style={{ fontWeight:600 }}>{a.clientes?.nome||"—"}</div>
-                            <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600 }}>{a.clientes?.codigo_cliente||"—"}</div>
+                            <div style={{ fontSize:"0.75rem",color:"#c4748a",fontWeight:600 }}>{a.clientes?.codigo_cliente||"—"}</div>
                             <div style={{ fontSize:"0.72rem",color:"#888" }}>{a.clientes?.telefone||a.clientes?.email}</div>
                             {enderecoCompleto && <div style={{ fontSize:"0.68rem",color:"#aaa",marginTop:"0.15rem" }}>📍 {enderecoCompleto}{a.clientes?.cidade?`, ${a.clientes.cidade}`:""}</div>}
                             <span style={{ ...BADGE(""),background:nv.cor+"22",color:nv.cor,marginTop:"0.2rem",display:"inline-block" }}>{nv.icon} {nv.nome}</span>
                           </td>
                           <td style={TD}>
                             <ProgressoAluguer estado={a.estado} />
-                            <select value={a.estado} onChange={e=>atualizarEstado(a.id,e.target.value)} style={{ fontSize:"0.6rem",padding:"0.3rem 0.4rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",cursor:"pointer",marginTop:"0.4rem" }}>
+                            <select value={a.estado} onChange={e=>atualizarEstado(a.id,e.target.value)} style={{ fontSize:"0.72rem",padding:"0.3rem 0.4rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"'Jost',sans-serif",cursor:"pointer",marginTop:"0.4rem" }}>
                               <option value="pendente">A aguardar pagamento</option>
                               <option value="confirmado">Pago — a preparar envio</option>
                               <option value="enviado">A caminho</option>
@@ -2334,7 +2334,7 @@ export default function Backoffice() {
                           <td style={TD}>{atraso>0?<span style={{ color:"#e74c3c",fontWeight:700 }}>+{atraso}d</span>:<span style={{ color:"#27ae60" }}>✓</span>}</td>
                           <td style={TD}>
                             <strong>{a.valor_aluguer}€</strong>
-                            {a.desconto_cesto && <div style={{ fontSize:"0.6rem",color:"#888",marginTop:"0.15rem" }}>{a.deposito_valor}€ dep.</div>}
+                            {a.desconto_cesto && <div style={{ fontSize:"0.72rem",color:"#888",marginTop:"0.15rem" }}>{a.deposito_valor}€ dep.</div>}
                           </td>
                           <td style={TD}>
                             {a.desconto_cesto ? (
@@ -2384,7 +2384,7 @@ export default function Backoffice() {
                     const nv = NIVEL(comp);
                     return (
                       <tr key={c.id} style={{ background:"#fff" }}>
-                        <td style={TD}><div style={{ fontWeight:600 }}>{c.nome||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.email}</div><div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,marginTop:"0.15rem" }}>{c.codigo_cliente}</div></td>
+                        <td style={TD}><div style={{ fontWeight:600 }}>{c.nome||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.email}</div><div style={{ fontSize:"0.75rem",color:"#c4748a",fontWeight:600,marginTop:"0.15rem" }}>{c.codigo_cliente}</div></td>
                         <td style={TD}><div style={{ fontSize:"0.82rem" }}>{c.telefone||"—"}</div><div style={{ fontSize:"0.72rem",color:"#888" }}>{c.nif?"NIF: "+c.nif:""}</div></td>
                         <td style={TD}>{c.cidade||"—"}</td>
                         <td style={TD}>
@@ -2414,7 +2414,7 @@ export default function Backoffice() {
                 <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem",marginBottom:"1.5rem" }}>
                   {[["Email",clienteSel.email],["Telefone",clienteSel.telefone||"—"],["NIF",clienteSel.nif||"—"],["Cidade",clienteSel.cidade||"—"],["País",clienteSel.pais||"—"],["Membro desde",new Date(clienteSel.created_at).toLocaleDateString("pt-PT")],["Género",clienteSel.genero||"—"],["Código postal",clienteSel.codigo_postal||"—"]].map(([k,v])=>(
                     <div key={k} style={{ background:"#f8f8f6",padding:"1rem" }}>
-                      <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem" }}>{k}</div>
+                      <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem" }}>{k}</div>
                       <div style={{ fontSize:"0.9rem",fontWeight:500 }}>{v}</div>
                     </div>
                   ))}
@@ -2460,7 +2460,7 @@ export default function Backoffice() {
                             </div>
                             <div>
                               <div style={{ fontWeight:600 }}>{r.stock_tamanhos?.pecas?.nome||"—"}</div>
-                              <div style={{ fontSize:"0.65rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia||"—"}</div>
+                              <div style={{ fontSize:"0.75rem",color:"#c4748a",fontWeight:600,fontFamily:"monospace" }}>{r.stock_tamanhos?.pecas?.codigo_referencia||"—"}</div>
                               <div style={{ fontSize:"0.72rem",color:"#888" }}>Tam: {r.stock_tamanhos?.tamanho}</div>
                             </div>
                           </div>
@@ -2481,7 +2481,7 @@ export default function Backoffice() {
                         <td style={TD}>
                           <span style={BADGE(r.estado==="aguarda"?"orange":"green")}>{r.estado==="aguarda"?"A aguardar":"Notificado automaticamente"}</span>
                           {r.estado==="notificado" && r.prazo_confirmacao && (
-                            <div style={{ fontSize:"0.62rem",color:"#888",marginTop:"0.2rem" }}>Prazo: {new Date(r.prazo_confirmacao).toLocaleString("pt-PT")}</div>
+                            <div style={{ fontSize:"0.75rem",color:"#888",marginTop:"0.2rem" }}>Prazo: {new Date(r.prazo_confirmacao).toLocaleString("pt-PT")}</div>
                           )}
                         </td>
                       </tr>
@@ -2536,8 +2536,8 @@ export default function Backoffice() {
                           <div style={{ fontWeight:600 }}>{c.titulo}</div>
                           <div style={{ fontSize:"0.75rem",color:"#888",maxWidth:220,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{c.mensagem}</div>
                           <div style={{ display:"flex",gap:"0.3rem",marginTop:"0.3rem" }}>
-                            {c.titulo_fr && <span style={{ fontSize:"0.6rem",background:"#e8f4f8",color:"#2980b9",padding:"0.1rem 0.35rem",borderRadius:2 }}>FR</span>}
-                            {c.titulo_lt && <span style={{ fontSize:"0.6rem",background:"#e8f8ee",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:2 }}>LT</span>}
+                            {c.titulo_fr && <span style={{ fontSize:"0.72rem",background:"#e8f4f8",color:"#2980b9",padding:"0.1rem 0.35rem",borderRadius:2 }}>FR</span>}
+                            {c.titulo_lt && <span style={{ fontSize:"0.72rem",background:"#e8f8ee",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:2 }}>LT</span>}
                           </div>
                         </td>
                         <td style={TD}><span style={BADGE(c.tipo==="cupao"?"rosa":c.tipo==="banner"?"blue":"green")}>{c.tipo}</span></td>
@@ -2649,8 +2649,8 @@ export default function Backoffice() {
                 {pecasComFoto.filter(p=>p.destaque).map(p => (
                   <div key={p.id} style={{ textAlign:"center",position:"relative" }}>
                     {p.fotos?.[0] && <img src={p.fotos[0]} alt={p.nome} style={{ width:64,height:80,objectFit:"cover",border:"2px solid #c4748a" }} />}
-                    <div style={{ fontSize:"0.5rem",color:"#c4748a",marginTop:"0.2rem",fontWeight:600 }}>★ DESTAQUE</div>
-                    <div style={{ fontSize:"0.55rem",color:"#555",maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{p.nome}</div>
+                    <div style={{ fontSize:"0.68rem",color:"#c4748a",marginTop:"0.2rem",fontWeight:600 }}>★ DESTAQUE</div>
+                    <div style={{ fontSize:"0.68rem",color:"#555",maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{p.nome}</div>
                   </div>
                 ))}
                 {pecasComFoto.filter(p=>p.destaque).length === 0 && (
@@ -2674,7 +2674,7 @@ export default function Backoffice() {
                   {[{val:`${estatisticas.totalReceita.toFixed(0)}€`,lbl:"Receita total",cor:"#c4748a"},{val:estatisticas.totalAlugueres,lbl:"Total alugueres"},{val:`${estatisticas.ltv.toFixed(0)}€`,lbl:"LTV médio"},{val:`${estatisticas.taxaCancelamento}%`,lbl:"Taxa cancelamento"}].map((s,i)=>(
                     <div key={i} style={{ background:"#fff",padding:"1.5rem",borderTop:`3px solid ${s.cor||"#080808"}` }}>
                       <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300,color:s.cor||"#080808" }}>{s.val}</div>
-                      <div style={{ fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>{s.lbl}</div>
+                      <div style={{ fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.5rem" }}>{s.lbl}</div>
                     </div>
                   ))}
                 </div>
@@ -2732,7 +2732,7 @@ export default function Backoffice() {
                     ].map((s,i) => (
                       <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
                         <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
-                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                        <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
                   </div>
@@ -2743,12 +2743,12 @@ export default function Backoffice() {
                   <p style={CARD_T}>Análise 80-20 (Pareto)</p>
                   <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem" }}>
                     <div style={{ background:"#fff8f0",padding:"1.5rem",borderLeft:"4px solid #c4748a" }}>
-                      <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Peças que geram 80% receita</div>
+                      <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Peças que geram 80% receita</div>
                       <div style={{ fontFamily:"var(--sans)",fontSize:"2.5rem",fontWeight:300,color:"#c4748a" }}>{estatisticas.pareto20Pecas}</div>
                       <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalPecas} peças totais ({estatisticas.totalPecas > 0 ? Math.round(estatisticas.pareto20Pecas/estatisticas.totalPecas*100) : 0}%)</div>
                     </div>
                     <div style={{ background:"#f0f8ff",padding:"1.5rem",borderLeft:"4px solid #080808" }}>
-                      <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Clientes que geram 80% receita</div>
+                      <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Clientes que geram 80% receita</div>
                       <div style={{ fontFamily:"var(--sans)",fontSize:"2.5rem",fontWeight:300,color:"#080808" }}>{estatisticas.pareto20Clientes}</div>
                       <div style={{ fontSize:"0.8rem",color:"#888" }}>de {estatisticas.totalClientes} clientes totais ({estatisticas.totalClientes > 0 ? Math.round(estatisticas.pareto20Clientes/estatisticas.totalClientes*100) : 0}%)</div>
                     </div>
@@ -2784,13 +2784,13 @@ export default function Backoffice() {
                     ].map((s,i)=>(
                       <div key={i} style={{ background:"#fff",padding:"1.25rem 1.5rem" }}>
                         <div style={{ fontFamily:"var(--sans)",fontSize:"1.5rem",fontWeight:600,color:s.cor }}>{s.val}</div>
-                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                        <div style={{ fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
                   </div>
                   {/* Breakeven visual */}
                   <div style={{ background:"#f8f8f6",padding:"1.25rem",marginBottom:"1rem" }}>
-                    <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Dia estimado de breakeven neste mês</div>
+                    <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Dia estimado de breakeven neste mês</div>
                     {estatisticas.diaBreakeven ? (
                       <>
                         <div style={{ display:"flex",alignItems:"baseline",gap:"0.75rem",marginBottom:"0.75rem" }}>
@@ -2802,7 +2802,7 @@ export default function Backoffice() {
                         <div style={{ height:8,background:"#e2dfda",borderRadius:4,overflow:"hidden",marginBottom:"0.4rem" }}>
                           <div style={{ height:"100%",width:`${Math.min(100,(estatisticas.diaBreakeven/30)*100)}%`,background:estatisticas.diaBreakeven<=15?"#27ae60":estatisticas.diaBreakeven<=22?"#f39c12":"#e74c3c",borderRadius:4 }}/>
                         </div>
-                        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.62rem",color:"#aaa" }}>
+                        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.75rem",color:"#aaa" }}>
                           <span>Dia 1</span><span>Dia 15</span><span>Dia 30</span>
                         </div>
                         <p style={{ fontSize:"0.72rem",color:"#888",marginTop:"0.75rem" }}>
@@ -2810,9 +2810,9 @@ export default function Backoffice() {
                         </p>
                         {estatisticas.temSeparacao && (
                           <div style={{ display:"flex",gap:"0.5rem",marginTop:"0.4rem",flexWrap:"wrap" }}>
-                            <span style={{ fontSize:"0.65rem",padding:"0.15rem 0.5rem",background:"#f0f4ff",color:"#3f5fa3",borderRadius:2 }}>🏠 Fixos: <strong>{Number(estatisticas.despesasFixasMedia3M||0).toFixed(0)}€/mês</strong></span>
-                            <span style={{ fontSize:"0.65rem",padding:"0.15rem 0.5rem",background:"#fff8f0",color:"#8a5a00",borderRadius:2 }}>📦 Variáveis: <strong>{Number(estatisticas.despesasVarMedia3M||0).toFixed(0)}€/mês</strong></span>
-                            <span style={{ fontSize:"0.65rem",color:"#aaa",alignSelf:"center" }}>Breakeven calculado sobre custos fixos</span>
+                            <span style={{ fontSize:"0.75rem",padding:"0.15rem 0.5rem",background:"#f0f4ff",color:"#3f5fa3",borderRadius:2 }}>🏠 Fixos: <strong>{Number(estatisticas.despesasFixasMedia3M||0).toFixed(0)}€/mês</strong></span>
+                            <span style={{ fontSize:"0.75rem",padding:"0.15rem 0.5rem",background:"#fff8f0",color:"#8a5a00",borderRadius:2 }}>📦 Variáveis: <strong>{Number(estatisticas.despesasVarMedia3M||0).toFixed(0)}€/mês</strong></span>
+                            <span style={{ fontSize:"0.75rem",color:"#aaa",alignSelf:"center" }}>Breakeven calculado sobre custos fixos</span>
                           </div>
                         )}
                       </>
@@ -2821,7 +2821,7 @@ export default function Backoffice() {
                     )}
                   </div>
                   {/* Tendência mensal */}
-                  <div style={{ fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Evolução dos últimos 6 meses</div>
+                  <div style={{ fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.75rem" }}>Evolução dos últimos 6 meses</div>
                   <div style={{ display:"flex",gap:"2px",height:80,alignItems:"flex-end" }}>
                     {(() => {
                       const maxVal = Math.max(...(estatisticas.tendenciaMensal||[]).map(m=>Math.max(m.receita,m.despesas)),1);
@@ -2829,12 +2829,12 @@ export default function Backoffice() {
                         <div key={m.key} style={{ flex:1,display:"flex",gap:"1px",alignItems:"flex-end",position:"relative" }}>
                           <div title={`Receita: ${m.receita.toFixed(0)}€`} style={{ flex:1,background:"#27ae60",height:`${(m.receita/maxVal)*100}%`,minHeight:2 }}/>
                           <div title={`Custos: ${m.despesas.toFixed(0)}€`} style={{ flex:1,background:"#e74c3c",height:`${(m.despesas/maxVal)*100}%`,minHeight:2 }}/>
-                          <div style={{ position:"absolute",bottom:-18,left:0,right:0,fontSize:"0.5rem",color:"#888",textAlign:"center",whiteSpace:"nowrap" }}>{m.label}</div>
+                          <div style={{ position:"absolute",bottom:-18,left:0,right:0,fontSize:"0.68rem",color:"#888",textAlign:"center",whiteSpace:"nowrap" }}>{m.label}</div>
                         </div>
                       ));
                     })()}
                   </div>
-                  <div style={{ display:"flex",gap:"1rem",marginTop:"1.5rem",fontSize:"0.65rem",color:"#888" }}>
+                  <div style={{ display:"flex",gap:"1rem",marginTop:"1.5rem",fontSize:"0.75rem",color:"#888" }}>
                     <span style={{ display:"flex",alignItems:"center",gap:"0.3rem" }}><span style={{ width:10,height:10,background:"#27ae60",display:"inline-block" }}/> Receita</span>
                     <span style={{ display:"flex",alignItems:"center",gap:"0.3rem" }}><span style={{ width:10,height:10,background:"#e74c3c",display:"inline-block" }}/> Custos</span>
                   </div>
@@ -2859,23 +2859,23 @@ export default function Backoffice() {
                   <p style={{ fontSize:"0.75rem",color:"#888",marginBottom:"1rem" }}>Top {Math.ceil((estatisticas.totalClientes||0)*0.2)} clientes ({Math.round(((estatisticas.pareto20Clientes||0)/(estatisticas.totalClientes||1))*100)}% da base) geram 80% da receita. Conhece-os.</p>
                   <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem" }}>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
-                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Idade média</div>
+                      <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Idade média</div>
                       <div style={{ fontFamily:"var(--sans)",fontSize:"2rem",fontWeight:300 }}>{estatisticas.idadeMediaPareto ? `${estatisticas.idadeMediaPareto} anos` : "—"}</div>
                     </div>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
-                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Género</div>
+                      <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Género</div>
                       {Object.entries(estatisticas.generosPareto||{}).sort((a,b)=>b[1]-a[1]).map(([g,n])=>(
                         <div key={g} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{g==="feminino"?"♀ Feminino":g==="masculino"?"♂ Masculino":g==="outro"?"⚧ Outro":"❓ Não definido"}: <strong>{n}</strong></div>
                       ))}
                     </div>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
-                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Cidades</div>
+                      <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Cidades</div>
                       {(estatisticas.cidadesPareto||[]).map(([c,n])=>(
                         <div key={c} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{c}: <strong>{n}</strong></div>
                       ))}
                     </div>
                     <div style={{ background:"#f8f8f6",padding:"1rem" }}>
-                      <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Profissões</div>
+                      <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem" }}>Profissões</div>
                       {(estatisticas.profissoesPareto||[]).length > 0 ? (estatisticas.profissoesPareto||[]).map(([p,n])=>(
                         <div key={p} style={{ fontSize:"0.82rem",marginBottom:"0.2rem" }}>{p}: <strong>{n}</strong></div>
                       )) : <span style={{ fontSize:"0.78rem",color:"#bbb" }}>Dados insuficientes</span>}
@@ -2897,7 +2897,7 @@ export default function Backoffice() {
                     ].map((s,i) => (
                       <div key={i} style={{ background:"#f8f8f6",padding:"1.25rem",borderTop:`3px solid ${s.cor}` }}>
                         <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:300,color:s.cor }}>{s.val}</div>
-                        <div style={{ fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
+                        <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.4rem" }}>{s.lbl}</div>
                       </div>
                     ))}
                   </div>
@@ -3063,16 +3063,16 @@ export default function Backoffice() {
                             : <div style={{ width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc",fontSize:"2rem" }}>📷</div>
                           }
                           {p.fotos?.length > 1 && (
-                            <div style={{ position:"absolute",top:6,right:6,background:"rgba(0,0,0,0.6)",color:"#fff",fontSize:"0.6rem",padding:"2px 6px",borderRadius:10,fontFamily:"'Jost',sans-serif" }}>+{p.fotos.length-1}</div>
+                            <div style={{ position:"absolute",top:6,right:6,background:"rgba(0,0,0,0.6)",color:"#fff",fontSize:"0.72rem",padding:"2px 6px",borderRadius:10,fontFamily:"'Jost',sans-serif" }}>+{p.fotos.length-1}</div>
                           )}
                         </div>
                         <div style={{ padding:"0.6rem 0.75rem" }}>
-                          <div style={{ fontSize:"0.65rem",color:"#aaa",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",marginBottom:"0.2rem" }}>{p.categoria||"—"}</div>
+                          <div style={{ fontSize:"0.75rem",color:"#aaa",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",marginBottom:"0.2rem" }}>{p.categoria||"—"}</div>
                           <div style={{ fontSize:"0.82rem",fontWeight:500,fontFamily:"'Jost',sans-serif",marginBottom:"0.15rem",lineHeight:1.3 }}>{p.nome}</div>
                           <div style={{ fontSize:"0.68rem",color:"#888",fontFamily:"'Jost',sans-serif",marginBottom:"0.6rem" }}>{p.clientes?.nome||"—"}</div>
                           <div style={{ display:"flex",gap:"0.4rem" }}>
-                            <button onClick={() => aprovarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.65rem",background:"#27ae60",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",fontWeight:500,letterSpacing:"0.06em" }}>✓ Aprovar</button>
-                            <button onClick={() => rejeitarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.65rem",background:"#fff",color:"#e74c3c",border:"1px solid #e74c3c",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em" }}>✕ Rejeitar</button>
+                            <button onClick={() => aprovarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.75rem",background:"#27ae60",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",fontWeight:500,letterSpacing:"0.06em" }}>✓ Aprovar</button>
+                            <button onClick={() => rejeitarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.75rem",background:"#fff",color:"#e74c3c",border:"1px solid #e74c3c",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em" }}>✕ Rejeitar</button>
                           </div>
                         </div>
                       </div>
@@ -3118,7 +3118,7 @@ export default function Backoffice() {
                 <p style={CARD_T}>Gestão de Lojistas</p>
                 <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap",marginBottom:"1.5rem" }}>
                   {subTabs.map(s => (
-                    <button key={s.id} onClick={() => setSubTabLojistas(s.id)} style={{ padding:"0.4rem 0.9rem",fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"none",background:subTabLojistas===s.id?"#080808":"#f0eeeb",color:subTabLojistas===s.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif" }}>{s.label}</button>
+                    <button key={s.id} onClick={() => setSubTabLojistas(s.id)} style={{ padding:"0.4rem 0.9rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"none",background:subTabLojistas===s.id?"#080808":"#f0eeeb",color:subTabLojistas===s.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif" }}>{s.label}</button>
                   ))}
                 </div>
                 {lista.length === 0 ? (

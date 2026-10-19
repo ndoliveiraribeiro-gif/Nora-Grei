@@ -225,7 +225,7 @@ function PostCard({ post, t, lang, liked, onLike }) {
         </div>
         {post.boosted && <span className="post-badge-boost">{t.boosted}</span>}
         {!post.boosted && (new Date() - new Date(post.publicado_em || post.created_at) < 86400000 * 2) && (
-          <span style={{ background:"#e8f5e9", color:"#27ae60", fontSize:"0.6rem", fontWeight:700, padding:"0.15rem 0.5rem", borderRadius:"10px", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.novo}</span>
+          <span style={{ background:"#e8f5e9", color:"#27ae60", fontSize:"0.72rem", fontWeight:700, padding:"0.15rem 0.5rem", borderRadius:"10px", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.novo}</span>
         )}
       </div>
 

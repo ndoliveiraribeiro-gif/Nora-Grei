@@ -496,7 +496,7 @@ export default function PecaDetalhe() {
               <span className="preco-unit">{t.porcDia}</span>
             </> : peca.preco_avulso > 0 ? <>
               <span className="preco-val">{peca.preco_avulso}€</span>
-              <span className="preco-unit" style={{fontSize:"0.6rem",letterSpacing:"0.1em"}}>venda usada</span>
+              <span className="preco-unit" style={{fontSize:"0.72rem",letterSpacing:"0.1em"}}>venda usada</span>
             </> : null}
           </div>
 
@@ -504,10 +504,10 @@ export default function PecaDetalhe() {
             const economia = Math.round((1 - peca.preco_aluguer_dia / peca.valor_peca) * 100);
             return (
               <div style={{background:'linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%)',borderRadius:'10px',padding:'0.75rem 1rem',margin:'0.5rem 0 1rem',display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
-                <span style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4a882',fontWeight:700,whiteSpace:'nowrap'}}>{t.pecaNova}: {peca.valor_peca}€</span>
+                <span style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4a882',fontWeight:700,whiteSpace:'nowrap'}}>{t.pecaNova}: {peca.valor_peca}€</span>
                 <span style={{color:'#555',fontSize:'0.8rem'}}>→</span>
                 <span style={{fontSize:'0.85rem',color:'#fff',fontWeight:600}}>{t.alugaPor} <strong style={{color:'#c4a882'}}>{peca.preco_aluguer_dia}€{t.porcDia}</strong></span>
-                <span style={{marginLeft:'auto',background:'#c4a882',color:'#1a1a1a',borderRadius:'20px',padding:'0.2rem 0.6rem',fontSize:'0.65rem',fontWeight:800,letterSpacing:'0.05em',whiteSpace:'nowrap'}}>{economia}% {t.economia}</span>
+                <span style={{marginLeft:'auto',background:'#c4a882',color:'#1a1a1a',borderRadius:'20px',padding:'0.2rem 0.6rem',fontSize:'0.75rem',fontWeight:800,letterSpacing:'0.05em',whiteSpace:'nowrap'}}>{economia}% {t.economia}</span>
               </div>
             );
           })()}
@@ -572,7 +572,7 @@ export default function PecaDetalhe() {
                       <div style={{ height:"4px", background:"#e8e4df", borderRadius:"2px", overflow:"hidden" }}>
                         <div style={{ height:"100%", width:`${pctRoi}%`, background:"#c4a882", borderRadius:"2px", transition:"width 0.5s" }} />
                       </div>
-                      <p style={{ fontSize:"0.65rem", color:"#9c9894", marginTop:"0.2rem" }}>{pctRoi}{t.roiRecuperado}</p>
+                      <p style={{ fontSize:"0.75rem", color:"#9c9894", marginTop:"0.2rem" }}>{pctRoi}{t.roiRecuperado}</p>
                     </div>
                   )}
                   <p className="deposito-desc">{t.depositoDesc}</p>
@@ -609,8 +609,8 @@ export default function PecaDetalhe() {
                 onMouseEnter={e=>{e.currentTarget.style.background="#080808";e.currentTarget.style.color="#fff";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#080808";}}>
                 <div>
-                  <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.1rem" }}>Comprar peça usada</div>
-                  <div style={{ fontSize:"0.65rem", opacity:0.6 }}>Peça de segunda mão em bom estado</div>
+                  <div style={{ fontSize:"0.68rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, marginBottom:"0.1rem" }}>Comprar peça usada</div>
+                  <div style={{ fontSize:"0.75rem", opacity:0.6 }}>Peça de segunda mão em bom estado</div>
                 </div>
                 <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--sans)", whiteSpace:"nowrap" }}>{peca.preco_avulso}€</span>
               </a>
@@ -622,8 +622,8 @@ export default function PecaDetalhe() {
                 onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
                 <div>
-                  <div style={{ fontSize:"0.52rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.1rem" }}>Comprar nova</div>
-                  <div style={{ fontSize:"0.65rem", color:"#888580" }}>noragrei.com ↗</div>
+                  <div style={{ fontSize:"0.68rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.1rem" }}>Comprar nova</div>
+                  <div style={{ fontSize:"0.75rem", color:"#888580" }}>noragrei.com ↗</div>
                 </div>
                 <span style={{ fontSize:"1.15rem", fontWeight:600, fontFamily:"var(--sans)", whiteSpace:"nowrap", color:"#c4a882" }}>{peca.valor_peca}€</span>
               </a>
@@ -682,7 +682,7 @@ export default function PecaDetalhe() {
               <div style={{ background:"#f9f6f2", borderLeft:"3px solid #c4748a", padding:"0.85rem 1rem", marginBottom:"1.25rem", display:"flex", gap:"0.75rem", alignItems:"flex-start" }}>
                 <span style={{ fontSize:"1.1rem", flexShrink:0 }}>✨</span>
                 <div>
-                  <p style={{ fontSize:"0.58rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#c4748a", fontWeight:600, marginBottom:"0.3rem", fontFamily:"var(--sans)" }}>{t.notaStylist}</p>
+                  <p style={{ fontSize:"0.68rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#c4748a", fontWeight:600, marginBottom:"0.3rem", fontFamily:"var(--sans)" }}>{t.notaStylist}</p>
                   <p style={{ fontSize:"0.85rem", color:"#3f3e3c", lineHeight:1.55, margin:0, fontFamily:"var(--sans)" }}>{conselho}</p>
                 </div>
               </div>
@@ -728,7 +728,7 @@ export default function PecaDetalhe() {
             </button>
             <button className="partilha-btn" onClick={() => partilhar("link")} title="Copiar link">
               {partilhado
-                ? <span style={{fontSize:"0.65rem",color:"#27ae60",fontWeight:600,letterSpacing:"0.05em"}}>✓</span>
+                ? <span style={{fontSize:"0.75rem",color:"#27ae60",fontWeight:600,letterSpacing:"0.05em"}}>✓</span>
                 : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
               }
             </button>
@@ -737,7 +737,7 @@ export default function PecaDetalhe() {
 
           {/* AVALIAÇÕES */}
           <div style={{marginTop:'2rem',paddingTop:'1.5rem',borderTop:'1px solid var(--g2)'}}>
-            <p style={{fontSize:'0.6rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'#5a5855',marginBottom:'1rem',fontWeight:600}}>{t.avaliacoes}</p>
+            <p style={{fontSize:'0.72rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'#5a5855',marginBottom:'1rem',fontWeight:600}}>{t.avaliacoes}</p>
             {avaliacoesPeca.length === 0 ? (
               <p style={{fontSize:'0.85rem',color:'#9c9894',fontStyle:'italic'}}>{t.semAvaliacoes}</p>
             ) : (
@@ -750,7 +750,7 @@ export default function PecaDetalhe() {
                           <span key={s} style={{fontSize:'1rem',color:s <= av.nota_cliente_empresa ? '#c4748a' : '#e2dfda'}}>★</span>
                         ))}
                       </div>
-                      <span style={{fontSize:'0.65rem',color:'#9c9894'}}>{av.clientes?.nome || t.anonimo}</span>
+                      <span style={{fontSize:'0.75rem',color:'#9c9894'}}>{av.clientes?.nome || t.anonimo}</span>
                     </div>
                     {av.comentario_cliente && (
                       <p style={{fontSize:'0.85rem',color:'#3f3e3c',fontStyle:'italic',lineHeight:1.6}}>"{av.comentario_cliente}"</p>

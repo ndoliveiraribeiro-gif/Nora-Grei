@@ -408,10 +408,10 @@ export default function PecaLojaPage() {
       {/* Banner de gestão — visível apenas para o dono da loja */}
       {userLogado && lojista && userLogado.id === lojista.id && (
         <div style={{position:"fixed",top:0,left:0,right:0,zIndex:200,background:"var(--black)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.45rem 2rem",fontFamily:"var(--sans)"}}>
-          <span style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da peça</span>
+          <span style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da peça</span>
           <div style={{display:"flex",gap:"0.5rem"}}>
-            <a href="/perfil" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
-            <a href="/perfil" style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
+            <a href="/perfil" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
+            <a href="/perfil" style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
           </div>
         </div>
       )}
@@ -459,10 +459,10 @@ export default function PecaLojaPage() {
             const eco = Math.round((1 - peca.preco_aluguer_dia / peca.valor_peca) * 100);
             return (
               <div style={{background:"linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%)",borderRadius:"10px",padding:"0.75rem 1rem",margin:"0.5rem 0 1rem",display:"flex",alignItems:"center",gap:"0.75rem",flexWrap:"wrap"}}>
-                <span style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4a882",fontWeight:700,whiteSpace:"nowrap"}}>{i.pecaNova}: {peca.valor_peca}€</span>
+                <span style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4a882",fontWeight:700,whiteSpace:"nowrap"}}>{i.pecaNova}: {peca.valor_peca}€</span>
                 <span style={{color:"#555",fontSize:"0.8rem"}}>→</span>
                 <span style={{fontSize:"0.85rem",color:"#fff",fontWeight:600}}>{i.alugaPor} <strong style={{color:"#c4a882"}}>{peca.preco_aluguer_dia}€{i.porcDia}</strong></span>
-                <span style={{marginLeft:"auto",background:"#c4a882",color:"#1a1a1a",borderRadius:"20px",padding:"0.2rem 0.6rem",fontSize:"0.65rem",fontWeight:800,letterSpacing:"0.05em",whiteSpace:"nowrap"}}>{eco}% {i.economia}</span>
+                <span style={{marginLeft:"auto",background:"#c4a882",color:"#1a1a1a",borderRadius:"20px",padding:"0.2rem 0.6rem",fontSize:"0.75rem",fontWeight:800,letterSpacing:"0.05em",whiteSpace:"nowrap"}}>{eco}% {i.economia}</span>
               </div>
             );
           })()}
@@ -520,7 +520,7 @@ export default function PecaLojaPage() {
                   <div style={{height:"4px",background:"#e8e4df",borderRadius:"2px",overflow:"hidden"}}>
                     <div style={{height:"100%",width:`${pctRoi}%`,background:"#c4a882",borderRadius:"2px",transition:"width 0.5s"}}/>
                   </div>
-                  <p style={{fontSize:"0.65rem",color:"#9c9894",marginTop:"0.2rem"}}>{pctRoi}{i.roiRecuperado}</p>
+                  <p style={{fontSize:"0.75rem",color:"#9c9894",marginTop:"0.2rem"}}>{pctRoi}{i.roiRecuperado}</p>
                 </div>
               )}
               <p className="deposito-desc">{i.depositoDesc}</p>
@@ -530,20 +530,20 @@ export default function PecaLojaPage() {
           {/* Datas de aluguer */}
           {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && peca.preco_aluguer_dia && (
             <div style={{marginBottom:"0.85rem",border:"1.5px solid var(--g2)",padding:"0.85rem 1rem",background:"#fafaf8"}}>
-              <p style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.6rem"}}>Datas de aluguer</p>
+              <p style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.6rem"}}>Datas de aluguer</p>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem"}}>
                 <div>
-                  <label style={{fontSize:"0.6rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Início</label>
+                  <label style={{fontSize:"0.72rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Início</label>
                   <input type="date" value={dataInicio} min={hoje} onChange={e=>{setDataInicio(e.target.value);if(dataFim&&e.target.value>=dataFim)setDataFim("")}} style={{width:"100%",border:"1px solid var(--g2)",padding:"0.45rem 0.5rem",fontFamily:"var(--sans)",fontSize:"0.75rem",outline:"none",background:"#fff"}} />
                 </div>
                 <div>
-                  <label style={{fontSize:"0.6rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Fim</label>
+                  <label style={{fontSize:"0.72rem",color:"var(--g4)",display:"block",marginBottom:"0.2rem"}}>Fim</label>
                   <input type="date" value={dataFim} min={dataInicio||hoje} onChange={e=>setDataFim(e.target.value)} style={{width:"100%",border:"1px solid var(--g2)",padding:"0.45rem 0.5rem",fontFamily:"var(--sans)",fontSize:"0.75rem",outline:"none",background:"#fff"}} />
                 </div>
               </div>
               {diasAluguer > 0 && (
                 <div style={{marginTop:"0.6rem",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:"0.65rem",color:"var(--g4)"}}>{diasAluguer} dia{diasAluguer!==1?"s":""} × {peca.preco_aluguer_dia}€</span>
+                  <span style={{fontSize:"0.75rem",color:"var(--g4)"}}>{diasAluguer} dia{diasAluguer!==1?"s":""} × {peca.preco_aluguer_dia}€</span>
                   <span style={{fontSize:"0.95rem",fontWeight:700,color:"var(--black)"}}>{totalAluguer}€</span>
                 </div>
               )}
@@ -578,7 +578,7 @@ export default function PecaLojaPage() {
                 style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0.75rem 1rem",border:"1.5px solid #c4a882",background:"#faf8f5",color:"#1a1a1a",textDecoration:"none",fontFamily:"var(--sans)",textAlign:"center"}}
                 onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
-                <span style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600,color:"#c4a882",marginBottom:"0.15rem"}}>{i.comprarNova}</span>
+                <span style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600,color:"#c4a882",marginBottom:"0.15rem"}}>{i.comprarNova}</span>
                 <span style={{fontSize:"1.1rem",fontWeight:700}}>{peca.valor_peca ? `${peca.valor_peca}€` : "↗"}</span>
               </a>
             </div>
@@ -607,7 +607,7 @@ export default function PecaLojaPage() {
             <div style={{background:"#f9f6f2",borderLeft:"3px solid #c4748a",padding:"0.85rem 1rem",marginBottom:"1.25rem",display:"flex",gap:"0.75rem",alignItems:"flex-start"}}>
               <span style={{fontSize:"1.1rem",flexShrink:0}}>✨</span>
               <div>
-                <p style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.notaStylist}</p>
+                <p style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.notaStylist}</p>
                 <p style={{fontSize:"0.85rem",color:"#3f3e3c",lineHeight:1.55,margin:0,fontFamily:"var(--sans)"}}>{conselho}</p>
               </div>
             </div>
@@ -662,7 +662,7 @@ export default function PecaLojaPage() {
             </button>
             <button className="partilha-btn" onClick={() => partilhar("link")} title="Copiar link">
               {partilhado
-                ? <span style={{fontSize:"0.65rem",color:"#27ae60",fontWeight:600}}>✓</span>
+                ? <span style={{fontSize:"0.75rem",color:"#27ae60",fontWeight:600}}>✓</span>
                 : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
               }
             </button>
@@ -671,7 +671,7 @@ export default function PecaLojaPage() {
 
           {/* Avaliações */}
           <div style={{marginTop:"2rem",paddingTop:"1.5rem",borderTop:"1px solid var(--g2)"}}>
-            <p style={{fontSize:"0.6rem",letterSpacing:"0.25em",textTransform:"uppercase",color:"#5a5855",marginBottom:"1rem",fontWeight:600}}>{i.avaliacoes}</p>
+            <p style={{fontSize:"0.72rem",letterSpacing:"0.25em",textTransform:"uppercase",color:"#5a5855",marginBottom:"1rem",fontWeight:600}}>{i.avaliacoes}</p>
             {avaliacoes.length === 0
               ? <p style={{fontSize:"0.85rem",color:"#9c9894",fontStyle:"italic"}}>{i.semAvaliacoes}</p>
               : <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
@@ -681,7 +681,7 @@ export default function PecaLojaPage() {
                         <div style={{display:"flex",gap:"0.15rem"}}>
                           {[1,2,3,4,5].map(s => <span key={s} style={{fontSize:"1rem",color:s <= av.nota ? "#c4748a" : "#e2dfda"}}>★</span>)}
                         </div>
-                        <span style={{fontSize:"0.65rem",color:"#9c9894"}}>{av.clientes?.nome || i.anonimo}</span>
+                        <span style={{fontSize:"0.75rem",color:"#9c9894"}}>{av.clientes?.nome || i.anonimo}</span>
                       </div>
                       {av.comentario && <p style={{fontSize:"0.85rem",color:"#3f3e3c",fontStyle:"italic",lineHeight:1.6}}>"{av.comentario}"</p>}
                     </div>

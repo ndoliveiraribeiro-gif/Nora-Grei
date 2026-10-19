@@ -148,7 +148,7 @@ function BotaoVerTalao({ aluguer, i }) {
 
   return (
     <>
-      <button onClick={buscarRecibo} disabled={loading} style={{ width:'100%',marginTop:'0.5rem',padding:'0.55rem',background:'#fff',color:'#080808',border:'1.5px solid #2e2d2b',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontWeight:600,fontFamily:"'Jost',sans-serif" }}>
+      <button onClick={buscarRecibo} disabled={loading} style={{ width:'100%',marginTop:'0.5rem',padding:'0.55rem',background:'#fff',color:'#080808',border:'1.5px solid #2e2d2b',fontSize:'0.75rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer',fontWeight:600,fontFamily:"'Jost',sans-serif" }}>
         {loading ? "..." : `${i.verTalao}`}
       </button>
       {aberto && recibo && (
@@ -272,20 +272,20 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
   };
 
   const sty = {
-    sec: { fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
+    sec: { fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',fontWeight:600,marginBottom:'0.75rem' },
     opt: (on) => ({ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.85rem 1rem',border:`1.5px solid ${on?'#080808':'#e2dfda'}`,background:on?'#f0eeeb':'#fff',cursor:'pointer',marginBottom:'0.5rem' }),
     radio: (on) => ({ width:16,height:16,borderRadius:'50%',border:`2px solid ${on?'#080808':'#ccc'}`,background:on?'#080808':'transparent',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center' }),
     radioDot: { width:6,height:6,borderRadius:'50%',background:'#fff' },
-    badge: (auto) => ({ fontSize:'0.5rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
+    badge: (auto) => ({ fontSize:'0.68rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.12rem 0.35rem',background:auto?'#e8f5e9':'#fff8e1',color:auto?'#27ae60':'#f39c12',fontWeight:600,marginLeft:'0.4rem' }),
     inp: { width:'100%',padding:'0.7rem 0.9rem',border:'1.5px solid #e2dfda',background:'#fff',fontFamily:"'Jost',sans-serif",fontSize:'0.9rem',color:'#080808',outline:'none',marginBottom:'0.5rem',boxSizing:'border-box' },
     row2: { display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:'0.5rem' },
     ibanBox: { background:'#f0eeeb',padding:'1rem',marginBottom:'0.75rem' },
-    ibanLabel: { fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
+    ibanLabel: { fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#888' },
     ibanVal: { fontFamily:"var(--sans)",fontSize:'1rem',fontWeight:500,color:'#080808',marginTop:'0.15rem',marginBottom:'0.5rem' },
     aviso: { fontSize:'0.72rem',color:'#946200',background:'#fff8e1',padding:'0.75rem 1rem',borderLeft:'3px solid #f39c12',lineHeight:1.5,marginTop:'0.5rem' },
     uploadBox: { display:'block',padding:'0.85rem',border:'2px dashed #e2dfda',background:'#f0eeeb',cursor:'pointer',textAlign:'center',fontSize:'0.78rem',color:'#5a5855',marginBottom:'0.5rem' },
-    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
-    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
+    btnPrimary: { width:'100%',padding:'0.7rem',background:'#080808',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.15em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',fontWeight:500 },
+    btnSecondary: { width:'100%',padding:'0.5rem',background:'transparent',color:'#888',border:'1px solid #e2dfda',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer',marginTop:'0.5rem' },
     mbRow: { display:'flex',justifyContent:'space-between',padding:'0.4rem 0',borderBottom:'1px solid #f0eeeb' },
     mbLabel: { fontSize:'0.68rem',color:'#888',letterSpacing:'0.08em',textTransform:'uppercase' },
     mbVal: { fontSize:'0.88rem',fontWeight:700,fontFamily:'monospace',color:'#080808' },
@@ -309,7 +309,7 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
           </div>
           <div style={{textAlign:'right',flexShrink:0,marginLeft:'1rem'}}>
             <p style={{fontFamily:"var(--sans)",fontSize:'1.1rem',fontWeight:600,color:'#080808'}}>{PRECO_USADA_PERFIL}€</p>
-            <p style={{fontSize:'0.65rem',color:'#888'}}>+ {PORTES_PERFIL.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
+            <p style={{fontSize:'0.75rem',color:'#888'}}>+ {PORTES_PERFIL.toFixed(2).replace('.',',')}€ {i.portesEnvio}</p>
           </div>
         </div>
         <button onClick={() => setFase("escolher_pag")} style={{...sty.btnPrimary,marginTop:'0.5rem'}}>{i.pagarReferencia}</button>
@@ -363,7 +363,7 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
       )}
       {metodoPag === "mbway" && (
         <div style={{marginTop:'0.75rem'}}>
-          <p style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>{i.telMbway}</p>
+          <p style={{fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'#5a5855',marginBottom:'0.4rem'}}>{i.telMbway}</p>
           <input style={sty.inp} placeholder="+351 912 345 678" value={telMbway} onChange={e => setTelMbway(e.target.value)} />
           <p style={{fontSize:'0.68rem',color:'#5a5855',fontStyle:'italic'}}>🔒 {i.simPag}</p>
         </div>
@@ -436,12 +436,12 @@ function BotaoComprarPecaPerfil({ aluguer, i, lang }) {
 
   if (fase === "voucher_nova" && codigo) return (
     <div style={{background:'#fff0f3',border:'1px solid #f0c0cc',padding:'1rem',marginTop:'0.75rem'}}>
-      <p style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
+      <p style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4748a',fontWeight:600,marginBottom:'0.5rem'}}>{i.codigoDesconto}</p>
       <div style={{fontFamily:"var(--sans)",fontSize:'1.6rem',fontWeight:600,letterSpacing:'0.15em',color:'#080808',marginBottom:'0.3rem'}}>{codigo.codigo}</div>
       <p style={{fontSize:'0.72rem',color:'#5a5855',marginBottom:'0.75rem'}}>{i.descontoInfo} — <strong>{codigo.valor}€</strong></p>
       <div style={{display:'flex',gap:'0.5rem'}}>
-        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
-        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irLoja}</a>
+        <button onClick={() => copiar(codigo.codigo)} style={{flex:1,padding:'0.6rem',background:copiado?'#27ae60':'#080808',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",cursor:'pointer'}}>{copiado ? i.copiado : i.copiar}</button>
+        <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{flex:1,padding:'0.6rem',background:'#c4748a',color:'#fff',border:'none',fontSize:'0.75rem',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Jost',sans-serif",textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center'}}>{i.irLoja}</a>
       </div>
     </div>
   );
@@ -467,7 +467,7 @@ function ReservaDisponivelCard({ reserva, i }) {
           <div style={{fontSize:'0.72rem',color:'#1e7e3e',fontWeight:600,marginTop:'0.25rem'}}>{i.reservaPrazoTempo} {tempo}</div>
         )}
       </div>
-      <a href={linkCheckout} style={{flexShrink:0,padding:'0.65rem 1.25rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600,fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap'}}>
+      <a href={linkCheckout} style={{flexShrink:0,padding:'0.65rem 1.25rem',background:'#080808',color:'#fff',textDecoration:'none',fontSize:'0.75rem',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600,fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap'}}>
         {i.reservaConfirmar}
       </a>
     </div>
@@ -735,20 +735,20 @@ function WishlistCard({ p, eDisponivel, i }) {
         {p.preco_aluguer_dia && <div style={{fontSize:"0.75rem",color:"var(--g4)",marginBottom:"0.4rem"}}>{p.preco_aluguer_dia}€/dia</div>}
         {eDisponivel ? (
           <>
-            <div style={{display:"inline-block",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#27ae60",background:"rgba(39,174,96,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.5rem"}}>{i.disponivel}</div>
+            <div style={{display:"inline-block",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#27ae60",background:"rgba(39,174,96,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.5rem"}}>{i.disponivel}</div>
             <a href={`/catalogo/${p.id}`} style={{display:"block",textAlign:"center",padding:"0.45rem 0",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"#c4748a",color:"#fff",textDecoration:"none",borderRadius:"2px"}}>{i.alugar}</a>
           </>
         ) : (
           <>
-            <div style={{display:"inline-block",fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",background:"rgba(192,57,43,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.35rem"}}>{i.alugada}</div>
+            <div style={{display:"inline-block",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c0392b",background:"rgba(192,57,43,0.08)",padding:"0.15rem 0.4rem",borderRadius:"2px",marginBottom:"0.35rem"}}>{i.alugada}</div>
             {tempo && (
-              <div style={{fontSize:"0.65rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
+              <div style={{fontSize:"0.75rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
                 <span style={{color:"var(--g4)"}}>{i.disponivelEm}: </span>
                 <span style={{fontWeight:600,color:"var(--black)"}}>{tempo}</span>
               </div>
             )}
             {!tempo && p._dataDisponivel && (
-              <div style={{fontSize:"0.65rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
+              <div style={{fontSize:"0.75rem",color:"var(--g5)",marginBottom:"0.35rem"}}>
                 {i.disponivelEm}: {new Date(p._dataDisponivel).toLocaleDateString()}
               </div>
             )}
@@ -808,12 +808,12 @@ function CartaoAvaliacao({ aluguer, i }) {
           <div style={{fontSize:"0.72rem",color:"var(--g6)",marginBottom:"0.75rem"}}>{aluguer.data_inicio} → {aluguer.data_fim}</div>
           {enviado ? (
             <>
-              <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.3rem"}}>{i.tuaAvaliacao}</div>
+              <div style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.3rem"}}>{i.tuaAvaliacao}</div>
               <StarRating value={nota} readonly />
               {avaliacao?.comentario_cliente && <p style={{fontSize:"0.82rem",color:"var(--g6)",marginTop:"0.4rem",fontStyle:"italic"}}>"{avaliacao.comentario_cliente}"</p>}
               {avaliacao?.nota_empresa_cliente && (
                 <div style={{marginTop:"1rem",paddingTop:"0.75rem",borderTop:"1px solid var(--g1)"}}>
-                  <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.3rem"}}>{i.avaliacaoEmpresa}</div>
                   <StarRating value={avaliacao.nota_empresa_cliente} readonly />
                   {avaliacao.comentario_empresa && <p style={{fontSize:"0.82rem",color:"var(--g6)",marginTop:"0.4rem",fontStyle:"italic"}}>"{avaliacao.comentario_empresa}"</p>}
                 </div>
@@ -821,14 +821,14 @@ function CartaoAvaliacao({ aluguer, i }) {
             </>
           ) : (
             <>
-              <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.5rem"}}>{i.avaliarExperiencia}</div>
+              <div style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.5rem"}}>{i.avaliarExperiencia}</div>
               <StarRating value={nota} onChange={setNota} />
               {nota > 0 && (
                 <>
                   <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder={i.comentarioPlaceholder}
                     style={{width:"100%",marginTop:"0.75rem",padding:"0.75rem",border:"1.5px solid var(--g2)",background:"var(--white)",fontFamily:"sans-serif",fontSize:"0.85rem",color:"var(--black)",resize:"vertical",minHeight:"80px",outline:"none"}} />
                   <button onClick={enviar} disabled={loading}
-                    style={{marginTop:"0.5rem",padding:"0.6rem 1.5rem",background:"var(--black)",color:"var(--white)",border:"none",fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontWeight:500}}>
+                    style={{marginTop:"0.5rem",padding:"0.6rem 1.5rem",background:"var(--black)",color:"var(--white)",border:"none",fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontWeight:500}}>
                     {loading ? "..." : i.enviarAvaliacao}
                   </button>
                 </>
@@ -924,7 +924,7 @@ function AvaliacoesLojista({ alugueresLoja, clienteId }) {
 
             {av?.nota_cliente_lojista ? (
               <div style={{background:"var(--g1)",padding:"0.75rem",marginBottom:"0.75rem"}}>
-                <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Avaliação do cliente</div>
+                <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Avaliação do cliente</div>
                 {estrelas(av.nota_cliente_lojista, null)}
                 {av.comentario_cliente && <p style={{fontSize:"0.78rem",color:"var(--g4)",marginTop:"0.3rem",fontStyle:"italic"}}>"{av.comentario_cliente}"</p>}
               </div>
@@ -933,7 +933,7 @@ function AvaliacoesLojista({ alugueresLoja, clienteId }) {
             )}
 
             <div style={{background:"#fdf6f8",padding:"0.75rem",borderLeft:"2px solid #c4748a"}}>
-              <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.4rem"}}>
+              <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.4rem"}}>
                 {jaRespondeu ? "A tua avaliação do cliente" : "Avaliar este cliente"}
               </div>
               {estrelas(jaRespondeu || r.nota, jaRespondeu ? null : (v) => setRespostas(prev=>({...prev,[a.id]:{...r,nota:v}})))}
@@ -943,7 +943,7 @@ function AvaliacoesLojista({ alugueresLoja, clienteId }) {
                     placeholder="Comentário opcional sobre o cliente..."
                     style={{width:"100%",marginTop:"0.5rem",padding:"0.5rem",border:"1.5px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.8rem",resize:"vertical",minHeight:"60px",outline:"none"}} />
                   <button onClick={()=>enviarResposta(a)} disabled={loadingIds[a.id]}
-                    style={{marginTop:"0.5rem",padding:"0.5rem 1.1rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer"}}>
+                    style={{marginTop:"0.5rem",padding:"0.5rem 1.1rem",background:"#c4748a",color:"#fff",border:"none",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer"}}>
                     {loadingIds[a.id]?"...":"Guardar avaliação"}
                   </button>
                 </>
@@ -1421,8 +1421,8 @@ export default function Perfil() {
           <NotificationBell lang={lang} />
           {modoLojista && codigoLoja && (
             <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-              <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.62rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Dashboard</button>
-              <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.62rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"var(--rosa)",color:"#fff",padding:"0.35rem 0.75rem",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Minha loja ↗</a>
+              <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.75rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Dashboard</button>
+              <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.75rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"var(--rosa)",color:"#fff",padding:"0.35rem 0.75rem",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Minha loja ↗</a>
             </div>
           )}
           <a href="/" className="nav-back">{i.voltarInicio}</a>
@@ -1438,14 +1438,14 @@ export default function Perfil() {
             {id:"guardados",label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
             ...(modoLojista ? [{id:"loja",label:i.tabLoja}] : []),
           ].map(tab => (
-            <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
+            <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
               {tab.label}
-              {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
+              {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.68rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
             </button>
           ))}
-          <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
+          <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
             {i.tabMensagens}
-            {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.55rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
+            {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.68rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
           </a>
         </div>
 
@@ -1524,7 +1524,7 @@ export default function Perfil() {
         {/* TAB GUARDADOS */}
         {tabAtiva === "guardados" && (
           <div style={{padding:"0 0 2rem"}}>
-            <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>{i.pecasGuardadas}</p>
+            <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1.25rem",fontFamily:"var(--sans)"}}>{i.pecasGuardadas}</p>
             {wishlistPecas.length === 0 ? (
               <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
                 <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>{i.semGuardados}</p>
@@ -1576,7 +1576,7 @@ export default function Perfil() {
         <div className="nivel-card">
           <div className="nivel-top">
             <div>
-              <div style={{fontSize:'0.6rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
+              <div style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
               <div className="nivel-badge" style={{color: nv.cor}}>
                 <span style={{fontWeight:700}}>{nv.nome}</span>
               </div>
@@ -1619,7 +1619,7 @@ export default function Perfil() {
         </div>
 
         <div className="pontos-card">
-          <p style={{fontSize:'0.65rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g6)',fontWeight:600}}>{i.pontosFidelizacao}</p>
+          <p style={{fontSize:'0.75rem',letterSpacing:'0.25em',textTransform:'uppercase',color:'var(--g6)',fontWeight:600}}>{i.pontosFidelizacao}</p>
           <p style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.5rem'}}>{i.pontosDesc}</p>
           <div className="pontos-circles">
             {Array.from({length:10}).map((_,idx) => {
@@ -1793,7 +1793,7 @@ export default function Perfil() {
                     <div key={r.id} style={{padding:"0.75rem 1rem",background:"var(--g1)",borderLeft:`3px solid ${r.estado==="resolvida"?"#27ae60":"#f39c12"}`}}>
                       <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.3rem"}}>
                         <span style={{fontSize:"0.82rem",fontWeight:500}}>{r.assunto}</span>
-                        <span style={{fontSize:"0.62rem",letterSpacing:"0.1em",textTransform:"uppercase",color:r.estado==="resolvida"?"#27ae60":"#f39c12"}}>{r.estado==="resolvida"?i.reclamacaoResolvida:i.reclamacaoPendente}</span>
+                        <span style={{fontSize:"0.75rem",letterSpacing:"0.1em",textTransform:"uppercase",color:r.estado==="resolvida"?"#27ae60":"#f39c12"}}>{r.estado==="resolvida"?i.reclamacaoResolvida:i.reclamacaoPendente}</span>
                       </div>
                       <p style={{fontSize:"0.78rem",color:"var(--g4)"}}>{r.mensagem}</p>
                       {r.resposta && <p style={{fontSize:"0.78rem",color:"#080808",marginTop:"0.5rem",fontStyle:"italic",borderTop:"1px solid var(--g2)",paddingTop:"0.5rem"}}>↳ {r.resposta}</p>}
@@ -1861,7 +1861,7 @@ export default function Perfil() {
 
                 {/* Dados da loja */}
                 <div style={{marginBottom:"1.25rem"}}>
-                  <div style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Sobre a tua loja</div>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Sobre a tua loja</div>
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da loja *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => setFormLojista(f => ({...f, nome_loja: e.target.value}))} placeholder="ex: Atelier da Maria" />
@@ -1874,7 +1874,7 @@ export default function Perfil() {
 
                 {/* Dados bancários */}
                 <div style={{marginBottom:"1.25rem"}}>
-                  <div style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Dados para receber pagamentos</div>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Dados para receber pagamentos</div>
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>IBAN / NIB *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}} value={formLojista.iban} onChange={e => setFormLojista(f => ({...f, iban: e.target.value}))} placeholder="PT50 0002 0000 0000 0000 0000 0" />
@@ -1923,23 +1923,23 @@ export default function Perfil() {
             {/* Barra de navegação rápida do lojista */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1rem",padding:"0.6rem 1rem",background:"var(--g1)",borderRadius:"4px",flexWrap:"wrap",gap:"0.5rem"}}>
               <div style={{display:"flex",alignItems:"center",gap:"0.75rem"}}>
-                <button onClick={()=>setTabAtiva("perfil")} style={{fontSize:"0.6rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",display:"flex",alignItems:"center",gap:"0.3rem",padding:0}}>
+                <button onClick={()=>setTabAtiva("perfil")} style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",display:"flex",alignItems:"center",gap:"0.3rem",padding:0}}>
                   ← Perfil
                 </button>
                 <span style={{color:"var(--g2)",fontSize:"0.75rem"}}>|</span>
-                <span style={{fontSize:"0.6rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",fontFamily:"var(--sans)",fontWeight:600}}>Gestão da loja</span>
+                <span style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",fontFamily:"var(--sans)",fontWeight:600}}>Gestão da loja</span>
               </div>
               {codigoLoja && (
                 <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
-                  <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
-                  <a href={`/loja/${codigoLoja}`} onClick={e=>{e.preventDefault();navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`).then(()=>alert("Link copiado!"));}} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</a>
+                  <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
+                  <a href={`/loja/${codigoLoja}`} onClick={e=>{e.preventDefault();navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`).then(()=>alert("Link copiado!"));}} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</a>
                 </div>
               )}
             </div>
             <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
                 {["Dashboard","Peças","Alugueres","Liquidações","Avaliações","Estatísticas"].map((s,idx) => (
-                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
+                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
                 ))}
               </div>
             </div>
@@ -1991,7 +1991,7 @@ export default function Perfil() {
                   {/* KPIs principais */}
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.6rem",marginBottom:"0.6rem"}}>
                     <div style={{background:"var(--white)",padding:"1.25rem",borderTop:"3px solid var(--rosa)",gridColumn:"1/-1"}}>
-                      <div style={{fontSize:"0.55rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Receita este mês</div>
+                      <div style={{fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.3rem"}}>Receita este mês</div>
                       <div style={{fontFamily:"var(--serif)",fontSize:"2.4rem",fontWeight:300,color:"var(--rosa)",lineHeight:1}}>{receitaMes.toFixed(0)}€</div>
                       <div style={{fontSize:"0.68rem",color:"var(--g4)",marginTop:"0.3rem"}}>{doMes.length} aluguer{doMes.length!==1?"es":""} · total acumulado {receitaTotal.toFixed(0)}€</div>
                     </div>
@@ -2001,27 +2001,27 @@ export default function Perfil() {
                     ].map((k,i)=>(
                       <div key={i} style={{background:"var(--white)",padding:"1.1rem",borderTop:`3px solid ${k.cor}`}}>
                         <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:k.cor}}>{k.val}</div>
-                        <div style={{fontSize:"0.55rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.25rem"}}>{k.lbl}</div>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.25rem"}}>{k.lbl}</div>
                       </div>
                     ))}
                   </div>
                   {/* Taxa de ocupação */}
                   <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
-                      <span style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)"}}>Taxa de ocupação (30 dias)</span>
+                      <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)"}}>Taxa de ocupação (30 dias)</span>
                       <span style={{fontFamily:"var(--serif)",fontSize:"1.2rem",color:taxaOcupacao>=50?"#27ae60":taxaOcupacao>=25?"#f39c12":"#e74c3c"}}>{taxaOcupacao}%</span>
                     </div>
                     <div style={{height:6,background:"#f0eeeb"}}>
                       <div style={{height:"100%",width:`${taxaOcupacao}%`,background:taxaOcupacao>=50?"#27ae60":taxaOcupacao>=25?"#f39c12":"#e74c3c",transition:"width 0.4s"}}/>
                     </div>
-                    <div style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.35rem"}}>{taxaOcupacao<25?"Preço pode estar alto ou peças precisam de mais visibilidade":taxaOcupacao<50?"A crescer — considera promover no feed":taxaOcupacao<75?"Boa ocupação":"Excelente — considera subir preço ou adicionar stock"}</div>
+                    <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.35rem"}}>{taxaOcupacao<25?"Preço pode estar alto ou peças precisam de mais visibilidade":taxaOcupacao<50?"A crescer — considera promover no feed":taxaOcupacao<75?"Boa ocupação":"Excelente — considera subir preço ou adicionar stock"}</div>
                   </div>
                   {/* Peça estrela do mês */}
                   {estrela && (
                     <div style={{background:"var(--white)",padding:"1.1rem",display:"flex",gap:"1rem",alignItems:"center"}}>
                       {estrela.foto?<img src={estrela.foto} style={{width:52,height:66,objectFit:"cover",flexShrink:0}} alt=""/>:<div style={{width:52,height:66,background:"var(--g1)",flexShrink:0}}/>}
                       <div style={{flex:1}}>
-                        <div style={{fontSize:"0.55rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--rosa)",fontWeight:600,marginBottom:"0.25rem"}}>⭐ Peça do mês</div>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--rosa)",fontWeight:600,marginBottom:"0.25rem"}}>⭐ Peça do mês</div>
                         <div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{estrela.nome}</div>
                         <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{estrela.total.toFixed(0)}€ gerados este mês</div>
                       </div>
@@ -2037,36 +2037,36 @@ export default function Perfil() {
                     return (
                       <div style={{background:"#faf8f5",border:"1.5px solid #e8d5a3",padding:"1.1rem",marginTop:"0.6rem"}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.75rem"}}>
-                          <div style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#8a6a2a",fontWeight:600}}>Links externos ↗</div>
-                          <span style={{fontSize:"0.65rem",color:"#8a6a2a",fontWeight:600}}>{custoTotal}€/mês</span>
+                          <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#8a6a2a",fontWeight:600}}>Links externos ↗</div>
+                          <span style={{fontSize:"0.75rem",color:"#8a6a2a",fontWeight:600}}>{custoTotal}€/mês</span>
                         </div>
                         {pecasComLink.map(p=>(
                           <div key={p.id} style={{display:"flex",gap:"0.75rem",alignItems:"center",marginBottom:"0.5rem",padding:"0.5rem",background:"#fff",border:"1px solid #e8d5a3"}}>
                             {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:32,height:40,objectFit:"cover",flexShrink:0}} alt=""/>:<div style={{width:32,height:40,background:"#e8d5a3",flexShrink:0}}/>}
                             <div style={{flex:1,minWidth:0}}>
                               <div style={{fontSize:"0.75rem",fontFamily:"var(--serif)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nome}</div>
-                              <div style={{fontSize:"0.58rem",color:"var(--g4)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.link_compra_externa}</div>
+                              <div style={{fontSize:"0.68rem",color:"var(--g4)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.link_compra_externa}</div>
                             </div>
-                            <span style={{fontSize:"0.58rem",fontWeight:600,whiteSpace:"nowrap",color:p.link_externo_ativo?"#27ae60":"#e67e22"}}>{p.link_externo_ativo?"✓ Ativo":"⏳ Pendente"}</span>
+                            <span style={{fontSize:"0.68rem",fontWeight:600,whiteSpace:"nowrap",color:p.link_externo_ativo?"#27ae60":"#e67e22"}}>{p.link_externo_ativo?"✓ Ativo":"⏳ Pendente"}</span>
                           </div>
                         ))}
-                        {pendentes>0 && <div style={{fontSize:"0.62rem",color:"#8a6a2a",marginTop:"0.5rem"}}>⏳ {pendentes} link{pendentes!==1?"s":""} pendente{pendentes!==1?"s":""} de ativação — contacta a Nora Grei para ativar.</div>}
-                        {ativas>0 && <div style={{fontSize:"0.62rem",color:"#27ae60",marginTop:"0.35rem"}}>✓ {ativas} link{ativas!==1?"s":""} ativo{ativas!==1?"s":""}</div>}
+                        {pendentes>0 && <div style={{fontSize:"0.75rem",color:"#8a6a2a",marginTop:"0.5rem"}}>⏳ {pendentes} link{pendentes!==1?"s":""} pendente{pendentes!==1?"s":""} de ativação — contacta a Nora Grei para ativar.</div>}
+                        {ativas>0 && <div style={{fontSize:"0.75rem",color:"#27ae60",marginTop:"0.35rem"}}>✓ {ativas} link{ativas!==1?"s":""} ativo{ativas!==1?"s":""}</div>}
                       </div>
                     );
                   })()}
-                  {diasTeste>0 && <div style={{marginTop:"0.6rem",fontSize:"0.65rem",color:"var(--g4)",textAlign:"center",padding:"0.6rem",background:"var(--g1)"}}>{diasTeste} dias de período teste restantes</div>}
+                  {diasTeste>0 && <div style={{marginTop:"0.6rem",fontSize:"0.75rem",color:"var(--g4)",textAlign:"center",padding:"0.6rem",background:"var(--g1)"}}>{diasTeste} dias de período teste restantes</div>}
                 </div>
               );
             })()}
             {tabLoja === "pecas" && (
               <div className="card" style={{padding:0}}>
-                <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
+                <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
                 {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>(
                   <div key={p.id} style={{padding:"1rem 1.5rem",display:"flex",gap:"1rem",alignItems:"center",borderBottom:"1px solid var(--g1)"}}>
                     {p.fotos?.[0]?<img src={p.fotos[0]} style={{width:48,height:60,objectFit:"cover"}} alt=""/>:<div style={{width:48,height:60,background:"var(--g1)"}}/>}
                     <div style={{flex:1}}><div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{p.nome}</div><div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{p.preco_aluguer_dia ? `${p.preco_aluguer_dia}€/dia` : "—"}{p.preco_venda ? ` · ${p.preco_venda}€ venda` : ""}</div></div>
-                    <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
+                    <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
                   </div>
                 ))}
               </div>
@@ -2085,7 +2085,7 @@ export default function Perfil() {
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:"0.5rem",flexWrap:"wrap"}}>
                           <div style={{fontFamily:"var(--serif)",fontSize:"1rem"}}>{a.pecas_lojista?.nome||"—"}</div>
-                          <span style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.2rem 0.6rem",background:estadoCor,color:"#fff",whiteSpace:"nowrap"}}>{estadoLabel}</span>
+                          <span style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.2rem 0.6rem",background:estadoCor,color:"#fff",whiteSpace:"nowrap"}}>{estadoLabel}</span>
                         </div>
                         <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>
                           {a.clientes?.nome} · {a.stock_lojista?.tamanho||"—"} · {a.data_inicio} → {a.data_fim}
@@ -2095,7 +2095,7 @@ export default function Perfil() {
                         </div>
                         {a.tracking_numero && (
                           <div style={{marginTop:"0.6rem",background:"#e3f2fd",borderLeft:"3px solid #1976d2",padding:"0.6rem 0.85rem"}}>
-                            <div style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.3rem"}}>📦 Envio registado</div>
+                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#1976d2",fontWeight:600,marginBottom:"0.3rem"}}>📦 Envio registado</div>
                             <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
                               <span style={{fontSize:"0.7rem",color:"#3f3e3c"}}>{a.tracking_transportadora}</span>
                               <span style={{fontSize:"0.8rem",fontWeight:700,fontFamily:"monospace",color:"#080808",letterSpacing:"0.05em"}}>{a.tracking_numero}</span>
@@ -2107,18 +2107,18 @@ export default function Perfil() {
                     {/* Ações por estado */}
                     <div style={{display:"flex",gap:"0.5rem",marginTop:"0.85rem",flexWrap:"wrap"}}>
                       {a.estado === "pendente" && <>
-                        <button onClick={()=>atualizarEstadoAluguer(a.id,"confirmado")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>✓ Confirmar</button>
-                        <button onClick={()=>atualizarEstadoAluguer(a.id,"cancelado")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"var(--sans)"}}>✕ Recusar</button>
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"confirmado")} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>✓ Confirmar</button>
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"cancelado")} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"var(--sans)"}}>✕ Recusar</button>
                       </>}
                       {a.estado === "confirmado" && <>
-                        <button onClick={()=>{setModalEnvio(a);setTrackingInfo({transportadora:"",numero:""});}} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#8e44ad",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>📦 Marcar enviado</button>
+                        <button onClick={()=>{setModalEnvio(a);setTrackingInfo({transportadora:"",numero:""});}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#8e44ad",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>📦 Marcar enviado</button>
                       </>}
                       {(a.estado === "enviado" || a.estado === "ativo") && <>
-                        <button onClick={()=>atualizarEstadoAluguer(a.id,"em_devolucao")} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e67e22",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>↩ Devolução iniciada</button>
-                        {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>✉ Contactar</a>}
+                        <button onClick={()=>atualizarEstadoAluguer(a.id,"em_devolucao")} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e67e22",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>↩ Devolução iniciada</button>
+                        {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>✉ Contactar</a>}
                       </>}
                       {a.estado === "em_devolucao" && <>
-                        <button onClick={()=>setModalVerificar(a)} style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>🔍 Verificar peça</button>
+                        <button onClick={()=>setModalVerificar(a)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>🔍 Verificar peça</button>
                       </>}
                     </div>
                   </div>
@@ -2148,9 +2148,9 @@ export default function Perfil() {
                           {val:depositosCativos.length,lbl:"Depósitos cativos",cor:"#e74c3c",nota:"Em disputa ou retidos por danos"},
                         ].map((k,i) => (
                           <div key={i} style={{background:"#fff",padding:"1rem"}}>
-                            <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{k.lbl}</div>
+                            <div style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.3rem"}}>{k.lbl}</div>
                             <div style={{fontFamily:"var(--serif)",fontSize:"1.8rem",fontWeight:300,color:k.cor,lineHeight:1}}>{k.val}</div>
-                            <div style={{fontSize:"0.65rem",color:"#aaa",marginTop:"0.25rem"}}>{k.nota}</div>
+                            <div style={{fontSize:"0.75rem",color:"#aaa",marginTop:"0.25rem"}}>{k.nota}</div>
                           </div>
                         ))}
                       </div>
@@ -2158,7 +2158,7 @@ export default function Perfil() {
                       {/* A RECEBER */}
                       {aReceber.length > 0 && (
                         <div style={{marginBottom:"1.5rem"}}>
-                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>A receber (nos próximos 10 dias úteis)</p>
+                          <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>A receber (nos próximos 10 dias úteis)</p>
                           {aReceber.map(a => (
                             <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}>
                               <div>
@@ -2175,7 +2175,7 @@ export default function Perfil() {
                       {/* JÁ RECEBIDO */}
                       {recebido.length > 0 && (
                         <div style={{marginBottom:"1.5rem"}}>
-                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#27ae60",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Já recebido</p>
+                          <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#27ae60",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Já recebido</p>
                           {recebido.map(a => (
                             <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem"}}>
                               <div>
@@ -2192,7 +2192,7 @@ export default function Perfil() {
                       {/* DEPÓSITOS CATIVOS */}
                       {depositosCativos.length > 0 && (
                         <div style={{marginBottom:"1rem"}}>
-                          <p style={{fontSize:"0.62rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#e74c3c",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Depósitos cativos / em disputa</p>
+                          <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#e74c3c",fontWeight:600,marginBottom:"0.75rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Depósitos cativos / em disputa</p>
                           {depositosCativos.map(a => (
                             <div key={a.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid var(--g1)",fontSize:"0.82rem",background:"#fff5f5",margin:"0 -0.5rem",padding:"0.6rem 0.5rem"}}>
                               <div>
@@ -2200,7 +2200,7 @@ export default function Perfil() {
                                 <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
                                 <div style={{fontSize:"0.68rem",color:"#e74c3c",marginTop:"0.1rem"}}>{a.deposito_estado==="em_disputa"?"Em análise pela Nora Grei":"Depósito retido — danos confirmados"}</div>
                               </div>
-                              <span style={{display:"inline-block",fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",fontWeight:600,background:"#fff5f5",color:"#e74c3c"}}>{a.deposito_estado}</span>
+                              <span style={{display:"inline-block",fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.2rem 0.5rem",fontWeight:600,background:"#fff5f5",color:"#e74c3c"}}>{a.deposito_estado}</span>
                             </div>
                           ))}
                         </div>
@@ -2267,13 +2267,13 @@ export default function Perfil() {
                   return (<>
                     {/* Receita por mês */}
                     <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                      <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Receita líquida — últimos 6 meses</p>
+                      <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Receita líquida — últimos 6 meses</p>
                       <div style={{display:"flex",alignItems:"flex-end",gap:"0.5rem",height:120}}>
                         {receitaMes.map(m=>(
                           <div key={m.key} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:"0.3rem"}}>
-                            <div style={{fontSize:"0.62rem",color:"#c4748a",fontWeight:600}}>{m.val>0?`${m.val.toFixed(0)}€`:""}</div>
+                            <div style={{fontSize:"0.75rem",color:"#c4748a",fontWeight:600}}>{m.val>0?`${m.val.toFixed(0)}€`:""}</div>
                             <div style={{width:"100%",background:"#c4748a",height:`${Math.round((m.val/maxReceita)*80)+4}px`,minHeight:4,transition:"height 0.3s"}}/>
-                            <div style={{fontSize:"0.55rem",color:"#aaa",textAlign:"center",letterSpacing:"0.05em"}}>{m.label}</div>
+                            <div style={{fontSize:"0.68rem",color:"#aaa",textAlign:"center",letterSpacing:"0.05em"}}>{m.label}</div>
                           </div>
                         ))}
                       </div>
@@ -2281,7 +2281,7 @@ export default function Perfil() {
 
                     {/* Breakeven por peça */}
                     <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
-                      <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Breakeven por peça</p>
+                      <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Breakeven por peça</p>
                       {pecasComBreak.length===0 && <p style={{color:"#aaa",fontSize:"0.85rem"}}>Sem peças ainda.</p>}
                       {pecasComBreak.map(p=>(
                         <div key={p.id} style={{marginBottom:"1.25rem"}}>
@@ -2295,8 +2295,8 @@ export default function Perfil() {
                             <div style={{height:"100%",width:`${p.pct}%`,background:p.pct>=100?"#27ae60":"#c4748a",transition:"width 0.4s"}}/>
                           </div>
                           <div style={{display:"flex",justifyContent:"space-between",marginTop:"0.25rem"}}>
-                            <span style={{fontSize:"0.62rem",color:"#aaa"}}>{p.receitaGerada.toFixed(0)}€ gerados</span>
-                            <span style={{fontSize:"0.62rem",color:"#aaa"}}>{p.valor_peca?`objetivo ${p.valor_peca}€`:"valor peça não definido"}</span>
+                            <span style={{fontSize:"0.75rem",color:"#aaa"}}>{p.receitaGerada.toFixed(0)}€ gerados</span>
+                            <span style={{fontSize:"0.75rem",color:"#aaa"}}>{p.valor_peca?`objetivo ${p.valor_peca}€`:"valor peça não definido"}</span>
                           </div>
                         </div>
                       ))}
@@ -2305,7 +2305,7 @@ export default function Perfil() {
                     {/* Pareto */}
                     {rankPecas.length>0 && (
                       <div className="card" style={{padding:"1.5rem"}}>
-                        <p style={{fontSize:"0.6rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Pareto — top peças por receita</p>
+                        <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1.25rem"}}>Pareto — top peças por receita</p>
                         {rankPecas.map((p,i)=>{
                           const pctAcum = rankPecas.slice(0,i+1).reduce((s,x)=>s+x.total,0)/totalGeral*100;
                           return (
@@ -2320,11 +2320,11 @@ export default function Perfil() {
                                   <div style={{height:"100%",width:`${p.total/totalGeral*100}%`,background:i<3?"#c4748a":"#d4c4ca"}}/>
                                 </div>
                               </div>
-                              <span style={{fontSize:"0.6rem",color:"#aaa",width:36,flexShrink:0,textAlign:"right"}}>{p.alugs}x</span>
+                              <span style={{fontSize:"0.72rem",color:"#aaa",width:36,flexShrink:0,textAlign:"right"}}>{p.alugs}x</span>
                             </div>
                           );
                         })}
-                        <p style={{fontSize:"0.65rem",color:"#aaa",marginTop:"1rem",borderTop:"1px solid var(--g1)",paddingTop:"0.75rem"}}>
+                        <p style={{fontSize:"0.75rem",color:"#aaa",marginTop:"1rem",borderTop:"1px solid var(--g1)",paddingTop:"0.75rem"}}>
                           {rankPecas.length>=3 ? `As top 3 peças geram ${(rankPecas.slice(0,3).reduce((s,p)=>s+p.total,0)/totalGeral*100).toFixed(0)}% da receita total.` : ""}
                         </p>
                       </div>
@@ -2430,7 +2430,7 @@ export default function Perfil() {
               {editarPeca.tem_defeito && (
                 <textarea className="inp" value={editarPeca.descricao_defeito||""} onChange={e=>setEditarPeca(p=>({...p,descricao_defeito:e.target.value}))} style={{resize:"vertical",minHeight:"60px",marginTop:"0.6rem",border:"1.5px solid #e74c3c"}} placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..." />
               )}
-              {!editarPeca.tem_defeito && <span style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
+              {!editarPeca.tem_defeito && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
             </div>
 
             {/* Descrição */}
@@ -2445,7 +2445,7 @@ export default function Perfil() {
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
                 {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
                   <button key={val} type="button" onClick={()=>setEditarPeca(p=>({...p,tipo:val}))}
-                    style={{padding:"0.6rem 0.4rem",fontSize:"0.65rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:(editarPeca.tipo||"alugar")===val?"var(--black)":"#e2dfda",background:(editarPeca.tipo||"alugar")===val?"var(--black)":"#fff",color:(editarPeca.tipo||"alugar")===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
+                    style={{padding:"0.6rem 0.4rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:(editarPeca.tipo||"alugar")===val?"var(--black)":"#e2dfda",background:(editarPeca.tipo||"alugar")===val?"var(--black)":"#fff",color:(editarPeca.tipo||"alugar")===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
                     {label}
                   </button>
                 ))}
@@ -2468,7 +2468,7 @@ export default function Perfil() {
                 <div className="fg">
                   <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
                     Aluguer / dia (€)
-                    {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
+                    {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.68rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
                   </label>
                   <input className="inp" type="number" min="0" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
                 </div>
@@ -2496,21 +2496,21 @@ export default function Perfil() {
                   <option key={oc} value={oc} style={{padding:"0.4rem 0.6rem",fontSize:"0.85rem"}}>{oc}</option>
                 ))}
               </select>
-              <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
+              <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
             </div>
 
             {/* Link externo para compra nova */}
             <div className="fg" style={{marginBottom:"1rem",padding:"1rem",background:"#faf8f5",border:"1.5px solid #e8d5a3"}}>
               <label className="lbl" style={{color:"#8a6a2a",display:"flex",alignItems:"center",gap:"0.4rem"}}>
                 Link para comprar nova ↗
-                <span style={{fontSize:"0.55rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
+                <span style={{fontSize:"0.68rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
               </label>
               <input className="inp" type="url" value={editarPeca.link_compra_externa||""} onChange={e=>setEditarPeca(p=>({...p,link_compra_externa:e.target.value}))} placeholder="https://www.zara.com/produto/..." style={{marginBottom:"0.4rem"}} />
               {editarPeca.link_externo_ativo
-                ? <span style={{fontSize:"0.62rem",color:"#27ae60",display:"flex",alignItems:"center",gap:"0.3rem"}}>✓ Link ativo</span>
+                ? <span style={{fontSize:"0.75rem",color:"#27ae60",display:"flex",alignItems:"center",gap:"0.3rem"}}>✓ Link ativo</span>
                 : editarPeca.link_compra_externa
-                  ? <span style={{fontSize:"0.62rem",color:"#e67e22"}}>⏳ Pendente ativação — após pagamento de 15€/mês a Nora Grei ativa o link</span>
-                  : <span style={{fontSize:"0.62rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. Custo: 15€/mês por peça.</span>
+                  ? <span style={{fontSize:"0.75rem",color:"#e67e22"}}>⏳ Pendente ativação — após pagamento de 15€/mês a Nora Grei ativa o link</span>
+                  : <span style={{fontSize:"0.75rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. Custo: 15€/mês por peça.</span>
               }
             </div>
 
@@ -2594,7 +2594,7 @@ export default function Perfil() {
               {novaPeca.tem_defeito && (
                 <textarea className="inp" value={novaPeca.descricao_defeito} onChange={e=>setNovaPeca(p=>({...p,descricao_defeito:e.target.value}))} style={{resize:"vertical",minHeight:"60px",marginTop:"0.6rem",border:"1.5px solid #e74c3c"}} placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..." />
               )}
-              {!novaPeca.tem_defeito && <span style={{fontSize:"0.62rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
+              {!novaPeca.tem_defeito && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
             </div>
 
             {/* Descrição */}
@@ -2609,7 +2609,7 @@ export default function Perfil() {
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
                 {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
                   <button key={val} type="button" onClick={()=>setNovaPeca(p=>({...p,tipo:val}))}
-                    style={{padding:"0.6rem 0.4rem",fontSize:"0.65rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:novaPeca.tipo===val?"var(--black)":"#e2dfda",background:novaPeca.tipo===val?"var(--black)":"#fff",color:novaPeca.tipo===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
+                    style={{padding:"0.6rem 0.4rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:novaPeca.tipo===val?"var(--black)":"#e2dfda",background:novaPeca.tipo===val?"var(--black)":"#fff",color:novaPeca.tipo===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
                     {label}
                   </button>
                 ))}
@@ -2632,7 +2632,7 @@ export default function Perfil() {
                 <div className="fg">
                   <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
                     Aluguer / dia (€) *
-                    {novaPeca.valor_peca&&parseFloat(novaPeca.valor_peca)>0&&<span style={{fontSize:"0.55rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>sugerido: {Math.round(parseFloat(novaPeca.valor_peca)*0.08)}€</span>}
+                    {novaPeca.valor_peca&&parseFloat(novaPeca.valor_peca)>0&&<span style={{fontSize:"0.68rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>sugerido: {Math.round(parseFloat(novaPeca.valor_peca)*0.08)}€</span>}
                   </label>
                   <input className="inp" type="number" min="0" value={novaPeca.preco_aluguer_dia} onChange={e=>setNovaPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
                 </div>
@@ -2660,7 +2660,7 @@ export default function Perfil() {
                   <option key={oc} value={oc} style={{padding:"0.4rem 0.6rem",fontSize:"0.85rem"}}>{oc}</option>
                 ))}
               </select>
-              <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
+              <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.25rem"}}>Ctrl+clique (Windows) ou Cmd+clique (Mac) para selecionar várias</span>
             </div>
 
             {/* Tamanhos */}
@@ -2675,17 +2675,17 @@ export default function Perfil() {
                   {novaPeca.tamanhos.length>1&&<button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:p.tamanhos.filter((_,i)=>i!==idx)}))} style={{background:"none",border:"none",color:"#e74c3c",cursor:"pointer",fontSize:"1rem",lineHeight:1}}>✕</button>}
                 </div>
               ))}
-              <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
+              <button type="button" onClick={()=>setNovaPeca(p=>({...p,tamanhos:[...p.tamanhos,{tamanho:"M",quantidade:1}]}))} style={{fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.4rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Tamanho</button>
             </div>
 
             {/* Link externo para compra nova */}
             <div className="fg" style={{marginBottom:"1rem",padding:"1rem",background:"#faf8f5",border:"1.5px solid #e8d5a3"}}>
               <label className="lbl" style={{color:"#8a6a2a",display:"flex",alignItems:"center",gap:"0.4rem"}}>
                 Link para comprar nova ↗
-                <span style={{fontSize:"0.55rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
+                <span style={{fontSize:"0.68rem",background:"#c4a882",color:"#fff",padding:"0.1rem 0.4rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.08em"}}>15€/mês</span>
               </label>
               <input className="inp" type="url" value={novaPeca.link_compra_externa} onChange={e=>setNovaPeca(p=>({...p,link_compra_externa:e.target.value}))} placeholder="https://www.zara.com/produto/..." style={{marginBottom:"0.4rem"}} />
-              <span style={{fontSize:"0.62rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. A Nora Grei ativa após pagamento de 15€/mês.</span>
+              <span style={{fontSize:"0.75rem",color:"var(--g4)"}}>Direciona clientes para comprar a peça nova noutro site. A Nora Grei ativa após pagamento de 15€/mês.</span>
             </div>
 
             {uploadProgressLoja && <p style={{fontSize:"0.82rem",color:"var(--g4)",margin:"0.5rem 0",fontStyle:"italic"}}>{uploadProgressLoja}</p>}
