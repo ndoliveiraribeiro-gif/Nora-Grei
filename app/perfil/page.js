@@ -1010,7 +1010,7 @@ export default function Perfil() {
   const [novaRec, setNovaRec] = useState({ assunto: "", mensagem: "", aluguer_id: "" });
   const [recMsg, setRecMsg] = useState("");
   const [recLoading, setRecLoading] = useState(false);
-  const [secaoAberta, setSecaoAberta] = useState("pessoal"); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
+  const [secaoAberta, setSecaoAberta] = useState(null); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
   const fileRef = useRef();
 
   useEffect(() => {
@@ -1399,16 +1399,18 @@ export default function Perfil() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g3:#c8c4bc;--g4:#7a776f;--g5:#4a4844;--g6:#2b2a28;--rosa:#c4748a;--serif:'Cormorant',Georgia,serif;--sans:'Jost',Arial,sans-serif}
+        html,body{overflow-x:hidden;max-width:100%}
         body{background:var(--g1);font-family:var(--sans);font-size:17px;-webkit-font-smoothing:antialiased}
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);width:100%}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
         .nav-back{font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g6);text-decoration:none}
-        .page{padding:6rem 4rem 4rem;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
-        .hero{background:var(--white);padding:2.5rem;display:flex;align-items:center;gap:2rem}
+        .page{padding:6rem 2rem 4rem;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem;width:100%;box-sizing:border-box}
+        .hero{background:var(--white);padding:2.5rem;display:flex;align-items:center;gap:2rem;min-width:0}
         .avatar-wrap{position:relative;flex-shrink:0}
         .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover}
         .avatar-ph{width:96px;height:96px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--g6)}
         .avatar-btn{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);border:2.5px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+        .hero-info{min-width:0;flex:1;overflow:hidden}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.1;margin-bottom:0.3rem;color:var(--black)}
         .tabs-scroll{display:flex;overflow-x:auto;border-bottom:2px solid var(--g2);margin-bottom:1.5rem;scrollbar-width:none;-ms-overflow-style:none}
         .tabs-scroll::-webkit-scrollbar{display:none}
@@ -1468,9 +1470,9 @@ export default function Perfil() {
         .btn-sair{font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g6);background:none;border:none;cursor:pointer;font-family:var(--sans);text-decoration:underline}
         .btn-sair:hover{color:#c0392b}
         @media(max-width:768px){
-          .nav{padding:0.85rem 1rem}
-          .page{padding:4.5rem 0.85rem 3rem;gap:1rem}
-          .hero{flex-direction:column;align-items:flex-start;gap:1rem;padding:1.25rem 1rem}
+          .nav{padding:0.85rem 1rem;width:100%}
+          .page{padding:4.5rem 0.85rem 3rem;gap:1rem;width:100%}
+          .hero{flex-direction:column;align-items:flex-start;gap:1rem;padding:1.25rem 1rem;width:100%;min-width:0}
           .hero-nome{font-size:1.4rem}
           .nivel-card{padding:1.25rem 1rem}
           .nivel-top{flex-direction:column;align-items:flex-start;gap:0.75rem}
@@ -1622,9 +1624,9 @@ export default function Perfil() {
             <button className="avatar-btn" onClick={() => fileRef.current?.click()}>{uploadingFoto?"...":"+"}</button>
             <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={uploadFoto} />
           </div>
-          <div>
+          <div className="hero-info">
             <div className="hero-nome">{perfil.nome || "—"}</div>
-            <div className="hero-email">{user?.email}</div>
+            <div className="hero-email" style={{wordBreak:'break-all'}}>{user?.email}</div>
             {perfil.cidade && <div style={{fontSize:'0.85rem',color:'var(--g6)',marginTop:'0.3rem'}}>{perfil.cidade}, {perfil.pais}</div>}
           </div>
         </div>
