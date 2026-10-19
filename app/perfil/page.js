@@ -2929,9 +2929,9 @@ export default function Perfil() {
           style={{
             position:"fixed", bottom:"2rem", left:"1.25rem", zIndex:9999,
             width:56, height:56, borderRadius:"50%",
-            background:"#c4748a", color:"#fff", border:"none",
+            background:"#7bafd4", color:"#fff", border:"none",
             fontSize:"1.7rem", lineHeight:1, cursor:"pointer",
-            boxShadow:"0 4px 20px rgba(196,116,138,0.5)",
+            boxShadow:"0 4px 20px rgba(123,175,212,0.5)",
             display:"flex", alignItems:"center", justifyContent:"center",
             touchAction:"manipulation", WebkitTapHighlightColor:"transparent",
           }}
