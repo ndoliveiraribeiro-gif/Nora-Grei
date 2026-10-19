@@ -105,7 +105,7 @@ export default function Admin() {
 
   // CONFIG
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
-  const [configReferral, setConfigReferral] = useState({ ativo: true, desconto_comprador: 10, comissao_referidor: 5, minimo_pagamento: 20, validade_cookie_dias: 30 });
+  const [configReferral, setConfigReferral] = useState({ ativo: true, desconto_comprador: 10, comissao_referidor: 5, minimo_pagamento: 20, validade_cookie_dias: 30, credito_10_pecas: 5, credito_primeira_venda: 5, credito_3_meses: 5, meses_sem_comissao_vendas: 3 });
   const [configReferralLoading, setConfigReferralLoading] = useState(false);
   const [configReferralMsg, setConfigReferralMsg] = useState("");
 
@@ -215,7 +215,7 @@ export default function Admin() {
     }
     if (tab === "config") {
       const { data: cfgRef } = await supabase.from("config_referral").select("*").single();
-      if (cfgRef) setConfigReferral({ ativo: cfgRef.ativo ?? true, desconto_comprador: cfgRef.desconto_comprador ?? 10, comissao_referidor: cfgRef.comissao_referidor ?? 5, minimo_pagamento: cfgRef.minimo_pagamento ?? 20, validade_cookie_dias: cfgRef.validade_cookie_dias ?? 30 });
+      if (cfgRef) setConfigReferral({ ativo: cfgRef.ativo ?? true, desconto_comprador: cfgRef.desconto_comprador ?? 10, comissao_referidor: cfgRef.comissao_referidor ?? 5, minimo_pagamento: cfgRef.minimo_pagamento ?? 20, validade_cookie_dias: cfgRef.validade_cookie_dias ?? 30, credito_10_pecas: cfgRef.credito_10_pecas ?? 5, credito_primeira_venda: cfgRef.credito_primeira_venda ?? 5, credito_3_meses: cfgRef.credito_3_meses ?? 5, meses_sem_comissao_vendas: cfgRef.meses_sem_comissao_vendas ?? 3 });
     }
   };
 
@@ -1169,6 +1169,32 @@ export default function Admin() {
                     <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Quantos dias o link de referência fica activo após o clique</span>
                   </div>
                 </div>
+                {/* Créditos escalonados */}
+                <div style={{marginTop:"1.25rem",paddingTop:"1.25rem",borderTop:"1px solid var(--g2)"}}>
+                  <p style={{fontSize:"0.72rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g6)",fontWeight:600,marginBottom:"1rem"}}>Créditos por convite (escalonado)</p>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+                    <div>
+                      <label className="ad-label">Crédito ao publicar 10 peças (€)</label>
+                      <input className="ad-input" type="number" min="0" step="0.5" value={configReferral.credito_10_pecas} onChange={e => setConfigReferral(c => ({...c, credito_10_pecas: parseFloat(e.target.value)||0}))} />
+                      <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Quando a lojista convidada publica 10+ peças</span>
+                    </div>
+                    <div>
+                      <label className="ad-label">Crédito na 1ª venda (€)</label>
+                      <input className="ad-input" type="number" min="0" step="0.5" value={configReferral.credito_primeira_venda} onChange={e => setConfigReferral(c => ({...c, credito_primeira_venda: parseFloat(e.target.value)||0}))} />
+                      <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Quando a lojista convidada realiza a 1ª venda</span>
+                    </div>
+                    <div>
+                      <label className="ad-label">Crédito aos 3 meses activa (€)</label>
+                      <input className="ad-input" type="number" min="0" step="0.5" value={configReferral.credito_3_meses} onChange={e => setConfigReferral(c => ({...c, credito_3_meses: parseFloat(e.target.value)||0}))} />
+                      <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Quando a lojista convidada completa 3 meses activa</span>
+                    </div>
+                    <div>
+                      <label className="ad-label">Meses sem comissão em vendas (lojista convidada)</label>
+                      <input className="ad-input" type="number" min="0" max="24" step="1" value={configReferral.meses_sem_comissao_vendas} onChange={e => setConfigReferral(c => ({...c, meses_sem_comissao_vendas: parseInt(e.target.value)||0}))} />
+                      <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Alugueres mantêm comissão normal</span>
+                    </div>
+                  </div>
+                </div>
                 {configReferralMsg && <div style={{padding:"0.6rem 0.85rem",background: configReferralMsg.includes("✓")?"#f0faf0":"#fff0f0",border:"1px solid",borderColor:configReferralMsg.includes("✓")?"#b8dbb8":"#f5c6cb",fontSize:"0.8rem",marginTop:"0.75rem",color:configReferralMsg.includes("✓")?"#2d6a2d":"#c0392b"}}>{configReferralMsg}</div>}
                 <button className="ad-btn ad-btn-rosa" style={{marginTop:"1rem"}} disabled={configReferralLoading} onClick={async () => {
                   setConfigReferralLoading(true); setConfigReferralMsg("");
@@ -1181,6 +1207,10 @@ export default function Admin() {
                         comissao_referidor: configReferral.comissao_referidor,
                         minimo_pagamento: configReferral.minimo_pagamento,
                         validade_cookie_dias: configReferral.validade_cookie_dias,
+                        credito_10_pecas: configReferral.credito_10_pecas,
+                        credito_primeira_venda: configReferral.credito_primeira_venda,
+                        credito_3_meses: configReferral.credito_3_meses,
+                        meses_sem_comissao_vendas: configReferral.meses_sem_comissao_vendas,
                         updated_at: new Date().toISOString()
                       }).eq("id", row.id)
                     : await supabase.from("config_referral").insert({
@@ -1188,7 +1218,11 @@ export default function Admin() {
                         desconto_comprador: configReferral.desconto_comprador,
                         comissao_referidor: configReferral.comissao_referidor,
                         minimo_pagamento: configReferral.minimo_pagamento,
-                        validade_cookie_dias: configReferral.validade_cookie_dias
+                        validade_cookie_dias: configReferral.validade_cookie_dias,
+                        credito_10_pecas: configReferral.credito_10_pecas,
+                        credito_primeira_venda: configReferral.credito_primeira_venda,
+                        credito_3_meses: configReferral.credito_3_meses,
+                        meses_sem_comissao_vendas: configReferral.meses_sem_comissao_vendas
                       });
                   setConfigReferralLoading(false);
                   setConfigReferralMsg(error ? "Erro: " + error.message : "✓ Configurações de referral guardadas");

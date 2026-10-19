@@ -2949,7 +2949,7 @@ export default function Perfil() {
           </div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:"0.75rem",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",color:"var(--black)",fontFamily:"var(--sans)"}}>Convida e ganha</div>
-            <div style={{fontSize:"0.78rem",color:"var(--g6)",marginTop:"0.15rem",fontFamily:"var(--serif)"}}>Partilha a Nora Grei com uma amiga. Cada loja que abrir com o teu link dá-te créditos.</div>
+            <div style={{fontSize:"0.78rem",color:"var(--g6)",marginTop:"0.15rem",fontFamily:"var(--serif)"}}>Convida uma amiga a abrir loja. Ela publica 10 peças → ganhas €{ganhos.config?.credito_10_pecas??5}. Ela faz a 1ª venda → mais €{ganhos.config?.credito_primeira_venda??5}. Ela fica 3 meses → mais €{ganhos.config?.credito_3_meses??5}.</div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:"0.4rem",flexShrink:0}}>
             <button onClick={() => { setTabAtiva("ganhos"); setShowReferralBanner(false); }} style={{padding:"0.4rem 0.85rem",background:"#c4a882",color:"#fff",border:"none",borderRadius:"6px",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver mais</button>
