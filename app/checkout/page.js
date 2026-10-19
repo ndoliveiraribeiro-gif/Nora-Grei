@@ -431,9 +431,10 @@ function CheckoutContent() {
   const [recibo, setRecibo] = useState(null);
   const [ocasiao, setOcasiao] = useState("");
   const [codigoAfiliado, setCodigoAfiliado] = useState("");
-  const [afiliadoAtivo, setAfiliadoAtivo] = useState(null); // { id, nome, desconto_pct, comissao_pct }
+  const [afiliadoAtivo, setAfiliadoAtivo] = useState(null); // { desconto_pct } — apenas via código pessoal
   const [afiliadoErro, setAfiliadoErro] = useState("");
   const [afiliadoOk, setAfiliadoOk] = useState(false);
+  const [refAfiliadoId, setRefAfiliadoId] = useState(null); // UUID do afiliado via link ?ref=
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -441,7 +442,17 @@ function CheckoutContent() {
     const saved = localStorage.getItem("ng_lang");
     if (saved && t[saved]) setLang(saved);
     carregarDados();
-    // Aplica código afiliado vindo do URL (?ref=CODIGO)
+    // Canal 1: link ?ref= guardado em localStorage (ng_ref)
+    try {
+      const ngRef = localStorage.getItem("ng_ref");
+      if (ngRef) {
+        const parsed = JSON.parse(ngRef);
+        if (parsed?.ref && parsed?.expiry && Date.now() < parsed.expiry) {
+          setRefAfiliadoId(parsed.ref);
+        }
+      }
+    } catch {}
+    // Canal 2: código pessoal inserido manualmente (refParam no URL, legacy)
     if (refParam) { setCodigoAfiliado(refParam.toUpperCase()); validarAfiliado(refParam.toUpperCase()); }
   }, []);
 
@@ -481,9 +492,24 @@ function CheckoutContent() {
   const validarAfiliado = async (codigo) => {
     const c = (codigo || codigoAfiliado).trim().toUpperCase();
     if (!c) { setAfiliadoAtivo(null); setAfiliadoOk(false); setAfiliadoErro(""); return; }
-    const { data } = await supabase.from("afiliados").select("id, nome, desconto_pct, comissao_pct").eq("codigo", c).eq("ativo", true).maybeSingle();
-    if (data) { setAfiliadoAtivo(data); setAfiliadoOk(true); setAfiliadoErro(""); }
-    else { setAfiliadoAtivo(null); setAfiliadoOk(false); setAfiliadoErro("Código não encontrado ou inválido."); }
+    // Usar novo sistema codigos_afiliado
+    const { data } = await supabase
+      .from("codigos_afiliado")
+      .select("id, cliente_id, codigo")
+      .eq("codigo", c)
+      .eq("ativo", true)
+      .maybeSingle();
+    if (data) {
+      // Buscar config de desconto
+      const { data: cfg } = await supabase.from("app_config").select("valor").eq("chave", "desconto_codigo_pct").maybeSingle();
+      const descontoPct = cfg ? parseFloat(cfg.valor) : 10;
+      setAfiliadoAtivo({ codigo: data.codigo, cliente_id: data.cliente_id, desconto_pct: descontoPct });
+      setAfiliadoOk(true);
+      setAfiliadoErro("");
+    } else {
+      setAfiliadoAtivo(null); setAfiliadoOk(false);
+      setAfiliadoErro("Código não encontrado ou inválido.");
+    }
   };
 
   // Carrega todos os intervalos ocupados para este stock/tamanho
@@ -693,29 +719,17 @@ function CheckoutContent() {
           ...(tudoConfirmado ? { deposito_confirmado_em: new Date().toISOString() } : {}),
         }),
         ...(ocasiao ? { ocasiao } : {}),
-        ...(afiliadoAtivo ? { codigo_afiliado: codigoAfiliado.trim().toUpperCase(), afiliado_id: afiliadoAtivo.id } : {}),
+        // Afiliado: link ref (canal 1) ou código pessoal (canal 2)
+        ...(refAfiliadoId && !afiliadoAtivo ? { ref_afiliado_id: refAfiliadoId } : {}),
+        ...(afiliadoAtivo ? { codigo_afiliado_usado: codigoAfiliado.trim().toUpperCase() } : {}),
       }).select().single();
       if (error) throw error;
 
-      // Registar conversão do afiliado
-      if (afiliadoAtivo && novoAluguer) {
-        const comissaoValor = Math.round(valorAluguerBase * (afiliadoAtivo.comissao_pct / 100) * 100) / 100;
-        await supabase.from("conversoes_afiliado").insert({
-          afiliado_id: afiliadoAtivo.id,
-          aluguer_id: novoAluguer.id,
-          codigo_usado: codigoAfiliado.trim().toUpperCase(),
-          valor_aluguer: valorAluguerBase,
-          desconto_aplicado: descontoAfiliado,
-          comissao_valor: comissaoValor,
-          utm_source: new URLSearchParams(window.location.search).get("utm_source"),
-          utm_medium: new URLSearchParams(window.location.search).get("utm_medium"),
-          utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign"),
-        });
-        // Atualizar totais do afiliado
-        await supabase.from("afiliados").update({
-          total_conversoes: (afiliadoAtivo.total_conversoes || 0) + 1,
-          total_comissao_gerada: (afiliadoAtivo.total_comissao_gerada || 0) + comissaoValor,
-        }).eq("id", afiliadoAtivo.id);
+      // Créditos são registados automaticamente pelo trigger Supabase
+      // ao confirmar o aluguer (estado = 'confirmado' ou 'ativo')
+      // Limpar ng_ref do localStorage após compra concluída (evitar re-uso)
+      if (novoAluguer && refAfiliadoId) {
+        try { localStorage.removeItem("ng_ref"); } catch {}
       }
 
       const numeroRecibo = gerarNumeroRecibo();
@@ -1006,7 +1020,7 @@ function CheckoutContent() {
                   />
                   <button onClick={() => validarAfiliado()} style={{background:"#080808",color:"#fff",border:"none",padding:"0 1rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans, sans-serif)",whiteSpace:"nowrap"}}>Aplicar</button>
                 </div>
-                {afiliadoOk && <p style={{fontSize:"0.75rem",color:"#27ae60",marginTop:"0.3rem"}}>✓ {afiliadoAtivo?.desconto_pct}% de desconto aplicado ({afiliadoAtivo?.nome})</p>}
+                {afiliadoOk && <p style={{fontSize:"0.75rem",color:"#27ae60",marginTop:"0.3rem"}}>✓ {afiliadoAtivo?.desconto_pct}% de desconto aplicado ({afiliadoAtivo?.codigo})</p>}
                 {afiliadoErro && <p style={{fontSize:"0.75rem",color:"#e74c3c",marginTop:"0.3rem"}}>{afiliadoErro}</p>}
               </div>
 
