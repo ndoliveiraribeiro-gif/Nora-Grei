@@ -41,7 +41,7 @@ const T = {
     catNomes: { Festa: "Festa", Trabalho: "Trabalho", "Férias": "Férias", Jantar: "Jantar" },
     cupao: { texto: "Oferta de boas-vindas — 15% de desconto em noragrei.com", copiar: "Copiar código", copiado: "Copiado ✓" },
     destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
-    pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações — sem ocupar espaço.", btn: "Instalar agora", ios: "No Safari, toca em  e depois em \"Adicionar ao ecrã inicial\".", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
+    pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações.", btn: "Instalar agora", iosP1: "1 · Toca em", iosP2: "⬆️ Partilhar", iosP3: "na barra do Safari", iosP4: "2 · Escolhe", iosP5: "\"Adicionar ao ecrã inicial\"", iosP6: "3 · Toca em", iosP7: "\"Adicionar\"", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
     trust: { label: "Porque nos escolhem", items: [
       { icon: "✦", titulo: "Peças únicas", desc: "Cada peça é seleccionada a pensar na mulher que quer ser diferente em cada ocasião." },
       { icon: "◎", titulo: "Caução garantida", desc: "O depósito é devolvido na totalidade quando a peça chega em boas condições." },
@@ -205,8 +205,10 @@ export default function Home() {
       pwaPrompt.prompt();
       const { outcome } = await pwaPrompt.userChoice;
       if (outcome === "accepted") { setPwaBanner(false); setPwaInstalado(true); localStorage.setItem("ng_pwa_dismiss","1"); }
+      else { setPwaBanner(false); }
     } else {
-      if (navigator.share) { try { await navigator.share({ title: "Nora Grei", url: window.location.origin }); } catch(_) {} }
+      // prompt não disponível — mostrar instruções manuais
+      setPwaBanner("ios");
     }
   };
   const dispensarPwa = () => { setPwaBanner(false); localStorage.setItem("ng_pwa_dismiss","1"); };
@@ -467,7 +469,9 @@ export default function Home() {
         .pwa-banner-btn{flex:1;padding:0.7rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-family:var(--sans);font-weight:500;cursor:pointer;border:none;transition:opacity 0.2s}
         .pwa-banner-btn.main{background:var(--white);color:var(--black)}
         .pwa-banner-btn.sec{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.2)}
-        .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px}
+        .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px;display:flex;flex-direction:column;gap:0.35rem}
+        .pwa-ios-step{display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap}
+        .pwa-ios-step strong{color:#fff;font-weight:500}
         .pwa-sec{padding:3rem 1.5rem;background:var(--g1);border-top:1px solid var(--g2);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem}
         .pwa-sec-txt{}
         .pwa-sec-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;margin-bottom:0.35rem}
@@ -553,7 +557,11 @@ export default function Home() {
             <button className="pwa-banner-fechar" onClick={dispensarPwa}>✕</button>
           </div>
           {pwaBanner === "ios" ? (
-            <div className="pwa-banner-ios">{t.pwa.ios}</div>
+            <div className="pwa-banner-ios">
+              <div className="pwa-ios-step"><span>{t.pwa.iosP1}</span> <strong>{t.pwa.iosP2}</strong> <span>{t.pwa.iosP3}</span></div>
+              <div className="pwa-ios-step"><span>{t.pwa.iosP4}</span> <strong>{t.pwa.iosP5}</strong></div>
+              <div className="pwa-ios-step"><span>{t.pwa.iosP6}</span> <strong>{t.pwa.iosP7}</strong></div>
+            </div>
           ) : (
             <div className="pwa-banner-btns">
               <button className="pwa-banner-btn main" onClick={instalarPwa}>{t.pwa.btn}</button>
