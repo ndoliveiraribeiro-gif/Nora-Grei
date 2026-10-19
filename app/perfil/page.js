@@ -1429,10 +1429,7 @@ export default function Perfil() {
         <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
           <NotificationBell lang={lang} />
           {modoLojista && codigoLoja && (
-            <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-              <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.75rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.75rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Dashboard</button>
-              <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.75rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"var(--rosa)",color:"#fff",padding:"0.35rem 0.75rem",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Minha loja ↗</a>
-            </div>
+            <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.72rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.3rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Loja</button>
           )}
           <a href="/" className="nav-back">{i.voltarInicio}</a>
         </div>
@@ -1928,29 +1925,24 @@ export default function Perfil() {
         )}
 
         {modoLojista && tabAtiva === "loja" && (
-          <div style={{padding:"1rem 0"}}>
-            {/* Barra de navegação rápida do lojista */}
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1rem",padding:"0.6rem 1rem",background:"var(--g1)",borderRadius:"4px",flexWrap:"wrap",gap:"0.5rem"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"0.75rem"}}>
-                <button onClick={()=>setTabAtiva("perfil")} style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",display:"flex",alignItems:"center",gap:"0.3rem",padding:0}}>
-                  ← Perfil
-                </button>
-                <span style={{color:"var(--g2)",fontSize:"0.75rem"}}>|</span>
-                <span style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",fontFamily:"var(--sans)",fontWeight:600}}>Gestão da loja</span>
-              </div>
+          <div style={{padding:"0.5rem 0 2rem"}}>
+            {/* Header da loja: título + link Ver loja */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1.5rem",paddingBottom:"1rem",borderBottom:"1px solid var(--g1)"}}>
+              <h2 style={{fontFamily:"var(--serif)",fontSize:"1.35rem",fontWeight:300,margin:0,letterSpacing:"0.04em"}}>
+                {lang==="fr"?"Ma boutique":lang==="lt"?"Mano parduotuvė":"Gestão da loja"}
+              </h2>
               {codigoLoja && (
                 <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
-                  <a href={`/loja/${codigoLoja}`} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
-                  <a href={`/loja/${codigoLoja}`} onClick={e=>{e.preventDefault();navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`).then(()=>alert("Link copiado!"));}} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.7rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</a>
+                  <a href={`/loja/${codigoLoja}`} target="_blank" rel="noreferrer" style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
+                  <button onClick={()=>navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`)} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</button>
                 </div>
               )}
             </div>
-            <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
-                {["Dashboard","Peças","Alugueres","Liquidações","Avaliações","Estatísticas"].map((s,idx) => (
-                  <button key={idx} onClick={() => setTabLoja(["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx])} style={{padding:"0.4rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"var(--black)":"var(--g1)",color:tabLoja===["dashboard","pecas","alugueres","liquidacoes","avaliacoes","estatisticas"][idx]?"#fff":"var(--g4)",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{s}</button>
-                ))}
-              </div>
+            {/* Tabs da loja — scroll horizontal no mobile */}
+            <div style={{display:"flex",borderBottom:"2px solid var(--g2)",marginBottom:"1.5rem",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
+              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["avaliacoes","Avaliações"],["estatisticas","Estatísticas"]].map(([key,label]) => (
+                <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
+              ))}
             </div>
             {tabLoja === "dashboard" && (() => {
               const agora = new Date();
