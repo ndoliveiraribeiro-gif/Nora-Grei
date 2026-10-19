@@ -36,7 +36,7 @@ export default function Entrar() {
 
         .left { background: #080808; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; }
         .left-logo { font-family: 'Cormorant', serif; font-size: 2.5rem; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #f8f7f5; margin-bottom: 0.5rem; }
-        .left-tag { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+        .left-tag { font-size: 0.78rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
         .left-quote { font-family: 'Cormorant', serif; font-size: 1.6rem; font-style: italic; color: rgba(255,255,255,0.5); margin-top: 4rem; text-align: center; line-height: 1.6; max-width: 28ch; }
 
         .right { display: flex; align-items: center; justify-content: center; padding: 4rem; background: #f8f7f5; }
@@ -81,7 +81,7 @@ export default function Entrar() {
         .form-link-small { display: block; text-align: center; margin-top: 1.25rem; font-size: 0.95rem; color: #2e2d2b; text-decoration: none; font-weight: 400; }
         .form-link-small:hover { color: #080808; }
 
-        .back-link { position: fixed; top: 1.25rem; left: 1.25rem; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f8f7f5; text-decoration: none; font-weight: 500; z-index: 10; }
+        .back-link { position: fixed; top: 1.25rem; left: 1.25rem; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f8f7f5; text-decoration: none; font-weight: 500; z-index: 10; }
 
         @media (max-width: 768px) {
           .page { grid-template-columns: 1fr; }

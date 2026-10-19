@@ -300,16 +300,16 @@ export default function Home() {
         .nav.scrolled{padding:0.75rem 4rem;box-shadow:0 2px 20px rgba(0,0,0,0.06)}
         .logo{display:flex;flex-direction:column;text-decoration:none;color:var(--black)}
         .logo-name{font-family:var(--serif);font-size:1.35rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;line-height:1}
-        .logo-tag{font-size:0.5rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--g4);margin-top:0.15rem}
+        .logo-tag{font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--g4);margin-top:0.15rem}
         .nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
-        .nav-links a{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;transition:color 0.2s}
+        .nav-links a{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;transition:color 0.2s}
         .nav-links a:hover{color:var(--black)}
         .nav-right{display:flex;align-items:center;gap:0.75rem}
         .nav-lang{display:flex;gap:0.3rem;align-items:center}
-        .lang-btn{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--g4);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:0;transition:color 0.2s}
+        .lang-btn{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--g4);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:0;transition:color 0.2s}
         .lang-btn.on{color:var(--black);font-weight:500}
-        .lang-sep{color:var(--g2);font-size:0.5rem}
-        .nb{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.6rem 1.1rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;white-space:nowrap}
+        .lang-sep{color:var(--g2);font-size:0.65rem}
+        .nb{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.6rem 1.1rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;white-space:nowrap}
         .nb-o{color:var(--black);border:1px solid var(--g2)}
         .nb-o:hover{border-color:var(--black)}
         .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}

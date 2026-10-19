@@ -357,7 +357,7 @@ export default function Admin() {
         .ad-sidebar { background:var(--black); color:var(--white); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:220px; z-index:100; }
         .ad-logo { padding:2rem 1.5rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.08); }
         .ad-logo-name { font-family:var(--serif); font-size:1.2rem; font-weight:300; letter-spacing:0.2em; text-transform:uppercase; }
-        .ad-logo-tag { font-size:0.55rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:0.2rem; }
+        .ad-logo-tag { font-size:0.68rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:0.2rem; }
         .ad-nav { padding:1rem 0; flex:1; }
         .ad-nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.85rem 1.5rem; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.5); cursor:pointer; transition:all 0.2s; font-weight:400; border:none; background:none; width:100%; text-align:left; }
         .ad-nav-item:hover { color:var(--white); background:rgba(255,255,255,0.05); }
@@ -365,7 +365,7 @@ export default function Admin() {
         .ad-nav-icon { font-size:0.9rem; width:16px; }
         .ad-sidebar-footer { padding:1.5rem; border-top:1px solid rgba(255,255,255,0.08); }
         .ad-user { font-size:0.72rem; color:rgba(255,255,255,0.4); margin-bottom:0.75rem; }
-        .ad-sair { font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.4); background:none; border:none; cursor:pointer; font-family:var(--sans); padding:0; transition:color 0.2s; }
+        .ad-sair { font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.4); background:none; border:none; cursor:pointer; font-family:var(--sans); padding:0; transition:color 0.2s; }
         .ad-sair:hover { color:var(--white); }
         
         .ad-main { margin-left:220px; padding:2.5rem; }
@@ -376,44 +376,44 @@ export default function Admin() {
         .ad-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
         .ad-stat { background:var(--white); padding:1.5rem; }
         .ad-stat-val { font-family:var(--sans); font-size:2.5rem; font-weight:700; color:var(--black); line-height:1; margin-bottom:0.4rem; }
-        .ad-stat-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
+        .ad-stat-label { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
         .ad-stat.destaque .ad-stat-val { color:var(--rosa); }
         
         .ad-card { background:var(--white); padding:1.5rem; margin-bottom:1.5rem; }
-        .ad-card-title { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--grey-100); }
+        .ad-card-title { font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--grey-100); }
         .ad-table { width:100%; border-collapse:collapse; }
-        .ad-table th { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:500; padding:0.6rem 0.75rem; text-align:left; border-bottom:1px solid var(--grey-200); }
+        .ad-table th { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:500; padding:0.6rem 0.75rem; text-align:left; border-bottom:1px solid var(--grey-200); }
         .ad-table td { font-size:0.88rem; padding:0.85rem 0.75rem; border-bottom:1px solid var(--grey-100); color:var(--black); vertical-align:middle; }
         .ad-table tr:last-child td { border-bottom:none; }
         .ad-table tr:hover td { background:var(--grey-100); }
         
-        .ad-badge { display:inline-block; font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.25rem 0.6rem; font-weight:500; }
+        .ad-badge { display:inline-block; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.25rem 0.6rem; font-weight:500; }
         .ad-badge-verde { background:#e8f5e9; color:#27ae60; }
         .ad-badge-laranja { background:#fff8e1; color:#f39c12; }
         .ad-badge-cinza { background:var(--grey-100); color:#5a5855; }
         .ad-badge-rosa { background:#fff0f3; color:var(--rosa); }
         .ad-badge-vermelho { background:#fff5f5; color:#e74c3c; }
         
-        .ad-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.85rem; border:none; cursor:pointer; font-family:var(--sans); font-weight:500; transition:all 0.2s; }
+        .ad-btn { font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 0.85rem; border:none; cursor:pointer; font-family:var(--sans); font-weight:500; transition:all 0.2s; }
         .ad-btn-black { background:var(--black); color:var(--white); }
         .ad-btn-black:hover { background:#2a2926; }
         .ad-btn-rosa { background:var(--rosa); color:var(--white); }
         .ad-btn-rosa:hover { background:#a85c72; }
         .ad-btn-outline { background:var(--white); color:var(--black); border:1px solid var(--grey-200); }
         .ad-btn-outline:hover { border-color:var(--black); }
-        .ad-btn-sm { padding:0.35rem 0.65rem; font-size:0.6rem; }
+        .ad-btn-sm { padding:0.35rem 0.65rem; font-size:0.72rem; }
         .ad-btn:disabled { opacity:0.5; cursor:not-allowed; }
         
         .ad-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
         .ad-form-grid-3 { grid-template-columns:1fr 1fr 1fr; }
         .ad-form-full { grid-column:1/-1; }
-        .ad-label { display:block; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; margin-bottom:0.4rem; font-weight:500; }
+        .ad-label { display:block; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; margin-bottom:0.4rem; font-weight:500; }
         .ad-input { width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.92rem; font-family:var(--sans); color:var(--black); outline:none; transition:border-color 0.2s; border-radius:0; }
         .ad-input:focus { border-color:var(--black); }
         .ad-select { width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.92rem; font-family:var(--sans); color:var(--black); outline:none; border-radius:0; cursor:pointer; }
         .ad-textarea { width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--grey-200); background:var(--white); font-size:0.92rem; font-family:var(--sans); color:var(--black); outline:none; border-radius:0; resize:vertical; min-height:80px; }
         
-        .ad-select-estado { font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.35rem 0.5rem; border:1px solid var(--grey-200); background:var(--white); font-family:var(--sans); cursor:pointer; color:var(--black); border-radius:0; }
+        .ad-select-estado { font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.35rem 0.5rem; border:1px solid var(--grey-200); background:var(--white); font-family:var(--sans); cursor:pointer; color:var(--black); border-radius:0; }
 
         /* UPLOAD AREA */
         .ad-upload-area { width:100%; padding:1.5rem; border:2px dashed var(--grey-200); background:var(--grey-100); cursor:pointer; text-align:center; transition:border-color 0.2s; font-family:var(--sans); font-size:0.85rem; color:#5a5855; }
@@ -428,7 +428,7 @@ export default function Admin() {
           .ad-sidebar { position:static; width:100%; height:auto; flex-direction:row; flex-wrap:wrap; padding:0.75rem; }
           .ad-logo { display:none; }
           .ad-nav { padding:0; display:flex; flex-wrap:wrap; gap:0.25rem; }
-          .ad-nav-item { padding:0.5rem 0.75rem; font-size:0.6rem; }
+          .ad-nav-item { padding:0.5rem 0.75rem; font-size:0.72rem; }
           .ad-sidebar-footer { display:none; }
           .ad-main { margin-left:0; padding:1.25rem; }
           .ad-stats { grid-template-columns:1fr 1fr; }

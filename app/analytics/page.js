@@ -140,17 +140,17 @@ Responde em português europeu, formatado com secções claras.`;
         .an-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem; }
         .an-titulo { font-family:var(--serif); font-size:2rem; font-weight:300; color:var(--black); }
         .an-periodo { display:flex; gap:0.5rem; }
-        .an-periodo-btn { font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:var(--grey-600); cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
+        .an-periodo-btn { font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 1rem; border:1px solid var(--grey-200); background:var(--white); color:var(--grey-600); cursor:pointer; font-family:var(--sans); font-weight:400; transition:all 0.2s; }
         .an-periodo-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
         .an-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
         .an-stat { background:var(--white); padding:1.5rem; }
         .an-stat-val { font-family:var(--sans); font-size:2.5rem; font-weight:700; color:var(--black); line-height:1; margin-bottom:0.4rem; }
-        .an-stat-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
+        .an-stat-label { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; color:#5a5855; font-weight:400; }
         .an-stat.destaque .an-stat-val { color:var(--rosa); }
         .an-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
         .an-grid-3 { grid-template-columns:1fr 1fr 1fr; }
         .an-card { background:var(--white); padding:1.5rem; }
-        .an-card-title { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--grey-100); display:flex; justify-content:space-between; }
+        .an-card-title { font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:#5a5855; font-weight:500; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--grey-100); display:flex; justify-content:space-between; }
         .an-bar-item { margin-bottom:0.75rem; }
         .an-bar-label { display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.3rem; color:var(--black); }
         .an-bar-label span { color:#5a5855; font-size:0.75rem; }
@@ -160,23 +160,23 @@ Responde em português europeu, formatado com secções claras.`;
         .an-peca-row { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 0; border-bottom:1px solid var(--grey-100); }
         .an-peca-row:last-child { border-bottom:none; }
         .an-peca-nome { font-size:0.9rem; color:var(--black); font-weight:400; }
-        .an-peca-cat { font-size:0.7rem; color:#5a5855; }
+        .an-peca-cat { font-size:0.78rem; color:#5a5855; }
         .an-peca-stats { display:flex; gap:1.5rem; text-align:right; }
         .an-peca-stat { font-size:0.82rem; }
-        .an-peca-stat span { display:block; font-size:0.6rem; color:#5a5855; letter-spacing:0.1em; text-transform:uppercase; }
-        .an-badge { font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.2rem 0.5rem; font-weight:500; }
+        .an-peca-stat span { display:block; font-size:0.72rem; color:#5a5855; letter-spacing:0.1em; text-transform:uppercase; }
+        .an-badge { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.2rem 0.5rem; font-weight:500; }
         .an-badge-verde { background:#e8f5e9; color:#27ae60; }
         .an-badge-laranja { background:#fff8e1; color:#f39c12; }
         .an-badge-rosa { background:#fff0f3; color:var(--rosa); }
         .an-camp-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:1rem; padding:0.75rem 0; border-bottom:1px solid var(--grey-100); align-items:center; font-size:0.82rem; }
-        .an-camp-header { font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; font-weight:500; }
+        .an-camp-header { font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; font-weight:500; }
 
         /* AI CONSULTING */
         .an-ai { background:var(--black); color:var(--white); padding:2rem; margin-bottom:1rem; }
         .an-ai-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
         .an-ai-titulo { font-family:var(--serif); font-size:1.4rem; font-weight:300; color:var(--white); }
-        .an-ai-sub { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:0.25rem; }
-        .an-ai-btn { font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--rosa); color:var(--white); border:none; padding:0.75rem 1.5rem; cursor:pointer; font-family:var(--sans); font-weight:500; transition:background 0.2s; white-space:nowrap; }
+        .an-ai-sub { font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:0.25rem; }
+        .an-ai-btn { font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--rosa); color:var(--white); border:none; padding:0.75rem 1.5rem; cursor:pointer; font-family:var(--sans); font-weight:500; transition:background 0.2s; white-space:nowrap; }
         .an-ai-btn:hover { background:#a85c72; }
         .an-ai-btn:disabled { opacity:0.6; cursor:not-allowed; }
         .an-ai-content { font-size:0.92rem; color:rgba(255,255,255,0.8); line-height:1.8; white-space:pre-wrap; font-family:var(--sans); }
@@ -188,7 +188,7 @@ Responde em português europeu, formatado com secções claras.`;
         @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 
         .an-empty { padding:2rem; text-align:center; color:#5a5855; font-size:0.9rem; }
-        .an-voltar { display:inline-flex; align-items:center; gap:0.5rem; font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; margin-bottom:1.5rem; font-weight:400; transition:color 0.2s; }
+        .an-voltar { display:inline-flex; align-items:center; gap:0.5rem; font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; margin-bottom:1.5rem; font-weight:400; transition:color 0.2s; }
         .an-voltar:hover { color:var(--black); }
 
         @media (max-width:768px) {

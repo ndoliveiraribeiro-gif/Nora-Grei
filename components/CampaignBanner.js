@@ -72,9 +72,9 @@ export default function CampaignBanner() {
         .ng-campanha-banner.saindo { animation: ngCampanhaOut 0.3s ease forwards; }
         .ng-campanha-info { flex: 1; min-width: 0; }
         .ng-campanha-titulo { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.2rem; }
-        .ng-campanha-desc { font-size: 0.75rem; color: rgba(248,247,245,0.7); }
+        .ng-campanha-desc { font-size: 0.85rem; color: rgba(248,247,245,0.7); }
         .ng-campanha-codigo { font-family: 'Cormorant', Georgia, serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.1em; color: #c4748a; margin-top: 0.25rem; }
-        .ng-campanha-btn { flex-shrink: 0; padding: 0.5rem 0.9rem; background: #c4748a; color: #fff; border: none; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; cursor: pointer; font-family: 'Jost', sans-serif; }
+        .ng-campanha-btn { flex-shrink: 0; padding: 0.5rem 0.9rem; background: #c4748a; color: #fff; border: none; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; cursor: pointer; font-family: 'Jost', sans-serif; }
         .ng-campanha-fechar { flex-shrink: 0; background: none; border: none; color: rgba(248,247,245,0.5); cursor: pointer; font-size: 1.1rem; padding: 0; line-height: 1; }
         @media (max-width: 480px) {
           .ng-campanha-banner { width: 94vw; padding: 1rem 1.1rem; gap: 0.75rem; }

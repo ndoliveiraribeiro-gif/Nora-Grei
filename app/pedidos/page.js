@@ -972,12 +972,12 @@ function PedidosContent() {
         .page{padding:5rem 0 2rem;max-width:600px;margin:0 auto}
         .titulo{font-family:var(--sans);font-size:1.6rem;font-weight:600;color:#080808;padding:1.5rem 1.25rem 1rem}
         .tabs{display:flex;border-bottom:1px solid #e2dfda;background:#f8f7f5;padding:0 1.25rem}
-        .tab{padding:0.85rem 1.25rem;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855;cursor:pointer;border:none;background:none;font-family:'Jost',sans-serif;font-weight:400;border-bottom:2px solid transparent;transition:all 0.2s}
+        .tab{padding:0.85rem 1.25rem;font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855;cursor:pointer;border:none;background:none;font-family:'Jost',sans-serif;font-weight:400;border-bottom:2px solid transparent;transition:all 0.2s}
         .tab.on{color:#080808;border-bottom-color:#080808;font-weight:500}
         .content{background:#f8f7f5;margin-top:1rem}
         .empty{padding:3rem 1.25rem;text-align:center}
         .empty p{font-size:1rem;color:#5a5855;margin-bottom:1.25rem}
-        .empty a{display:inline-block;padding:0.9rem 2rem;background:#080808;color:#f8f7f5;text-decoration:none;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:500}
+        .empty a{display:inline-block;padding:0.9rem 2rem;background:#080808;color:#f8f7f5;text-decoration:none;font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:500}
       `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
 

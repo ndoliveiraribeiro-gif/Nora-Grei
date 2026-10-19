@@ -115,7 +115,7 @@ export default function BottomNav() {
         }
         .bn-item.active { color: #080808; }
         .bn-label {
-          font-size: 0.58rem;
+          font-size: 0.72rem;
           letter-spacing: 0.12em;
           text-transform: uppercase;
           font-family: 'Jost', sans-serif;
@@ -138,10 +138,10 @@ export default function BottomNav() {
           top: -5px; right: -8px;
           background: #c4748a;
           color: #fff;
-          font-size: 0.5rem;
+          font-size: 0.65rem;
           font-family: 'Jost', sans-serif;
           font-weight: 600;
-          width: 15px; height: 15px;
+          width: 17px; height: 17px;
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           line-height: 1;

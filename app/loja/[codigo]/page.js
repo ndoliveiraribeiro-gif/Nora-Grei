@@ -180,12 +180,12 @@ export default function LojaPublica() {
         body{background:var(--white);color:var(--black);font-family:var(--sans);-webkit-font-smoothing:antialiased}
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
-        .nav-back{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+        .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
         .hero-loja{padding:7rem 2rem 3rem;text-align:center;border-bottom:1px solid var(--g2)}
         .loja-nome{font-family:var(--sans);font-size:clamp(2rem,6vw,4rem);font-weight:600;margin-bottom:0.5rem}
-        .loja-local{font-size:0.78rem;color:var(--g4);letter-spacing:0.1em}
+        .loja-local{font-size:0.85rem;color:var(--g4);letter-spacing:0.1em}
         .filtros{display:flex;justify-content:center;gap:0.5rem;padding:1.5rem 2rem;border-bottom:1px solid var(--g1)}
-        .filtro-btn{padding:0.5rem 1.5rem;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;background:none;border:1.5px solid var(--g2);cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.2s}
+        .filtro-btn{padding:0.5rem 1.5rem;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;background:none;border:1.5px solid var(--g2);cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.2s}
         .filtro-btn.on{background:var(--black);color:#fff;border-color:var(--black)}
         .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--g2);padding:1px}
         @media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -196,9 +196,9 @@ export default function LojaPublica() {
         .peca-foto-ph{width:100%;aspect-ratio:3/4;background:var(--g1);display:flex;align-items:center;justify-content:center}
         .peca-info{padding:1rem}
         .peca-nome{font-family:var(--sans);font-size:1rem;font-weight:500;margin-bottom:0.25rem}
-        .peca-preco{font-size:0.78rem;color:var(--g4)}
+        .peca-preco{font-size:0.85rem;color:var(--g4)}
         .peca-tags{display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap}
-        .tag{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.2rem 0.5rem;background:var(--g1);color:var(--g4)}
+        .tag{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.2rem 0.5rem;background:var(--g1);color:var(--g4)}
         .tag-rosa{background:#fce4ec;color:var(--rosa)}
         .tag-timer{background:#fff8e1;color:#b8860b;font-variant-numeric:tabular-nums}
         .sem-pecas{text-align:center;padding:5rem 2rem;font-size:0.85rem;color:var(--g4)}
@@ -207,10 +207,10 @@ export default function LojaPublica() {
       {/* Banner de gestão — visível apenas para o dono da loja */}
       {user && lojista && user.id === lojista.id && (
         <div style={{position:"fixed",top:0,left:0,right:0,zIndex:200,background:"var(--black)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.45rem 2rem",fontFamily:"var(--sans)"}}>
-          <span style={{fontSize:"0.58rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da tua loja</span>
+          <span style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da tua loja</span>
           <div style={{display:"flex",gap:"0.5rem"}}>
-            <a href="/perfil#loja-dashboard" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
-            <a href="/perfil" style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
+            <a href="/perfil#loja-dashboard" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
+            <a href="/perfil" style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
           </div>
         </div>
       )}

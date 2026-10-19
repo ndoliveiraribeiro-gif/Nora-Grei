@@ -1657,7 +1657,7 @@ export default function Backoffice() {
         .bo-bottom-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.25rem 0.5rem; border: none; background: none; color: rgba(255,255,255,0.5); cursor: pointer; font-family: 'Jost',sans-serif; gap: 0.2rem; border-top: 2px solid transparent; }
         .bo-bottom-btn.active { color: #fff; border-top-color: #c4748a; }
         .bo-bottom-btn span.icon { font-size: 1.2rem; line-height: 1; }
-        .bo-bottom-btn span.lbl { font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; }
+        .bo-bottom-btn span.lbl { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
         .bo-tab-select { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.45rem 0.75rem; font-family: 'Jost',sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; cursor: pointer; flex: 1; }
         .bo-tab-select option { background: #080808; color: #fff; }
       `}</style>

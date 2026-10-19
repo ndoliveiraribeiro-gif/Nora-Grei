@@ -178,7 +178,7 @@ export default function ChatWidget({ lang = "pt" }) {
 
         .chat-header-info { display: flex; flex-direction: column; gap: 0.2rem; }
         .chat-header-titulo { font-family: 'Cormorant', serif; font-size: 1rem; font-weight: 400; letter-spacing: 0.1em; }
-        .chat-header-sub { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Jost', sans-serif; font-weight: 400; }
+        .chat-header-sub { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-family: 'Jost', sans-serif; font-weight: 400; }
         .chat-header-dot { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; display: inline-block; margin-right: 0.4rem; }
         .chat-close { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 1.1rem; padding: 0; transition: color 0.2s; }
         .chat-close:hover { color: #f8f7f5; }
@@ -269,7 +269,7 @@ export default function ChatWidget({ lang = "pt" }) {
         }
 
         .chat-humano-text { font-size: 0.78rem; color: #4a4845; font-family: 'Jost', sans-serif; font-weight: 400; }
-        .chat-humano-btn { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; background: #25D366; color: #fff; border: none; padding: 0.5rem 0.85rem; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 500; white-space: nowrap; border-radius: 4px; }
+        .chat-humano-btn { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; background: #25D366; color: #fff; border: none; padding: 0.5rem 0.85rem; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 500; white-space: nowrap; border-radius: 4px; }
 
         .chat-input-area {
           padding: 0.75rem 1rem;

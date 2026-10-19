@@ -147,7 +147,7 @@ export default function Registar() {
         .page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
         .left { background: var(--black); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; }
         .left-logo { font-family: var(--serif); font-size: 2.5rem; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: var(--white); margin-bottom: 0.5rem; }
-        .left-tag { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-weight: 400; }
+        .left-tag { font-size: 0.78rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,255,255,0.5); font-weight: 400; }
         .left-steps { margin-top: 4rem; display: flex; flex-direction: column; gap: 2rem; width: 100%; max-width: 280px; }
         .left-step { display: flex; align-items: flex-start; gap: 1rem; }
         .left-step-num { font-family: var(--serif); font-size: 1.5rem; font-weight: 300; color: rgba(255,255,255,0.3); line-height: 1; flex-shrink: 0; }
@@ -156,7 +156,7 @@ export default function Registar() {
         .form-wrap { width: 100%; max-width: 400px; }
         .form-title { font-family: var(--sans); font-size: 2.5rem; font-weight: 600; color: var(--black); margin-bottom: 2rem; line-height: 1; }
         .form-group { margin-bottom: 1.25rem; }
-        .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-700); margin-bottom: 0.6rem; font-weight: 500; }
+        .form-label { display: block; font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-700); margin-bottom: 0.6rem; font-weight: 500; }
         .form-input { width: 100%; padding: 1rem 1.1rem; border: 1.5px solid var(--grey-200); background: var(--white); font-size: 1.05rem; font-family: var(--sans); font-weight: 400; color: var(--black); outline: none; transition: border-color 0.2s; border-radius: 0; -webkit-appearance: none; }
         .form-input:focus { border-color: var(--black); }
         .form-input::placeholder { color: var(--grey-200); }

@@ -109,20 +109,20 @@ export default function AvaliacoesLoja() {
         body{background:var(--white);color:var(--black);font-family:var(--sans);-webkit-font-smoothing:antialiased}
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
-        .nav-back{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+        .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
         .hero{padding:7rem 2rem 3rem;text-align:center;border-bottom:1px solid var(--g2)}
         .titulo{font-family:var(--serif);font-size:clamp(1.8rem,5vw,3rem);font-weight:300;margin-bottom:0.5rem}
-        .subtitulo{font-size:0.75rem;color:var(--g4);letter-spacing:0.12em;text-transform:uppercase}
+        .subtitulo{font-size:0.85rem;color:var(--g4);letter-spacing:0.12em;text-transform:uppercase}
         .media-bloco{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1.5rem;padding:1.5rem;background:var(--g1);max-width:320px;margin-left:auto;margin-right:auto}
         .media-num{font-family:var(--sans);font-size:3rem;font-weight:700;color:var(--black);line-height:1}
         .media-info{text-align:left}
-        .media-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g4);margin-top:0.3rem}
+        .media-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g4);margin-top:0.3rem}
         .lista{max-width:720px;margin:0 auto;padding:2rem 1.5rem 5rem}
         .card-av{padding:1.75rem 0;border-bottom:1px solid var(--g1)}
         .card-av:last-child{border-bottom:none}
         .av-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:0.75rem}
         .av-nome{font-size:0.8rem;font-weight:500;letter-spacing:0.05em}
-        .av-data{font-size:0.68rem;color:var(--g4)}
+        .av-data{font-size:0.78rem;color:var(--g4)}
         .av-comentario{font-family:var(--sans);font-size:0.95rem;font-weight:400;color:var(--black);margin-top:0.6rem;line-height:1.6}
         .sem{text-align:center;padding:5rem 2rem;font-size:0.85rem;color:var(--g4)}
       `}</style>

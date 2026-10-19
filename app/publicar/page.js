@@ -179,7 +179,7 @@ export default function PublicarPage() {
 
         .pub-nav { background: #fff; border-bottom: 1px solid var(--g2); padding: 0.9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
         .pub-logo { font-family: var(--serif); font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; color: var(--black); }
-        .pub-voltar { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--g4); text-decoration: none; }
+        .pub-voltar { font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--g4); text-decoration: none; }
         .pub-steps { display: flex; align-items: center; gap: 0.3rem; }
         .pub-step { width: 28px; height: 3px; border-radius: 2px; background: var(--g2); transition: background 0.3s; }
         .pub-step.done { background: var(--black); }
@@ -190,9 +190,9 @@ export default function PublicarPage() {
         .pub-subtitulo { font-size: 0.8rem; color: var(--g4); margin-bottom: 2rem; }
 
         .pub-card { background: #fff; padding: 1.5rem; margin-bottom: 1rem; }
-        .pub-card-t { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--g4); font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--g1); }
+        .pub-card-t { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--g4); font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--g1); }
 
-        .pub-label { display: block; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: #3a3936; font-weight: 600; margin-bottom: 0.4rem; }
+        .pub-label { display: block; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: #3a3936; font-weight: 600; margin-bottom: 0.4rem; }
         .pub-input { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--g2); background: #fff; font-size: 0.92rem; font-family: var(--sans); color: var(--black); outline: none; transition: border-color 0.2s; }
         .pub-input:focus { border-color: var(--black); }
         .pub-select { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--g2); background: #fff; font-size: 0.92rem; font-family: var(--sans); color: var(--black); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a776f' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; }
@@ -207,13 +207,13 @@ export default function PublicarPage() {
         .fotos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
         .foto-thumb { aspect-ratio: 3/4; border-radius: 4px; overflow: hidden; position: relative; background: var(--g1); }
         .foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .foto-remove { position: absolute; top: 4px; right: 4px; background: rgba(8,8,8,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .foto-add { aspect-ratio: 3/4; border-radius: 4px; border: 2px dashed var(--g3); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 0.4rem; color: var(--g4); font-size: 0.65rem; text-align: center; padding: 0.5rem; transition: border-color 0.15s; }
+        .foto-remove { position: absolute; top: 4px; right: 4px; background: rgba(8,8,8,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .foto-add { aspect-ratio: 3/4; border-radius: 4px; border: 2px dashed var(--g3); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 0.4rem; color: var(--g4); font-size: 0.75rem; text-align: center; padding: 0.5rem; transition: border-color 0.15s; }
         .foto-add:hover { border-color: var(--black); color: var(--black); }
         .foto-add svg { opacity: 0.5; }
 
         /* Tipo btns */
-        .tipo-btn { padding: 0.6rem; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; text-align: center; }
+        .tipo-btn { padding: 0.6rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; text-align: center; }
         .tipo-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
 
         /* Tamanhos */
@@ -223,7 +223,7 @@ export default function PublicarPage() {
         .tamanho-rm { background: none; border: none; color: var(--rosa); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0.2rem; }
 
         /* Ocasiões */
-        .ocasiao-btn { padding: 0.35rem 0.6rem; font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; }
+        .ocasiao-btn { padding: 0.35rem 0.6rem; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; }
         .ocasiao-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
 
         /* Upload area */
@@ -242,16 +242,16 @@ export default function PublicarPage() {
         .pub-actions .pub-btn-outline { flex: 0 0 auto; padding: 0.9rem 1.25rem; width: auto; }
 
         .pub-erro { background: #fff5f5; border-left: 3px solid #e74c3c; padding: 0.75rem 1rem; font-size: 0.8rem; color: #c0392b; margin-top: 0.5rem; }
-        .pub-sugestao { font-size: 0.68rem; color: #27ae60; margin-top: 0.25rem; }
-        .pub-hint { font-size: 0.65rem; color: var(--g4); margin-top: 0.25rem; }
+        .pub-sugestao { font-size: 0.75rem; color: #27ae60; margin-top: 0.25rem; }
+        .pub-hint { font-size: 0.75rem; color: var(--g4); margin-top: 0.25rem; }
 
         .defeito-box { padding: 0.85rem 1rem; border: 1.5px solid var(--g2); background: #fafafa; margin-bottom: 1rem; }
         .defeito-box.ativo { border-color: #e74c3c; background: #fff5f5; }
-        .defeito-label { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: var(--g4); }
+        .defeito-label { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: var(--g4); }
         .defeito-box.ativo .defeito-label { color: #c0392b; }
 
         .link-externo-box { padding: 1rem; background: #faf8f5; border: 1.5px solid #e8d5a3; margin-bottom: 1rem; }
-        .link-externo-badge { font-size: 0.55rem; background: var(--ouro); color: #fff; padding: 0.1rem 0.4rem; font-weight: 600; letter-spacing: 0.08em; margin-left: 0.4rem; }
+        .link-externo-badge { font-size: 0.72rem; background: var(--ouro); color: #fff; padding: 0.1rem 0.4rem; font-weight: 600; letter-spacing: 0.08em; margin-left: 0.4rem; }
 
         /* Sucesso */
         .sucesso-wrap { text-align: center; padding: 3rem 2rem; }

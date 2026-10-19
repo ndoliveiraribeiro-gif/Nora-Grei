@@ -558,20 +558,20 @@ const ESTILOS = `
   body{background:var(--g1);color:var(--black);font-family:var(--sans);-webkit-font-smoothing:antialiased}
   .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
   .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
-  .nav-back{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+  .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
   .page{padding:6rem 2rem 4rem;max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start}
   .col-esquerda{display:flex;flex-direction:column;gap:1rem}
   .titulo{font-family:var(--sans);font-size:2rem;font-weight:600;display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.5rem}
-  .count{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);font-weight:400}
-  .vazio{background:var(--white);padding:3rem 2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem;font-size:0.88rem;color:var(--g4)}
-  .btn-cat{display:inline-block;padding:0.75rem 2rem;background:var(--black);color:#fff;text-decoration:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase}
+  .count{font-family:var(--sans);font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);font-weight:400}
+  .vazio{background:var(--white);padding:3rem 2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem;font-size:0.95rem;color:var(--g4)}
+  .btn-cat{display:inline-block;padding:0.75rem 2rem;background:var(--black);color:#fff;text-decoration:none;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase}
   .item-card{background:var(--white);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start}
   .item-foto{width:64px;height:80px;object-fit:cover;flex-shrink:0;background:var(--g1)}
   .item-info{flex:1}
   .item-nome{font-family:var(--sans);font-size:1.1rem;font-weight:500;margin-bottom:0.25rem}
-  .item-meta{font-size:0.72rem;color:var(--g4);margin-bottom:0.15rem}
+  .item-meta{font-size:0.82rem;color:var(--g4);margin-bottom:0.15rem}
   .item-preco{font-size:0.95rem;font-weight:500;margin-top:0.4rem}
-  .btn-remover{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1px solid var(--g2);padding:0.3rem 0.65rem;cursor:pointer;color:var(--g4);font-family:var(--sans);white-space:nowrap;align-self:center;transition:border-color 0.2s}
+  .btn-remover{font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1px solid var(--g2);padding:0.3rem 0.65rem;cursor:pointer;color:var(--g4);font-family:var(--sans);white-space:nowrap;align-self:center;transition:border-color 0.2s}
   .btn-remover:hover{border-color:#e74c3c;color:#e74c3c}
   .bloco-desconto{background:var(--white);padding:1.5rem;border-left:3px solid var(--rosa)}
   .desconto-titulo{font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem}
@@ -586,13 +586,13 @@ const ESTILOS = `
   .opcao-desc{font-size:0.75rem;color:var(--g4);line-height:1.5}
   .opcao-poupas{font-size:0.75rem;color:#27ae60;margin-top:0.25rem;font-weight:500}
   .resumo{background:var(--white);padding:1.75rem;position:sticky;top:6rem;display:flex;flex-direction:column;gap:0}
-  .resumo-titulo{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--g4);font-weight:500;padding-bottom:1rem;border-bottom:1px solid var(--g1);margin-bottom:1rem}
+  .resumo-titulo{font-size:0.78rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--g4);font-weight:500;padding-bottom:1rem;border-bottom:1px solid var(--g1);margin-bottom:1rem}
   .nivel-box{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.85rem;background:var(--g1);margin-bottom:0.75rem;font-size:0.82rem}
   .r-linha{display:flex;justify-content:space-between;font-size:0.88rem;padding:0.5rem 0;border-bottom:1px solid var(--g1);color:var(--g4)}
   .r-total{display:flex;justify-content:space-between;font-size:1.05rem;font-weight:500;padding:0.85rem 0 0;color:var(--black);border-top:2px solid var(--black);margin-top:0.4rem}
-  .r-nota{font-size:0.72rem;color:var(--g4);margin-top:0.6rem;font-style:italic;line-height:1.5}
+  .r-nota{font-size:0.82rem;color:var(--g4);margin-top:0.6rem;font-style:italic;line-height:1.5}
   .login-box{margin-top:1rem}
-  .btn-confirmar{display:block;width:100%;padding:1.1rem;background:var(--black);color:#fff;border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;margin-top:1.25rem;text-decoration:none;text-align:center;transition:background 0.2s}
+  .btn-confirmar{display:block;width:100%;padding:1.1rem;background:var(--black);color:#fff;border:none;font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;margin-top:1.25rem;text-decoration:none;text-align:center;transition:background 0.2s}
   .btn-confirmar:hover{background:#2a2926}
   .btn-confirmar:disabled{opacity:0.6;cursor:not-allowed}
   .erro{color:#c0392b;font-size:0.85rem;margin-top:0.75rem;padding:0.65rem;background:#fff5f5;border:1px solid #f5c6cb}

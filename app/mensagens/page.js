@@ -242,7 +242,7 @@ export default function MensagensPage() {
 
         .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
         .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
-        .nav-voltar{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;background:none;border:none;cursor:pointer}
+        .nav-voltar{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;background:none;border:none;cursor:pointer}
 
         .layout{display:flex;height:calc(100vh - 57px);margin-top:57px}
 
@@ -250,7 +250,7 @@ export default function MensagensPage() {
         .lista-col{width:340px;min-width:340px;border-right:1px solid var(--g2);display:flex;flex-direction:column;background:var(--white)}
         .lista-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between}
         .lista-titulo{font-family:var(--sans);font-size:1.2rem;font-weight:600}
-        .badge-total{background:var(--rosa);color:#fff;font-size:0.55rem;letter-spacing:0.1em;padding:0.15rem 0.5rem;border-radius:10px}
+        .badge-total{background:var(--rosa);color:#fff;font-size:0.72rem;letter-spacing:0.1em;padding:0.15rem 0.5rem;border-radius:10px}
         .lista-scroll{overflow-y:auto;flex:1}
         .conv-item{padding:1rem 1.5rem;border-bottom:1px solid var(--g1);cursor:pointer;transition:background 0.15s;display:flex;gap:0.75rem;align-items:flex-start}
         .conv-item:hover{background:var(--g1)}
@@ -258,10 +258,10 @@ export default function MensagensPage() {
         .conv-avatar{width:40px;height:40px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:0.9rem;font-weight:500;color:var(--g4);flex-shrink:0}
         .conv-body{flex:1;min-width:0}
         .conv-nome{font-size:0.82rem;font-weight:500;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .conv-assunto{font-size:0.7rem;color:var(--g4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .conv-assunto{font-size:0.82rem;color:var(--g4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .conv-meta{display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem;flex-shrink:0}
-        .conv-hora{font-size:0.6rem;color:var(--g4);letter-spacing:0.05em}
-        .conv-badge{background:var(--rosa);color:#fff;font-size:0.55rem;padding:0.1rem 0.4rem;border-radius:10px;min-width:18px;text-align:center}
+        .conv-hora{font-size:0.75rem;color:var(--g4);letter-spacing:0.05em}
+        .conv-badge{background:var(--rosa);color:#fff;font-size:0.72rem;padding:0.1rem 0.4rem;border-radius:10px;min-width:18px;text-align:center}
         .sem-conv{padding:3rem 1.5rem;text-align:center;font-size:0.78rem;color:var(--g4);line-height:1.6}
 
         /* Área chat */

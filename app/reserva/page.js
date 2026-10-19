@@ -361,19 +361,19 @@ function ReservaContent() {
         /* NAV */
         .nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
         .nav-logo { font-family:var(--serif); font-size:1.1rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .nav-back { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; }
+        .nav-back { font-size:0.82rem; letter-spacing:0.15em; text-transform:uppercase; color:#5a5855; text-decoration:none; }
 
         /* HERO PANEL */
         .hero { background:var(--black); color:var(--white); padding:5.5rem 1.25rem 2rem; text-align:center; }
-        .hero-badge { display:inline-block; font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase; color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.2); padding:0.3rem 0.75rem; margin-bottom:1.25rem; }
+        .hero-badge { display:inline-block; font-size:0.75rem; letter-spacing:0.28em; text-transform:uppercase; color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.2); padding:0.3rem 0.75rem; margin-bottom:1.25rem; }
         .hero-titulo { font-family:var(--serif); font-size:clamp(1.8rem,7vw,2.8rem); font-weight:300; line-height:1.05; margin-bottom:0.75rem; }
         .hero-desc { font-size:0.82rem; color:rgba(255,255,255,0.65); line-height:1.8; max-width:44ch; margin:0 auto 1.75rem; }
 
         /* COMO FUNCIONA */
         .passos { display:flex; gap:0; border-top:1px solid rgba(255,255,255,0.1); padding-top:1.5rem; margin-top:0.5rem; justify-content:center; }
         .passo { text-align:center; padding:0 1rem; flex:1; max-width:140px; }
-        .passo-n { width:28px; height:28px; border-radius:50%; border:1px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; font-size:0.65rem; margin:0 auto 0.5rem; color:rgba(255,255,255,0.5); }
-        .passo-t { font-size:0.7rem; font-weight:500; color:var(--white); margin-bottom:0.2rem; }
+        .passo-n { width:28px; height:28px; border-radius:50%; border:1px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; font-size:0.78rem; margin:0 auto 0.5rem; color:rgba(255,255,255,0.5); }
+        .passo-t { font-size:0.82rem; font-weight:500; color:var(--white); margin-bottom:0.2rem; }
         .passo-d { font-size:0.62rem; color:rgba(255,255,255,0.45); line-height:1.5; }
 
         /* LAYOUT PRINCIPAL */

@@ -568,14 +568,14 @@ const ESTILOS = `
   .nav-back{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855;text-decoration:none}
   .page{padding:6rem 4rem 4rem;max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:start}
   .sec{background:var(--white);padding:2rem;margin-bottom:1.5rem}
-  .sec-t{font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#5a5855;font-weight:500;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
+  .sec-t{font-size:0.78rem;letter-spacing:0.25em;text-transform:uppercase;color:#5a5855;font-weight:500;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--g1)}
   .peca-row{display:flex;gap:1.25rem;align-items:center}
   .peca-img{width:72px;height:90px;object-fit:cover;background:var(--g1);flex-shrink:0}
   .peca-nome{font-family:var(--sans);font-size:1.2rem;font-weight:500;color:var(--black);margin-bottom:0.3rem}
-  .peca-cat{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:#5a5855}
+  .peca-cat{font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:#5a5855}
   .peca-tam{font-size:0.82rem;color:#5a5855;margin-top:0.3rem}
   .dates{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .lbl{display:block;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#1a1a18;margin-bottom:0.5rem;font-weight:500}
+  .lbl{display:block;font-size:0.82rem;letter-spacing:0.18em;text-transform:uppercase;color:#1a1a18;margin-bottom:0.5rem;font-weight:500}
   .inp{width:100%;padding:0.9rem 1rem;border:1.5px solid var(--g2);background:var(--white);font-size:1rem;font-family:var(--sans);color:var(--black);outline:none;transition:border-color 0.2s}
   .inp:focus{border-color:var(--black)}
   .opts{display:flex;flex-direction:column;gap:0.75rem}
@@ -586,8 +586,8 @@ const ESTILOS = `
   .opt.on .opt-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--white)}
   .opt-label{font-size:0.95rem;font-weight:500;color:var(--black);margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem}
   .opt-desc{font-size:0.8rem;color:#5a5855}
-  .badge-auto{font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#e8f5e9;color:#27ae60;font-weight:600}
-  .badge-manual{font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#fff8e1;color:#f39c12;font-weight:600}
+  .badge-auto{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#e8f5e9;color:#27ae60;font-weight:600}
+  .badge-manual{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.4rem;background:#fff8e1;color:#f39c12;font-weight:600}
   .resumo{background:var(--white);padding:2rem;position:sticky;top:6rem}
   .r-linha{display:flex;justify-content:space-between;font-size:0.95rem;padding:0.6rem 0;border-bottom:1px solid var(--g1);color:#5a5855}
   .r-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:500;padding:1rem 0 0;color:var(--black);border-top:2px solid var(--black);margin-top:0.5rem}
@@ -610,7 +610,7 @@ const ESTILOS = `
   .qr-placeholder{background:#fff;padding:0.5rem}
   .qr-texto{font-size:0.82rem;color:#5a5855;text-align:center}
   .iban-box{background:var(--g1);padding:1.25rem}
-  .iban-label{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855}
+  .iban-label{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855}
   .iban-val{font-family:var(--sans);font-size:1.1rem;font-weight:500;color:var(--black);margin-top:0.2rem}
   .upload-box{display:block;padding:1rem;border:2px dashed var(--g2);background:var(--g1);cursor:pointer;text-align:center;transition:border-color 0.2s}
   .upload-box:hover{border-color:var(--black)}

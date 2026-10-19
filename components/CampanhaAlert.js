@@ -105,7 +105,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
         }
         .ng-campanha-info { flex: 1; min-width: 0; }
         .ng-campanha-surpresa {
-          font-size: 0.55rem;
+          font-size: 0.72rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
           color: #c4748a;
@@ -137,7 +137,7 @@ export default function CampanhaAlert({ lang = "pt" }) {
           background: #c4748a;
           color: #fff;
           border: none;
-          font-size: 0.62rem;
+          font-size: 0.78rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           font-weight: 600;

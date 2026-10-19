@@ -116,12 +116,12 @@ export default function FeedPage() {
         .feed-header{background:#fff;border-bottom:1px solid #e8e4df;position:sticky;top:0;z-index:100;padding:0.75rem 1rem}
         .feed-header-top{display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto 0.6rem}
         .feed-logo{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:0.05em;color:#1a1a1a;text-decoration:none}
-        .feed-pub-btn{background:#1a1a1a;color:#fff;border:none;padding:0.45rem 1rem;border-radius:20px;font-size:0.75rem;font-weight:600;cursor:pointer;letter-spacing:0.05em;font-family:'Jost',sans-serif}
+        .feed-pub-btn{background:#1a1a1a;color:#fff;border:none;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;cursor:pointer;letter-spacing:0.05em;font-family:'Jost',sans-serif}
         .feed-search{max-width:600px;margin:0 auto;position:relative}
         .feed-search input{width:100%;padding:0.55rem 1rem 0.55rem 2.2rem;border:1.5px solid #e8e4df;border-radius:20px;font-size:0.85rem;font-family:'Jost',sans-serif;background:#f7f5f2;outline:none}
         .feed-search svg{position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);color:#9c9894}
         .feed-tabs{display:flex;max-width:600px;margin:0.5rem auto 0;border-bottom:1px solid #e8e4df}
-        .feed-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:0.55rem 0;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;font-family:'Jost',sans-serif;cursor:pointer;color:#9c9894;margin-bottom:-1px;transition:color 0.2s,border-color 0.2s}
+        .feed-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:0.55rem 0;font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;font-family:'Jost',sans-serif;cursor:pointer;color:#9c9894;margin-bottom:-1px;transition:color 0.2s,border-color 0.2s}
         .feed-tab.on{color:#1a1a1a;border-bottom-color:#c4748a}
         .feed-grid{max-width:600px;margin:0 auto;padding:1rem}
         .post-card{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
@@ -130,8 +130,8 @@ export default function FeedPage() {
         .post-avatar{width:36px;height:36px;border-radius:50%;background:#e8e4df;object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#5a5855}
         .post-meta{flex:1;min-width:0}
         .post-nome{font-size:0.82rem;font-weight:600;color:#1a1a1a}
-        .post-tempo{font-size:0.7rem;color:#9c9894}
-        .post-badge-boost{background:#c4a882;color:#fff;font-size:0.6rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:10px;letter-spacing:0.08em;text-transform:uppercase}
+        .post-tempo{font-size:0.82rem;color:#9c9894}
+        .post-badge-boost{background:#c4a882;color:#fff;font-size:0.72rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:10px;letter-spacing:0.08em;text-transform:uppercase}
         .post-fotos{position:relative;overflow:hidden;aspect-ratio:4/5;background:#e8e4df}
         .post-fotos img{width:100%;height:100%;object-fit:cover}
         .post-fotos-nav{position:absolute;bottom:0.5rem;left:50%;transform:translateX(-50%);display:flex;gap:0.3rem}
@@ -140,7 +140,7 @@ export default function FeedPage() {
         .post-acoes{display:flex;align-items:center;gap:1rem;padding:0.75rem 1rem 0.4rem}
         .btn-like{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:0.3rem;font-size:0.8rem;color:#5a5855;padding:0;font-family:'Jost',sans-serif}
         .btn-like.liked{color:#e74c3c}
-        .post-likes{font-size:0.75rem;color:#9c9894;margin-left:auto}
+        .post-likes{font-size:0.85rem;color:#9c9894;margin-left:auto}
         .post-body{padding:0 1rem 0.75rem}
         .post-titulo{font-size:0.9rem;font-weight:600;color:#1a1a1a;margin-bottom:0.2rem}
         .post-desc{font-size:0.8rem;color:#5a5855;line-height:1.5}
