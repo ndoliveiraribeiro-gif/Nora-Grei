@@ -2771,6 +2771,23 @@ export default function Perfil() {
           </div>
         </div>
       )}
+
+      {/* Botão flutuante Nova Peça — só para lojistas */}
+      {modoLojista && (
+        <button
+          onClick={() => { setTabAtiva("loja"); setShowNovaPeca(true); }}
+          style={{
+            position:"fixed", bottom:"5rem", right:"1.25rem", zIndex:200,
+            width:52, height:52, borderRadius:"50%",
+            background:"#c4748a", color:"#fff", border:"none",
+            fontSize:"1.6rem", lineHeight:1, cursor:"pointer",
+            boxShadow:"0 4px 16px rgba(196,116,138,0.45)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            touchAction:"manipulation", WebkitTapHighlightColor:"transparent",
+          }}
+          title="Nova peça"
+        >＋</button>
+      )}
     </>
   );
 }
