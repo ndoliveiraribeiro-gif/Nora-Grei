@@ -760,7 +760,7 @@ export default function Home() {
                     </div>
                   </a>
                   {dispEstado
-                    ? <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.78rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.alugar}</a>
+                    ? <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.78rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #d5d2cd",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.alugar}</a>
                     : <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.reservar}</a>
                   }
                 </div>
