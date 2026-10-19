@@ -970,6 +970,7 @@ export default function Perfil() {
   const [guardado, setGuardado] = useState(false);
   const [uploadingFoto, setUploadingFoto] = useState(false);
   const [showReferralBanner, setShowReferralBanner] = useState(false);
+  const [showModalConvida, setShowModalConvida] = useState(false);
   const [detectandoLoc, setDetectandoLoc] = useState(false);
   const [locDetectada, setLocDetectada] = useState(false);
   const [lang, setLang] = useState("pt");
@@ -1726,6 +1727,17 @@ export default function Perfil() {
               <div style={{marginBottom:"0.4rem"}}>🔗 <strong>Link partilhado</strong> — quem comprar ou alugar via o teu link, tu ganhas <strong style={{color:"#c4a882"}}>10% em créditos</strong>. Sem desconto para o comprador.</div>
               <div>🏷️ <strong>Código pessoal</strong> — o comprador usa o teu código e recebe <strong>10% de desconto</strong>. Tu ganhas <strong style={{color:"#c4a882"}}>5% em créditos</strong>.</div>
               <div style={{marginTop:"0.5rem",fontSize:"0.72rem",color:"#9c9894"}}>Os créditos são usados em alugueres ou compras de peças usadas na plataforma.</div>
+            </div>
+
+            {/* Convida e Ganha — abertura de lojas */}
+            <div style={{padding:"0.9rem 1rem",background:"linear-gradient(135deg,#fdf6ee,#faf3e8)",border:"1.5px solid #c4a882",marginBottom:"1.5rem"}}>
+              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,marginBottom:"0.4rem"}}>Convida e Ganha — abertura de lojas</div>
+              <div style={{fontSize:"0.78rem",color:"#5a4a35",lineHeight:1.6,marginBottom:"0.65rem"}}>
+                Convida uma amiga a abrir loja. Ela publica 10 peças → ganhas €{ganhos.config?.credito_10_pecas??5}. Ela faz a 1.ª venda → mais €{ganhos.config?.credito_primeira_venda??5}. Ela fica 3 meses → mais €{ganhos.config?.credito_3_meses??5}.
+              </div>
+              <button onClick={() => setShowModalConvida(true)} style={{padding:"0.45rem 1rem",background:"#c4a882",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600}}>
+                Saber mais e obter link
+              </button>
             </div>
 
             {/* Código pessoal */}
@@ -3300,8 +3312,73 @@ export default function Perfil() {
             <div style={{fontSize:"0.78rem",color:"var(--g6)",marginTop:"0.15rem",fontFamily:"var(--serif)"}}>Convida uma amiga a abrir loja. Ela publica 10 peças → ganhas €{ganhos.config?.credito_10_pecas??5}. Ela faz a 1ª venda → mais €{ganhos.config?.credito_primeira_venda??5}. Ela fica 3 meses → mais €{ganhos.config?.credito_3_meses??5}.</div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:"0.4rem",flexShrink:0}}>
-            <button onClick={() => { setTabAtiva("ganhos"); setShowReferralBanner(false); }} style={{padding:"0.4rem 0.85rem",background:"#c4a882",color:"#fff",border:"none",borderRadius:"6px",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver mais</button>
+            <button onClick={() => { setShowModalConvida(true); setShowReferralBanner(false); }} style={{padding:"0.4rem 0.85rem",background:"#c4a882",color:"#fff",border:"none",borderRadius:"6px",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Saber mais</button>
             <button onClick={() => { setShowReferralBanner(false); try{localStorage.setItem("ng_referral_dispensado", new Date().toDateString());}catch{} }} style={{padding:"0.4rem 0.85rem",background:"none",color:"var(--g6)",border:"none",fontSize:"0.7rem",cursor:"pointer",fontFamily:"var(--sans)"}}>Agora não</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal — Convida e Ganha (abertura de lojas) */}
+      {showModalConvida && (
+        <div onClick={() => setShowModalConvida(false)} style={{position:"fixed",inset:0,zIndex:10000,background:"rgba(8,8,8,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(4px)"}}>
+          <div onClick={e => e.stopPropagation()} style={{background:"var(--bg,#f8f7f5)",width:"100%",maxWidth:600,maxHeight:"88vh",overflowY:"auto",padding:"2rem 1.5rem 3rem",borderRadius:"18px 18px 0 0",boxShadow:"0 -8px 48px rgba(0,0,0,0.18)"}}>
+            {/* Header */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1.5rem"}}>
+              <div>
+                <div style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,marginBottom:"0.3rem"}}>Programa de referral</div>
+                <div style={{fontFamily:"var(--serif,Georgia)",fontSize:"1.5rem",fontWeight:300,color:"#080808",lineHeight:1.2}}>Convida e Ganha</div>
+              </div>
+              <button onClick={() => setShowModalConvida(false)} style={{background:"none",border:"none",fontSize:"1.4rem",cursor:"pointer",color:"#aaa",lineHeight:1,padding:"0.25rem"}}>✕</button>
+            </div>
+
+            {/* O que é */}
+            <div style={{fontSize:"0.85rem",color:"#5a5855",lineHeight:1.7,marginBottom:"1.5rem"}}>
+              Tanto utilizadores como lojistas podem angariar novas lojas para a plataforma. Quando alguém que conheces abre uma loja pela primeira vez através do <strong>teu link único</strong>, os créditos são automaticamente creditados na tua conta à medida que a loja evolui.
+            </div>
+
+            {/* Como funciona — passos */}
+            <div style={{marginBottom:"1.5rem"}}>
+              <div style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"0.75rem"}}>Como funciona</div>
+              {[
+                { step:"1", titulo:"Partilha o teu link de abertura de loja", desc:"No teu perfil encontras um link único de convite. Partilha-o com amigas, colegas ou conhecidos que queiram abrir loja na Nora Grei — via WhatsApp, Instagram, email ou onde preferires.", cor:"#c4a882" },
+                { step:"2", titulo:"A pessoa abre a loja pelo teu link", desc:"Para que a angariação seja registada, quem crias a conta tem de o fazer através do teu link. Contas criadas por outro meio não são associadas a ti.", cor:"#c4748a" },
+                { step:"3", titulo:"Ela publica 10 peças → ganhas €"+(ganhos.config?.credito_10_pecas??5), desc:"Assim que a nova loja publicar as primeiras 10 peças, recebe o primeiro crédito na tua conta.", cor:"#27ae60" },
+                { step:"4", titulo:"Ela faz a 1.ª venda ou aluguer → mais €"+(ganhos.config?.credito_primeira_venda??5), desc:"Quando a loja concretizar a primeira transação (aluguer ou venda), recebe o segundo crédito.", cor:"#27ae60" },
+                { step:"5", titulo:"Ela permanece ativa 3 meses → mais €"+(ganhos.config?.credito_3_meses??5), desc:"Se a loja se mantiver ativa durante 3 meses, recebes o terceiro e último crédito do ciclo.", cor:"#27ae60" },
+              ].map(s => (
+                <div key={s.step} style={{display:"flex",gap:"0.75rem",marginBottom:"0.85rem",alignItems:"flex-start"}}>
+                  <div style={{width:28,height:28,borderRadius:"50%",background:s.cor,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.75rem",fontWeight:700,flexShrink:0,marginTop:"0.1rem"}}>{s.step}</div>
+                  <div>
+                    <div style={{fontSize:"0.85rem",fontWeight:600,color:"#080808",marginBottom:"0.2rem"}}>{s.titulo}</div>
+                    <div style={{fontSize:"0.78rem",color:"#7a6a5a",lineHeight:1.55}}>{s.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Onde ver os créditos */}
+            <div style={{background:"#fdf6ee",border:"1.5px solid #c4a882",padding:"0.9rem 1rem",marginBottom:"1.5rem",fontSize:"0.8rem",color:"#5a4a35",lineHeight:1.6}}>
+              <strong>Onde ver os teus créditos:</strong> no teu perfil, vai ao separador <strong>Ganhos</strong> (ícone ⚡). Aí encontras o histórico de créditos ganhos, o saldo disponível e quando cada crédito foi creditado.
+            </div>
+
+            {/* Link de convite */}
+            <div style={{marginBottom:"1.25rem"}}>
+              <div style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link de convite para abertura de loja</div>
+              <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+                <div style={{flex:1,fontSize:"0.72rem",color:"#5a5855",background:"#fff",padding:"0.55rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
+                  {typeof window !== "undefined" ? `${window.location.origin}/registar?ref=${user?.id?.slice(0,8)}…` : "noragrei.com/registar?ref=…"}
+                </div>
+                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/registar?ref=${user?.id}`); } catch {} }}
+                  style={{padding:"0.55rem 0.85rem",background:"#c4748a",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",whiteSpace:"nowrap",fontWeight:600}}>
+                  Copiar
+                </button>
+              </div>
+              <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.4rem"}}>Partilha este link específico — é diferente do link de produtos. Só conta se a pessoa criar conta por aqui.</div>
+            </div>
+
+            <button onClick={() => setShowModalConvida(false)} style={{width:"100%",padding:"0.85rem",background:"#080808",color:"#f8f7f5",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600}}>
+              Fechar
+            </button>
           </div>
         </div>
       )}
@@ -3311,11 +3388,11 @@ export default function Perfil() {
         <button
           onClick={() => { window.location.href = "/publicar"; }}
           style={{
-            position:"fixed", bottom:"5.5rem", right:"1.25rem", zIndex:9999,
+            position:"fixed", bottom:"1.5rem", right:"1.25rem", zIndex:9999,
             width:56, height:56, borderRadius:"50%",
-            background:"#c4a882", color:"#fff", border:"none",
+            background:"#89c4e1", color:"#fff", border:"none",
             fontSize:"1.7rem", lineHeight:1, cursor:"pointer",
-            boxShadow:"0 4px 20px rgba(196,168,130,0.5)",
+            boxShadow:"0 4px 20px rgba(137,196,225,0.5)",
             display:"flex", alignItems:"center", justifyContent:"center",
             touchAction:"manipulation", WebkitTapHighlightColor:"transparent",
           }}
