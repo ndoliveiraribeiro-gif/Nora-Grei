@@ -576,8 +576,8 @@ export default function PecaLojaPage() {
               )}
               <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer"
                 style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0.75rem 1rem",border:"1.5px solid #c4a882",background:"#faf8f5",color:"#1a1a1a",textDecoration:"none",fontFamily:"var(--sans)",textAlign:"center"}}
-                onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
+                onMouseEnter={e=>{e.currentTarget.style.background="#f5eaed";e.currentTarget.style.borderColor="#c4748a";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";e.currentTarget.style.borderColor="#c4a882";}}>
                 <span style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",fontWeight:600,color:"#c4a882",marginBottom:"0.15rem"}}>{i.comprarNova}</span>
                 <span style={{fontSize:"1.1rem",fontWeight:700}}>{peca.valor_peca ? `${peca.valor_peca}€` : "↗"}</span>
               </a>
@@ -588,8 +588,8 @@ export default function PecaLojaPage() {
           {peca.link_externo_ativo && peca.link_compra_externa && (
             <a href={peca.link_compra_externa} target="_blank" rel="noopener noreferrer"
               style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.5rem",width:"100%",marginBottom:"0.75rem",padding:"0.75rem 1rem",border:"1.5px solid #c4a882",background:"#faf8f5",color:"#8a6a2a",textDecoration:"none",fontFamily:"var(--sans)",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,boxSizing:"border-box"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";e.currentTarget.style.color="#fff";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";e.currentTarget.style.color="#8a6a2a";}}>
+              onMouseEnter={e=>{e.currentTarget.style.background="#f5eaed";e.currentTarget.style.borderColor="#c4748a";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";e.currentTarget.style.borderColor="#c4a882";}}>
               {peca.marca ? `Comprar nova na ${peca.marca} ↗` : "Comprar nova ↗"}
             </a>
           )}

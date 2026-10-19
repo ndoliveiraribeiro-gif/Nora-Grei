@@ -619,8 +619,8 @@ export default function PecaDetalhe() {
             {/* 3. COMPRAR NOVA */}
             {peca.valor_peca > 0 && (
               <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0.8rem 1rem", border:"1.5px solid #c4a882", background:"#faf8f5", color:"#1a1a1a", textDecoration:"none", fontFamily:"var(--sans)", transition:"all 0.15s" }}
-                onMouseEnter={e=>{e.currentTarget.style.background="#c4a882";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";}}>
+                onMouseEnter={e=>{e.currentTarget.style.background="#f5eaed";e.currentTarget.style.borderColor="#c4748a";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#faf8f5";e.currentTarget.style.borderColor="#c4a882";}}>
                 <div>
                   <div style={{ fontSize:"0.68rem", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:600, color:"#c4a882", marginBottom:"0.1rem" }}>Comprar nova</div>
                   <div style={{ fontSize:"0.75rem", color:"#888580" }}>noragrei.com ↗</div>
