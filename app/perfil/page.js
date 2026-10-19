@@ -1015,6 +1015,9 @@ export default function Perfil() {
   const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
   const [codigoAfiliado, setCodigoAfiliado] = useState(null);
   const [creditosAfiliado, setCreditosAfiliado] = useState({ total: 0, disponiveis: 0, lista: [] });
+  const [boostersLoja, setBoostersLoja] = useState([]);
+  const [tiposBoosters, setTiposBoosters] = useState([]);
+  const [boostersLoading, setBoostersLoading] = useState(false);
   const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
   const fileRef = useRef();
 
@@ -1155,6 +1158,16 @@ export default function Perfil() {
       const disponiveis = creds.filter(c => !c.usado).reduce((s, c) => s + (c.valor || 0), 0);
       const total = creds.reduce((s, c) => s + (c.valor || 0), 0);
       setCreditosAfiliado({ total, disponiveis, lista: creds });
+    }
+
+    // Boosters activos do lojista
+    if (modoLojista) {
+      const [{ data: boosters }, { data: tipos }] = await Promise.all([
+        supabase.from("boosters_lojista").select("*, booster_tipos(nome, descricao)").eq("cliente_id", user.id).eq("ativo", true).order("created_at", { ascending: false }),
+        supabase.from("booster_tipos").select("*").eq("ativo", true)
+      ]);
+      if (boosters) setBoostersLoja(boosters);
+      if (tipos) setTiposBoosters(tipos);
     }
 
     setLoading(false);
@@ -2208,7 +2221,7 @@ export default function Perfil() {
             </div>
             {/* Tabs da loja — scroll horizontal no mobile */}
             <div className="tabs-scroll">
-              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["avaliacoes","Avaliações"],["estatisticas","Estatísticas"]].map(([key,label]) => (
+              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["estatisticas","Estatísticas"]].map(([key,label]) => (
                 <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
               ))}
             </div>
@@ -2534,6 +2547,119 @@ export default function Perfil() {
                 })()}
               </div>
             )}
+            {tabLoja === "custos" && (() => {
+              // Calcular saldo a receber dos alugueres (devolvidos, não liquidados)
+              const saldoAReceber = alugueresLoja
+                .filter(a => a.estado === "devolvido" && !a.liquidado_em)
+                .reduce((s,a) => s + (a.valor_aluguer||0)*0.9, 0);
+
+              // Boosters activos — custo semanal total
+              const custoSemana = boostersLoja.reduce((s,b) => s + (b.preco_semana||0), 0);
+              const custoMes = custoSemana * 4;
+
+              // Saldo vs custo
+              const saldoCobre = saldoAReceber >= custoMes;
+              const saldoCobresemana = saldoAReceber >= custoSemana;
+
+              return (
+                <div>
+                  {/* KPIs */}
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1rem"}}>
+                    {[
+                      {val:`${custoSemana.toFixed(2)}€`,lbl:"Custo / semana",cor:"#c4748a"},
+                      {val:`${custoMes.toFixed(2)}€`,lbl:"Custo / mês (est.)",cor:"#c4748a"},
+                      {val:`${saldoAReceber.toFixed(2)}€`,lbl:"Saldo a receber",cor:"#27ae60"},
+                      {val:saldoCobre?"Saldo suficiente":"Cartão necessário",lbl:"Método provável",cor:saldoCobre?"#27ae60":"#f39c12"},
+                    ].map((k,idx) => (
+                      <div key={idx} style={{background:"var(--bg)",padding:"1rem"}}>
+                        <div style={{fontSize:"0.7rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.25rem"}}>{k.lbl}</div>
+                        <div style={{fontFamily:"var(--serif)",fontSize:"1.6rem",fontWeight:300,color:k.cor,lineHeight:1}}>{k.val}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Boosters activos */}
+                  <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                    <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Boosters activos</p>
+                    {boostersLoja.length === 0 ? (
+                      <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"1.5rem 0"}}>Nenhum booster activo de momento.</p>
+                    ) : (
+                      boostersLoja.map(b => (
+                        <div key={b.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.7rem 0",borderBottom:"1px solid var(--g1)"}}>
+                          <div>
+                            <div style={{fontFamily:"var(--serif)",fontSize:"0.95rem",marginBottom:"0.15rem"}}>{b.booster_tipos?.nome||b.booster_id}</div>
+                            <div style={{fontSize:"0.72rem",color:"#aaa"}}>{b.booster_tipos?.descricao||""}</div>
+                            {b.inicio_em && <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Activo desde {new Date(b.inicio_em).toLocaleDateString("pt-PT")}</div>}
+                          </div>
+                          <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
+                            <div style={{fontWeight:600,color:"#c4748a",fontSize:"0.95rem"}}>{(b.preco_semana||0).toFixed(2)}€<span style={{fontSize:"0.68rem",color:"#aaa",fontWeight:400}}>/sem</span></div>
+                            <div style={{fontSize:"0.7rem",color:"#aaa"}}>{((b.preco_semana||0)*4).toFixed(2)}€/mês est.</div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                    {boostersLoja.length > 0 && (
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"0.75rem",marginTop:"0.25rem"}}>
+                        <span style={{fontSize:"0.75rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888"}}>Total semanal</span>
+                        <span style={{fontWeight:700,color:"#c4748a",fontSize:"1.1rem"}}>{custoSemana.toFixed(2)}€</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Catálogo de boosters disponíveis */}
+                  {tiposBoosters.length > 0 && (
+                    <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                      <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Ferramentas disponíveis</p>
+                      {tiposBoosters.map(t => {
+                        const jaActivo = boostersLoja.some(b => b.booster_id === t.id);
+                        return (
+                          <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.7rem 0",borderBottom:"1px solid var(--g1)"}}>
+                            <div>
+                              <div style={{fontFamily:"var(--serif)",fontSize:"0.9rem",marginBottom:"0.1rem"}}>{t.nome}</div>
+                              <div style={{fontSize:"0.72rem",color:"#aaa"}}>{t.descricao}</div>
+                            </div>
+                            <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
+                              <div style={{fontWeight:600,color:jaActivo?"#27ae60":"#080808",fontSize:"0.9rem"}}>{(t.preco_semana||0).toFixed(2)}€/sem</div>
+                              {jaActivo && <div style={{fontSize:"0.68rem",color:"#27ae60"}}>✓ Activo</div>}
+                              {!jaActivo && <div style={{fontSize:"0.68rem",color:"#aaa"}}>Contacta-nos para activar</div>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Pagamento */}
+                  <div className="card" style={{padding:"1.5rem",marginBottom:"1rem"}}>
+                    <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#888",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Como são cobrados os custos</p>
+                    <div style={{fontSize:"0.85rem",color:"var(--g6)",lineHeight:1.7}}>
+                      {saldoAReceber > 0 ? (
+                        <>
+                          <p style={{marginBottom:"0.75rem"}}>
+                            Tens <strong style={{color:"#27ae60"}}>{saldoAReceber.toFixed(2)}€</strong> a receber de alugueres concluídos.
+                          </p>
+                          {saldoCobre ? (
+                            <div style={{background:"#f0faf0",border:"1.5px solid #b8dbb8",padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#2d6a2d",marginBottom:"0.75rem"}}>
+                              ✓ O teu saldo de alugueres é suficiente para cobrir o custo mensal dos boosters (<strong>{custoMes.toFixed(2)}€</strong>). O valor será descontado automaticamente antes da liquidação.
+                            </div>
+                          ) : (
+                            <div style={{background:"#fff8e1",border:"1.5px solid #f39c12",padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#856404",marginBottom:"0.75rem"}}>
+                              ⚠ O teu saldo de alugueres ({saldoAReceber.toFixed(2)}€) não cobre o custo mensal dos boosters ({custoMes.toFixed(2)}€). A diferença de <strong>{(custoMes - saldoAReceber).toFixed(2)}€</strong> será debitada no cartão de crédito/débito associado à conta.
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div style={{background:"#fff5f0",border:"1.5px solid #f5c6cb",padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#c0392b",marginBottom:"0.75rem"}}>
+                          Sem saldo de alugueres disponível. Os custos dos boosters (<strong>{custoMes.toFixed(2)}€/mês</strong>) serão cobrados no cartão de crédito/débito associado à conta.
+                        </div>
+                      )}
+                      <p style={{fontSize:"0.75rem",color:"#aaa",marginTop:"0.5rem"}}>Os boosters são cobrados semanalmente. Para cancelar ou gerir boosters, contacta o suporte da Nora Grei.</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {tabLoja === "avaliacoes" && (
               <div className="card" style={{padding:"1.5rem"}}>
                 <AvaliacoesLojista alugueresLoja={alugueresLoja} clienteId={clienteData?.id} />

@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-const TABS = ["dashboard", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };
-const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", lojistas: "◫", clientes: "◉", reservas: "◌", campanhas: "✉", config: "⚙" };
+const TABS = ["dashboard", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "afiliados", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", afiliados: "Afiliados", config: "Configurações" };
+const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", lojistas: "◫", clientes: "◉", reservas: "◌", campanhas: "✉", afiliados: "◆", config: "⚙" };
 
 function ReferralsPendentes({ supabase, minimo }) {
   const [lista, setLista] = useState([]);
@@ -112,6 +112,7 @@ export default function Admin() {
   // CAMPANHAS
   const [campanhas, setCampanhas] = useState([]);
   const [novaCampanha, setNovaCampanha] = useState({ titulo: "", mensagem: "", tipo: "cupao", codigo: "", desconto: "", probabilidade: 20, url_destino: "https://www.noragrei.com", validade: "" });
+  const [afiliados, setAfiliados] = useState([]);
 
   useEffect(() => {
     const pwd = new URLSearchParams(window.location.search).get('k');
@@ -212,6 +213,13 @@ export default function Admin() {
     if (tab === "campanhas") {
       const { data } = await supabase.from("campanhas").select("*, pecas(nome)").order("created_at", { ascending: false });
       if (data) setCampanhas(data);
+    }
+    if (tab === "afiliados") {
+      const { data } = await supabase
+        .from("v_afiliados_resumo")
+        .select("*")
+        .order("total_creditos_gerados", { ascending: false });
+      if (data) setAfiliados(data);
     }
     if (tab === "config") {
       const { data: cfgRef } = await supabase.from("config_referral").select("*").single();
@@ -1110,6 +1118,76 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </>
+          )}
+
+          {/* ── AFILIADOS ── */}
+          {tab === "afiliados" && (
+            <>
+              <div className="ad-header">
+                <h1 className="ad-titulo">Afiliados</h1>
+                <p className="ad-subtitulo">Códigos activos, créditos gerados e receita por afiliado</p>
+              </div>
+
+              {/* KPIs globais */}
+              {(() => {
+                const totalAfil = afiliados.length;
+                const totalCreditos = afiliados.reduce((s,a) => s + (a.total_creditos_gerados||0), 0);
+                const totalUsos = afiliados.reduce((s,a) => s + (a.total_usos||0), 0);
+                const totalDisp = afiliados.reduce((s,a) => s + (a.creditos_disponiveis||0), 0);
+                return (
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"var(--g2)",marginBottom:"1.5rem"}}>
+                    {[
+                      {val:totalAfil,lbl:"Afiliados activos"},
+                      {val:totalUsos,lbl:"Usos totais"},
+                      {val:`${totalCreditos.toFixed(2)}€`,lbl:"Créditos gerados"},
+                      {val:`${totalDisp.toFixed(2)}€`,lbl:"Créditos por usar"},
+                    ].map((k,i) => (
+                      <div key={i} style={{background:"var(--ad-bg)",padding:"1.25rem 1rem"}}>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"0.4rem"}}>{k.lbl}</div>
+                        <div style={{fontFamily:"var(--serif)",fontSize:"2rem",fontWeight:300,color:"#c4748a",lineHeight:1}}>{k.val}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Tabela de afiliados */}
+              <div className="ad-card" style={{padding:0,overflow:"hidden"}}>
+                <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g2)"}}>
+                  <p className="ad-card-title" style={{margin:0}}>Todos os afiliados</p>
+                </div>
+                {afiliados.length === 0 ? (
+                  <p style={{padding:"2rem",textAlign:"center",color:"var(--g4)",fontSize:"0.85rem"}}>Nenhum afiliado ainda.</p>
+                ) : (
+                  <div style={{overflowX:"auto"}}>
+                    <table style={{width:"100%",borderCollapse:"collapse",fontSize:"0.82rem"}}>
+                      <thead>
+                        <tr style={{borderBottom:"1px solid var(--g2)",background:"var(--g1)"}}>
+                          {["Nome","Email","Código","Usos","Créditos gerados","Créditos disponíveis","Última comissão"].map(h => (
+                            <th key={h} style={{padding:"0.65rem 1rem",textAlign:"left",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,whiteSpace:"nowrap"}}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {afiliados.map((a,i) => (
+                          <tr key={a.cliente_id} style={{borderBottom:"1px solid var(--g2)",background:i%2===0?"var(--ad-bg)":"var(--g1)"}}>
+                            <td style={{padding:"0.7rem 1rem",fontWeight:500,whiteSpace:"nowrap"}}>{a.nome||"—"}</td>
+                            <td style={{padding:"0.7rem 1rem",color:"var(--g4)",fontSize:"0.78rem"}}>{a.email||"—"}</td>
+                            <td style={{padding:"0.7rem 1rem"}}>
+                              <code style={{background:"var(--g2)",padding:"0.15rem 0.5rem",fontSize:"0.82rem",letterSpacing:"0.05em",fontFamily:"monospace"}}>{a.codigo}</code>
+                            </td>
+                            <td style={{padding:"0.7rem 1rem",textAlign:"center",fontWeight:600}}>{a.total_usos||0}</td>
+                            <td style={{padding:"0.7rem 1rem",color:"#c4748a",fontWeight:600,textAlign:"right"}}>{(a.total_creditos_gerados||0).toFixed(2)}€</td>
+                            <td style={{padding:"0.7rem 1rem",color:"#27ae60",fontWeight:600,textAlign:"right"}}>{(a.creditos_disponiveis||0).toFixed(2)}€</td>
+                            <td style={{padding:"0.7rem 1rem",color:"var(--g4)",fontSize:"0.78rem",whiteSpace:"nowrap"}}>{a.ultima_comissao_em ? new Date(a.ultima_comissao_em).toLocaleDateString("pt-PT") : "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </>
           )}
