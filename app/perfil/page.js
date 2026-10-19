@@ -1011,6 +1011,7 @@ export default function Perfil() {
   const [recMsg, setRecMsg] = useState("");
   const [recLoading, setRecLoading] = useState(false);
   const [secaoAberta, setSecaoAberta] = useState(null); // "pessoal" | "morada" | "docs" | "seguranca" | "suporte"
+  const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
   const fileRef = useRef();
 
   useEffect(() => {
@@ -1110,6 +1111,17 @@ export default function Perfil() {
     const campoId = eLojistaLocal ? "lojista_id" : "cliente_id";
     const { data: convNL } = await supabase.from("conversas").select(campoNL).eq(campoId, user.id);
     if (convNL) setNaoLidasMsg(convNL.reduce((s, cv) => s + (cv[campoNL] || 0), 0));
+
+    // Ganhos de referral — disponível para todos
+    const [{ data: refs }, { data: cfgRef }] = await Promise.all([
+      supabase.from("referrals").select("*, pecas_lojista(nome, fotos)").eq("referidor_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("config_referral").select("*").single()
+    ]);
+    if (refs) {
+      const pendente = refs.filter(r => !r.comissao_paga && r.status !== "cancelado").reduce((s, r) => s + (r.comissao_gerada || 0), 0);
+      const pago = refs.filter(r => r.comissao_paga).reduce((s, r) => s + (r.comissao_gerada || 0), 0);
+      setGanhos({ referrals: refs, config: cfgRef, totalPendente: pendente, totalPago: pago });
+    }
 
     setLoading(false);
   };
@@ -1513,6 +1525,7 @@ export default function Perfil() {
             {id:"perfil",label:i.tabPerfil},
             {id:"pedidos",label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
             {id:"guardados",label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+            {id:"ganhos",label:{pt:"Ganhos",fr:"Gains",lt:"Pajamos"}[lang]||"Ganhos", badge: ganhos.totalPendente > 0 ? `€${ganhos.totalPendente.toFixed(0)}` : null},
             ...(modoLojista ? [{id:"loja",label:i.tabLoja}] : []),
           ].map(tab => (
             <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
@@ -1620,8 +1633,83 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* PERFIL NORMAL — oculto nas tabs guardados, pedidos e loja */}
-        <div style={{display: (tabAtiva === "guardados" || tabAtiva === "pedidos" || tabAtiva === "loja") ? "none" : "block"}}>
+        {/* GANHOS — referrals e comissões */}
+        {tabAtiva === "ganhos" && (
+          <div style={{padding:"0 0 3rem"}}>
+            {/* Sumário */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.75rem",marginBottom:"1.5rem"}}>
+              <div style={{padding:"1.25rem",background:"linear-gradient(135deg,#fdf6ee,#faf0f4)",border:"1px solid #e8d8c8",textAlign:"center"}}>
+                <div style={{fontSize:"1.6rem",fontFamily:"var(--serif)",color:"#c4a882",fontWeight:600}}>€{ganhos.totalPendente.toFixed(2)}</div>
+                <div style={{fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",marginTop:"0.3rem",fontFamily:"var(--sans)"}}>Por receber</div>
+              </div>
+              <div style={{padding:"1.25rem",background:"var(--g1)",border:"1px solid var(--g2)",textAlign:"center"}}>
+                <div style={{fontSize:"1.6rem",fontFamily:"var(--serif)",color:"#3a7a3a",fontWeight:600}}>€{ganhos.totalPago.toFixed(2)}</div>
+                <div style={{fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--g4)",marginTop:"0.3rem",fontFamily:"var(--sans)"}}>Já recebido</div>
+              </div>
+            </div>
+
+            {/* Como funciona */}
+            {ganhos.config && (
+              <div style={{padding:"0.9rem 1rem",background:"#f8f7f5",border:"1px solid #e2dfda",marginBottom:"1.5rem",fontSize:"0.8rem",color:"#5a5855",lineHeight:1.6}}>
+                <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",fontWeight:600,marginBottom:"0.4rem"}}>Como funciona</div>
+                Partilha qualquer peça com o teu link. Quem comprar ou alugar recebe <strong>{ganhos.config.desconto_comprador}% de desconto</strong> e tu ganhas <strong>{ganhos.config.comissao_referidor}% de comissão</strong> sobre o valor.
+              </div>
+            )}
+
+            {/* Link de referência rápido */}
+            <div style={{padding:"0.9rem 1rem",background:"#fff",border:"1.5px solid #c4748a",marginBottom:"1.5rem"}}>
+              <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link de referência</div>
+              <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+                <div style={{flex:1,fontSize:"0.75rem",color:"#5a5855",background:"#f8f7f5",padding:"0.5rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
+                  {typeof window !== "undefined" ? `${window.location.origin}?ref=${user?.id?.slice(0,8)}…` : "noragrei.com?ref=…"}
+                </div>
+                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}?ref=${user?.id}`); } catch {} }}
+                  style={{padding:"0.5rem 0.85rem",background:"#c4748a",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",whiteSpace:"nowrap",fontWeight:600}}>
+                  Copiar
+                </button>
+              </div>
+              <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.4rem"}}>Funciona em qualquer peça — basta partilhar qualquer link do site.</div>
+            </div>
+
+            {/* Lista de referrals */}
+            <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.75rem"}}>
+              Histórico de partilhas ({ganhos.referrals.length})
+            </div>
+            {ganhos.referrals.length === 0 ? (
+              <div style={{padding:"2rem 1rem",textAlign:"center",color:"#9c9894"}}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e2dfda" strokeWidth="1.5" style={{marginBottom:"0.75rem",display:"block",margin:"0 auto 0.75rem"}}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <div style={{fontSize:"0.85rem",marginBottom:"0.4rem"}}>Ainda não partilhaste nenhuma peça</div>
+                <div style={{fontSize:"0.75rem"}}>Vai a qualquer peça e clica em "Partilhar e ganhar"</div>
+              </div>
+            ) : (
+              <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+                {ganhos.referrals.map(r => (
+                  <div key={r.id} style={{padding:"0.9rem 1rem",background:"#fff",border:"1px solid #e2dfda",display:"flex",alignItems:"center",gap:"0.85rem"}}>
+                    {r.pecas_lojista?.fotos?.[0] && (
+                      <img src={r.pecas_lojista.fotos[0]} alt="" style={{width:44,height:44,objectFit:"cover",flexShrink:0,background:"#f8f7f5"}} />
+                    )}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:"0.82rem",fontWeight:600,color:"var(--black)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.pecas_lojista?.nome||"Peça"}</div>
+                      <div style={{fontSize:"0.72rem",color:"#7a6a5a",marginTop:"0.2rem"}}>{r.tipo==="aluguer"?"Aluguer":"Compra"} · {r.comprador_email||"visitante"}</div>
+                      <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.15rem"}}>{new Date(r.created_at).toLocaleDateString("pt-PT")}</div>
+                    </div>
+                    <div style={{textAlign:"right",flexShrink:0}}>
+                      <div style={{fontSize:"0.9rem",fontFamily:"var(--serif)",fontWeight:600,color:r.status==="cancelado"?"#c0392b":r.comissao_paga?"#3a7a3a":"#c4a882"}}>
+                        {r.comissao_gerada ? `+€${r.comissao_gerada.toFixed(2)}` : "—"}
+                      </div>
+                      <div style={{fontSize:"0.62rem",letterSpacing:"0.1em",textTransform:"uppercase",marginTop:"0.15rem",color:r.status==="cancelado"?"#c0392b":r.status==="confirmado"||r.status==="pago"?"#3a7a3a":"#c4a882",fontFamily:"var(--sans)",fontWeight:600}}>
+                        {{pendente:"Pendente",confirmado:"Confirmado",pago:"Pago",cancelado:"Cancelado"}[r.status]||r.status}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PERFIL NORMAL — oculto nas tabs guardados, pedidos, ganhos e loja */}
+        <div style={{display: (tabAtiva === "guardados" || tabAtiva === "pedidos" || tabAtiva === "ganhos" || tabAtiva === "loja") ? "none" : "block"}}>
         <div className="hero">
           <div className="avatar-wrap">
             {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
