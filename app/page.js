@@ -322,11 +322,11 @@ export default function Home() {
         .hero-bg img.visivel{opacity:1}
         .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center center}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.15) 0%,rgba(8,8,8,0.45) 50%,rgba(8,8,8,0.82) 100%);z-index:1}
-        .hero-sound{position:absolute;bottom:2rem;right:1.5rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
+        .hero-sound{position:absolute;bottom:2rem;right:1.5rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
         .hero-sound:hover{background:rgba(255,255,255,0.22)}
         @media(min-width:769px){.hero>.hero-sound{display:none!important}}
         .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
-        .hero-eyebrow{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
+        .hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
         .hero-sub{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;font-style:italic;color:rgba(255,255,255,0.65);line-height:1.02;margin-bottom:1.5rem}
         .hero-desc{font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:45ch;line-height:1.8;margin-bottom:2rem}
@@ -339,7 +339,7 @@ export default function Home() {
         /* STRIP */
         .strip{background:var(--rosa);padding:0.75rem 0;overflow:hidden}
         .strip-track{display:flex;white-space:nowrap;animation:marquee 25s linear infinite}
-        .strip-item{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.9);padding:0 2.5rem;flex-shrink:0}
+        .strip-item{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.9);padding:0 2.5rem;flex-shrink:0}
         .strip-item::after{content:'✦';margin-left:2.5rem;color:rgba(255,255,255,0.4)}
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
@@ -354,7 +354,7 @@ export default function Home() {
 
         /* SECTIONS */
         .sec{padding:2rem 1.5rem}
-        .sec-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.4rem;font-weight:500}
+        .sec-label{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:0.4rem;font-weight:500}
         .sec-titulo{font-family:var(--serif);font-size:clamp(1.6rem,5vw,2.6rem);font-weight:300;line-height:1.1;margin-bottom:1.25rem}
         .sec-titulo em{font-style:italic;color:var(--g4)}
 
@@ -389,7 +389,7 @@ export default function Home() {
         .numero{padding:1.5rem 1rem;text-align:center;border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
         .numero:nth-child(even){border-right:none}
         .numero-val{font-family:var(--serif);font-size:2.2rem;font-weight:300;color:var(--rosa);line-height:1;margin-bottom:0.3rem}
-        .numero-label{font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+        .numero-label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
 
         /* TRUST */
         .trust-sec{padding:1.75rem 1.5rem;background:var(--g1)}
@@ -401,10 +401,10 @@ export default function Home() {
 
         /* INSTAGRAM */
         .insta-sec{padding:2rem 1.5rem;background:var(--black);text-align:center}
-        .insta-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500;margin-bottom:0.6rem}
+        .insta-label{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500;margin-bottom:0.6rem}
         .insta-titulo{font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:300;color:#fff;margin-bottom:0.35rem}
         .insta-sub{font-size:0.82rem;color:rgba(255,255,255,0.45);margin-bottom:1.5rem}
-        .insta-btn{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.25);padding:0.75rem 1.75rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;display:inline-block}
+        .insta-btn{font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.25);padding:0.75rem 1.75rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;display:inline-block}
         .insta-btn:hover{border-color:#fff;background:rgba(255,255,255,0.05)}
         @media(min-width:769px){.insta-sec{padding:2.5rem 4rem}}
 
@@ -418,21 +418,21 @@ export default function Home() {
         .cta-final{padding:2.5rem 1.5rem;text-align:center;background:var(--black);color:#fff}
         .cta-final-titulo{font-family:var(--serif);font-size:clamp(2rem,6vw,4rem);font-weight:300;line-height:1;color:#fff}
         .cta-final-sub{font-family:var(--serif);font-size:clamp(2rem,6vw,4rem);font-weight:300;font-style:italic;color:var(--rosa);line-height:1;margin-bottom:0.6rem}
-        .cta-final-tag{font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:2rem;display:block}
+        .cta-final-tag{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:2rem;display:block}
         .cta-final-btn{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1rem 2.5rem;text-decoration:none;font-family:var(--sans);transition:background 0.2s;display:inline-block}
         .cta-final-btn:hover{background:#a85c72}
 
         /* FOOTER */
         footer{padding:3rem 1.5rem 2rem;border-top:1px solid var(--g2);background:var(--white)}
         .footer-cols{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem}
-        .footer-col-titulo{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--black);font-weight:500;margin-bottom:0.85rem}
+        .footer-col-titulo{font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--black);font-weight:500;margin-bottom:0.85rem}
         .footer-col-links{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
         .footer-col-links a{font-size:0.78rem;color:var(--g4);text-decoration:none;transition:color 0.2s}
         .footer-col-links a:hover{color:var(--black)}
         .footer-bottom{display:flex;flex-direction:column;gap:0.75rem;padding-top:1.5rem;border-top:1px solid var(--g2)}
         .footer-copy{font-size:0.65rem;color:var(--g4)}
         .footer-social{display:flex;align-items:center;gap:0.75rem}
-        .footer-social-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--g4)}
+        .footer-social-label{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--g4)}
         .footer-social-link{font-size:0.72rem;color:var(--g4);text-decoration:none;transition:color 0.2s}
         .footer-social-link:hover{color:var(--rosa)}
 
@@ -605,7 +605,7 @@ export default function Home() {
           <a href={userLogado ? "/perfil" : "/entrar"} className="nb nb-o">{userLogado ? t.nav.perfil : t.nav.entrar}</a>
           <a href="/cesto" style={{position:"relative",display:"flex",alignItems:"center",padding:"0.45rem",color:"#080808",lineHeight:1}} title="Cesto">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            {cestoCont > 0 && <span style={{position:"absolute",top:"-2px",right:"-2px",background:"#c4748a",color:"#fff",fontSize:"0.45rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+            {cestoCont > 0 && <span style={{position:"absolute",top:"-2px",right:"-2px",background:"#c4748a",color:"#fff",fontSize:"0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"16px",height:"16px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
           </a>
           <a href="/catalogo" className="nb nb-f">{t.hero.cta1}</a>
         </div>
@@ -732,7 +732,7 @@ export default function Home() {
                         : <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#e8e4e0,#d5d0c8)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:"2.5rem",fontWeight:300,color:"rgba(0,0,0,0.06)",fontStyle:"italic"}}>NG</span></div>
                       }
                       {!dispEstado && (
-                        <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
+                        <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"rgba(248,247,245,0.92)",color:"#5a5855",padding:"0.25rem 0.55rem",fontFamily:"var(--sans)",fontWeight:400,zIndex:2}}>
                           {t.destaque.reservar.split("—")[0].trim()}
                         </div>
                       )}
@@ -745,23 +745,23 @@ export default function Home() {
                         return (
                           <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(8,8,8,0.72)",backdropFilter:"blur(4px)",padding:"0.45rem 0.75rem",display:"flex",alignItems:"center",gap:"0.4rem",zIndex:3}}>
                             <div style={{width:5,height:5,borderRadius:"50%",background:"#f39c12",flexShrink:0}} />
-                            <span style={{fontFamily:"var(--sans)",fontSize:"0.55rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"rgba(255,255,255,0.9)"}}>{t.destaque.dispEm} <strong>{tempo}</strong></span>
+                            <span style={{fontFamily:"var(--sans)",fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"rgba(255,255,255,0.9)"}}>{t.destaque.dispEm} <strong>{tempo}</strong></span>
                           </div>
                         );
                       })()}
                     </div>
                     <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
-                      {peca.categoria && <p style={{fontSize:"0.48rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
+                      {peca.categoria && <p style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
                       <h3 style={{fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:500,lineHeight:1.2,marginBottom:"0.3rem",color:"#111"}}>{peca.nome}</h3>
                       <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
                         <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
-                        <span style={{fontFamily:"var(--sans)",fontSize:"0.55rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+                        <span style={{fontFamily:"var(--sans)",fontSize:"0.68rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
                       </div>
                     </div>
                   </a>
                   {dispEstado
-                    ? <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.58rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.alugar}</a>
-                    : <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.55rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.reservar}</a>
+                    ? <a href={`/catalogo/${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.78rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.alugar}</a>
+                    : <a href={`/reserva?peca=${peca.id}`} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"transparent",color:"#5a5855",border:"1px solid #dedad4",textAlign:"center",textDecoration:"none",fontFamily:"var(--sans)",fontWeight:400,minHeight:"44px"}}>{t.destaque.reservar}</a>
                   }
                 </div>
               );

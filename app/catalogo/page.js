@@ -23,20 +23,20 @@ function PecaCardLojista({ peca, lang }) {
             </div>
           )}
           {/* Badge Lojista */}
-          <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.55rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.25rem 0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
+          <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.25rem 0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
         </div>
         <div style={{padding:"0.7rem 0.75rem 0.4rem"}}>
           {peca.categoria && (
-            <p style={{fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a8783",fontFamily:"'Jost',sans-serif",marginBottom:"0.18rem",fontWeight:400}}>{peca.categoria}</p>
+            <p style={{fontSize:"0.72rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a8783",fontFamily:"'Jost',sans-serif",marginBottom:"0.18rem",fontWeight:400}}>{peca.categoria}</p>
           )}
           <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:"0.92rem",fontWeight:500,lineHeight:1.25,marginBottom:"0.2rem",color:"#111",letterSpacing:"0.01em"}}>{peca.nome}</h3>
           {peca.lojistaNome && (
-            <p style={{fontSize:"0.65rem",letterSpacing:"0.04em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem",fontWeight:500}}>{peca.lojistaNome}</p>
+            <p style={{fontSize:"0.72rem",letterSpacing:"0.04em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem",fontWeight:500}}>{peca.lojistaNome}</p>
           )}
           {peca.tamanhos && peca.tamanhos.length > 0 && (
             <div style={{display:"flex",gap:"0.3rem",flexWrap:"wrap",marginBottom:"0.4rem"}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:"0.65rem",letterSpacing:"0.03em",border:"1px solid #d0cdc8",padding:"0.16rem 0.45rem",color:"#4a4845",fontFamily:"'Jost',sans-serif",fontWeight:400,background:"#f2f0ed"}}>{t}</span>
+                <span key={t} style={{fontSize:"0.72rem",letterSpacing:"0.03em",border:"1px solid #d0cdc8",padding:"0.16rem 0.45rem",color:"#4a4845",fontFamily:"'Jost',sans-serif",fontWeight:400,background:"#f2f0ed"}}>{t}</span>
               ))}
             </div>
           )}
@@ -307,7 +307,7 @@ export default function Catalogo() {
         .ocas-scroll::-webkit-scrollbar { display:none; }
         .ocas-chip {
           flex-shrink:0; border:1px solid var(--grey-200); background:none; cursor:pointer;
-          font-family:var(--sans); font-size:0.7rem; font-weight:400;
+          font-family:var(--sans); font-size:0.78rem; font-weight:400;
           letter-spacing:0.04em; color:#5a5855;
           padding:0.3rem 0.7rem; white-space:nowrap; border-radius:20px;
           transition:all 0.12s;
@@ -318,7 +318,7 @@ export default function Catalogo() {
         .sort-select {
           flex-shrink:0; border:none; border-left:1px solid var(--grey-200);
           background:none; outline:none; cursor:pointer;
-          font-family:var(--sans); font-size:0.68rem; font-weight:400;
+          font-family:var(--sans); font-size:0.75rem; font-weight:400;
           letter-spacing:0.06em; text-transform:uppercase; color:#5a5855;
           padding:0.5rem 0.75rem; appearance:none; -webkit-appearance:none;
           height:100%; min-width:80px;
@@ -333,7 +333,7 @@ export default function Catalogo() {
         .fonte-linha::-webkit-scrollbar { display:none; }
         .fonte-chip {
           flex-shrink:0; border:1px solid var(--grey-200); background:none; cursor:pointer;
-          font-family:var(--sans); font-size:0.68rem; font-weight:400;
+          font-family:var(--sans); font-size:0.75rem; font-weight:400;
           letter-spacing:0.04em; color:#5a5855;
           padding:0.25rem 0.65rem; white-space:nowrap; border-radius:20px;
           transition:all 0.12s;
@@ -362,7 +362,7 @@ export default function Catalogo() {
           flex:1; display:flex; flex-direction:column; align-items:center;
           justify-content:center; gap:0.2rem; text-decoration:none;
           color:#5a5855; border:none; background:none; cursor:pointer;
-          font-family:var(--sans); font-size:0.52rem; font-weight:500;
+          font-family:var(--sans); font-size:0.65rem; font-weight:500;
           letter-spacing:0.08em; text-transform:uppercase;
           transition:color 0.12s;
         }

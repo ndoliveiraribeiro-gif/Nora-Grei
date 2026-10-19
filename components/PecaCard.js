@@ -24,7 +24,7 @@ function Timer({ dataFim, lang }) {
   return (
     <div style={{position:'absolute',bottom:0,left:0,right:0,background:'rgba(8,8,8,0.72)',backdropFilter:'blur(4px)',padding:'0.45rem 0.75rem',display:'flex',alignItems:'center',gap:'0.4rem',zIndex:3}}>
       <div style={{width:5,height:5,borderRadius:'50%',background:'#f39c12',flexShrink:0,animation:'pcpulse 2s infinite'}}/>
-      <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.9)'}}>{labels[lang]||labels.pt} <strong>{tempo}</strong></span>
+      <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.72rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.9)'}}>{labels[lang]||labels.pt} <strong>{tempo}</strong></span>
     </div>
   );
 }
@@ -112,7 +112,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
 
           {/* Badge disponibilidade — canto superior direito, discreto */}
           {!disponivel && (
-            <div style={{position:'absolute',top:'0.6rem',right:'0.6rem',fontSize:'0.58rem',letterSpacing:'0.14em',textTransform:'uppercase',background:'rgba(248,247,245,0.92)',color:'#5a5855',padding:'0.28rem 0.6rem',fontFamily:"'Jost',sans-serif",fontWeight:400,zIndex:2}}>
+            <div style={{position:'absolute',top:'0.6rem',right:'0.6rem',fontSize:'0.68rem',letterSpacing:'0.14em',textTransform:'uppercase',background:'rgba(248,247,245,0.92)',color:'#5a5855',padding:'0.28rem 0.6rem',fontFamily:"'Jost',sans-serif",fontWeight:400,zIndex:2}}>
               {l.indisponivel}
             </div>
           )}
@@ -124,7 +124,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
         {/* INFO */}
         <div style={{padding:'0.7rem 0.75rem 0.4rem'}}>
           {peca.categoria && (
-            <p style={{fontSize:'0.62rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'#8a8783',fontFamily:"'Jost',sans-serif",marginBottom:'0.18rem',fontWeight:400}}>{peca.categoria}</p>
+            <p style={{fontSize:'0.72rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'#8a8783',fontFamily:"'Jost',sans-serif",marginBottom:'0.18rem',fontWeight:400}}>{peca.categoria}</p>
           )}
           {/* Nome: peso 500 para ser bem legível */}
           <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:'0.92rem',fontWeight:500,lineHeight:1.25,marginBottom:'0.35rem',color:'#111',letterSpacing:'0.01em'}}>{peca.nome}</h3>
@@ -133,9 +133,9 @@ export default function PecaCard({ peca, lang = "pt" }) {
           {peca.tamanhos && peca.tamanhos.length > 0 && (
             <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap',marginBottom:'0.4rem'}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:'0.65rem',letterSpacing:'0.03em',border:'1px solid #d0cdc8',padding:'0.16rem 0.45rem',color:'#4a4845',fontFamily:"'Jost',sans-serif",fontWeight:400,background:'#f2f0ed'}}>{t}</span>
+                <span key={t} style={{fontSize:'0.72rem',letterSpacing:'0.03em',border:'1px solid #d0cdc8',padding:'0.16rem 0.45rem',color:'#4a4845',fontFamily:"'Jost',sans-serif",fontWeight:400,background:'#f2f0ed'}}>{t}</span>
               ))}
-              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.65rem',color:'#8a8783',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
+              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.72rem',color:'#8a8783',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
             </div>
           )}
 
@@ -157,7 +157,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
             justifyContent:'center',
             margin:'0 0.6rem 0.6rem',
             padding:'0.55rem',
-            fontSize:'0.68rem',
+            fontSize:'0.78rem',
             letterSpacing:'0.1em',
             textTransform:'uppercase',
             background:'transparent',
