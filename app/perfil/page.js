@@ -996,7 +996,7 @@ export default function Perfil() {
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
-  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", aceita_termos: false });
+  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false });
   const [formLojistaMsg, setFormLojistaMsg] = useState("");
   const [formLojistaLoading, setFormLojistaLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -1161,8 +1161,12 @@ export default function Perfil() {
 
   const submeterCandidaturaLojista = async () => {
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
+    if (!formLojista.nif.trim()) { setFormLojistaMsg("Indica o teu NIF (obrigatório por lei)."); return; }
+    if (!formLojista.telefone_loja.trim()) { setFormLojistaMsg("Indica um número de telefone de contacto."); return; }
+    if (!formLojista.morada.trim()) { setFormLojistaMsg("Indica a tua morada para levantamento das peças."); return; }
     if (!formLojista.iban.trim()) { setFormLojistaMsg("Indica o teu IBAN ou NIB para receberes pagamentos."); return; }
-    if (!formLojista.aceita_termos) { setFormLojistaMsg("Tens de aceitar os termos para continuar."); return; }
+    if (!formLojista.aceita_termos) { setFormLojistaMsg("Tens de aceitar os termos e condições para continuar."); return; }
+    if (!formLojista.aceita_responsabilidades) { setFormLojistaMsg("Tens de confirmar que compreendes as responsabilidades do lojista."); return; }
     setFormLojistaLoading(true);
     setFormLojistaMsg("");
     const { data: { user } } = await supabase.auth.getUser();
@@ -1172,6 +1176,10 @@ export default function Perfil() {
       descricao: formLojista.descricao.trim(),
       iban: formLojista.iban.trim().toUpperCase(),
       tipo_pagamento: formLojista.tipo_pagamento,
+      nif: formLojista.nif.trim(),
+      telefone_loja: formLojista.telefone_loja.trim(),
+      morada: formLojista.morada.trim(),
+      tipo_pecas: formLojista.tipo_pecas.trim(),
       submetida_em: new Date().toISOString(),
     };
     const { error } = await supabase.from("clientes").update({
@@ -1914,32 +1922,56 @@ export default function Perfil() {
                   <button onClick={() => setShowFormLojista(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"var(--g4)",lineHeight:1}}>✕</button>
                 </div>
 
-                {/* Dados da loja */}
-                <div style={{marginBottom:"1.25rem"}}>
-                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Sobre a tua loja</div>
+                {/* 1. Sobre a loja */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>1 · Sobre a tua loja</div>
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da loja *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => setFormLojista(f => ({...f, nome_loja: e.target.value}))} placeholder="ex: Atelier da Maria" />
                   </div>
+                  <div style={{marginBottom:"0.75rem"}}>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Que tipo de peças tens para alugar? *</label>
+                    <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.tipo_pecas} onChange={e => setFormLojista(f => ({...f, tipo_pecas: e.target.value}))} placeholder="ex: Vestidos de noite, casacos de inverno, acessórios..." />
+                  </div>
                   <div>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Descrição breve (opcional)</label>
-                    <textarea style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box",resize:"vertical",minHeight:"80px"}} value={formLojista.descricao} onChange={e => setFormLojista(f => ({...f, descricao: e.target.value}))} placeholder="Que tipo de peças tens para alugar? Qual é o teu estilo?" />
+                    <textarea style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box",resize:"vertical",minHeight:"72px"}} value={formLojista.descricao} onChange={e => setFormLojista(f => ({...f, descricao: e.target.value}))} placeholder="O que torna a tua loja especial? Qual é o teu estilo?" />
                   </div>
                 </div>
 
-                {/* Dados bancários */}
-                <div style={{marginBottom:"1.25rem"}}>
-                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Dados para receber pagamentos</div>
+                {/* 2. Dados pessoais */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>2 · Identificação e contacto</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.75rem",marginBottom:"0.75rem"}}>
+                    <div>
+                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>NIF *</label>
+                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nif} onChange={e => setFormLojista(f => ({...f, nif: e.target.value}))} placeholder="123 456 789" inputMode="numeric" maxLength={11} />
+                    </div>
+                    <div>
+                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Telefone *</label>
+                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.telefone_loja} onChange={e => setFormLojista(f => ({...f, telefone_loja: e.target.value}))} placeholder="+351 912 345 678" inputMode="tel" />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Morada de levantamento das peças *</label>
+                    <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.morada} onChange={e => setFormLojista(f => ({...f, morada: e.target.value}))} placeholder="Rua, número, código postal, cidade" />
+                    <p style={{fontSize:"0.72rem",color:"var(--g4)",marginTop:"0.3rem",lineHeight:1.5}}>Endereço onde a Nora Grei recolhe as peças após cada aluguer.</p>
+                  </div>
+                </div>
+
+                {/* 3. Dados bancários */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>3 · Dados para receber pagamentos</div>
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>IBAN / NIB *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",outline:"none",boxSizing:"border-box",letterSpacing:"0.05em"}} value={formLojista.iban} onChange={e => setFormLojista(f => ({...f, iban: e.target.value}))} placeholder="PT50 0002 0000 0000 0000 0000 0" />
-                    <p style={{fontSize:"0.72rem",color:"var(--g4)",marginTop:"0.3rem",lineHeight:1.5}}>Usado para transferir os teus ganhos (90% de cada aluguer).</p>
+                    <p style={{fontSize:"0.72rem",color:"var(--g4)",marginTop:"0.3rem",lineHeight:1.5}}>Recebes 90% do valor de cada aluguer, após dedução de 9€ de higienização por peça.</p>
                   </div>
                   <div>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Preferência de pagamento *</label>
                     <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap"}}>
                       {[["transferencia","Transferência bancária"],["mbway","MB Way"],["cheque","Cheque"]].map(([val,label]) => (
-                        <button key={val} onClick={() => setFormLojista(f => ({...f, tipo_pagamento: val}))} style={{padding:"0.5rem 1rem",fontSize:"0.68rem",letterSpacing:"0.08em",border:"1.5px solid",borderColor:formLojista.tipo_pagamento===val?"var(--black)":"#e2dfda",background:formLojista.tipo_pagamento===val?"var(--black)":"#fff",color:formLojista.tipo_pagamento===val?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",transition:"all 0.15s"}}>
+                        <button key={val} type="button" onClick={() => setFormLojista(f => ({...f, tipo_pagamento: val}))} style={{padding:"0.5rem 1rem",fontSize:"0.68rem",letterSpacing:"0.08em",border:"1.5px solid",borderColor:formLojista.tipo_pagamento===val?"var(--black)":"#e2dfda",background:formLojista.tipo_pagamento===val?"var(--black)":"#fff",color:formLojista.tipo_pagamento===val?"#fff":"var(--g6)",cursor:"pointer",fontFamily:"var(--sans)",transition:"all 0.15s"}}>
                           {label}
                         </button>
                       ))}
@@ -1947,12 +1979,21 @@ export default function Perfil() {
                   </div>
                 </div>
 
-                {/* Termos */}
-                <div style={{marginBottom:"1.5rem",padding:"1rem",background:"#fff",border:"1px solid #e8e3dc"}}>
-                  <label style={{display:"flex",gap:"0.75rem",alignItems:"flex-start",cursor:"pointer"}}>
-                    <input type="checkbox" checked={formLojista.aceita_termos} onChange={e => setFormLojista(f => ({...f, aceita_termos: e.target.checked}))} style={{marginTop:"0.2rem",accentColor:"var(--black)",width:"16px",height:"16px",flexShrink:0}} />
+                {/* 4. Confirmações */}
+                <div style={{marginBottom:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.25rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>4 · Confirmações obrigatórias</div>
+
+                  <label style={{display:"flex",gap:"0.75rem",alignItems:"flex-start",cursor:"pointer",padding:"0.9rem",background:"#fff",border:"1px solid #e8e3dc"}}>
+                    <input type="checkbox" checked={formLojista.aceita_termos} onChange={e => setFormLojista(f => ({...f, aceita_termos: e.target.checked}))} style={{marginTop:"0.15rem",accentColor:"var(--black)",width:"16px",height:"16px",flexShrink:0}} />
                     <span style={{fontSize:"0.78rem",color:"var(--g6)",lineHeight:1.6}}>
-                      Aceito os <a href="/termos-lojista" target="_blank" style={{color:"var(--black)",fontWeight:500}}>termos e condições para lojistas</a>. Entendo que recebo 90% do valor de cada aluguer, após higienização (9€ por peça). O período de teste é de 180 dias gratuitos.
+                      Li e aceito os <a href="/termos-lojista" target="_blank" style={{color:"var(--black)",fontWeight:600,textDecoration:"underline"}}>Termos e Condições para Lojistas</a> da Nora Grei. O período de teste é de 180 dias gratuitos.
+                    </span>
+                  </label>
+
+                  <label style={{display:"flex",gap:"0.75rem",alignItems:"flex-start",cursor:"pointer",padding:"0.9rem",background:"#fff",border:"1px solid #e8e3dc"}}>
+                    <input type="checkbox" checked={formLojista.aceita_responsabilidades} onChange={e => setFormLojista(f => ({...f, aceita_responsabilidades: e.target.checked}))} style={{marginTop:"0.15rem",accentColor:"var(--black)",width:"16px",height:"16px",flexShrink:0}} />
+                    <span style={{fontSize:"0.78rem",color:"var(--g6)",lineHeight:1.6}}>
+                      Compreendo que sou responsável pelo estado das peças que coloco à venda. Em caso de dano causado pelo cliente, a Nora Grei medeia mas não garante compensação total. Comprometo-me a entregar as peças em bom estado e dentro dos prazos acordados.
                     </span>
                   </label>
                 </div>
