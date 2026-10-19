@@ -319,7 +319,7 @@ export default function Catalogo() {
           transition:color 0.12s, border-color 0.12s;
         }
         .cat-chip:first-child { padding-left:1rem; }
-        .cat-chip.active { color:var(--black); font-weight:600; border-bottom-color:var(--black); }
+        .cat-chip.active { color:#c4748a; font-weight:600; border-bottom-color:#c4748a; }
 
         /* Linha 2: ocasião em scroll + ordenar à direita */
         .filtros-sec {
@@ -340,7 +340,7 @@ export default function Catalogo() {
           padding:0.3rem 0.7rem; white-space:nowrap; border-radius:20px;
           transition:all 0.12s;
         }
-        .ocas-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+        .ocas-chip.active { background:#c4748a; color:#fff; border-color:#c4748a; }
 
         /* Select ordenar compacto */
         .sort-select {
@@ -366,7 +366,7 @@ export default function Catalogo() {
           padding:0.25rem 0.65rem; white-space:nowrap; border-radius:20px;
           transition:all 0.12s;
         }
-        .fonte-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+        .fonte-chip.active { background:#c4748a; color:#fff; border-color:#c4748a; }
 
         /* ── PAINEL FILTROS AVANÇADOS (tamanho / cor / condição) ── */
         .filtros-avancados-toggle {
@@ -380,7 +380,7 @@ export default function Catalogo() {
         }
         .filtros-avancados-toggle.has-active { color:var(--black); }
         .filtros-badge {
-          background:var(--black); color:var(--white);
+          background:#c4748a; color:#fff;
           font-size:0.62rem; font-weight:600;
           width:16px; height:16px; border-radius:50%;
           display:inline-flex; align-items:center; justify-content:center;
@@ -413,7 +413,7 @@ export default function Catalogo() {
           padding:0.28rem 0.65rem; white-space:nowrap; border-radius:20px;
           transition:all 0.12s;
         }
-        .filtro-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+        .filtro-chip.active { background:#c4748a; color:#fff; border-color:#c4748a; }
         .filtros-panel-footer {
           display:flex; justify-content:flex-end; padding-top:0.4rem;
           border-top:1px solid var(--grey-200);
