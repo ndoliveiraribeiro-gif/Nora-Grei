@@ -1219,13 +1219,22 @@ export default function Perfil() {
       if (fotosLojista.length > 0) {
         const urls = [];
         for (const foto of fotosLojista) {
-          const ext = foto.name.split(".").pop();
-          const path = `${peca.id}/${Date.now()}.${ext}`;
+          const ext = foto.name.split(".").pop().toLowerCase();
+          const path = `lojista/${peca.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
           setUploadProgressLoja(`A fazer upload de ${foto.name}...`);
-          const { error: upErr } = await supabase.storage.from("pecas_lojista").upload(path, foto, { upsert: true });
-          if (!upErr) { const { data } = supabase.storage.from("pecas_lojista").getPublicUrl(path); urls.push(data.publicUrl); }
+          const { error: upErr } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true });
+          if (upErr) {
+            console.error("Upload error:", upErr);
+            setUploadProgressLoja(`❌ Erro no upload: ${upErr.message}`);
+          } else {
+            const { data: urlData } = supabase.storage.from("pecas").getPublicUrl(path);
+            urls.push(urlData.publicUrl);
+          }
         }
-        if (urls.length > 0) { await supabase.from("pecas_lojista").update({ fotos: urls }).eq("id", peca.id); }
+        if (urls.length > 0) {
+          const { error: fotoErr } = await supabase.from("pecas_lojista").update({ fotos: urls }).eq("id", peca.id);
+          if (fotoErr) console.error("Fotos update error:", fotoErr);
+        }
       }
       setUploadProgressLoja("✓ Peça adicionada!");
       const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(*)").eq("cliente_id", session.user.id).order("created_at", { ascending: false });
@@ -2529,8 +2538,26 @@ export default function Perfil() {
             {/* Fotos */}
             <div className="fg" style={{marginBottom:"1rem"}}>
               <label className="lbl">{lang==="fr"?"Photos":lang==="lt"?"Nuotraukos":"Fotos"}</label>
-              <input type="file" accept="image/*" multiple onChange={e=>setFotosLojista(Array.from(e.target.files))} style={{padding:"0.5rem",border:"1.5px solid var(--g2)",width:"100%",fontFamily:"var(--sans)",fontSize:"0.82rem"}} />
-              {fotosLojista.length > 0 && <div style={{display:"flex",gap:"0.5rem",marginTop:"0.5rem",flexWrap:"wrap"}}>{fotosLojista.map((f,idx2)=><span key={idx2} style={{fontSize:"0.7rem",color:"var(--g4)",background:"var(--g1)",padding:"0.2rem 0.5rem"}}>{f.name}</span>)}</div>}
+              <label style={{display:"block",cursor:"pointer"}}>
+                <input type="file" accept="image/*" multiple onChange={e=>setFotosLojista(Array.from(e.target.files))} style={{display:"none"}} />
+                <div style={{border:"1.5px dashed var(--g2)",borderRadius:4,padding:"1.25rem 1rem",textAlign:"center",background:"var(--g1)",transition:"border-color 0.2s"}}>
+                  <div style={{fontSize:"1.6rem",marginBottom:"0.3rem"}}>📷</div>
+                  <div style={{fontFamily:"var(--sans)",fontSize:"0.82rem",color:"var(--g4)"}}>
+                    {lang==="fr"?"Clique pour ajouter des photos":lang==="lt"?"Spustelėkite norėdami pridėti nuotraukas":"Clica para adicionar fotos"}
+                  </div>
+                  <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g3)",marginTop:"0.2rem"}}>JPG, PNG · várias fotos</div>
+                </div>
+              </label>
+              {fotosLojista.length > 0 && (
+                <div style={{display:"flex",gap:"0.5rem",marginTop:"0.75rem",flexWrap:"wrap"}}>
+                  {fotosLojista.map((f,idx2)=>(
+                    <div key={idx2} style={{position:"relative"}}>
+                      <img src={URL.createObjectURL(f)} alt="" style={{width:72,height:90,objectFit:"cover",border:"1.5px solid var(--g2)"}} />
+                      <button type="button" onClick={()=>setFotosLojista(prev=>prev.filter((_,i)=>i!==idx2))} style={{position:"absolute",top:2,right:2,width:18,height:18,background:"rgba(0,0,0,0.6)",border:"none",borderRadius:"50%",color:"#fff",fontSize:"0.6rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Categoria */}
