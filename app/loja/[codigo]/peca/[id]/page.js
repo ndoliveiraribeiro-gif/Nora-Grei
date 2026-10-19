@@ -334,11 +334,17 @@ export default function PecaLojaPage() {
   const contactarLojista = async () => {
     if (!userLogado) { window.location.href = "/entrar"; return; }
     if (!lojista?.id) return;
-    if (lojista.id === userLogado.id) return;
     setContactando(true);
     try {
-      const { data: existente } = await supabase.from("conversas").select("id").eq("cliente_id", userLogado.id).eq("lojista_id", lojista.id).maybeSingle();
-      if (!existente) await supabase.from("conversas").insert({ cliente_id: userLogado.id, lojista_id: lojista.id, assunto: peca?.nome });
+      let destinoId = lojista.id;
+      // Se é o próprio lojista, contactar a Nora Grei (admin)
+      if (lojista.id === userLogado.id) {
+        const { data: admin } = await supabase.from("clientes").select("id").eq("is_admin", true).limit(1).single();
+        if (!admin || admin.id === userLogado.id) { setContactando(false); return; }
+        destinoId = admin.id;
+      }
+      const { data: existente } = await supabase.from("conversas").select("id").eq("cliente_id", userLogado.id).eq("lojista_id", destinoId).maybeSingle();
+      if (!existente) await supabase.from("conversas").insert({ cliente_id: userLogado.id, lojista_id: destinoId, assunto: peca?.nome });
       window.location.href = "/mensagens";
     } catch { setContactando(false); }
   };
