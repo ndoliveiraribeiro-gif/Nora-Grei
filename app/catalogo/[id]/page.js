@@ -333,48 +333,48 @@ export default function PecaDetalhe() {
         .thumb.active{opacity:1;border-color:var(--black)}
         .thumb img{width:100%;height:100%;object-fit:cover}
         .info{padding:3rem;overflow-y:auto}
-        .badge-cat{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:#aaa89f;margin-bottom:0.5rem}
+        .badge-cat{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:#aaa89f;margin-bottom:0.5rem}
         .nome{font-family:var(--sans);font-size:clamp(1.6rem,3vw,2.5rem);font-weight:600;line-height:1.1;margin-bottom:1rem}
         .preco-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.75rem}
         .preco-val{font-family:var(--sans);font-size:2rem;font-weight:600}
-        .preco-unit{font-size:0.72rem;color:#aaa89f;letter-spacing:0.1em}
-        .badge-estado{display:inline-block;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.75rem;margin-bottom:1.25rem}
+        .preco-unit{font-size:0.85rem;color:#aaa89f;letter-spacing:0.08em}
+        .badge-estado{display:inline-block;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.35rem 0.85rem;margin-bottom:1.25rem}
         .secao{margin-bottom:1.75rem}
-        .secao-label{font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:#5a5855;margin-bottom:0.75rem}
+        .secao-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;margin-bottom:0.75rem;font-weight:500}
         .tamanhos-grid{display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-start}
-        .tam-wrap{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
-        .tam-btn{padding:0.5rem 1rem;font-size:0.72rem;letter-spacing:0.1em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s}
+        .tam-wrap{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+        .tam-btn{padding:0.6rem 1.1rem;font-size:0.85rem;letter-spacing:0.06em;font-family:var(--sans);border:1.5px solid var(--g2);background:var(--white);cursor:pointer;transition:all 0.2s;min-height:44px}
         .tam-btn:hover{border-color:var(--black)}
         .tam-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
         .tam-btn.sem-stock{opacity:0.4;cursor:not-allowed;text-decoration:line-through}
-        .tam-data{font-size:0.54rem;color:var(--rosa);letter-spacing:0.08em;text-transform:uppercase}
-        .tam-reservar{font-size:0.54rem;color:#5a5855;letter-spacing:0.08em;text-transform:uppercase;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans);padding:0}
+        .tam-data{font-size:0.68rem;color:var(--rosa);letter-spacing:0.06em;text-transform:uppercase}
+        .tam-reservar{font-size:0.68rem;color:#5a5855;letter-spacing:0.06em;text-transform:uppercase;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans);padding:0}
         .tam-reservar:hover{color:var(--black)}
         .ocasioes-wrap{display:flex;gap:0.4rem;flex-wrap:wrap}
-        .ocasiao-tag{font-size:0.62rem;letter-spacing:0.1em;padding:0.3rem 0.65rem;background:var(--g1);color:#5a5855;border:1px solid var(--g2)}
+        .ocasiao-tag{font-size:0.78rem;letter-spacing:0.06em;padding:0.4rem 0.8rem;background:var(--g1);color:#5a5855;border:1px solid var(--g2)}
         .sep{border:none;border-top:1px solid var(--g2);margin:1.5rem 0}
-        .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--g1);font-size:0.85rem}
-        .info-key{color:#5a5855;font-size:0.72rem;letter-spacing:0.1em}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--g1);font-size:0.92rem}
+        .info-key{color:#5a5855;font-size:0.78rem;letter-spacing:0.08em}
         .deposito-box{background:var(--g1);padding:1rem 1.25rem;margin-bottom:1.5rem;border-left:3px solid var(--g2)}
         .deposito-val{font-family:var(--sans);font-size:1.5rem;font-weight:500}
-        .deposito-desc{font-size:0.72rem;color:#5a5855;margin-top:0.2rem}
-        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
+        .deposito-desc{font-size:0.82rem;color:#5a5855;margin-top:0.2rem}
+        .btn-alugar{width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-size:0.82rem;letter-spacing:0.16em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:background 0.2s}
         .btn-alugar:hover{background:#2a2926}
         .btn-alugar:disabled{background:#ccc;cursor:not-allowed}
-        .btn-cesto{width:100%;padding:0.85rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem}
+        .btn-cesto{width:100%;padding:0.9rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem}
         .btn-cesto:hover{background:var(--g1)}
         .btn-cesto:disabled{opacity:0.4;cursor:not-allowed}
-        .btn-reservar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--g2);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:border-color 0.2s;text-decoration:none;display:block;text-align:center;margin-bottom:0.75rem}
+        .btn-reservar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--g2);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:border-color 0.2s;text-decoration:none;display:block;text-align:center;margin-bottom:0.75rem}
         .btn-reservar:hover{border-color:var(--black)}
-        .btn-comprar{width:100%;padding:1rem;background:var(--rosa);color:var(--white);border:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:block;text-align:center;transition:background 0.2s}
+        .btn-comprar{width:100%;padding:1rem;background:var(--rosa);color:var(--white);border:none;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:block;text-align:center;transition:background 0.2s}
         .btn-comprar:hover{background:#a85c72}
-        .btn-contactar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;margin-top:0.75rem}
+        .btn-contactar{width:100%;padding:1rem;background:var(--white);color:var(--black);border:1.5px solid var(--black);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;margin-top:0.75rem}
         .btn-contactar:hover{background:var(--black);color:var(--white)}
         .btn-contactar:disabled{opacity:0.5;cursor:not-allowed}
-        .descricao{font-size:0.92rem;line-height:1.7;color:#3a3835}
+        .descricao{font-size:1rem;line-height:1.75;color:#3a3835}
         .partilha{display:flex;gap:0.5rem;align-items:center;margin-top:1.5rem}
-        .partilha-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a5855;margin-right:0.25rem}
-        .partilha-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--g2);background:var(--white);cursor:pointer;font-size:1rem;transition:all 0.2s;text-decoration:none;color:var(--black)}
+        .partilha-label{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#5a5855;margin-right:0.25rem}
+        .partilha-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--g2);background:var(--white);cursor:pointer;font-size:1rem;transition:all 0.2s;text-decoration:none;color:var(--black)}
         .partilha-btn:hover{border-color:var(--black);background:var(--g1)}
         /* Sticky CTA bar para mobile */
         .sticky-cta{display:none}
@@ -412,10 +412,10 @@ export default function PecaDetalhe() {
           .sticky-preco-val{font-family:var(--sans);font-size:1.4rem;font-weight:600;line-height:1;color:#080808}
           .sticky-preco-unit{font-family:'Jost',sans-serif;font-size:0.55rem;color:#b0ada6;letter-spacing:0.08em}
           .sticky-btn-alugar{
-            flex:2;min-height:46px;
+            flex:2;min-height:52px;
             background:#080808;color:#f8f7f5;
             border:none;
-            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;
             text-decoration:none;
@@ -423,17 +423,17 @@ export default function PecaDetalhe() {
           }
           .sticky-btn-alugar:disabled{background:#c5c2be;cursor:not-allowed}
           .sticky-btn-cesto{
-            width:46px;min-height:46px;flex-shrink:0;
+            width:52px;min-height:52px;flex-shrink:0;
             background:var(--white);border:1.5px solid var(--black);
-            font-size:1.1rem;cursor:pointer;
+            font-size:1.2rem;cursor:pointer;
             display:flex;align-items:center;justify-content:center;
           }
           .sticky-btn-cesto:disabled{opacity:0.4;cursor:not-allowed}
           .sticky-btn-comprar{
-            flex:1;min-height:46px;
+            flex:1;min-height:52px;
             background:#c4748a;color:#fff;
             border:none;
-            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;
             text-decoration:none;
@@ -441,10 +441,10 @@ export default function PecaDetalhe() {
             white-space:nowrap;
           }
           .sticky-btn-contactar{
-            flex:1;min-height:46px;
+            flex:1;min-height:52px;
             background:var(--white);color:var(--black);
             border:1.5px solid var(--black);
-            font-family:'Jost',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
+            font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;
             cursor:pointer;
             display:flex;align-items:center;justify-content:center;gap:0.35rem;
             padding:0 0.6rem;
