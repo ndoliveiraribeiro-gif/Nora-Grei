@@ -86,6 +86,16 @@ const OCASIOES = {
   ],
 };
 
+const TAMANHOS = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","48","Único"];
+const CORES = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
+const CONDICOES = [
+  { key: "novo",       pt: "Novo",       fr: "Neuf",         lt: "Naujas" },
+  { key: "como_novo",  pt: "Como novo",  fr: "Comme neuf",   lt: "Kaip naujas" },
+  { key: "muito_bom",  pt: "Muito bom",  fr: "Très bon",     lt: "Labai geras" },
+  { key: "bom",        pt: "Bom",        fr: "Bon",          lt: "Geras" },
+  { key: "usado",      pt: "Usado",      fr: "Usé",          lt: "Naudotas" },
+];
+
 const translations = {
   pt: {
     titulo: "Catálogo", subtitulo: "Roupa e acessórios para cada momento.", todas: "Todas", todasOcasiao: "Todas as ocasiões",
@@ -94,6 +104,9 @@ const translations = {
     ordenar: "Ordenar", precoAsc: "Preço: menor primeiro", precoDesc: "Preço: maior primeiro", recentes: "Mais recentes",
     ocasiao: "Ocasião",
     fonte: "Fonte", todasFontes: "Todas", noraGrei: "Nora Grei", lojistas: "Lojistas",
+    filtros: "Filtros", limpar: "Limpar",
+    tamanho: "Tamanho", cor: "Cor", condicao: "Condição",
+    todosTamanhos: "Todos", todasCores: "Todas", todasCondicoes: "Todas",
   },
   fr: {
     titulo: "Catalogue", subtitulo: "Vêtements et accessoires pour chaque moment.", todas: "Tout", todasOcasiao: "Toutes",
@@ -102,6 +115,9 @@ const translations = {
     ordenar: "Trier", precoAsc: "Prix: croissant", precoDesc: "Prix: décroissant", recentes: "Plus récents",
     ocasiao: "Occasion",
     fonte: "Source", todasFontes: "Tout", noraGrei: "Nora Grei", lojistas: "Boutiques",
+    filtros: "Filtres", limpar: "Effacer",
+    tamanho: "Taille", cor: "Couleur", condicao: "État",
+    todosTamanhos: "Toutes", todasCores: "Toutes", todasCondicoes: "Tous",
   },
   lt: {
     titulo: "Katalogas", subtitulo: "Drabužiai ir aksesuarai kiekvienai progai.", todas: "Visi", todasOcasiao: "Visos",
@@ -110,6 +126,9 @@ const translations = {
     ordenar: "Rūšiuoti", precoAsc: "Kaina: mažiausia pirma", precoDesc: "Kaina: didžiausia pirma", recentes: "Naujausi",
     ocasiao: "Proga",
     fonte: "Šaltinis", todasFontes: "Visi", noraGrei: "Nora Grei", lojistas: "Parduotuvės",
+    filtros: "Filtrai", limpar: "Išvalyti",
+    tamanho: "Dydis", cor: "Spalva", condicao: "Būklė",
+    todosTamanhos: "Visi", todasCores: "Visos", todasCondicoes: "Visos",
   },
 };
 
@@ -124,6 +143,10 @@ export default function Catalogo() {
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
   const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
   const [filtroFonte, setFiltroFonte] = useState("todas");
+  const [filtroTamanho, setFiltroTamanho] = useState("todos");
+  const [filtroCor, setFiltroCor] = useState("todas");
+  const [filtroCondicao, setFiltroCondicao] = useState("todas");
+  const [filtrosPanelOpen, setFiltrosPanelOpen] = useState(false);
   const [ordenar, setOrdenar] = useState("recentes");
   const [lang, setLang] = useState("pt");
   const [cestoCont, setCestoCont] = useState(0);
@@ -146,7 +169,7 @@ export default function Catalogo() {
       // Peças Nora Grei
       const { data: ngData } = await supabase
         .from("pecas")
-        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total)")
+        .select("*, categorias(nome), stock_tamanhos(id, tamanho, quantidade_disponivel, quantidade_total), cor, condicao")
         .order("created_at", { ascending: false });
 
       const { data: alugueresAtivos } = await supabase
@@ -238,10 +261,15 @@ export default function Catalogo() {
     return idx >= 0 ? CATEGORIAS_BD[idx] : catTraduzida;
   };
 
+  const filtrosAtivos = [filtroTamanho !== "todos", filtroCor !== "todas", filtroCondicao !== "todas"].filter(Boolean).length;
+
   const pecasFiltradas = pecas
     .filter(p => filtroFonte === "todas" || (filtroFonte === "ng" ? p._origem === "ng" : p._origem === "lojista"))
     .filter(p => filtroCategoria === "todas" || p.categoria === categoriaTraduzidaParaBD(filtroCategoria))
     .filter(p => filtroOcasiao === "todas" || (p.ocasiao && p.ocasiao.includes(filtroOcasiao)))
+    .filter(p => filtroTamanho === "todos" || (p.tamanhos && p.tamanhos.includes(filtroTamanho)))
+    .filter(p => filtroCor === "todas" || (p.cor && p.cor.toLowerCase() === filtroCor.toLowerCase()))
+    .filter(p => filtroCondicao === "todas" || p.condicao === filtroCondicao)
     .sort((a, b) => {
       if (ordenar === "precoAsc") return (a.preco_aluguer_dia||0) - (b.preco_aluguer_dia||0);
       if (ordenar === "precoDesc") return (b.preco_aluguer_dia||0) - (a.preco_aluguer_dia||0);
@@ -340,6 +368,72 @@ export default function Catalogo() {
         }
         .fonte-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
 
+        /* ── PAINEL FILTROS AVANÇADOS (tamanho / cor / condição) ── */
+        .filtros-avancados-toggle {
+          display:flex; align-items:center; gap:0.35rem;
+          border:none; background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.75rem; font-weight:500;
+          letter-spacing:0.06em; text-transform:uppercase; color:#5a5855;
+          padding:0.4rem 1rem; flex-shrink:0; border-left:1px solid var(--grey-200);
+          transition:color 0.12s;
+          height:100%;
+        }
+        .filtros-avancados-toggle.has-active { color:var(--black); }
+        .filtros-badge {
+          background:var(--black); color:var(--white);
+          font-size:0.62rem; font-weight:600;
+          width:16px; height:16px; border-radius:50%;
+          display:inline-flex; align-items:center; justify-content:center;
+          line-height:1;
+        }
+        .filtros-panel {
+          border-top:1px solid var(--grey-200);
+          background:rgba(248,247,245,0.99);
+          overflow:hidden;
+          max-height:0;
+          transition:max-height 0.25s ease;
+        }
+        .filtros-panel.open { max-height:420px; }
+        .filtros-panel-inner {
+          padding:0.85rem 1rem 1rem;
+          display:flex; flex-direction:column; gap:0.9rem;
+        }
+        .filtro-grupo-label {
+          font-family:var(--sans); font-size:0.68rem; font-weight:600;
+          letter-spacing:0.12em; text-transform:uppercase; color:#8a8783;
+          margin-bottom:0.45rem;
+        }
+        .filtro-chips-row {
+          display:flex; flex-wrap:wrap; gap:0.35rem;
+        }
+        .filtro-chip {
+          border:1px solid var(--grey-200); background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.75rem; font-weight:400;
+          letter-spacing:0.03em; color:#5a5855;
+          padding:0.28rem 0.65rem; white-space:nowrap; border-radius:20px;
+          transition:all 0.12s;
+        }
+        .filtro-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+        .filtros-panel-footer {
+          display:flex; justify-content:flex-end; padding-top:0.4rem;
+          border-top:1px solid var(--grey-200);
+        }
+        .btn-limpar {
+          border:none; background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.75rem; font-weight:500;
+          letter-spacing:0.06em; text-transform:uppercase; color:#8a8783;
+          padding:0.3rem 0.2rem;
+          transition:color 0.12s;
+        }
+        .btn-limpar:hover { color:var(--black); }
+        @media (min-width:600px) {
+          .filtros-panel-inner { padding:0.85rem 2rem 1rem; flex-direction:row; flex-wrap:wrap; gap:1.25rem; }
+          .filtros-panel-inner > div { flex:1; min-width:160px; }
+        }
+        @media (min-width:960px) {
+          .filtros-panel-inner { padding:0.85rem 3rem 1rem; }
+        }
+
         /* ── GRID ── */
         .cat-grid {
           padding:0.75rem 0.5rem 5rem;
@@ -418,7 +512,7 @@ export default function Catalogo() {
           ))}
         </div>
 
-        {/* Ocasião + Ordenar */}
+        {/* Ocasião + Filtros + Ordenar */}
         <div className="filtros-sec">
           <div className="ocas-scroll">
             <button className={`ocas-chip${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
@@ -426,11 +520,64 @@ export default function Catalogo() {
               <button key={o.key} className={`ocas-chip${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
             ))}
           </div>
+          {/* Botão Filtros avançados */}
+          <button
+            className={`filtros-avancados-toggle${filtrosAtivos > 0 ? " has-active" : ""}`}
+            onClick={() => setFiltrosPanelOpen(v => !v)}
+            aria-expanded={filtrosPanelOpen}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            {filtrosAtivos > 0 && <span className="filtros-badge">{filtrosAtivos}</span>}
+          </button>
           <select className="sort-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
             <option value="recentes">{t.recentes}</option>
             <option value="precoAsc">↑ {t.precoAsc.split(":")[0]}</option>
             <option value="precoDesc">↓ {t.precoDesc.split(":")[0]}</option>
           </select>
+        </div>
+
+        {/* Painel filtros avançados */}
+        <div className={`filtros-panel${filtrosPanelOpen ? " open" : ""}`}>
+          <div className="filtros-panel-inner">
+            {/* Tamanho */}
+            <div>
+              <div className="filtro-grupo-label">{t.tamanho}</div>
+              <div className="filtro-chips-row">
+                <button className={`filtro-chip${filtroTamanho === "todos" ? " active" : ""}`} onClick={() => setFiltroTamanho("todos")}>{t.todosTamanhos}</button>
+                {TAMANHOS.map(tam => (
+                  <button key={tam} className={`filtro-chip${filtroTamanho === tam ? " active" : ""}`} onClick={() => setFiltroTamanho(filtroTamanho === tam ? "todos" : tam)}>{tam}</button>
+                ))}
+              </div>
+            </div>
+            {/* Cor */}
+            <div>
+              <div className="filtro-grupo-label">{t.cor}</div>
+              <div className="filtro-chips-row">
+                <button className={`filtro-chip${filtroCor === "todas" ? " active" : ""}`} onClick={() => setFiltroCor("todas")}>{t.todasCores}</button>
+                {CORES.map(cor => (
+                  <button key={cor} className={`filtro-chip${filtroCor === cor ? " active" : ""}`} onClick={() => setFiltroCor(filtroCor === cor ? "todas" : cor)}>{cor}</button>
+                ))}
+              </div>
+            </div>
+            {/* Condição */}
+            <div>
+              <div className="filtro-grupo-label">{t.condicao}</div>
+              <div className="filtro-chips-row">
+                <button className={`filtro-chip${filtroCondicao === "todas" ? " active" : ""}`} onClick={() => setFiltroCondicao("todas")}>{t.todasCondicoes}</button>
+                {CONDICOES.map(c => (
+                  <button key={c.key} className={`filtro-chip${filtroCondicao === c.key ? " active" : ""}`} onClick={() => setFiltroCondicao(filtroCondicao === c.key ? "todas" : c.key)}>{c[lang] || c.pt}</button>
+                ))}
+              </div>
+            </div>
+            {/* Limpar filtros */}
+            {filtrosAtivos > 0 && (
+              <div className="filtros-panel-footer">
+                <button className="btn-limpar" onClick={() => { setFiltroTamanho("todos"); setFiltroCor("todas"); setFiltroCondicao("todas"); }}>
+                  {t.limpar}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Fonte — só mostra se tiver lojistas */}
