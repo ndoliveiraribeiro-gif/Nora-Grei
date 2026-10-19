@@ -43,6 +43,10 @@ export default function LojaPublica() {
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("todos");
   const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
+  const [filtroCategoria, setFiltroCategoria] = useState("todas");
+  const [filtroTamanho, setFiltroTamanho] = useState("todos");
+  const [filtroCor, setFiltroCor] = useState("todas");
+  const [searchQuery, setSearchQuery] = useState("");
   const [mediaRating, setMediaRating] = useState(null);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
   const [user, setUser] = useState(null);
@@ -150,6 +154,13 @@ export default function LojaPublica() {
   const t = T[lang] || T.pt;
   const temNoraGrei = pecas.some(p => p.origem === "Nora Grei");
   const ocasioesDisponiveis = OCASIOES_LOJA[lang] || OCASIOES_LOJA.pt;
+
+  // Derivar listas únicas para filtros dinâmicos
+  const categoriasDisponiveis = [...new Set(pecas.map(p => p.categoria).filter(Boolean))].sort();
+  const tamanhosTodos = pecas.flatMap(p => (p.stock_lojista || []).map(s => s.tamanho).filter(Boolean));
+  const tamanhosDisponiveis = [...new Set(tamanhosTodos)].sort();
+  const coresDisponiveis = [...new Set(pecas.map(p => p.cor).filter(Boolean))].sort();
+
   const pecasFiltradas = pecas
     .filter(p => {
       if (filtro === "alugar") return !!p.preco_aluguer_dia;
@@ -158,7 +169,15 @@ export default function LojaPublica() {
       if (filtro === "usada") return p.origem !== "Nora Grei";
       return true;
     })
-    .filter(p => filtroOcasiao === "todas" || (Array.isArray(p.ocasioes) && p.ocasioes.includes(filtroOcasiao)));
+    .filter(p => filtroOcasiao === "todas" || (Array.isArray(p.ocasioes) && p.ocasioes.includes(filtroOcasiao)))
+    .filter(p => filtroCategoria === "todas" || p.categoria === filtroCategoria)
+    .filter(p => filtroTamanho === "todos" || (p.stock_lojista || []).some(s => s.tamanho === filtroTamanho))
+    .filter(p => filtroCor === "todas" || p.cor === filtroCor)
+    .filter(p => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (p.nome || "").toLowerCase().includes(q) || (p.categoria || "").toLowerCase().includes(q) || (p.cor || "").toLowerCase().includes(q);
+    });
 
   if (loading) return (
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Jost',sans-serif",fontSize:"0.8rem",letterSpacing:"0.2em",color:"#888",textTransform:"uppercase"}}>...</div>
@@ -207,11 +226,23 @@ export default function LojaPublica() {
         .filtro-btn{padding:0.9rem 1.2rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.18s;white-space:nowrap;flex-shrink:0}
         .filtro-btn:hover{color:var(--black)}
         .filtro-btn.on{color:var(--black);border-bottom-color:var(--rosa);font-weight:500}
-        .ocasioes-wrap{padding:0.75rem 1.5rem 0.9rem;display:flex;gap:0.4rem;overflow-x:auto;WebkitOverflowScrolling:touch;scrollbar-width:none}
+        .ocasioes-wrap{padding:0.75rem 1.5rem 0.9rem;display:flex;gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
         .ocasioes-wrap::-webkit-scrollbar{display:none}
         .pill{font-size:0.72rem;letter-spacing:0.05em;padding:0.32rem 0.8rem;border-radius:999px;border:1px solid var(--g2);background:transparent;color:var(--g4);cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;transition:all 0.15s}
         .pill:hover{border-color:var(--rosa);color:var(--rosa)}
         .pill.on{background:var(--rosa);border-color:var(--rosa);color:#fff}
+        .search-loja{display:flex;align-items:center;gap:0.6rem;padding:0.7rem 1.5rem;border-bottom:1px solid var(--g2);background:var(--white)}
+        .search-loja-icon{font-size:0.9rem;color:var(--g4);flex-shrink:0}
+        .search-loja-input{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:0.85rem;color:var(--black);outline:none;min-width:0}
+        .search-loja-input::placeholder{color:var(--g4)}
+        .search-loja-clear{background:none;border:none;cursor:pointer;font-size:0.85rem;color:var(--g4);padding:0;flex-shrink:0}
+        .filtros-extra{padding:0.5rem 1.5rem 0.6rem;display:flex;gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:1px solid var(--g2)}
+        .filtros-extra::-webkit-scrollbar{display:none}
+        .chip-select{font-size:0.7rem;letter-spacing:0.08em;padding:0.28rem 0.7rem;border-radius:0;border:1px solid var(--g2);background:transparent;color:var(--g4);cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;transition:all 0.15s;appearance:none;-webkit-appearance:none}
+        .chip-select:focus{outline:none;border-color:var(--black)}
+        .chip-select.ativo{border-color:var(--rosa);color:var(--rosa);background:rgba(196,116,138,0.06)}
+        .filtros-ativos{font-size:0.68rem;color:var(--g4);padding:0 1.5rem 0.5rem;letter-spacing:0.08em}
+        .filtros-ativos span{color:var(--rosa);cursor:pointer;margin-left:0.3rem}
 
         /* ── GRID ── */
         .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--g2)}
@@ -250,6 +281,7 @@ export default function LojaPublica() {
               <button key={l} onClick={() => { localStorage.setItem("ng_lang",l); setLang(l); }} style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:lang===l?"var(--black)":"var(--g4)",fontWeight:lang===l?500:300}}>{l.toUpperCase()}</button>
             ))}
           </div>
+          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",fontSize:"1.1rem",lineHeight:1}}>🔍</a>
           <a href="/catalogo" className="nav-back">{t.voltar}</a>
         </div>
       </nav>
@@ -285,6 +317,18 @@ export default function LojaPublica() {
 
       {/* Filtros principais */}
       <div className="filtros-wrap">
+        {/* Barra de pesquisa interna */}
+        <div className="search-loja">
+          <span className="search-loja-icon">🔍</span>
+          <input
+            className="search-loja-input"
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={lang==="fr" ? "Rechercher dans cette boutique..." : lang==="lt" ? "Ieškoti šioje parduotuvėje..." : "Pesquisar nesta loja..."}
+          />
+          {searchQuery && <button className="search-loja-clear" onClick={() => setSearchQuery("")}>✕</button>}
+        </div>
         <div className="filtros">
           {[
             {id:"todos",       label:{pt:"Todos",fr:"Tous",lt:"Visi"}},
@@ -303,6 +347,50 @@ export default function LojaPublica() {
             <button key={o.key} onClick={()=>setFiltroOcasiao(o.key)} className={`pill${filtroOcasiao===o.key?" on":""}`}>{o.label}</button>
           ))}
         </div>
+        {/* Filtros extra: categoria, tamanho, cor */}
+        {(categoriasDisponiveis.length > 0 || tamanhosDisponiveis.length > 0 || coresDisponiveis.length > 0) && (
+          <div className="filtros-extra">
+            {categoriasDisponiveis.length > 0 && (
+              <select
+                className={`chip-select${filtroCategoria !== "todas" ? " ativo" : ""}`}
+                value={filtroCategoria}
+                onChange={e => setFiltroCategoria(e.target.value)}
+              >
+                <option value="todas">{lang==="fr" ? "Catégorie" : lang==="lt" ? "Kategorija" : "Categoria"}</option>
+                {categoriasDisponiveis.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+            {tamanhosDisponiveis.length > 0 && (
+              <select
+                className={`chip-select${filtroTamanho !== "todos" ? " ativo" : ""}`}
+                value={filtroTamanho}
+                onChange={e => setFiltroTamanho(e.target.value)}
+              >
+                <option value="todos">{lang==="fr" ? "Taille" : lang==="lt" ? "Dydis" : "Tamanho"}</option>
+                {tamanhosDisponiveis.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            )}
+            {coresDisponiveis.length > 0 && (
+              <select
+                className={`chip-select${filtroCor !== "todas" ? " ativo" : ""}`}
+                value={filtroCor}
+                onChange={e => setFiltroCor(e.target.value)}
+              >
+                <option value="todas">{lang==="fr" ? "Couleur" : lang==="lt" ? "Spalva" : "Cor"}</option>
+                {coresDisponiveis.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+            {(filtroCategoria !== "todas" || filtroTamanho !== "todos" || filtroCor !== "todas") && (
+              <button
+                className="chip-select"
+                style={{color:"var(--rosa)",borderColor:"var(--rosa)",cursor:"pointer"}}
+                onClick={() => { setFiltroCategoria("todas"); setFiltroTamanho("todos"); setFiltroCor("todas"); }}
+              >
+                ✕ {lang==="fr" ? "Réinitialiser" : lang==="lt" ? "Atstatyti" : "Limpar"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {pecasFiltradas.length === 0 ? (

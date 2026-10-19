@@ -493,6 +493,9 @@ export default function Catalogo() {
       {/* ── NAV ── */}
       <nav className="cat-nav">
         <a href="/" className="cat-nav-logo">Nora Grei</a>
+        <a href="/pesquisa" className="cat-nav-icon" title="Pesquisar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </a>
         <a href="/perfil" className="cat-nav-icon" title="Perfil">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </a>

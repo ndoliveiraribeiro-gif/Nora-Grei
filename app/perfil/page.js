@@ -1388,9 +1388,10 @@ export default function Perfil() {
 
   const _nm = NIVEL_NOMES_PERFIL[lang] || NIVEL_NOMES_PERFIL.pt;
   const NIVEIS_TABELA = [
-    { sigla: "BRZ", nome: _nm.bronze, cor: "#a8632f", caucao: "100%" },
-    { sigla: "PRT", nome: _nm.prata,  cor: "#6b7280", caucao: "75%" },
-    { sigla: "OUR", nome: _nm.ouro,   cor: "#b8860b", caucao: "50%" },
+    { sigla: "BRZ", nome: _nm.bronze,  cor: "#a8632f", caucao: "100%" },
+    { sigla: "PRT", nome: _nm.prata,   cor: "#6b7280", caucao: "75%" },
+    { sigla: "OUR", nome: _nm.ouro,    cor: "#b8860b", caucao: "50%" },
+    { sigla: "PLT", nome: _nm.platina, cor: "#6c5ce7", caucao: "0%" },
   ];
 
   return (
@@ -1427,7 +1428,7 @@ export default function Perfil() {
         .nivel-barra{height:6px;background:var(--g2);border-radius:3px;overflow:hidden}
         .nivel-barra-fill{height:100%;border-radius:3px;transition:width 0.8s ease}
         .nivel-info{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--g6);margin-top:0.4rem}
-        .nivel-beneficios{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--g1)}
+        .nivel-beneficios{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--g1)}
         .beneficio{text-align:center;padding:1rem}
         .beneficio-sigla{font-family:var(--serif);font-size:1.1rem;font-weight:500;margin-bottom:0.3rem}
         .beneficio-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g6)}
@@ -1494,6 +1495,7 @@ export default function Perfil() {
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
         <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",fontSize:"1.1rem",lineHeight:1}}>🔍</a>
           <NotificationBell lang={lang} />
           {modoLojista && codigoLoja && (
             <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.72rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.3rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Loja</button>

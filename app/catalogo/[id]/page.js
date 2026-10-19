@@ -455,7 +455,10 @@ export default function PecaDetalhe() {
 
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
-        <a href="/catalogo" className="nav-back">{t.voltar}</a>
+        <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
+          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",fontSize:"1.1rem",lineHeight:1}}>🔍</a>
+          <a href="/catalogo" className="nav-back">{t.voltar}</a>
+        </div>
       </nav>
 
       <div className="layout">
