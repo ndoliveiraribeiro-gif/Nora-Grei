@@ -223,16 +223,8 @@ export default function PecaDetalhe() {
     setContactando(true);
     try {
       // Determinar o lojista: usa lojista_id da peça se existir, senão busca o admin (modo_lojista)
-      let lojistaId = peca?.lojista_id || null;
-      if (!lojistaId) {
-        const { data: lojista } = await supabase
-          .from("clientes")
-          .select("id")
-          .eq("modo_lojista", true)
-          .limit(1)
-          .single();
-        lojistaId = lojista?.id;
-      }
+      const NORA_GREI_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+      let lojistaId = peca?.lojista_id || NORA_GREI_ID;
       if (!lojistaId) { setContactando(false); return; }
 
       // Se é o próprio lojista, ir direto para mensagens
