@@ -73,12 +73,12 @@ export default function PecaCard({ peca, lang = "pt" }) {
 
       {/* IMAGEM — toca e vai direto ao detalhe */}
       <a href={`/catalogo/${peca.id}`} style={{textDecoration:'none',color:'inherit',display:'block',position:'relative'}}>
-        <div style={{aspectRatio:'3/4',background:'#e8e5e0',overflow:'hidden',position:'relative'}}>
+        <div style={{aspectRatio:'2/3',background:'#e8e5e0',overflow:'hidden',position:'relative'}}>
           {peca.fotos && peca.fotos[0] ? (
             <img
               src={peca.fotos[0]}
               alt={peca.nome}
-              style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top',display:'block'}}
+              style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center',display:'block'}}
             />
           ) : (
             <div style={{width:'100%',height:'100%',background:'linear-gradient(160deg,#e8e4e0,#d5d0c8)',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -147,50 +147,26 @@ export default function PecaCard({ peca, lang = "pt" }) {
         </div>
       </a>
 
-      {/* CTA — botão grande, bem legível */}
-      {disponivel ? (
-        <a
-          href={`/catalogo/${peca.id}`}
-          style={{
-            display:'flex',
-            alignItems:'center',
-            justifyContent:'center',
-            margin:'0 0.75rem 0.75rem',
-            padding:'0.8rem',
-            fontSize:'0.78rem',
-            letterSpacing:'0.1em',
-            textTransform:'uppercase',
-            background:'#080808',
-            color:'#f8f7f5',
-            textAlign:'center',
-            textDecoration:'none',
-            fontFamily:"'Jost',sans-serif",
-            fontWeight:500,
-            minHeight:'46px',
-          }}
-        >
-          {l.alugar}
-        </a>
-      ) : (
+      {/* CTA — apenas para indisponível (reservar). Disponível: card inteiro é clicável */}
+      {!disponivel && (
         <a
           href={`/reserva?peca=${peca.id}`}
           style={{
             display:'flex',
             alignItems:'center',
             justifyContent:'center',
-            margin:'0 0.75rem 0.75rem',
-            padding:'0.8rem',
-            fontSize:'0.75rem',
-            letterSpacing:'0.08em',
+            margin:'0 0.6rem 0.6rem',
+            padding:'0.55rem',
+            fontSize:'0.68rem',
+            letterSpacing:'0.1em',
             textTransform:'uppercase',
             background:'transparent',
-            color:'#4a4845',
-            border:'1.5px solid #ccc9c4',
+            color:'#7a7875',
+            border:'1px solid #d5d2cd',
             textAlign:'center',
             textDecoration:'none',
             fontFamily:"'Jost',sans-serif",
             fontWeight:400,
-            minHeight:'46px',
           }}
         >
           {l.reservar}
