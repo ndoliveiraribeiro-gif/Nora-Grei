@@ -149,24 +149,28 @@ export default function Admin() {
   };
 
   const handleFotos = (e) => {
-    setFotosUpload(Array.from(e.target.files));
+    const files = Array.from(e.target.files);
+    setFotosUpload(prev => [...prev, ...files]);
+  };
+
+  const handleFotosDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
+    if (files.length) setFotosUpload(prev => [...prev, ...files]);
   };
 
   const uploadFotos = async (pecaId) => {
-    const urls = [];
-    for (const foto of fotosUpload) {
-      const ext = foto.name.split(".").pop();
-      const path = `${pecaId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      setUploadProgress(`A fazer upload de ${foto.name}...`);
+    setUploadProgress(`A fazer upload de ${fotosUpload.length} foto(s)...`);
+    // Upload paralelo — todos ao mesmo tempo
+    const resultados = await Promise.all(fotosUpload.map(async (foto) => {
+      const ext = foto.name.split(".").pop().toLowerCase();
+      const path = `${pecaId}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
       const { error } = await supabase.storage.from("pecas").upload(path, foto, { upsert: true });
-      if (!error) {
-        const { data } = supabase.storage.from("pecas").getPublicUrl(path);
-        urls.push(data.publicUrl);
-      } else {
-        console.error("Erro upload:", error.message);
-      }
-    }
-    return urls;
+      if (error) { console.error("Erro upload:", error.message); return null; }
+      const { data } = supabase.storage.from("pecas").getPublicUrl(path);
+      return data.publicUrl;
+    }));
+    return resultados.filter(Boolean);
   };
 
   const criarPeca = async () => {
@@ -545,35 +549,44 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* UPLOAD FOTOS — CORRIGIDO */}
+                {/* UPLOAD FOTOS */}
                 <div style={{marginBottom:'1rem'}}>
-                  <label className="ad-label">Fotos da peça</label>
-                  <label className="ad-upload-area" style={{display:'block',cursor:'pointer'}}>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleFotos}
-                      style={{display:'none'}}
-                    />
-                    {fotosUpload.length === 0 ? (
-                      <div>
-                        <div style={{fontSize:'1.5rem',marginBottom:'0.4rem'}}>📷</div>
-                        <div style={{fontSize:'0.82rem',color:'#5a5855'}}>Clica para selecionar fotos</div>
-                        <div style={{fontSize:'0.72rem',color:'#999',marginTop:'0.2rem'}}>JPG, PNG, WEBP — múltiplas fotos</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div style={{fontSize:'0.82rem',color:'#27ae60',fontWeight:500}}>{fotosUpload.length} foto(s) selecionada(s)</div>
-                        <div style={{fontSize:'0.72rem',color:'#5a5855',marginTop:'0.2rem'}}>{fotosUpload.map(f => f.name).join(", ")}</div>
-                      </div>
-                    )}
+                  <label className="ad-label">Fotos da peça {fotosUpload.length > 0 && <span style={{color:'#c4748a',fontWeight:600}}>({fotosUpload.length}) — arrasta para reordenar</span>}</label>
+                  <label
+                    className="ad-upload-area"
+                    style={{display:'block',cursor:'pointer',borderStyle: fotosUpload.length > 0 ? 'solid' : 'dashed'}}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={handleFotosDrop}
+                  >
+                    <input type="file" accept="image/*" multiple onChange={handleFotos} style={{display:'none'}} />
+                    <div style={{fontSize:'1.5rem',marginBottom:'0.3rem'}}>📷</div>
+                    <div style={{fontSize:'0.82rem',color:'#5a5855'}}>Clica ou arrasta fotos aqui</div>
+                    <div style={{fontSize:'0.72rem',color:'#999',marginTop:'0.2rem'}}>JPG, PNG, WEBP — múltiplas fotos · upload paralelo</div>
                   </label>
-                  {/* Preview das fotos selecionadas */}
+                  {/* Preview reordenável */}
                   {fotosUpload.length > 0 && (
-                    <div className="ad-fotos-preview">
+                    <div style={{display:'flex',gap:'0.5rem',marginTop:'0.75rem',flexWrap:'wrap'}}>
                       {fotosUpload.map((f, i) => (
-                        <img key={i} src={URL.createObjectURL(f)} alt="" className="ad-foto-thumb" />
+                        <div key={i} draggable
+                          onDragStart={e => e.dataTransfer.setData("idx", i)}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={e => {
+                            e.preventDefault();
+                            const from = parseInt(e.dataTransfer.getData("idx"));
+                            if (from === i) return;
+                            setFotosUpload(prev => {
+                              const arr = [...prev];
+                              const [moved] = arr.splice(from, 1);
+                              arr.splice(i, 0, moved);
+                              return arr;
+                            });
+                          }}
+                          style={{position:'relative',cursor:'grab'}}>
+                          <img src={URL.createObjectURL(f)} alt="" style={{width:80,height:100,objectFit:'cover',border: i===0 ? '2.5px solid #c4748a' : '1.5px solid #e2dfda',display:'block'}} />
+                          {i === 0 && <div style={{position:'absolute',top:3,left:3,background:'#c4748a',color:'#fff',fontSize:'0.55rem',padding:'1px 4px',letterSpacing:'0.08em',fontWeight:600}}>CAPA</div>}
+                          <button type="button" onClick={() => setFotosUpload(prev => prev.filter((_,j) => j !== i))}
+                            style={{position:'absolute',top:3,right:3,width:18,height:18,background:'rgba(0,0,0,0.65)',border:'none',borderRadius:'50%',color:'#fff',fontSize:'0.65rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                        </div>
                       ))}
                     </div>
                   )}
