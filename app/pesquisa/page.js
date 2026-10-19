@@ -169,7 +169,7 @@ export default function Pesquisa() {
       <div className="search-wrap">
         {/* Barra de pesquisa */}
         <div className="search-bar">
-          <span className="search-icon">🔍</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" style={{flexShrink:0,color:"var(--g4)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
             ref={inputRef}
             className="search-input"
@@ -187,7 +187,9 @@ export default function Pesquisa() {
         {/* Estado vazio */}
         {!buscado && !loading && (
           <div className="estado-central">
-            <div className="estado-icon">🔍</div>
+            <div className="estado-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40" style={{opacity:0.25}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
             <div className="estado-titulo">{t.procura}</div>
           </div>
         )}
@@ -200,7 +202,9 @@ export default function Pesquisa() {
         {/* Sem resultados */}
         {buscado && !loading && totalResultados === 0 && (
           <div className="estado-central">
-            <div className="estado-icon">○</div>
+            <div className="estado-icon" style={{opacity:0.15}}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
             <p>{t.semResultados} "{query}"</p>
           </div>
         )}

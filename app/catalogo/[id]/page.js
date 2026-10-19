@@ -456,7 +456,9 @@ export default function PecaDetalhe() {
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
         <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
-          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",fontSize:"1.1rem",lineHeight:1}}>🔍</a>
+          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",lineHeight:1}}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </a>
           <a href="/catalogo" className="nav-back">{t.voltar}</a>
         </div>
       </nav>
