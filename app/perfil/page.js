@@ -1878,38 +1878,37 @@ export default function Perfil() {
         </div>{/* fim display:none guardados */}
         </div>{/* fim display:none loja */}
 
-        {/* BLOCO LOJISTA — CTA / formulário / estado candidatura */}
-        {!modoLojista && (
-          <div style={{margin:"2rem 0 3rem"}}>
+        {/* BLOCO LOJISTA — CTA / formulário / estado candidatura — só na tab perfil */}
+        {!modoLojista && tabAtiva === "perfil" && (
+          <div style={{margin:"1.5rem 0 0"}}>
 
-            {/* Estado: candidatura pendente */}
+            {/* Estado: candidatura pendente — compacto */}
             {candidaturaLojista === "pendente" && (
-              <div style={{padding:"2rem",background:"#f0f7f0",border:"1px solid #b8dbb8",textAlign:"center"}}>
-                <div style={{fontSize:"1.5rem",marginBottom:"0.75rem"}}>⏳</div>
-                <div style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Candidatura em análise</div>
-                <p style={{fontSize:"0.82rem",color:"#4a7a4a",lineHeight:1.6,maxWidth:"380px",margin:"0 auto"}}>Recebemos o teu pedido para abrir loja. A equipa Nora Grei irá rever os teus dados e entrar em contacto em breve. Normalmente em 1–2 dias úteis.</p>
+              <div style={{padding:"0.75rem 1rem",background:"#f0f7f0",border:"1px solid #b8dbb8",display:"flex",alignItems:"center",gap:"0.6rem"}}>
+                <span style={{fontSize:"0.9rem"}}>⏳</span>
+                <span style={{fontSize:"0.78rem",color:"#4a7a4a"}}>Candidatura a lojista em análise — entraremos em contacto em 1–2 dias úteis.</span>
               </div>
             )}
 
-            {/* Estado: candidatura recusada */}
+            {/* Estado: candidatura recusada — compacto */}
             {candidaturaLojista === "recusada" && (
-              <div style={{padding:"2rem",background:"#fff5f5",border:"1px solid #f5c6c6",textAlign:"center"}}>
-                <div style={{fontSize:"1.5rem",marginBottom:"0.75rem"}}>✗</div>
-                <div style={{fontFamily:"var(--serif)",fontSize:"1.2rem",fontWeight:400,marginBottom:"0.5rem",color:"#c0392b"}}>Candidatura não aprovada</div>
-                <p style={{fontSize:"0.82rem",color:"#888",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>A tua candidatura não foi aprovada desta vez. Podes contactar-nos para mais informações.</p>
-                <button onClick={() => { setCandidaturaLojista(null); setShowFormLojista(true); }} style={{padding:"0.7rem 1.8rem",background:"var(--black)",color:"var(--white)",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
-                  Submeter nova candidatura
+              <div style={{padding:"0.75rem 1rem",background:"#fff5f5",border:"1px solid #f5c6c6",display:"flex",alignItems:"center",gap:"0.6rem",justifyContent:"space-between"}}>
+                <span style={{fontSize:"0.78rem",color:"#c0392b"}}>✗ Candidatura não aprovada desta vez.</span>
+                <button onClick={() => { setCandidaturaLojista(null); setShowFormLojista(true); }} style={{background:"none",border:"none",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--black)",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap",textDecoration:"underline",padding:0}}>
+                  Nova candidatura
                 </button>
               </div>
             )}
 
-            {/* Estado: sem candidatura — botão inicial */}
+            {/* Estado: sem candidatura — convite discreto */}
             {!candidaturaLojista && !showFormLojista && (
-              <div style={{padding:"2rem",background:"#f8f5f0",border:"1px solid #e8e3dc",textAlign:"center"}}>
-                <div style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:400,marginBottom:"0.5rem",color:"var(--black)"}}>Abre a tua loja na Nora Grei</div>
-                <p style={{fontSize:"0.82rem",color:"var(--g6)",lineHeight:1.6,maxWidth:"380px",margin:"0 auto 1.25rem"}}>Aluga as tuas peças de moda a outras mulheres. Sem compromissos — 180 dias de período de teste gratuito.</p>
-                <button onClick={() => setShowFormLojista(true)} style={{display:"inline-block",padding:"0.9rem 2.5rem",background:"var(--black)",color:"var(--white)",border:"none",cursor:"pointer",fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600}}>
-                  Tornar-me Lojista →
+              <div style={{padding:"1rem",background:"#f8f5f0",border:"1px solid #e8e3dc",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem",flexWrap:"wrap"}}>
+                <div>
+                  <div style={{fontSize:"0.78rem",fontWeight:600,color:"var(--black)",marginBottom:"0.2rem"}}>Tens peças para alugar?</div>
+                  <div style={{fontSize:"0.72rem",color:"var(--g4)"}}>180 dias de teste gratuito · comissão 10%</div>
+                </div>
+                <button onClick={() => setShowFormLojista(true)} style={{padding:"0.6rem 1.25rem",background:"var(--black)",color:"var(--white)",border:"none",cursor:"pointer",fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
+                  Abrir loja →
                 </button>
               </div>
             )}
