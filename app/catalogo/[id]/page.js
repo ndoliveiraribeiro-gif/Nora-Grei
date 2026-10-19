@@ -506,7 +506,7 @@ export default function PecaDetalhe() {
               <div style={{background:'linear-gradient(135deg,#1a2e22 0%,#2d4a38 100%)',borderRadius:'10px',padding:'0.75rem 1rem',margin:'0.5rem 0 1rem',display:'flex',alignItems:'center',gap:'0.75rem',flexWrap:'wrap'}}>
                 <span style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'#c4a882',fontWeight:700,whiteSpace:'nowrap'}}>{t.pecaNova}: {peca.valor_peca}€</span>
                 <span style={{color:'#c4a882',fontSize:'0.8rem'}}>→</span>
-                <span style={{fontSize:'0.85rem',color:'#f0f5f2',fontWeight:600}}>{t.alugaPor} <strong style={{color:'#c4a882'}}>{peca.preco_aluguer_dia}€{t.porcDia}</strong></span>
+                <span style={{fontSize:'0.85rem',color:'#fff',fontWeight:400}}>{t.alugaPor} <strong style={{color:'#c4a882',fontWeight:700}}>{peca.preco_aluguer_dia}€{t.porcDia}</strong></span>
                 <span style={{marginLeft:'auto',background:'#3a7a52',color:'#f0f5f2',borderRadius:'4px',padding:'0.2rem 0.6rem',fontSize:'0.75rem',fontWeight:800,letterSpacing:'0.05em',whiteSpace:'nowrap'}}>{economia}% {t.economia}</span>
               </div>
             );
