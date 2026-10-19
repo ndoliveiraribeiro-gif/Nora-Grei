@@ -25,31 +25,31 @@ function PecaCardLojista({ peca, lang }) {
           {/* Badge Lojista */}
           <div style={{position:"absolute",top:"0.6rem",right:"0.6rem",fontSize:"0.55rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#b8964e",color:"#fff",padding:"0.25rem 0.55rem",fontFamily:"'Jost',sans-serif",fontWeight:500,zIndex:2}}>Lojista</div>
         </div>
-        <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
+        <div style={{padding:"0.7rem 0.75rem 0.4rem"}}>
           {peca.categoria && (
-            <p style={{fontSize:"0.6rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"'Jost',sans-serif",marginBottom:"0.2rem"}}>{peca.categoria}</p>
+            <p style={{fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a8783",fontFamily:"'Jost',sans-serif",marginBottom:"0.18rem",fontWeight:400}}>{peca.categoria}</p>
           )}
-          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1.05rem",fontWeight:300,lineHeight:1.15,marginBottom:"0.2rem",color:"#080808"}}>{peca.nome}</h3>
+          <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:"0.92rem",fontWeight:500,lineHeight:1.25,marginBottom:"0.2rem",color:"#111",letterSpacing:"0.01em"}}>{peca.nome}</h3>
           {peca.lojistaNome && (
-            <p style={{fontSize:"0.6rem",letterSpacing:"0.06em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{peca.lojistaNome}</p>
+            <p style={{fontSize:"0.65rem",letterSpacing:"0.04em",color:"#b8964e",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem",fontWeight:500}}>{peca.lojistaNome}</p>
           )}
           {peca.tamanhos && peca.tamanhos.length > 0 && (
-            <div style={{display:"flex",gap:"0.3rem",flexWrap:"wrap",marginBottom:"0.3rem"}}>
+            <div style={{display:"flex",gap:"0.3rem",flexWrap:"wrap",marginBottom:"0.4rem"}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:"0.6rem",letterSpacing:"0.04em",border:"1px solid #dedad4",padding:"0.14rem 0.4rem",color:"#6b6960",fontFamily:"'Jost',sans-serif"}}>{t}</span>
+                <span key={t} style={{fontSize:"0.65rem",letterSpacing:"0.03em",border:"1px solid #d0cdc8",padding:"0.16rem 0.45rem",color:"#4a4845",fontFamily:"'Jost',sans-serif",fontWeight:400,background:"#f2f0ed"}}>{t}</span>
               ))}
             </div>
           )}
-          <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
-            <span style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:"1.2rem",fontWeight:300,color:"#080808"}}>{peca.preco_aluguer_dia}€</span>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.65rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+          <div style={{display:"flex",alignItems:"baseline",gap:"0.25rem",paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0"}}>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
           </div>
         </div>
       </a>
       {disponivel ? (
-        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.68rem",letterSpacing:"0.14em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:400,minHeight:"44px"}}>{lbl}</a>
+        <a href={href} style={{display:"flex",alignItems:"center",justifyContent:"center",margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.78rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"#080808",color:"#f8f7f5",textAlign:"center",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:500,minHeight:"46px"}}>{lbl}</a>
       ) : (
-        <div style={{margin:"0 0.7rem 0.7rem",padding:"0.72rem",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",border:"1px solid #dedad4",color:"#b0ada6",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"44px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
+        <div style={{margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",border:"1.5px solid #ccc9c4",color:"#4a4845",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"46px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
       )}
     </div>
   );

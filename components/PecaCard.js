@@ -122,51 +122,51 @@ export default function PecaCard({ peca, lang = "pt" }) {
         </div>
 
         {/* INFO */}
-        <div style={{padding:'0.65rem 0.7rem 0.3rem'}}>
+        <div style={{padding:'0.7rem 0.75rem 0.4rem'}}>
           {peca.categoria && (
-            <p style={{fontSize:'0.6rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'#b0ada6',fontFamily:"'Jost',sans-serif",marginBottom:'0.2rem'}}>{peca.categoria}</p>
+            <p style={{fontSize:'0.62rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'#8a8783',fontFamily:"'Jost',sans-serif",marginBottom:'0.18rem',fontWeight:400}}>{peca.categoria}</p>
           )}
-          <h3 style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.05rem',fontWeight:300,lineHeight:1.15,marginBottom:'0.3rem',color:'#080808'}}>{peca.nome}</h3>
+          {/* Nome: peso 500 para ser bem legível */}
+          <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:'0.92rem',fontWeight:500,lineHeight:1.25,marginBottom:'0.35rem',color:'#111',letterSpacing:'0.01em'}}>{peca.nome}</h3>
 
           {/* Tamanhos disponíveis */}
           {peca.tamanhos && peca.tamanhos.length > 0 && (
-            <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap',marginBottom:'0.3rem'}}>
+            <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap',marginBottom:'0.4rem'}}>
               {peca.tamanhos.slice(0,5).map(t => (
-                <span key={t} style={{fontSize:'0.6rem',letterSpacing:'0.04em',border:'1px solid #dedad4',padding:'0.14rem 0.4rem',color:'#6b6960',fontFamily:"'Jost',sans-serif"}}>{t}</span>
+                <span key={t} style={{fontSize:'0.65rem',letterSpacing:'0.03em',border:'1px solid #d0cdc8',padding:'0.16rem 0.45rem',color:'#4a4845',fontFamily:"'Jost',sans-serif",fontWeight:400,background:'#f2f0ed'}}>{t}</span>
               ))}
-              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.6rem',color:'#b0ada6',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
+              {peca.tamanhos.length > 5 && <span style={{fontSize:'0.65rem',color:'#8a8783',fontFamily:"'Jost',sans-serif",alignSelf:'center'}}>+{peca.tamanhos.length-5}</span>}
             </div>
           )}
 
-          {/* Preço */}
-          <div style={{display:'flex',alignItems:'baseline',gap:'0.3rem',paddingTop:'0.4rem',borderTop:'1px solid #ece9e4'}}>
-            <span style={{fontFamily:"'Cormorant',Georgia,serif",fontSize:'1.2rem',fontWeight:300,color:'#080808'}}>{peca.preco_aluguer_dia}€</span>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.65rem',color:'#b0ada6',fontWeight:300}}>/dia</span>
+          {/* Preço — grande e a negrito */}
+          <div style={{display:'flex',alignItems:'baseline',gap:'0.25rem',paddingTop:'0.4rem',borderTop:'1px solid #e8e5e0'}}>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:'1.15rem',fontWeight:600,color:'#111'}}>{peca.preco_aluguer_dia}€</span>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:'0.72rem',color:'#8a8783',fontWeight:400}}>/dia</span>
           </div>
         </div>
       </a>
 
-      {/* CTA — único, claro, grande o suficiente para o polegar */}
+      {/* CTA — botão grande, bem legível */}
       {disponivel ? (
         <a
           href={`/catalogo/${peca.id}`}
           style={{
-            display:'block',
-            margin:'0 0.7rem 0.7rem',
-            padding:'0.72rem',
-            fontSize:'0.68rem',
-            letterSpacing:'0.14em',
+            display:'flex',
+            alignItems:'center',
+            justifyContent:'center',
+            margin:'0 0.75rem 0.75rem',
+            padding:'0.8rem',
+            fontSize:'0.78rem',
+            letterSpacing:'0.1em',
             textTransform:'uppercase',
             background:'#080808',
             color:'#f8f7f5',
             textAlign:'center',
             textDecoration:'none',
             fontFamily:"'Jost',sans-serif",
-            fontWeight:400,
-            minHeight:'44px',
-            display:'flex',
-            alignItems:'center',
-            justifyContent:'center',
+            fontWeight:500,
+            minHeight:'46px',
           }}
         >
           {l.alugar}
@@ -178,19 +178,19 @@ export default function PecaCard({ peca, lang = "pt" }) {
             display:'flex',
             alignItems:'center',
             justifyContent:'center',
-            margin:'0 0.7rem 0.7rem',
-            padding:'0.72rem',
-            fontSize:'0.65rem',
-            letterSpacing:'0.1em',
+            margin:'0 0.75rem 0.75rem',
+            padding:'0.8rem',
+            fontSize:'0.75rem',
+            letterSpacing:'0.08em',
             textTransform:'uppercase',
             background:'transparent',
-            color:'#5a5855',
-            border:'1px solid #dedad4',
+            color:'#4a4845',
+            border:'1.5px solid #ccc9c4',
             textAlign:'center',
             textDecoration:'none',
             fontFamily:"'Jost',sans-serif",
             fontWeight:400,
-            minHeight:'44px',
+            minHeight:'46px',
           }}
         >
           {l.reservar}
