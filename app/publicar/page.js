@@ -23,7 +23,7 @@ export default function PublicarPage() {
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [passo, setPasso] = useState(1); // 1=fotos, 2=detalhes, 3=preços, 4=sucesso
-  const [fotos, setFotos] = useState([]); // { file, url }
+  const [fotos, setFotos] = useState([]); // { file, url, valida, validando, motivo }
   const [peca, setPeca] = useState(PECA_VAZIA);
   const [enviando, setEnviando] = useState(false);
   const [progresso, setProgresso] = useState("");
@@ -41,10 +41,48 @@ export default function PublicarPage() {
     });
   }, []);
 
+  const validarFotoComIA = async (foto, index) => {
+    try {
+      // Converter File para base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(foto.file);
+      });
+
+      const res = await fetch("/api/validar-foto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagem: base64, tipo: foto.file.type }),
+      });
+      const resultado = await res.json();
+
+      setFotos(prev => prev.map((f, i) =>
+        i === index
+          ? { ...f, validando: false, valida: resultado.valida, motivo: resultado.motivo, categoria_ia: resultado.categoria }
+          : f
+      ));
+    } catch {
+      // Em caso de erro de rede, aceitar a foto
+      setFotos(prev => prev.map((f, i) =>
+        i === index ? { ...f, validando: false, valida: true, motivo: "Validação indisponível" } : f
+      ));
+    }
+  };
+
   const adicionarFotos = (files) => {
     const arr = Array.from(files).slice(0, 5 - fotos.length);
-    const novas = arr.map(f => ({ file: f, url: URL.createObjectURL(f) }));
-    setFotos(prev => [...prev, ...novas].slice(0, 5));
+    setFotos(prev => {
+      const base = prev.length;
+      const novas = arr.map(f => ({ file: f, url: URL.createObjectURL(f), validando: true, valida: null, motivo: "" }));
+      const todas = [...prev, ...novas].slice(0, 5);
+      // Lançar validação para cada nova foto
+      novas.forEach((f, i) => {
+        validarFotoComIA(f, base + i);
+      });
+      return todas;
+    });
   };
 
   const removerFoto = (i) => setFotos(prev => prev.filter((_, j) => j !== i));
@@ -90,7 +128,7 @@ export default function PublicarPage() {
         ocasioes: peca.ocasioes,
         link_compra_externa: peca.link_compra_externa.trim() || null,
         link_externo_ativo: false,
-        estado: "disponivel",
+        estado: "pendente",
         codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(count + 1).padStart(3, "0")}`,
       }).select().single();
 
@@ -307,6 +345,25 @@ export default function PublicarPage() {
                     <div key={i} className="foto-thumb">
                       <img src={f.url} alt="" />
                       <button className="foto-remove" onClick={() => removerFoto(i)} title="Remover">✕</button>
+                      {/* Badge de validação IA */}
+                      {f.validando && (
+                        <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(8,8,8,0.7)",display:"flex",alignItems:"center",justifyContent:"center",padding:"0.3rem",gap:"0.3rem"}}>
+                          <div style={{width:6,height:6,borderRadius:"50%",background:"#f39c12",animation:"pcpulse 1s infinite"}}/>
+                          <span style={{fontSize:"0.55rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em"}}>A analisar...</span>
+                        </div>
+                      )}
+                      {!f.validando && f.valida === true && (
+                        <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(39,174,96,0.88)",display:"flex",alignItems:"center",justifyContent:"center",padding:"0.3rem",gap:"0.25rem"}}>
+                          <span style={{fontSize:"0.55rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>✓ {f.motivo}</span>
+                        </div>
+                      )}
+                      {!f.validando && f.valida === false && (
+                        <div style={{position:"absolute",inset:0,background:"rgba(200,50,50,0.82)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0.4rem",gap:"0.3rem"}}>
+                          <span style={{fontSize:"0.6rem",color:"#fff",fontFamily:"'Jost',sans-serif",fontWeight:600,letterSpacing:"0.06em",textAlign:"center"}}>✕ Foto rejeitada</span>
+                          <span style={{fontSize:"0.52rem",color:"rgba(255,255,255,0.85)",fontFamily:"'Jost',sans-serif",textAlign:"center",lineHeight:1.3}}>{f.motivo}</span>
+                          <button onClick={() => removerFoto(i)} style={{marginTop:"0.25rem",fontSize:"0.52rem",background:"rgba(255,255,255,0.2)",color:"#fff",border:"1px solid rgba(255,255,255,0.4)",padding:"0.2rem 0.5rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>Remover</button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {fotos.length < 5 && (
@@ -341,11 +398,14 @@ export default function PublicarPage() {
                 className="pub-btn pub-btn-black"
                 onClick={() => {
                   if (!fotos.length) { setErro("Adiciona pelo menos uma foto."); return; }
+                  if (fotos.some(f => f.validando)) { setErro("Aguarda a análise das fotos."); return; }
+                  const invalidas = fotos.filter(f => f.valida === false);
+                  if (invalidas.length > 0) { setErro("Remove as fotos rejeitadas antes de continuar."); return; }
                   setErro(""); setPasso(2);
                 }}
-                disabled={fotos.length === 0}
+                disabled={fotos.length === 0 || fotos.some(f => f.validando)}
               >
-                Continuar →
+                {fotos.some(f => f.validando) ? "A analisar fotos..." : "Continuar →"}
               </button>
             </div>
           </>

@@ -1065,6 +1065,7 @@ export default function Backoffice() {
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
   const [alugueresLojista, setAlugueresLojista] = useState([]);
   const [candidaturasLojista, setCandidaturasLojista] = useState([]);
+  const [pecasPendentes, setPecasPendentes] = useState([]);
   const [subTabCandidaturas, setSubTabCandidaturas] = useState(false); // toggle detalhe
   const [subTabLojistas, setSubTabLojistas] = useState("depositos");
   const chatRef = useRef(null);
@@ -1255,6 +1256,12 @@ export default function Backoffice() {
         .eq("candidatura_lojista", "pendente")
         .eq("modo_lojista", false);
       if (cands) setCandidaturasLojista(cands);
+      const { data: pendentes } = await supabase
+        .from("pecas_lojista")
+        .select("id, nome, categoria, fotos, created_at, clientes(nome, email)")
+        .eq("estado", "pendente")
+        .order("created_at", { ascending: false });
+      if (pendentes) setPecasPendentes(pendentes);
     }
     if (tab === "estatisticas") await carregarEstatisticas();
   };
@@ -3030,8 +3037,50 @@ export default function Backoffice() {
             if (al) setAlugueresLojista(al);
           };
 
+          const aprovarPeca = async (peca) => {
+            await supabase.from("pecas_lojista").update({ estado: "disponivel" }).eq("id", peca.id);
+            setPecasPendentes(prev => prev.filter(p => p.id !== peca.id));
+          };
+          const rejeitarPeca = async (peca) => {
+            const motivo = prompt(`Motivo de rejeição para "${peca.nome}" (ficará invisível):`);
+            if (motivo === null) return;
+            await supabase.from("pecas_lojista").update({ estado: "rejeitado", motivo_rejeicao: motivo }).eq("id", peca.id);
+            setPecasPendentes(prev => prev.filter(p => p.id !== peca.id));
+          };
+
           return (
             <>
+              {/* PEÇAS PENDENTES DE APROVAÇÃO */}
+              {pecasPendentes.length > 0 && (
+                <div style={{ ...CARD, border:"2px solid #e74c3c", background:"#fff8f8", marginBottom:"1.5rem" }}>
+                  <p style={{ ...CARD_T, color:"#e74c3c" }}>📸 Peças a aprovar ({pecasPendentes.length})</p>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:"1rem" }}>
+                    {pecasPendentes.map(p => (
+                      <div key={p.id} style={{ background:"#fff", border:"1px solid #f0eeeb", borderRadius:8, overflow:"hidden" }}>
+                        <div style={{ aspectRatio:"2/3", background:"#f0eeeb", position:"relative" }}>
+                          {p.fotos?.[0]
+                            ? <img src={p.fotos[0]} alt={p.nome} style={{ width:"100%",height:"100%",objectFit:"cover" }} />
+                            : <div style={{ width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc",fontSize:"2rem" }}>📷</div>
+                          }
+                          {p.fotos?.length > 1 && (
+                            <div style={{ position:"absolute",top:6,right:6,background:"rgba(0,0,0,0.6)",color:"#fff",fontSize:"0.6rem",padding:"2px 6px",borderRadius:10,fontFamily:"'Jost',sans-serif" }}>+{p.fotos.length-1}</div>
+                          )}
+                        </div>
+                        <div style={{ padding:"0.6rem 0.75rem" }}>
+                          <div style={{ fontSize:"0.65rem",color:"#aaa",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",marginBottom:"0.2rem" }}>{p.categoria||"—"}</div>
+                          <div style={{ fontSize:"0.82rem",fontWeight:500,fontFamily:"'Jost',sans-serif",marginBottom:"0.15rem",lineHeight:1.3 }}>{p.nome}</div>
+                          <div style={{ fontSize:"0.68rem",color:"#888",fontFamily:"'Jost',sans-serif",marginBottom:"0.6rem" }}>{p.clientes?.nome||"—"}</div>
+                          <div style={{ display:"flex",gap:"0.4rem" }}>
+                            <button onClick={() => aprovarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.65rem",background:"#27ae60",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",fontWeight:500,letterSpacing:"0.06em" }}>✓ Aprovar</button>
+                            <button onClick={() => rejeitarPeca(p)} style={{ flex:1,padding:"0.45rem 0",fontSize:"0.65rem",background:"#fff",color:"#e74c3c",border:"1px solid #e74c3c",borderRadius:4,cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em" }}>✕ Rejeitar</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* CANDIDATURAS PENDENTES */}
               {candidaturasLojista.length > 0 && (
                 <div style={{ ...CARD, border:"2px solid #f39c12", background:"#fffbf0" }}>
