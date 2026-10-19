@@ -7,6 +7,70 @@ const TABS = ["dashboard", "catalogo", "alugueres", "lojistas", "clientes", "res
 const TAB_LABELS = { dashboard: "Dashboard", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", config: "Configurações" };
 const TAB_ICONS = { dashboard: "◈", catalogo: "✦", alugueres: "◎", lojistas: "◫", clientes: "◉", reservas: "◌", campanhas: "✉", config: "⚙" };
 
+function ReferralsPendentes({ supabase, minimo }) {
+  const [lista, setLista] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagando, setPagando] = useState(null);
+
+  useEffect(() => {
+    supabase.from("referrals")
+      .select("*, clientes!referidor_id(id, nome, email), pecas_lojista(nome)")
+      .eq("status", "confirmado")
+      .eq("comissao_paga", false)
+      .order("created_at", { ascending: true })
+      .then(({ data }) => { if (data) setLista(data); setLoading(false); });
+  }, []);
+
+  // Agrupar por referidor
+  const porReferidor = lista.reduce((acc, r) => {
+    const id = r.referidor_id;
+    if (!acc[id]) acc[id] = { referidor: r.clientes, total: 0, ids: [] };
+    acc[id].total += r.comissao_gerada || 0;
+    acc[id].ids.push(r.id);
+    return acc;
+  }, {});
+
+  const marcarPago = async (referidorId, ids) => {
+    setPagando(referidorId);
+    await supabase.from("referrals").update({ comissao_paga: true, status: "pago" }).in("id", ids);
+    setLista(prev => prev.filter(r => !ids.includes(r.id)));
+    setPagando(null);
+  };
+
+  if (loading) return <div style={{color:"#9c9894",fontSize:"0.82rem"}}>A carregar...</div>;
+
+  const referidores = Object.entries(porReferidor);
+  if (referidores.length === 0) return (
+    <div style={{padding:"1.5rem",textAlign:"center",color:"#9c9894",fontSize:"0.82rem",background:"#fafafa",border:"1px solid #e2dfda"}}>
+      Nenhuma comissão pendente de pagamento
+    </div>
+  );
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+      {referidores.map(([id, { referidor, total, ids }]) => (
+        <div key={id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.9rem 1rem",background:"#fff",border:"1px solid #e2dfda",gap:"1rem",flexWrap:"wrap"}}>
+          <div>
+            <div style={{fontWeight:600,fontSize:"0.85rem"}}>{referidor?.nome || "—"}</div>
+            <div style={{fontSize:"0.75rem",color:"#7a6a5a"}}>{referidor?.email}</div>
+            <div style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.2rem"}}>{ids.length} referência(s) confirmada(s)</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:"1.1rem",fontWeight:700,color: total >= minimo ? "#3a7a3a" : "#c4a882"}}}>€{total.toFixed(2)}</div>
+              {total < minimo && <div style={{fontSize:"0.68rem",color:"#c4a882"}}>Mín. €{minimo}</div>}
+            </div>
+            <button onClick={() => marcarPago(id, ids)} disabled={pagando === id || total < minimo}
+              style={{padding:"0.5rem 1rem",background: total >= minimo ? "#3a7a3a" : "#e2dfda",color: total >= minimo ? "#fff" : "#9c9894",border:"none",cursor: total >= minimo ? "pointer" : "not-allowed",fontFamily:"var(--sans)",fontSize:"0.68rem",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,whiteSpace:"nowrap"}}>
+              {pagando === id ? "..." : "Marcar pago"}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
   const [user, setUser] = useState(null);
@@ -41,6 +105,9 @@ export default function Admin() {
 
   // CONFIG
   const [config, setConfig] = useState({ higienizacao: 9, whatsapp: "", email_suporte: "" });
+  const [configReferral, setConfigReferral] = useState({ ativo: true, desconto_comprador: 10, comissao_referidor: 5, minimo_pagamento: 20, validade_cookie_dias: 30 });
+  const [configReferralLoading, setConfigReferralLoading] = useState(false);
+  const [configReferralMsg, setConfigReferralMsg] = useState("");
 
   // CAMPANHAS
   const [campanhas, setCampanhas] = useState([]);
@@ -145,6 +212,10 @@ export default function Admin() {
     if (tab === "campanhas") {
       const { data } = await supabase.from("campanhas").select("*, pecas(nome)").order("created_at", { ascending: false });
       if (data) setCampanhas(data);
+    }
+    if (tab === "config") {
+      const { data: cfgRef } = await supabase.from("config_referral").select("*").single();
+      if (cfgRef) setConfigReferral({ ativo: cfgRef.ativo ?? true, desconto_comprador: cfgRef.desconto_comprador ?? 10, comissao_referidor: cfgRef.comissao_referidor ?? 5, minimo_pagamento: cfgRef.minimo_pagamento ?? 20, validade_cookie_dias: cfgRef.validade_cookie_dias ?? 30 });
     }
   };
 
@@ -1048,17 +1119,91 @@ export default function Admin() {
             <>
               <div className="ad-header">
                 <h1 className="ad-titulo">Configurações</h1>
-                <p className="ad-subtitulo">Preços, contactos e definições gerais</p>
+                <p className="ad-subtitulo">Preços, taxas, referrals e definições gerais</p>
               </div>
+
+              {/* Preços e taxas */}
               <div className="ad-card">
                 <p className="ad-card-title">Preços e taxas</p>
                 <div className="ad-form-grid">
                   <div>
                     <label className="ad-label">Taxa de higienização (€)</label>
-                    <input className="ad-input" type="number" value={config.higienizacao} onChange={e => setConfig(c => ({...c, higienizacao: e.target.value}))} />
+                    <input className="ad-input" type="number" min="0" step="0.5" value={config.higienizacao} onChange={e => setConfig(c => ({...c, higienizacao: e.target.value}))} />
+                    <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Cobrada ao cliente em cada aluguer</span>
                   </div>
                 </div>
+                <button className="ad-btn ad-btn-black" style={{marginTop:"1rem"}} onClick={async () => {
+                  await supabase.from("app_config").upsert({ chave: "higienizacao", valor: String(config.higienizacao) }, { onConflict: "chave" });
+                  alert("Guardado!");
+                }}>Guardar taxas</button>
               </div>
+
+              {/* Referrals / Afiliados */}
+              <div className="ad-card">
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1rem"}}>
+                  <p className="ad-card-title" style={{margin:0}}>Sistema de referrals (afiliados)</p>
+                  <label style={{display:"flex",alignItems:"center",gap:"0.5rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>
+                    <input type="checkbox" checked={configReferral.ativo} onChange={e => setConfigReferral(c => ({...c, ativo: e.target.checked}))} style={{width:16,height:16,accentColor:"#c4748a"}} />
+                    {configReferral.ativo ? "Activo" : "Inactivo"}
+                  </label>
+                </div>
+                <div className="ad-form-grid">
+                  <div>
+                    <label className="ad-label">Desconto para o comprador (%)</label>
+                    <input className="ad-input" type="number" min="0" max="100" step="0.5" value={configReferral.desconto_comprador} onChange={e => setConfigReferral(c => ({...c, desconto_comprador: parseFloat(e.target.value)||0}))} />
+                    <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>% de desconto na compra/aluguer quando vem via link de referência</span>
+                  </div>
+                  <div>
+                    <label className="ad-label">Comissão para o referidor (%)</label>
+                    <input className="ad-input" type="number" min="0" max="100" step="0.5" value={configReferral.comissao_referidor} onChange={e => setConfigReferral(c => ({...c, comissao_referidor: parseFloat(e.target.value)||0}))} />
+                    <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>% do valor da transacção que vai para quem partilhou o link</span>
+                  </div>
+                  <div>
+                    <label className="ad-label">Mínimo para pagamento de comissão (€)</label>
+                    <input className="ad-input" type="number" min="0" step="1" value={configReferral.minimo_pagamento} onChange={e => setConfigReferral(c => ({...c, minimo_pagamento: parseFloat(e.target.value)||0}))} />
+                    <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Só processa pagamento quando o utilizador acumulou este valor</span>
+                  </div>
+                  <div>
+                    <label className="ad-label">Validade do cookie de referência (dias)</label>
+                    <input className="ad-input" type="number" min="1" max="365" step="1" value={configReferral.validade_cookie_dias} onChange={e => setConfigReferral(c => ({...c, validade_cookie_dias: parseInt(e.target.value)||30}))} />
+                    <span style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.3rem",display:"block"}}>Quantos dias o link de referência fica activo após o clique</span>
+                  </div>
+                </div>
+                {configReferralMsg && <div style={{padding:"0.6rem 0.85rem",background: configReferralMsg.includes("✓")?"#f0faf0":"#fff0f0",border:"1px solid",borderColor:configReferralMsg.includes("✓")?"#b8dbb8":"#f5c6cb",fontSize:"0.8rem",marginTop:"0.75rem",color:configReferralMsg.includes("✓")?"#2d6a2d":"#c0392b"}}>{configReferralMsg}</div>}
+                <button className="ad-btn ad-btn-rosa" style={{marginTop:"1rem"}} disabled={configReferralLoading} onClick={async () => {
+                  setConfigReferralLoading(true); setConfigReferralMsg("");
+                  // Obter o id da linha primeiro
+                  const { data: row } = await supabase.from("config_referral").select("id").limit(1).single();
+                  const { error } = row
+                    ? await supabase.from("config_referral").update({
+                        ativo: configReferral.ativo,
+                        desconto_comprador: configReferral.desconto_comprador,
+                        comissao_referidor: configReferral.comissao_referidor,
+                        minimo_pagamento: configReferral.minimo_pagamento,
+                        validade_cookie_dias: configReferral.validade_cookie_dias,
+                        updated_at: new Date().toISOString()
+                      }).eq("id", row.id)
+                    : await supabase.from("config_referral").insert({
+                        ativo: configReferral.ativo,
+                        desconto_comprador: configReferral.desconto_comprador,
+                        comissao_referidor: configReferral.comissao_referidor,
+                        minimo_pagamento: configReferral.minimo_pagamento,
+                        validade_cookie_dias: configReferral.validade_cookie_dias
+                      });
+                  setConfigReferralLoading(false);
+                  setConfigReferralMsg(error ? "Erro: " + error.message : "✓ Configurações de referral guardadas");
+                }}>
+                  {configReferralLoading ? "A guardar..." : "Guardar configurações de referral"}
+                </button>
+              </div>
+
+              {/* Gestão de comissões a pagar */}
+              <div className="ad-card">
+                <p className="ad-card-title">Comissões pendentes de pagamento</p>
+                <ReferralsPendentes supabase={supabase} minimo={configReferral.minimo_pagamento} />
+              </div>
+
+              {/* Contactos */}
               <div className="ad-card">
                 <p className="ad-card-title">Contactos de suporte</p>
                 <div className="ad-form-grid">
@@ -1071,7 +1216,7 @@ export default function Admin() {
                     <input className="ad-input" type="email" value={config.email_suporte} onChange={e => setConfig(c => ({...c, email_suporte: e.target.value}))} placeholder="suporte@noragrei.com" />
                   </div>
                 </div>
-                <button className="ad-btn ad-btn-black" onClick={() => alert("Guardado!")}>Guardar configurações</button>
+                <button className="ad-btn ad-btn-black" style={{marginTop:"1rem"}} onClick={() => alert("Guardado!")}>Guardar contactos</button>
               </div>
             </>
           )}
