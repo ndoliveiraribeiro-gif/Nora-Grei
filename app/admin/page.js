@@ -57,7 +57,7 @@ function ReferralsPendentes({ supabase, minimo }) {
           </div>
           <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
             <div style={{textAlign:"right"}}>
-              <div style={{fontSize:"1.1rem",fontWeight:700,color: total >= minimo ? "#3a7a3a" : "#c4a882"}}}>€{total.toFixed(2)}</div>
+              <div style={{fontSize:"1.1rem",fontWeight:700,color: total >= minimo ? "#3a7a3a" : "#c4a882"}}>€{total.toFixed(2)}</div>
               {total < minimo && <div style={{fontSize:"0.68rem",color:"#c4a882"}}>Mín. €{minimo}</div>}
             </div>
             <button onClick={() => marcarPago(id, ids)} disabled={pagando === id || total < minimo}
