@@ -251,116 +251,193 @@ export default function Catalogo() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
+        :root { --black: #080808; --white: #f8f7f5; --grey-100: #f0eeeb; --grey-200: #e2dfda; --rosa: #c4748a; --serif: 'Cormorant', Georgia, serif; --sans: 'Jost', Arial, sans-serif; }
         body { background: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-        /* MOBILE FIRST */
-        .cat-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1rem 1rem; background:rgba(248,247,245,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--grey-200); }
-        .cat-nav-logo { font-family:var(--serif); font-size:1.1rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); }
-        .cat-nav-back { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:#3a3835; text-decoration:none; font-weight:400; }
-        .cat-header { padding:5rem 1rem 1.5rem; }
-        .cat-header-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#3a3835; margin-bottom:0.5rem; font-weight:400; }
-        .cat-header-title { font-family:var(--sans); font-size:clamp(1.5rem,6vw,2.5rem); font-weight:600; line-height:1.05; margin-bottom:0.5rem; color:#080808; }
-        /* Filtros */
-        .filtros-bloco { border-top:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200); margin-bottom:1.5rem; }
-        .filtros-linha { display:flex; align-items:center; gap:0; border-bottom:1px solid var(--grey-200); }
-        .filtros-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex:1; }
-        .filtros-scroll::-webkit-scrollbar { display:none; }
-        .filter-btn { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.85rem 1rem; border:none; border-right:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); font-weight:400; white-space:nowrap; flex-shrink:0; transition:background 0.12s,color 0.12s; }
-        .filter-btn:first-child { padding-left:1rem; }
-        .filter-btn.active { background:var(--black); color:var(--white); }
-        .filter-select { font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.85rem 0.85rem; border:none; border-left:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); font-weight:400; outline:none; flex-shrink:0; appearance:none; -webkit-appearance:none; }
-        /* Linha 2: ocasião + fonte em blocos empilhados no mobile */
-        .filtros-linha-2 { display:flex; flex-direction:column; gap:0; }
-        .filtros-grupo { display:flex; align-items:center; gap:0.6rem; padding:0.65rem 1rem; border-bottom:1px solid var(--grey-200); flex-wrap:wrap; }
-        .filtros-grupo:last-child { border-bottom:none; }
-        .filtros-grupo-label { font-size:0.64rem; letter-spacing:0.2em; text-transform:uppercase; color:#888580; font-family:var(--sans); white-space:nowrap; flex-shrink:0; min-width:56px; }
-        .filtros-tags { display:flex; gap:0.4rem; flex-wrap:wrap; }
-        .tag-btn { font-size:0.7rem; letter-spacing:0.06em; padding:0.38rem 0.75rem; border:1px solid var(--grey-200); background:transparent; color:#4a4845; cursor:pointer; font-family:var(--sans); white-space:nowrap; flex-shrink:0; transition:all 0.12s; min-height:36px; display:flex; align-items:center; }
-        .tag-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
-        .cat-grid { padding:0 1rem 4rem; display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
-        .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--sans); font-size:1.1rem; font-weight:400; color:#3a3835; }
+
+        /* ── NAV ── */
+        .cat-nav {
+          position:fixed; top:0; left:0; right:0; z-index:100;
+          display:flex; align-items:center; gap:0.75rem;
+          padding:0.75rem 1rem;
+          background:rgba(248,247,245,0.97); backdrop-filter:blur(20px);
+          border-bottom:1px solid var(--grey-200);
+          height:52px;
+        }
+        .cat-nav-logo { font-family:var(--serif); font-size:1rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); flex:1; }
+        .cat-nav-icon { display:flex; align-items:center; justify-content:center; padding:0.35rem; color:var(--black); position:relative; text-decoration:none; }
+
+        /* ── FILTROS TOPO — sticky abaixo da nav ── */
+        .filtros-sticky {
+          position:sticky; top:52px; z-index:90;
+          background:rgba(248,247,245,0.98); backdrop-filter:blur(12px);
+          border-bottom:1px solid var(--grey-200);
+        }
+
+        /* Linha 1: chips de categoria em scroll horizontal */
+        .cats-scroll {
+          display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch;
+          scrollbar-width:none; gap:0;
+          border-bottom:1px solid var(--grey-200);
+        }
+        .cats-scroll::-webkit-scrollbar { display:none; }
+        .cat-chip {
+          flex-shrink:0; border:none; background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.78rem; font-weight:400;
+          letter-spacing:0.08em; text-transform:uppercase; color:#5a5855;
+          padding:0.75rem 1rem; white-space:nowrap;
+          border-bottom:2px solid transparent;
+          transition:color 0.12s, border-color 0.12s;
+        }
+        .cat-chip:first-child { padding-left:1rem; }
+        .cat-chip.active { color:var(--black); font-weight:600; border-bottom-color:var(--black); }
+
+        /* Linha 2: ocasião em scroll + ordenar à direita */
+        .filtros-sec {
+          display:flex; align-items:center; gap:0;
+          border-bottom:none;
+          min-height:44px;
+        }
+        .ocas-scroll {
+          display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch;
+          scrollbar-width:none; gap:0.4rem; flex:1;
+          padding:0.5rem 1rem;
+        }
+        .ocas-scroll::-webkit-scrollbar { display:none; }
+        .ocas-chip {
+          flex-shrink:0; border:1px solid var(--grey-200); background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.7rem; font-weight:400;
+          letter-spacing:0.04em; color:#5a5855;
+          padding:0.3rem 0.7rem; white-space:nowrap; border-radius:20px;
+          transition:all 0.12s;
+        }
+        .ocas-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+
+        /* Select ordenar compacto */
+        .sort-select {
+          flex-shrink:0; border:none; border-left:1px solid var(--grey-200);
+          background:none; outline:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.68rem; font-weight:400;
+          letter-spacing:0.06em; text-transform:uppercase; color:#5a5855;
+          padding:0.5rem 0.75rem; appearance:none; -webkit-appearance:none;
+          height:100%; min-width:80px;
+        }
+
+        /* Linha 3 (só se tiver lojistas): filtro fonte — oculto por default no mobile se só NG */
+        .fonte-linha {
+          display:flex; gap:0.4rem; padding:0.4rem 1rem;
+          border-top:1px solid var(--grey-200);
+          overflow-x:auto; scrollbar-width:none;
+        }
+        .fonte-linha::-webkit-scrollbar { display:none; }
+        .fonte-chip {
+          flex-shrink:0; border:1px solid var(--grey-200); background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.68rem; font-weight:400;
+          letter-spacing:0.04em; color:#5a5855;
+          padding:0.25rem 0.65rem; white-space:nowrap; border-radius:20px;
+          transition:all 0.12s;
+        }
+        .fonte-chip.active { background:var(--black); color:var(--white); border-color:var(--black); }
+
+        /* ── GRID ── */
+        .cat-grid {
+          padding:0.75rem 0.5rem 5rem;
+          display:grid;
+          grid-template-columns:repeat(2,1fr);
+          gap:0.5rem;
+        }
+        .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--sans); font-size:1rem; font-weight:400; color:#3a3835; }
         .cat-loading { padding:4rem; text-align:center; font-size:0.78rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; }
-        /* TABLET */
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+          position:fixed; bottom:0; left:0; right:0; z-index:100;
+          display:flex; align-items:stretch;
+          background:rgba(248,247,245,0.98); backdrop-filter:blur(20px);
+          border-top:1px solid var(--grey-200);
+          height:56px;
+        }
+        .bn-item {
+          flex:1; display:flex; flex-direction:column; align-items:center;
+          justify-content:center; gap:0.2rem; text-decoration:none;
+          color:#5a5855; border:none; background:none; cursor:pointer;
+          font-family:var(--sans); font-size:0.52rem; font-weight:500;
+          letter-spacing:0.08em; text-transform:uppercase;
+          transition:color 0.12s;
+        }
+        .bn-item.active { color:var(--black); }
+        .bn-item svg { flex-shrink:0; }
+
+        /* TABLET ≥ 600px */
         @media (min-width:600px) {
-          .cat-nav { padding:1.1rem 2rem; }
-          .cat-header { padding:6rem 2rem 2rem; }
-          .cat-grid { padding:0 2rem 5rem; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
-          .filter-btn:first-child { padding-left:2rem; }
-          .filtros-linha-2 { flex-direction:row; }
-          .filtros-grupo { border-bottom:none; border-left:1px solid var(--grey-200); padding:0.65rem 1.5rem; }
-          .filtros-grupo:first-child { border-left:none; }
+          .cat-nav { padding:0.85rem 2rem; }
+          .cat-chip:first-child { padding-left:2rem; }
+          .ocas-scroll { padding:0.5rem 2rem; }
+          .cat-grid { padding:0.75rem 1.5rem 5rem; grid-template-columns:repeat(3,1fr); gap:1rem; }
+          .bottom-nav { display:none; }
         }
-        /* DESKTOP */
+        /* DESKTOP ≥ 960px */
         @media (min-width:960px) {
-          .cat-nav { padding:1.25rem 3rem; }
-          .cat-header { padding:7rem 3rem 2.5rem; }
-          .cat-grid { padding:0 3rem 6rem; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
-          .filter-btn { font-size:0.72rem; padding:0.85rem 1.2rem; }
-          .filter-btn:first-child { padding-left:3rem; }
-          .filter-btn:hover:not(.active) { color:var(--black); }
-          .filter-select { font-size:0.72rem; padding:0.85rem 1.2rem; }
-          .filtros-grupo { padding:0.65rem 2rem; }
-          .tag-btn:hover:not(.active) { border-color:#aaa; color:var(--black); }
+          .cat-nav { padding:1rem 3rem; height:60px; }
+          .filtros-sticky { top:60px; }
+          .cat-chip:first-child { padding-left:3rem; }
+          .cat-chip { font-size:0.72rem; padding:0.85rem 1.1rem; }
+          .ocas-scroll { padding:0.5rem 3rem; }
+          .cat-grid { padding:1rem 3rem 5rem; grid-template-columns:repeat(4,1fr); gap:1.25rem; }
+          .cat-chip:hover:not(.active) { color:var(--black); }
+          .ocas-chip:hover:not(.active) { border-color:#aaa; color:var(--black); }
+          .bottom-nav { display:none; }
         }
-        @media (min-width:1280px) {
-          .cat-grid { grid-template-columns:repeat(4,1fr); }
+        @media (min-width:1440px) {
+          .cat-grid { grid-template-columns:repeat(5,1fr); }
         }
       `}</style>
 
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
+      {/* ── NAV ── */}
       <nav className="cat-nav">
         <a href="/" className="cat-nav-logo">Nora Grei</a>
-        <a href="/" className="cat-nav-back">← Início</a>
-        <a href="/cesto" style={{position:"relative",display:"flex",alignItems:"center",padding:"0.4rem",color:"#080808",lineHeight:1,marginLeft:"auto"}} title="Cesto">
+        <a href="/perfil" className="cat-nav-icon" title="Perfil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+        <a href="/cesto" className="cat-nav-icon" title="Cesto" style={{position:"relative"}}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          {cestoCont > 0 && <span style={{position:"absolute",top:"-2px",right:"-2px",background:"#c4748a",color:"#fff",fontSize:"0.45rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+          {cestoCont > 0 && <span style={{position:"absolute",top:"0px",right:"0px",background:"var(--rosa)",color:"#fff",fontSize:"0.5rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
         </a>
       </nav>
 
-      <div className="cat-header">
-        <p className="cat-header-label">{t.titulo}</p>
-        <h1 className="cat-header-title">{t.subtitulo}</h1>
-      </div>
+      {/* ── FILTROS STICKY ── */}
+      <div className="filtros-sticky">
+        {/* Categorias */}
+        <div className="cats-scroll">
+          <button className={`cat-chip${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
+          {t.categorias.map(cat => (
+            <button key={cat} className={`cat-chip${filtroCategoria === cat ? " active" : ""}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
+          ))}
+        </div>
 
-      {/* Bloco de filtros unificado */}
-      <div className="filtros-bloco">
-        {/* Linha 1: Categorias + ordenar */}
-        <div className="filtros-linha">
-          <div className="filtros-scroll">
-            <button className={`filter-btn${filtroCategoria === "todas" ? " active" : ""}`} onClick={() => setFiltroCategoria("todas")}>{t.todas}</button>
-            {t.categorias.map(cat => (
-              <button key={cat} className={`filter-btn${filtroCategoria === cat ? " active" : ""}`} onClick={() => setFiltroCategoria(cat)}>{cat}</button>
+        {/* Ocasião + Ordenar */}
+        <div className="filtros-sec">
+          <div className="ocas-scroll">
+            <button className={`ocas-chip${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
+            {(OCASIOES[lang] || OCASIOES.pt).map(o => (
+              <button key={o.key} className={`ocas-chip${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
             ))}
           </div>
-          <select className="filter-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
+          <select className="sort-select" value={ordenar} onChange={e => setOrdenar(e.target.value)}>
             <option value="recentes">{t.recentes}</option>
-            <option value="precoAsc">{t.precoAsc}</option>
-            <option value="precoDesc">{t.precoDesc}</option>
+            <option value="precoAsc">↑ {t.precoAsc.split(":")[0]}</option>
+            <option value="precoDesc">↓ {t.precoDesc.split(":")[0]}</option>
           </select>
         </div>
 
-        {/* Linha 2: Ocasião + Fonte — mais subtil */}
-        <div className="filtros-linha-2">
-          <div className="filtros-grupo">
-            <span className="filtros-grupo-label">{t.ocasiao}</span>
-            <div className="filtros-tags">
-              <button className={`tag-btn${filtroOcasiao === "todas" ? " active" : ""}`} onClick={() => setFiltroOcasiao("todas")}>{t.todasOcasiao}</button>
-              {(OCASIOES[lang] || OCASIOES.pt).map(o => (
-                <button key={o.key} className={`tag-btn${filtroOcasiao === o.key ? " active" : ""}`} onClick={() => setFiltroOcasiao(o.key)}>{o.label}</button>
-              ))}
-            </div>
-          </div>
-          <div className="filtros-grupo">
-            <span className="filtros-grupo-label">{t.fonte}</span>
-            <div className="filtros-tags">
-              {[["todas", t.todasFontes], ["ng", t.noraGrei], ["lojista", t.lojistas]].map(([key, label]) => (
-                <button key={key} className={`tag-btn${filtroFonte === key ? " active" : ""}`} onClick={() => setFiltroFonte(key)}>{label}</button>
-              ))}
-            </div>
-          </div>
+        {/* Fonte — só mostra se tiver lojistas */}
+        <div className="fonte-linha">
+          {[["todas", t.todasFontes], ["ng", t.noraGrei], ["lojista", t.lojistas]].map(([key, label]) => (
+            <button key={key} className={`fonte-chip${filtroFonte === key ? " active" : ""}`} onClick={() => setFiltroFonte(key)}>{label}</button>
+          ))}
         </div>
       </div>
 
@@ -377,6 +454,31 @@ export default function Catalogo() {
           )}
         </div>
       )}
+
+      {/* ── BOTTOM NAV (mobile only) ── */}
+      <nav className="bottom-nav">
+        <a href="/" className="bn-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Início
+        </a>
+        <a href="/catalogo" className="bn-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Catálogo
+        </a>
+        <a href="/pedidos" className="bn-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Pedidos
+        </a>
+        <a href="/cesto" className="bn-item" style={{position:"relative"}}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          {cestoCont > 0 && <span style={{position:"absolute",top:"4px",right:"calc(50% - 14px)",background:"var(--rosa)",color:"#fff",fontSize:"0.48rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"13px",height:"13px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
+          Cesto
+        </a>
+        <a href="/perfil" className="bn-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Perfil
+        </a>
+      </nav>
     </>
   );
 }
