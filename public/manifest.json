@@ -1,6 +1,7 @@
 {
   "name": "Nora Grei",
   "short_name": "Nora Grei",
+  "version": "2.0",
   "description": "Aluga ou compra peças exclusivas de moda.",
   "start_url": "/",
   "display": "standalone",
