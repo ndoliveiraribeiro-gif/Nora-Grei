@@ -142,6 +142,7 @@ export default function BottomNav() {
 
         /* Overlay drawer "Mais" */
         .bn-mais-overlay {
+          display: none;
           position: fixed;
           inset: 0;
           z-index: 199;
@@ -154,6 +155,7 @@ export default function BottomNav() {
           pointer-events: all;
         }
         .bn-mais-drawer {
+          display: none;
           position: fixed;
           bottom: calc(60px + env(safe-area-inset-bottom, 0px));
           left: 0; right: 0;
@@ -204,6 +206,8 @@ export default function BottomNav() {
 
         @media (max-width: 768px) {
           .bn-wrap { display: block; }
+          .bn-mais-overlay { display: block; }
+          .bn-mais-drawer { display: block; }
         }
       `}</style>
 
