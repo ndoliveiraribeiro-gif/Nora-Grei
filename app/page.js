@@ -60,7 +60,7 @@ const T = {
   },
   fr: {
     nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Robe","Manteau","Blazer","Ensemble"] },
+    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","le sac","le manteau","la robe","le pull","le pantalon"] },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -115,7 +115,7 @@ const T = {
   },
   lt: {
     nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Suknelė","Paltas","Švarkas","Komplektas"] },
+    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","spintoje","rankinę","paltą","suknelę","megztinį","kelnes"] },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
