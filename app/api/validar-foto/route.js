@@ -42,11 +42,13 @@ CONTEÚDO (obrigatório):
 - Deve mostrar uma peça de roupa, acessório ou calçado real
 - Não aceitar: screenshots, memes, texto, paisagens, comida, animais, rostos sem roupa, ilustrações digitais, catálogos escaneados, imagens de produto de loja online (fundo branco puro com mannequin digital)
 
-QUALIDADE (obrigatório):
-- Nitidez: imagem focada e clara, não desfocada nem tremida
-- Exposição: bem iluminada, não muito escura nem sobreexposta
-- Resolução: detalhe suficiente para ver textura e cor reais
-- Enquadramento: peça visível e centrada, não cortada de forma estranha
+QUALIDADE (critérios exigentes — rejeitar se qualquer um falhar):
+- Nitidez: imagem bem focada e nítida. REJEITAR se desfocada, tremida ou com motion blur
+- Iluminação: luz natural ou artificial equilibrada, cores reais visíveis. REJEITAR se escura, amarelada/alaranjada (luz incandescente), sobreexposta ou com sombras fortes que escondam detalhes
+- Resolução: detalhe suficiente para ver textura, costuras e cor real da peça
+- Enquadramento: peça centrada e bem visível, ocupando pelo menos 40% da imagem. REJEITAR se cortada, muito ao longe, torcida ou mostrada de forma que dificulte a avaliação
+- Fundo: fundo neutro ou simples preferível. REJEITAR se o fundo está muito desarrumado e distrai da peça
+- Apresentação: peça deve estar estendida, dobrada cuidadosamente, num cabide ou vestida numa pessoa. REJEITAR se atirada no chão de qualquer maneira ou amachucada
 
 SEGURANÇA (obrigatório):
 - Sem conteúdo adulto, violento ou ofensivo
