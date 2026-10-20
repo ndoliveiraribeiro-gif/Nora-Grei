@@ -1449,7 +1449,8 @@ export default function Perfil() {
       link_compra_externa: novaPeca.link_compra_externa||null,
       link_externo_ativo: false,
       estado: "disponivel",
-      codigo_referencia: `${cliente?.codigo_cliente || "NG"}-${String(pecasLoja.length + 1).padStart(3, "0")}`,
+      // codigo_referencia gerado pelo trigger SQL (<codigo_cliente>-001, -002, ...)
+
     }).select().single();
     if (peca) {
       for (const t of novaPeca.tamanhos) {

@@ -1410,6 +1410,7 @@ export default function Backoffice() {
   const criarPeca = async () => {
     if (!novaPeca.nome || !novaPeca.preco_aluguer_dia) { alert("Nome e preço são obrigatórios"); return; }
     setCriandoPeca(true); setUploadProgress("A criar peça...");
+    // codigo_referencia gerado automaticamente pelo trigger SQL (NG-0001, NG-0002, ...)
     const { data: pc, error } = await supabase.from("pecas").insert({ nome: novaPeca.nome, categoria_id: novaPeca.categoria_id||null, preco_aluguer_dia: parseFloat(novaPeca.preco_aluguer_dia), preco_avulso: parseFloat(novaPeca.preco_avulso)||null, valor_peca: parseFloat(novaPeca.valor_peca)||0, descricao: novaPeca.descricao, material: novaPeca.material, origem: novaPeca.origem, destaque: novaPeca.destaque, hero_position: novaPeca.hero_position||"center top", ocasioes: novaPeca.ocasioes, estado: "disponivel" }).select().single();
     if (error) { setUploadProgress("❌ " + error.message); setCriandoPeca(false); return; }
     for (const t of novaPeca.tamanhos) { if (t.tamanho) await supabase.from("stock_tamanhos").insert({ peca_id: pc.id, tamanho: t.tamanho, quantidade_total: parseInt(t.quantidade_total)||1, quantidade_disponivel: parseInt(t.quantidade_total)||1 }); }
