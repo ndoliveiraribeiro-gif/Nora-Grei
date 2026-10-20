@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 
 const T = {
   pt: {
-    nav: { catalogo: "Colecção", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
+    nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
     hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Vestido","Casaco","Blazer","Conjunto"] },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
@@ -59,7 +59,7 @@ const T = {
     lojasSec: { label: "Marketplace", titulo: "Lojas em destaque.", sub: "Lojistas curadoras que partilham as suas peças na plataforma Nora Grei.", verTodas: "Ver todas as lojas", verLoja: "Ver loja" },
   },
   fr: {
-    nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
+    nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
     hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Robe","Manteau","Blazer","Ensemble"] },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
@@ -114,7 +114,7 @@ const T = {
     lojasSec: { label: "Marketplace", titulo: "Boutiques en vedette.", sub: "Des curatrices qui partagent leurs pièces sur la plateforme Nora Grei.", verTodas: "Voir toutes les boutiques", verLoja: "Voir la boutique" },
   },
   lt: {
-    nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
+    nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
     hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Suknelė","Paltas","Švarkas","Komplektas"] },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
@@ -914,6 +914,7 @@ export default function Home() {
         </a>
         <ul className="nav-links">
           <li><a href="/catalogo">{t.nav.catalogo}</a></li>
+          <li><a href="/lojas">{t.nav.lojas}</a></li>
           <li><a href="/feed">Feed</a></li>
           <li><a href="#como">{t.nav.comoFunciona}</a></li>
         </ul>
