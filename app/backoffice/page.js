@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-const SENHA = "noragrei2024admin";
+const SENHA = process.env.NEXT_PUBLIC_BACKOFFICE_SENHA || "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
 const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "config"];

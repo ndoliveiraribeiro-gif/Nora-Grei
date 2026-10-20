@@ -515,7 +515,7 @@ function MensagensInner() {
 
 export default function MensagensPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div style={{minHeight:"100svh",display:"flex",alignItems:"center",justifyContent:"center",background:"#f8f7f5"}}><div style={{width:32,height:32,border:"2px solid #e2dfda",borderTopColor:"#c4748a",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>}>
       <MensagensInner />
     </Suspense>
   );

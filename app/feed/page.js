@@ -44,43 +44,48 @@ export default function FeedPage() {
 
   const carregar = async (pag = 0, reset = false, currentUser = user, tab = feedTab) => {
     setLoading(true);
-    let query = supabase
-      .from("feed_posts")
-      .select("*, clientes(nome, avatar_url, id), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
-      .eq("estado", "publicado")
-      .order("boosted", { ascending: false })
-      .order("publicado_em", { ascending: false })
-      .range(pag * POR_PAG, pag * POR_PAG + POR_PAG - 1);
+    try {
+      let query = supabase
+        .from("feed_posts")
+        .select("*, clientes(nome, avatar_url, id), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
+        .eq("estado", "publicado")
+        .order("boosted", { ascending: false })
+        .order("publicado_em", { ascending: false })
+        .range(pag * POR_PAG, pag * POR_PAG + POR_PAG - 1);
 
-    // Tab "Seguindo": filtrar só posts de lojistas que o user segue
-    if (tab === "seguindo" && currentUser) {
-      const { data: follows } = await supabase.from("follows").select("lojista_id").eq("follower_id", currentUser.id);
-      const lojistaIds = (follows || []).map(f => f.lojista_id);
-      if (lojistaIds.length === 0) {
-        setPosts(reset ? [] : posts);
-        setTemMais(false);
-        setPagina(pag);
-        setLoading(false);
-        return;
+      // Tab "Seguindo": filtrar só posts de lojistas que o user segue
+      if (tab === "seguindo" && currentUser) {
+        const { data: follows } = await supabase.from("follows").select("lojista_id").eq("follower_id", currentUser.id);
+        const lojistaIds = (follows || []).map(f => f.lojista_id);
+        if (lojistaIds.length === 0) {
+          setPosts(reset ? [] : posts);
+          setTemMais(false);
+          setPagina(pag);
+          setLoading(false);
+          return;
+        }
+        query = query.in("cliente_id", lojistaIds);
       }
-      query = query.in("cliente_id", lojistaIds);
-    }
 
-    const { data } = await query;
-    const lista = data || [];
-    setPosts(prev => reset ? lista : [...prev, ...lista]);
-    setTemMais(lista.length === POR_PAG);
-    setPagina(pag);
-    setLoading(false);
-    // likes do user
-    if (currentUser && lista.length > 0) {
-      const ids = lista.map(p => p.id);
-      const { data: lk } = await supabase.from("feed_likes").select("post_id").eq("cliente_id", currentUser.id).in("post_id", ids);
-      if (lk) {
-        const map = {};
-        lk.forEach(l => { map[l.post_id] = true; });
-        setLikesFeitos(prev => ({ ...prev, ...map }));
+      const { data } = await query;
+      const lista = data || [];
+      setPosts(prev => reset ? lista : [...prev, ...lista]);
+      setTemMais(lista.length === POR_PAG);
+      setPagina(pag);
+      // likes do user
+      if (currentUser && lista.length > 0) {
+        const ids = lista.map(p => p.id);
+        const { data: lk } = await supabase.from("feed_likes").select("post_id").eq("cliente_id", currentUser.id).in("post_id", ids);
+        if (lk) {
+          const map = {};
+          lk.forEach(l => { map[l.post_id] = true; });
+          setLikesFeitos(prev => ({ ...prev, ...map }));
+        }
       }
+    } catch (err) {
+      console.error("Erro ao carregar feed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,13 +94,20 @@ export default function FeedPage() {
     const jaLikei = likesFeitos[post.id];
     setLikesFeitos(prev => ({ ...prev, [post.id]: !jaLikei }));
     setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: (p.likes || 0) + (jaLikei ? -1 : 1) } : p));
-    if (jaLikei) {
-      await supabase.from("feed_likes").delete().eq("post_id", post.id).eq("cliente_id", user.id);
-      await supabase.from("feed_posts").update({ likes: Math.max(0, (post.likes || 1) - 1) }).eq("id", post.id);
-    } else {
-      await supabase.from("feed_likes").insert({ post_id: post.id, cliente_id: user.id });
-      await supabase.from("feed_posts").update({ likes: (post.likes || 0) + 1 }).eq("id", post.id);
-      await supabase.from("feed_posts").update({ visualizacoes: (post.visualizacoes || 0) + 1 }).eq("id", post.id);
+    try {
+      if (jaLikei) {
+        await supabase.from("feed_likes").delete().eq("post_id", post.id).eq("cliente_id", user.id);
+        await supabase.from("feed_posts").update({ likes: Math.max(0, (post.likes || 1) - 1) }).eq("id", post.id);
+      } else {
+        await supabase.from("feed_likes").insert({ post_id: post.id, cliente_id: user.id });
+        await supabase.from("feed_posts").update({ likes: (post.likes || 0) + 1 }).eq("id", post.id);
+        await supabase.from("feed_posts").update({ visualizacoes: (post.visualizacoes || 0) + 1 }).eq("id", post.id);
+      }
+    } catch (err) {
+      console.error("Erro no like:", err);
+      // reverter optimistic update
+      setLikesFeitos(prev => ({ ...prev, [post.id]: jaLikei }));
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: (p.likes || 0) + (jaLikei ? 1 : -1) } : p));
     }
   };
 

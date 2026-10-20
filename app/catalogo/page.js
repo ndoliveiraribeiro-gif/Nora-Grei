@@ -473,7 +473,6 @@ export default function Catalogo() {
           .cat-chip:first-child { padding-left:2rem; }
           .ocas-scroll { padding:0.5rem 2rem; }
           .cat-grid { padding:0.75rem 1.5rem 5rem; grid-template-columns:repeat(3,1fr); gap:1rem; }
-          .bottom-nav { display:none; }
         }
         /* DESKTOP ≥ 960px */
         @media (min-width:960px) {
@@ -485,7 +484,6 @@ export default function Catalogo() {
           .cat-grid { padding:1rem 3rem 5rem; grid-template-columns:repeat(4,1fr); gap:1.25rem; }
           .cat-chip:hover:not(.active) { color:var(--black); }
           .ocas-chip:hover:not(.active) { border-color:#aaa; color:var(--black); }
-          .bottom-nav { display:none; }
         }
         @media (min-width:1440px) {
           .cat-grid { grid-template-columns:repeat(5,1fr); }
