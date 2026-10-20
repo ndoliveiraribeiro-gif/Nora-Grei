@@ -578,7 +578,7 @@ export default function Home() {
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55);transition:opacity 1s ease;opacity:0}
         .hero-bg img.visivel{opacity:1}
-        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center center}
+        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center top}
         @media(max-width:768px){.hero{min-height:56.25vw;max-height:100svh}}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.88) 0%,rgba(8,8,8,0.2) 55%,rgba(8,8,8,0.45) 100%);z-index:1}
         .hero-sound{position:absolute;bottom:1.5rem;right:max(1.5rem,env(safe-area-inset-right,0px));z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s;border-radius:2px}
