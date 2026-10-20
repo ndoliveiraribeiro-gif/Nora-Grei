@@ -1171,6 +1171,10 @@ export default function Perfil() {
   const [subTabCustos, setSubTabCustos] = useState("alugueres");
   const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
   const [avaliacoesLoja, setAvaliacoesLoja] = useState([]); // avaliacoes_lojista para cálculo de nota média
+  const [higienizacaoLojista, setHigienizacaoLojista] = useState({}); // { categoria: valor }
+  const [higienizacaoPadrao, setHigienizacaoPadrao] = useState({}); // fallback da plataforma
+  const [higienizacaoSaving, setHigienizacaoSaving] = useState(false);
+  const [higienizacaoOk, setHigienizacaoOk] = useState(false);
   const fileRef = useRef();
 
   // Lembrete de referral — aparece 45s após carregar, se não foi dispensado hoje
@@ -1221,6 +1225,20 @@ export default function Perfil() {
             // carregar avaliações para cálculo da nota média no dashboard
             const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma").eq("lojista_id", user.id);
             if (avs) setAvaliacoesLoja(avs);
+            // Carregar tabela de higienização do lojista
+            const { data: hig } = await supabase.from("higienizacao_lojista").select("categoria, valor").eq("lojista_id", user.id);
+            if (hig) {
+              const map = {};
+              hig.forEach(h => { map[h.categoria] = h.valor; });
+              setHigienizacaoLojista(map);
+            }
+            // Carregar valores padrão da plataforma
+            const { data: pad } = await supabase.from("higienizacao_padrao").select("categoria, valor");
+            if (pad) {
+              const map = {};
+              pad.forEach(h => { map[h.categoria] = h.valor; });
+              setHigienizacaoPadrao(map);
+            }
           }
         }
       } else {
@@ -2631,7 +2649,7 @@ export default function Perfil() {
             </div>
             {/* Tabs da loja — scroll horizontal no mobile */}
             <div className="tabs-scroll">
-              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["estatisticas","Estatísticas"]].map(([key,label]) => (
+              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["higienizacao","Higienização"],["estatisticas","Estatísticas"]].map(([key,label]) => (
                 <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
               ))}
             </div>
@@ -3403,6 +3421,63 @@ export default function Perfil() {
                 <AvaliacoesLojista alugueresLoja={alugueresLoja} clienteId={clienteData?.id} />
               </div>
             )}
+            {tabLoja === "higienizacao" && (() => {
+              const TODAS = [
+                "Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans",
+                "Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios",
+                "Relógios","Saltos","Sandálias","Botas","Sapatilhas","Calçado"
+              ];
+              const salvarHigienizacao = async () => {
+                setHigienizacaoSaving(true);
+                const upserts = TODAS.map(cat => ({
+                  lojista_id: user.id,
+                  categoria: cat,
+                  valor: parseFloat(higienizacaoLojista[cat]) || parseFloat(higienizacaoPadrao[cat]) || 0,
+                  updated_at: new Date().toISOString(),
+                }));
+                await supabase.from("higienizacao_lojista").upsert(upserts, { onConflict: "lojista_id,categoria" });
+                setHigienizacaoSaving(false);
+                setHigienizacaoOk(true);
+                setTimeout(() => setHigienizacaoOk(false), 2500);
+              };
+              return (
+                <div className="card" style={{padding:"1.5rem"}}>
+                  <p style={{fontSize:"0.62rem",letterSpacing:"0.25em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.4rem"}}>Parceria com lavandaria</p>
+                  <h3 style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,marginBottom:"0.5rem"}}>Tabela de higienização</h3>
+                  <p style={{fontSize:"0.82rem",color:"var(--g4)",lineHeight:1.6,marginBottom:"1.5rem"}}>
+                    Define o preço que a tua lavandaria parceira cobra por cada tipo de peça. Os valores aparecem no checkout e o cliente pode optar por tratar da higienização ele próprio.
+                    Os valores em cinzento são os padrões da plataforma — podes ajustar.
+                  </p>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.6rem",marginBottom:"1.5rem"}}>
+                    {TODAS.map(cat => {
+                      const val = higienizacaoLojista[cat] !== undefined ? higienizacaoLojista[cat] : higienizacaoPadrao[cat] ?? "";
+                      const isPadrao = higienizacaoLojista[cat] === undefined;
+                      return (
+                        <div key={cat} style={{display:"flex",alignItems:"center",gap:"0.5rem",padding:"0.5rem 0.75rem",background:isPadrao?"#fafafa":"#fff",border:`1px solid ${isPadrao?"var(--g2)":"#c4748a33"}`}}>
+                          <span style={{flex:1,fontSize:"0.8rem",fontFamily:"var(--sans)"}}>{cat}</span>
+                          <div style={{display:"flex",alignItems:"center",gap:"0.2rem"}}>
+                            <input
+                              type="number" min="0" step="0.5"
+                              value={val}
+                              onChange={e => setHigienizacaoLojista(prev => ({ ...prev, [cat]: e.target.value }))}
+                              style={{width:54,border:"1px solid var(--g2)",padding:"0.25rem 0.4rem",fontSize:"0.82rem",fontFamily:"var(--sans)",textAlign:"right",background:"transparent",outline:"none"}}
+                            />
+                            <span style={{fontSize:"0.72rem",color:"var(--g4)"}}>€</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <button
+                    onClick={salvarHigienizacao}
+                    disabled={higienizacaoSaving}
+                    style={{padding:"0.85rem 2rem",background:"#080808",color:"#f8f7f5",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.7rem",letterSpacing:"0.18em",textTransform:"uppercase"}}
+                  >
+                    {higienizacaoSaving ? "A guardar..." : higienizacaoOk ? "✓ Guardado" : "Guardar tabela"}
+                  </button>
+                </div>
+              );
+            })()}
             {tabLoja === "estatisticas" && (
               <div>
                 {(() => {
