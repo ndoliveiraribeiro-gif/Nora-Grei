@@ -1270,7 +1270,15 @@ export default function Home() {
           <span className="mob-nav-label">{t.bottomNav.catalogo}</span>
         </a>
         <a href="/lojas" className="mob-nav-item destaque">
-          <span className="mob-nav-icon" style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:300}}>NG</span>
+          <span className="mob-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l1-5h16l1 5"/>
+              <path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/>
+              <path d="M9 9v12M15 9v12"/>
+              <path d="M3 9h18"/>
+              <rect x="9" y="14" width="6" height="6" rx="0.5"/>
+            </svg>
+          </span>
           <span className="mob-nav-label">{t.nav.lojas}</span>
         </a>
         <a href="/pesquisa" className="mob-nav-item">

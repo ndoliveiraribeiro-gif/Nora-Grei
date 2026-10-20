@@ -9,9 +9,9 @@ const supabase = createClient(
 );
 
 const t = {
-  pt: { inicio: "Início", catalogo: "Colecção", feed: "Feed", cesto: "Cesto", perfil: "Perfil" },
-  fr: { inicio: "Accueil", catalogo: "Collection", feed: "Feed", cesto: "Panier", perfil: "Profil" },
-  lt: { inicio: "Pradžia", catalogo: "Kolekcija", feed: "Feed", cesto: "Krepšelis", perfil: "Profilis" },
+  pt: { inicio: "Início", catalogo: "Colecção", lojas: "Lojistas", cesto: "Cesto", perfil: "Perfil" },
+  fr: { inicio: "Accueil", catalogo: "Collection", lojas: "Boutiques", cesto: "Panier", perfil: "Profil" },
+  lt: { inicio: "Pradžia", catalogo: "Kolekcija", lojas: "Parduotuvės", cesto: "Krepšelis", perfil: "Profilis" },
 };
 
 export default function BottomNav() {
@@ -56,12 +56,12 @@ export default function BottomNav() {
         <rect x="14" y="14" width="7" height="7" rx="1"/>
       </svg>
     )},
-    { href: "/feed", label: i.feed, icon: (
+    { href: "/lojas", label: i.lojas, icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
-        <rect x="3" y="3" width="18" height="14" rx="2"/>
+        <path d="M3 9l1.5-6h15L21 9"/>
+        <path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/>
         <path d="M3 9h18"/>
-        <path d="M8 21h8"/>
-        <path d="M12 17v4"/>
+        <rect x="9" y="13" width="6" height="8" rx="0.5"/>
       </svg>
     )},
     { href: "/cesto", label: i.cesto, badge: cestoCont, icon: (
