@@ -1170,6 +1170,7 @@ export default function Perfil() {
   const [pagamentosBooster, setPagamentosBooster] = useState([]);
   const [subTabCustos, setSubTabCustos] = useState("alugueres");
   const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
+  const [avaliacoesLoja, setAvaliacoesLoja] = useState([]); // avaliacoes_lojista para cálculo de nota média
   const fileRef = useRef();
 
   // Lembrete de referral — aparece 45s após carregar, se não foi dispensado hoje
@@ -1215,7 +1216,12 @@ export default function Perfil() {
         if (ps) setPecasLoja(ps);
         if (ps && ps.length > 0) {
           const { data: als } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone, cidade), pecas_lojista(nome, fotos, preco_aluguer_dia), stock_lojista(tamanho)").eq("lojista_id", user.id).order("created_at", { ascending: false });
-          if (als) setAlugueresLoja(als);
+          if (als) {
+            setAlugueresLoja(als);
+            // carregar avaliações para cálculo da nota média no dashboard
+            const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma").eq("lojista_id", user.id);
+            if (avs) setAvaliacoesLoja(avs);
+          }
         }
       } else {
         // Não é lojista — verificar se tem candidatura pendente
@@ -1651,12 +1657,11 @@ export default function Perfil() {
   };
 
   const cancelarAluguerLojista = async (aluguer) => {
+    const agora = new Date().toISOString();
     // 1. Muda estado para cancelado
-    await atualizarEstadoAluguer(aluguer.id, "cancelado", { cancelado_por: "lojista", cancelado_em: new Date().toISOString() });
+    await atualizarEstadoAluguer(aluguer.id, "cancelado", { cancelado_por: "lojista", cancelado_em: agora });
     // 2. Cria pedido de reembolso pendente — cliente escolhe crédito ou dinheiro
-    // (crédito automático ou Stripe refund serão implementados quando integração estiver ativa)
     if (aluguer.cliente_id && aluguer.valor_aluguer) {
-      // buscar recibo para ter metodo_pagamento
       const { data: recibo } = await supabase.from("recibos").select("id, metodo_pagamento").eq("aluguer_id", aluguer.id).maybeSingle();
       await supabase.from("reembolsos_pendentes").insert({
         aluguer_id: aluguer.id,
@@ -1666,9 +1671,18 @@ export default function Perfil() {
         metodo_pagamento: recibo?.metodo_pagamento || null,
         recibo_id: recibo?.id || null,
         estado: "aguarda_escolha",
-        created_at: new Date().toISOString(),
+        created_at: agora,
       });
     }
+    // 3. Penalização automática 1★ da plataforma por cancelamento do lojista
+    await supabase.from("avaliacoes_lojista").upsert({
+      aluguer_lojista_id: aluguer.id,
+      cliente_id: aluguer.cliente_id,
+      lojista_id: aluguer.lojista_id,
+      nota_plataforma: 1,
+      motivo_plataforma: "Cancelamento por iniciativa do lojista",
+      created_at: agora,
+    }, { onConflict: "aluguer_lojista_id" });
     setModalCancelarLojista(null);
   };
 
@@ -2754,6 +2768,41 @@ export default function Perfil() {
                     </div>
                     <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.35rem"}}>{taxaOcupacao<25?"Preço pode estar alto ou peças precisam de mais visibilidade":taxaOcupacao<50?"A crescer — considera promover no feed":taxaOcupacao<75?"Boa ocupação":"Excelente — considera subir preço ou adicionar stock"}</div>
                   </div>
+                  {/* ── NOTA DA PLATAFORMA ── */}
+                  {(() => {
+                    // Nota média combinada: clientes + penalizações plataforma
+                    const notasClientes = avaliacoesLoja.filter(av => av.nota_cliente_lojista).map(av => av.nota_cliente_lojista);
+                    const notasPlataforma = avaliacoesLoja.filter(av => av.nota_plataforma).map(av => av.nota_plataforma);
+                    const todasNotas = [...notasClientes, ...notasPlataforma];
+                    if (todasNotas.length === 0) return null;
+                    const mediaGlobal = (todasNotas.reduce((s,n)=>s+n,0) / todasNotas.length);
+                    const mediaStr = mediaGlobal.toFixed(1);
+                    const estrelasCor = mediaGlobal >= 4 ? "#c4748a" : mediaGlobal >= 3 ? "#f39c12" : "#e74c3c";
+                    const penalizacoes = notasPlataforma.filter(n => n <= 2);
+                    return (
+                      <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem",border:"1.5px solid #f0eeeb"}}>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.75rem"}}>⭐ Nota da plataforma</div>
+                        <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"0.6rem"}}>
+                          <div style={{fontFamily:"var(--serif)",fontSize:"2.8rem",fontWeight:300,color:estrelasCor,lineHeight:1}}>{mediaStr}</div>
+                          <div>
+                            <div style={{display:"flex",gap:"0.1rem",marginBottom:"0.2rem"}}>
+                              {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"1.1rem",color:v<=Math.round(mediaGlobal)?estrelasCor:"#e2dfda"}}>★</span>)}
+                            </div>
+                            <div style={{fontSize:"0.68rem",color:"var(--g4)",letterSpacing:"0.05em"}}>
+                              {notasClientes.length > 0 && <span>{notasClientes.length} avaliação{notasClientes.length!==1?"ões":""} de clientes</span>}
+                              {notasClientes.length > 0 && notasPlataforma.length > 0 && <span> · </span>}
+                              {notasPlataforma.length > 0 && <span>{notasPlataforma.length} nota{notasPlataforma.length!==1?"s":""} da Nora Grei</span>}
+                            </div>
+                          </div>
+                        </div>
+                        {penalizacoes.length > 0 && (
+                          <div style={{background:"#ffeaea",border:"1px solid #e74c3c22",padding:"0.5rem 0.7rem",fontSize:"0.72rem",color:"#c0392b",lineHeight:1.4}}>
+                            ⚠ {penalizacoes.length} penalização{penalizacoes.length!==1?"ões":""} atribuída{penalizacoes.length!==1?"s":""} pela plataforma — cancela reservas ou incidentes afetam a tua nota.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                   {/* ── SAÚDE OPERACIONAL ── */}
                   {(() => {
                     const total = alugueresLoja.length;

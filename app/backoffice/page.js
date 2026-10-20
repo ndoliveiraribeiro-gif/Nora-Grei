@@ -1104,6 +1104,8 @@ export default function Backoffice() {
   const [pecasPendentes, setPecasPendentes] = useState([]);
   const [subTabCandidaturas, setSubTabCandidaturas] = useState(false); // toggle detalhe
   const [subTabLojistas, setSubTabLojistas] = useState("depositos");
+  const [lojistasAprovados, setLojistasAprovados] = useState([]);
+  const [avaliacoesBackoffice, setAvaliacoesBackoffice] = useState({}); // { lojista_id: [avaliacoes] }
   const chatRef = useRef(null);
 
   // Filtros alugueres
@@ -1298,6 +1300,25 @@ export default function Backoffice() {
         .eq("estado", "pendente")
         .order("created_at", { ascending: false });
       if (pendentes) setPecasPendentes(pendentes);
+      // lojistas aprovados para painel de avaliações
+      const { data: lojs } = await supabase
+        .from("clientes")
+        .select("id, nome, email, codigo_cliente, lojista_estado")
+        .eq("modo_lojista", true)
+        .order("nome");
+      if (lojs) setLojistasAprovados(lojs);
+      // avaliações agrupadas por lojista
+      const { data: avsTodas } = await supabase
+        .from("avaliacoes_lojista")
+        .select("lojista_id, nota_cliente_lojista, nota_plataforma, motivo_plataforma, created_at");
+      if (avsTodas) {
+        const map = {};
+        avsTodas.forEach(av => {
+          if (!map[av.lojista_id]) map[av.lojista_id] = [];
+          map[av.lojista_id].push(av);
+        });
+        setAvaliacoesBackoffice(map);
+      }
     }
     if (tab === "estatisticas") await carregarEstatisticas();
   };
@@ -3051,8 +3072,27 @@ export default function Backoffice() {
             { id: "pagamentos", label: `Pagamentos pendentes (${pagamentos.length})` },
             { id: "disputas", label: `Disputas (${disputas.length})` },
             { id: "todos", label: `Todos (${alugueresLojista.length})` },
+            { id: "avaliacoes", label: `Avaliações (${lojistasAprovados.length})` },
           ];
           const lista = subTabLojistas === "depositos" ? depositos : subTabLojistas === "pagamentos" ? pagamentos : subTabLojistas === "disputas" ? disputas : alugueresLojista;
+
+          const atribuirNotaPlataforma = async (lojistaId, nota, motivo) => {
+            const agora = new Date().toISOString();
+            // Insere avaliação manual da plataforma (sem aluguer_lojista_id específico — registo administrativo)
+            await supabase.from("avaliacoes_lojista").insert({
+              lojista_id: lojistaId,
+              nota_plataforma: nota,
+              motivo_plataforma: motivo || "Avaliação manual pela Nora Grei",
+              created_at: agora,
+            });
+            // Recarrega avaliações
+            const { data: avs } = await supabase.from("avaliacoes_lojista").select("lojista_id, nota_cliente_lojista, nota_plataforma, motivo_plataforma, created_at");
+            if (avs) {
+              const map = {};
+              avs.forEach(av => { if (!map[av.lojista_id]) map[av.lojista_id] = []; map[av.lojista_id].push(av); });
+              setAvaliacoesBackoffice(map);
+            }
+          };
 
           const confirmarDepositoDevolucao = async (id) => {
             await supabase.from("alugueres_lojista").update({ deposito_estado: "devolvido", deposito_devolvido_em: new Date().toISOString() }).eq("id", id);
@@ -3158,7 +3198,93 @@ export default function Backoffice() {
                     <button key={s.id} onClick={() => setSubTabLojistas(s.id)} style={{ padding:"0.4rem 0.9rem",fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",border:"none",background:subTabLojistas===s.id?"#080808":"#f0eeeb",color:subTabLojistas===s.id?"#fff":"#555",cursor:"pointer",fontFamily:"'Jost',sans-serif" }}>{s.label}</button>
                   ))}
                 </div>
-                {lista.length === 0 ? (
+
+                {subTabLojistas === "avaliacoes" && (() => {
+                  if (lojistasAprovados.length === 0) return <p style={{ fontSize:"0.85rem",color:"#aaa",padding:"2rem 0",textAlign:"center" }}>Nenhum lojista aprovado.</p>;
+                  return (
+                    <div style={{ display:"flex",flexDirection:"column",gap:"1rem" }}>
+                      {lojistasAprovados.map(lj => {
+                        const avs = avaliacoesBackoffice[lj.id] || [];
+                        const notasClientes = avs.filter(av => av.nota_cliente_lojista).map(av => av.nota_cliente_lojista);
+                        const notasPlataforma = avs.filter(av => av.nota_plataforma).map(av => av.nota_plataforma);
+                        const todasNotas = [...notasClientes, ...notasPlataforma];
+                        const media = todasNotas.length ? (todasNotas.reduce((s,n)=>s+n,0)/todasNotas.length).toFixed(1) : null;
+                        const mediaNum = media ? parseFloat(media) : 0;
+                        const corMedia = mediaNum >= 4 ? "#27ae60" : mediaNum >= 3 ? "#f39c12" : mediaNum > 0 ? "#e74c3c" : "#aaa";
+                        return (
+                          <div key={lj.id} style={{ background:"#fff",border:"1px solid #f0eeeb",padding:"1rem 1.25rem",borderLeft:`3px solid ${corMedia}` }}>
+                            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:"0.75rem" }}>
+                              <div>
+                                <div style={{ fontWeight:500,fontSize:"0.9rem",fontFamily:"'Jost',sans-serif" }}>{lj.nome}</div>
+                                <div style={{ fontSize:"0.72rem",color:"#888",fontFamily:"'Jost',sans-serif" }}>{lj.email} · @{lj.codigo_cliente||"—"}</div>
+                              </div>
+                              <div style={{ display:"flex",alignItems:"center",gap:"0.75rem" }}>
+                                {media ? (
+                                  <div style={{ textAlign:"right" }}>
+                                    <div style={{ display:"flex",alignItems:"baseline",gap:"0.3rem" }}>
+                                      <span style={{ fontFamily:"serif",fontSize:"1.8rem",fontWeight:300,color:corMedia,lineHeight:1 }}>{media}</span>
+                                      <span style={{ fontSize:"0.68rem",color:"#aaa" }}>/ 5</span>
+                                    </div>
+                                    <div style={{ display:"flex",gap:"0.1rem" }}>
+                                      {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"0.85rem",color:v<=Math.round(mediaNum)?corMedia:"#e2dfda"}}>★</span>)}
+                                    </div>
+                                    <div style={{ fontSize:"0.62rem",color:"#aaa",marginTop:"0.1rem" }}>
+                                      {notasClientes.length} cliente{notasClientes.length!==1?"s":""} · {notasPlataforma.length} plataforma
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span style={{ fontSize:"0.75rem",color:"#aaa",fontStyle:"italic" }}>Sem avaliações</span>
+                                )}
+                              </div>
+                            </div>
+                            {/* Histórico de notas da plataforma */}
+                            {notasPlataforma.length > 0 && (
+                              <div style={{ marginTop:"0.75rem",paddingTop:"0.75rem",borderTop:"1px solid #f0eeeb" }}>
+                                <div style={{ fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.4rem" }}>Notas da plataforma</div>
+                                <div style={{ display:"flex",flexDirection:"column",gap:"0.25rem" }}>
+                                  {avs.filter(av => av.nota_plataforma).map((av, idx) => (
+                                    <div key={idx} style={{ display:"flex",alignItems:"center",gap:"0.5rem",fontSize:"0.75rem",fontFamily:"'Jost',sans-serif" }}>
+                                      <span style={{ color:av.nota_plataforma<=2?"#e74c3c":av.nota_plataforma<=3?"#f39c12":"#27ae60",fontWeight:600 }}>{"★".repeat(av.nota_plataforma)}{"☆".repeat(5-av.nota_plataforma)}</span>
+                                      <span style={{ color:"#555" }}>{av.motivo_plataforma||"—"}</span>
+                                      <span style={{ color:"#bbb",fontSize:"0.68rem" }}>{av.created_at ? new Date(av.created_at).toLocaleDateString("pt-PT") : ""}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {/* Atribuir nova nota da plataforma */}
+                            <div style={{ marginTop:"0.75rem",paddingTop:"0.75rem",borderTop:"1px solid #f0eeeb" }}>
+                              <div style={{ fontSize:"0.65rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.5rem" }}>Atribuir nota da plataforma</div>
+                              <div style={{ display:"flex",gap:"0.4rem",flexWrap:"wrap",alignItems:"center" }}>
+                                {[1,2,3,4,5].map(n => (
+                                  <button key={n} style={BTN(n<=2?"red":n<=3?"outline":"green","sm")}
+                                    onClick={async () => {
+                                      const motivo = n === 1
+                                        ? "Cancelamento por iniciativa do lojista"
+                                        : n === 2
+                                        ? "Atraso recorrente ou incidente logístico"
+                                        : n === 3
+                                        ? "Desempenho médio"
+                                        : n === 4
+                                        ? "Bom desempenho operacional"
+                                        : "Desempenho excecional";
+                                      const motFinal = prompt(`Motivo para ${n}★ (ou Enter para usar o padrão):`, motivo);
+                                      if (motFinal === null) return;
+                                      await atribuirNotaPlataforma(lj.id, n, motFinal || motivo);
+                                    }}>
+                                    {"★".repeat(n)} {n}★
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+
+                {subTabLojistas !== "avaliacoes" && (lista.length === 0 ? (
                   <p style={{ fontSize:"0.85rem",color:"#aaa",padding:"2rem 0",textAlign:"center" }}>Nenhum registo.</p>
                 ) : (
                   <table style={{ width:"100%",borderCollapse:"collapse" }}>
@@ -3208,7 +3334,7 @@ export default function Backoffice() {
                       })}
                     </tbody>
                   </table>
-                )}
+                ))}
               </div>
             </>
           );
