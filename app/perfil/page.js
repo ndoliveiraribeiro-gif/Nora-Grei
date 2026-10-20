@@ -1061,6 +1061,10 @@ export default function Perfil() {
   const [alugueresLoja, setAlugueresLoja] = useState([]);
   const [diasTeste, setDiasTeste] = useState(180);
   const [codigoLoja, setCodigoLoja] = useState(null);
+  const [editandoUrl, setEditandoUrl] = useState(false);
+  const [novoUrl, setNovoUrl] = useState("");
+  const [urlStatus, setUrlStatus] = useState(null); // null | "checking" | "ok" | "taken" | "invalid"
+  const [urlCheckTimer, setUrlCheckTimer] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
   const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
@@ -1275,6 +1279,35 @@ export default function Perfil() {
       setDetectandoLoc(false);
     }, () => setDetectandoLoc(false));
   };
+
+  // ── URL PERSONALIZADO DA LOJA ──────────────────────────────────────────
+  const slugify = (str) => str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"").slice(0,30);
+
+  const verificarUrl = async (valor) => {
+    const slug = slugify(valor);
+    if (!slug || slug.length < 3) { setUrlStatus("invalid"); return; }
+    setUrlStatus("checking");
+    const { data } = await supabase.from("clientes").select("id").eq("codigo_cliente", slug).neq("id", user.id).maybeSingle();
+    setUrlStatus(data ? "taken" : "ok");
+  };
+
+  const onNovoUrlChange = (val) => {
+    setNovoUrl(val);
+    setUrlStatus(null);
+    if (urlCheckTimer) clearTimeout(urlCheckTimer);
+    const t = setTimeout(() => verificarUrl(val), 600);
+    setUrlCheckTimer(t);
+  };
+
+  const gravarUrl = async () => {
+    const slug = slugify(novoUrl);
+    if (urlStatus !== "ok" || slug.length < 3) return;
+    await supabase.from("clientes").update({ codigo_cliente: slug }).eq("id", user.id);
+    setCodigoLoja(slug);
+    setEditandoUrl(false);
+    setUrlStatus(null);
+  };
+  // ──────────────────────────────────────────────────────────────────────
 
   const guardarPerfil = async () => {
     if (!user) return;
@@ -2308,10 +2341,34 @@ export default function Perfil() {
               <h2 style={{fontFamily:"var(--serif)",fontSize:"1.35rem",fontWeight:300,margin:0,letterSpacing:"0.04em"}}>
                 {lang==="fr"?"Ma boutique":lang==="lt"?"Mano parduotuvė":"Gestão da loja"}
               </h2>
-              {codigoLoja && (
-                <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+              {codigoLoja && !editandoUrl && (
+                <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
                   <a href={`/loja/${codigoLoja}`} target="_blank" rel="noreferrer" style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
                   <button onClick={()=>navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`)} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</button>
+                  <button onClick={()=>{setNovoUrl(codigoLoja);setEditandoUrl(true);setUrlStatus(null);}} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>✎ URL</button>
+                </div>
+              )}
+              {editandoUrl && (
+                <div style={{display:"flex",flexDirection:"column",gap:"0.4rem",minWidth:0,maxWidth:340}}>
+                  <div style={{display:"flex",alignItems:"center",gap:"0.4rem",background:"var(--g1)",border:`1.5px solid ${urlStatus==="ok"?"#4caf50":urlStatus==="taken"||urlStatus==="invalid"?"#e57373":"var(--g2)"}`,padding:"0.3rem 0.6rem"}}>
+                    <span style={{fontSize:"0.65rem",color:"var(--g4)",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>/loja/</span>
+                    <input
+                      value={novoUrl}
+                      onChange={e=>onNovoUrlChange(e.target.value)}
+                      placeholder="o-meu-url"
+                      style={{border:"none",background:"none",outline:"none",fontFamily:"var(--sans)",fontSize:"0.82rem",color:"var(--ink)",minWidth:80,flex:1}}
+                      autoFocus
+                    />
+                    {urlStatus==="checking" && <span style={{fontSize:"0.65rem",color:"var(--g4)"}}>···</span>}
+                    {urlStatus==="ok" && <span style={{fontSize:"0.75rem",color:"#4caf50"}}>✓</span>}
+                    {urlStatus==="taken" && <span style={{fontSize:"0.65rem",color:"#e57373"}}>Ocupado</span>}
+                    {urlStatus==="invalid" && <span style={{fontSize:"0.65rem",color:"#e57373"}}>Mín. 3 letras</span>}
+                  </div>
+                  <div style={{fontSize:"0.6rem",color:"var(--g4)",fontFamily:"var(--sans)",letterSpacing:"0.05em"}}>Só letras e números · sem espaços · único na plataforma</div>
+                  <div style={{display:"flex",gap:"0.4rem"}}>
+                    <button onClick={gravarUrl} disabled={urlStatus!=="ok"} style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.75rem",background:urlStatus==="ok"?"var(--rosa)":"var(--g2)",color:urlStatus==="ok"?"#fff":"var(--g4)",border:"none",fontFamily:"var(--sans)",cursor:urlStatus==="ok"?"pointer":"not-allowed"}}>Guardar</button>
+                    <button onClick={()=>{setEditandoUrl(false);setUrlStatus(null);}} style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.3rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",fontFamily:"var(--sans)",cursor:"pointer"}}>Cancelar</button>
+                  </div>
                 </div>
               )}
             </div>
