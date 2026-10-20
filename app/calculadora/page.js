@@ -69,10 +69,10 @@ export default function Calculadora() {
     const alugueresTotal = Math.round(rotacaoMes * meses);
 
     // Receita bruta aluguer
+    // A higienização e logística são custos pagos pelo cliente — não saem do ganho do lojista
     const receitaBruta = precoAluguer * alugueresTotal;
     const comissaoTotal = receitaBruta * COMISSAO_ALUGUER;
-    const higienizacaoTotal = CUSTO_HIGIENIZACAO * alugueresTotal;
-    const liquidoAluguer = receitaBruta - comissaoTotal - higienizacaoTotal;
+    const liquidoAluguer = receitaBruta - comissaoTotal;
 
     // Valor residual da peça após os alugueres (deprecia mais lentamente com cuidado NG)
     // Assumimos que o aluguer controlado deprecia menos que uso privado (fator 0.85 vs 1.0)
@@ -492,10 +492,6 @@ export default function Calculadora() {
                 <div className="bk-row">
                   <span className="bk-label">Comissão Nora Grei (10%)</span>
                   <span className="bk-val neg">−€{Math.round(calc.receitaBruta * COMISSAO_ALUGUER)}</span>
-                </div>
-                <div className="bk-row">
-                  <span className="bk-label">Higienização ({calc.alugueresTotal}× €{CUSTO_HIGIENIZACAO})</span>
-                  <span className="bk-val neg">−€{CUSTO_HIGIENIZACAO * calc.alugueresTotal}</span>
                 </div>
                 <div className="bk-div"/>
                 <div className="bk-row">
