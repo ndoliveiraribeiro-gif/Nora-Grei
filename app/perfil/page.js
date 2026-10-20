@@ -3,6 +3,44 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
 
+// ── Estimativa de valor ─────────────────────────────────────────────────────
+const MARCAS_PREMIUM_P = ["hermès","hermes","chanel","louis vuitton","lv","gucci","prada",
+  "bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline",
+  "givenchy","valentino","versace","balenciaga","jacquemus","loewe","loro piana",
+  "brunello cucinelli","max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren"];
+const MARCAS_ALTA_P = ["zara","mango","&other stories","other stories","cos","arket",
+  "massimo dutti","pedro del hierro","escorpion","escorpión","hugo boss","boss",
+  "calvin klein","ck","tommy hilfiger","tommy","lacoste","levis","levi's","gant",
+  "scotch soda","weekday","monki","stradivarius","bershka","pull&bear","sfera",
+  "phase eight","whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje"];
+function fatorMarcaP(marca = "") {
+  const m = marca.toLowerCase().trim();
+  if (MARCAS_PREMIUM_P.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
+  if (MARCAS_ALTA_P.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
+  return { fator: 0.32, tier: "massmarket" };
+}
+const FATOR_ESTADO_P = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
+const FATOR_IDADE_P  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
+const ROTACAO_CAT_P = {
+  Vestidos: 1.8, Fatos: 1.5, Macacões: 1.4, Conjuntos: 1.3,
+  Casacos: 1.0, Saias: 1.2, Calças: 1.1, Blusas: 1.1,
+  Camisas: 1.0, Kaftans: 0.9, Malas: 2.0, Acessórios: 1.6,
+  _default: 1.2,
+};
+function calcEstimativaP({ valor_peca, marca, condicao, idade_peca, categoria }) {
+  const p = parseFloat(valor_peca) || 0;
+  if (!p) return null;
+  const { fator: fm, tier } = fatorMarcaP(marca);
+  const fe = FATOR_ESTADO_P[condicao] ?? 0.68;
+  const fi = FATOR_IDADE_P[idade_peca] ?? 0.85;
+  const valorMercado = Math.round(p * fm * fe * fi);
+  const precoAluguerDia = Math.max(5, Math.round(valorMercado * 0.08 / 5) * 5);
+  const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
+  const rotMes = ROTACAO_CAT_P[categoria] ?? ROTACAO_CAT_P._default;
+  const ganho12m = Math.round(precoAluguerDia * 4 * rotMes * 12 * 0.9);
+  return { valorMercado, precoAluguerDia, precoVendaUsada, rotMes: rotMes.toFixed(1), ganho12m, tier };
+}
+
 const NIVEL_NOMES_PERFIL = {
   pt: { platina:"Platina", ouro:"Ouro", prata:"Prata", bronze:"Bronze" },
   fr: { platina:"Platine", ouro:"Or",   prata:"Argent", bronze:"Bronze" },
@@ -3371,33 +3409,76 @@ export default function Perfil() {
               </div>
             </div>
 
-            {/* Valor nova + sugestão aluguer */}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
+            {/* Valor nova + idade */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.75rem"}}>
               <div className="fg">
-                <label className="lbl">Valor peça nova (€)</label>
+                <label className="lbl">Valor peça nova (€) <span style={{color:"#c0392b"}}>*</span></label>
                 <input className="inp" type="number" min="0" value={editarPeca.valor_peca||""}
-                  onChange={e=>{
-                    const v=e.target.value;
-                    const sugestao=v&&parseFloat(v)>0?Math.round(parseFloat(v)*0.08):"";
-                    setEditarPeca(p=>({...p,valor_peca:v,preco_aluguer_dia:p.preco_aluguer_dia||sugestao}));
-                  }}
+                  onChange={e=>setEditarPeca(p=>({...p,valor_peca:e.target.value}))}
                   placeholder="200" />
               </div>
+              <div className="fg">
+                <label className="lbl">Idade da peça</label>
+                <select className="inp" value={editarPeca.idade_peca||"1a2"} onChange={e=>setEditarPeca(p=>({...p,idade_peca:e.target.value}))}>
+                  <option value="novo">Nova / nunca usada</option>
+                  <option value="1a2">1 – 2 anos</option>
+                  <option value="2a4">2 – 4 anos</option>
+                  <option value="4mais">+ de 4 anos</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Bloco de estimativa */}
+            {(()=>{
+              const est = calcEstimativaP(editarPeca);
+              if (!est) return (
+                <p style={{fontSize:"0.75rem",color:"var(--g4)",marginBottom:"1rem",padding:"0.75rem",background:"#f7f6f4",borderRadius:"8px",border:"1px dashed #d5d0c8"}}>
+                  Preenche o valor da peça nova para ver a estimativa de preços ↑
+                </p>
+              );
+              return (
+                <div style={{background:"#1a1816",color:"#f5f3ef",borderRadius:"10px",padding:"1rem",marginBottom:"1rem"}}>
+                  <div style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#a09890",marginBottom:"0.6rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                    <span>✦</span> Estimativa Nora Grei
+                    <span style={{marginLeft:"auto",fontSize:"0.6rem",background:"#2a2826",padding:"0.1rem 0.35rem",borderRadius:"3px",color:"#c4748a"}}>
+                      {est.tier === "premium" ? "marca premium" : est.tier === "alta" ? "marca alta" : "mass market"}
+                    </span>
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem",marginBottom:"0.75rem"}}>
+                    <div style={{textAlign:"center"}}>
+                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#f5f3ef"}}>{est.valorMercado}€</div>
+                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>valor mercado</div>
+                    </div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826",borderRight:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#c4748a"}}>{est.precoAluguerDia}€</div>
+                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer / dia</div>
+                    </div>
+                    <div style={{textAlign:"center"}}>
+                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#f5f3ef"}}>{est.precoVendaUsada}€</div>
+                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda usada</div>
+                    </div>
+                  </div>
+                  <div style={{fontSize:"0.7rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
+                    ~{est.rotMes} alugueres/mês · potencial {est.ganho12m}€ em 12 meses
+                  </div>
+                  <button type="button"
+                    onClick={()=>setEditarPeca(p=>({...p,preco_aluguer_dia:est.precoAluguerDia,preco_venda:est.precoVendaUsada}))}
+                    style={{width:"100%",background:"#c4748a",color:"#fff",border:"none",borderRadius:"6px",padding:"0.5rem",fontSize:"0.75rem",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",cursor:"pointer"}}>
+                    Usar sugestão →
+                  </button>
+                </div>
+              );
+            })()}
+
+            {/* Aluguer / dia + Venda */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>
               {((editarPeca.tipo||"alugar")==="alugar"||(editarPeca.tipo||"alugar")==="ambos") && (
                 <div className="fg">
-                  <label className="lbl" style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
-                    Aluguer / dia (€)
-                    {editarPeca.valor_peca&&parseFloat(editarPeca.valor_peca)>0&&<span style={{fontSize:"0.68rem",background:"#e8f5e9",color:"#27ae60",padding:"0.1rem 0.35rem",borderRadius:"3px",fontWeight:600,letterSpacing:"0.05em"}}>ref: {Math.round(parseFloat(editarPeca.valor_peca)*0.08)}€</span>}
-                  </label>
+                  <label className="lbl">Aluguer / dia (€)</label>
                   <input className="inp" type="number" min="0" value={editarPeca.preco_aluguer_dia||""} onChange={e=>setEditarPeca(p=>({...p,preco_aluguer_dia:e.target.value}))} placeholder="16" />
                 </div>
               )}
             </div>
-            {editarPeca.valor_peca&&editarPeca.preco_aluguer_dia&&parseFloat(editarPeca.valor_peca)>0&&parseFloat(editarPeca.preco_aluguer_dia)>0&&(
-              <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
-                A cliente poupa {Math.round((1-parseFloat(editarPeca.preco_aluguer_dia)/parseFloat(editarPeca.valor_peca))*100)}% vs comprar nova
-              </p>
-            )}
 
             {/* Preço venda + Material */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
