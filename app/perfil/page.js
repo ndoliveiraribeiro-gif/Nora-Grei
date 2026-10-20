@@ -1613,6 +1613,8 @@ export default function Perfil() {
       preco_aluguer_dia: editarPeca.preco_aluguer_dia ? parseFloat(editarPeca.preco_aluguer_dia) : null,
       preco_venda: editarPeca.preco_venda ? parseFloat(editarPeca.preco_venda) : null,
       valor_peca: editarPeca.valor_peca ? parseFloat(editarPeca.valor_peca) : null,
+      idade_peca: editarPeca.idade_peca || "1a2",
+      caucao: (() => { const e = calcEstimativaP(editarPeca); return e ? e.caucao : null; })(),
       material: editarPeca.material || null,
       marca: editarPeca.marca || null,
       cor: editarPeca.cor || null,

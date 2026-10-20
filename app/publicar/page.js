@@ -247,6 +247,8 @@ export default function PublicarPage() {
         preco_aluguer_dia: peca.preco_aluguer_dia ? parseFloat(peca.preco_aluguer_dia) : null,
         preco_venda: peca.preco_venda ? parseFloat(peca.preco_venda) : null,
         valor_peca: peca.valor_peca ? parseFloat(peca.valor_peca) : null,
+        idade_peca: peca.idade_peca || "1a2",
+        caucao: (() => { const e = calcEstimativa(peca); return e ? e.caucao : null; })(),
         material: peca.material.trim() || null,
         marca: peca.marca.trim() || null,
         cor: peca.cor.trim() || null,
