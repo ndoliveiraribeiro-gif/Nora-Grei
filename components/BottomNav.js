@@ -153,10 +153,12 @@ export default function BottomNav() {
           background: rgba(8,8,8,0);
           transition: background 0.25s;
           pointer-events: none;
+          visibility: hidden;
         }
         .bn-mais-overlay.open {
           background: rgba(8,8,8,0.35);
           pointer-events: all;
+          visibility: visible;
         }
         .bn-mais-drawer {
           display: none;
@@ -169,12 +171,15 @@ export default function BottomNav() {
           border-top: 1px solid #e2dfda;
           border-radius: 16px 16px 0 0;
           padding: 1rem 1.5rem 1.25rem;
-          transform: translateY(100%);
-          transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+          transform: translateY(110%);
+          visibility: hidden;
+          transition: transform 0.28s cubic-bezier(0.32,0.72,0,1), visibility 0s linear 0.28s;
           box-shadow: 0 -8px 32px rgba(8,8,8,0.08);
         }
         .bn-mais-drawer.open {
           transform: translateY(0);
+          visibility: visible;
+          transition: transform 0.28s cubic-bezier(0.32,0.72,0,1), visibility 0s linear 0s;
         }
         .bn-mais-handle {
           width: 36px; height: 4px;
