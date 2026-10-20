@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const T = {
@@ -79,7 +80,8 @@ function formatData(iso, t) {
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
 }
 
-export default function MensagensPage() {
+function MensagensInner() {
+  const searchParams = useSearchParams();
   const [lang, setLang] = useState("pt");
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +109,40 @@ export default function MensagensPage() {
     const { data: cli } = await supabase.from("clientes").select("id, nome, modo_lojista").eq("id", user.id).maybeSingle();
     if (!cli) { setLoading(false); return; }
     setCliente(cli);
-    await carregarConversas(cli);
+    const lista = await carregarConversas(cli);
+
+    // Abrir conversa via URL param (?conversa=ID ou ?lojista=ID)
+    const paramConversa = searchParams.get("conversa");
+    const paramLojista = searchParams.get("lojista");
+
+    if (paramConversa) {
+      const conv = lista?.find(c => c.id === paramConversa);
+      if (conv) { await abrirConversa(conv, cli); setLoading(false); return; }
+    }
+
+    if (paramLojista && !cli.modo_lojista) {
+      // Verificar se já existe conversa com este lojista
+      let conv = lista?.find(c => c.lojista?.id === paramLojista);
+      if (!conv) {
+        // Criar nova conversa
+        const { data: novaConv } = await supabase.from("conversas").insert({
+          cliente_id: cli.id,
+          lojista_id: paramLojista,
+          assunto: null,
+        }).select(`
+          id, assunto, ultima_mensagem_em, nao_lidas_cliente, nao_lidas_lojista,
+          cliente:cliente_id(id, nome),
+          lojista:lojista_id(id, nome),
+          aluguer:aluguer_lojista_id(id, referencia)
+        `).maybeSingle();
+        if (novaConv) {
+          setConversas(prev => [novaConv, ...prev]);
+          conv = novaConv;
+        }
+      }
+      if (conv) { await abrirConversa(conv, cli); setLoading(false); return; }
+    }
+
     setLoading(false);
   };
 
@@ -124,9 +159,11 @@ export default function MensagensPage() {
       .eq(campo, cli.id)
       .order("ultima_mensagem_em", { ascending: false, nullsFirst: false });
     setConversas(data || []);
+    return data || [];
   };
 
-  const abrirConversa = async (conv) => {
+  const abrirConversa = async (conv, cliOverride) => {
+    const cliAtivo = cliOverride || cliente;
     setConversaAtiva(conv);
     setVistaChat(true);
     setMensagens([]);
@@ -138,8 +175,8 @@ export default function MensagensPage() {
     }
 
     // Marcar lidas
-    if (cliente) {
-      const campo = cliente.modo_lojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
+    if (cliAtivo) {
+      const campo = cliAtivo.modo_lojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
       await supabase.from("conversas").update({ [campo]: 0 }).eq("id", conv.id);
       setConversas(prev => prev.map(c => c.id === conv.id ? { ...c, [campo]: 0 } : c));
     }
@@ -153,8 +190,8 @@ export default function MensagensPage() {
     setMensagens(data || []);
 
     // Marcar como lidas as mensagens recebidas
-    if (cliente && data) {
-      const idsNaoLidas = data.filter(m => m.remetente_id !== cliente.id && !m.lida).map(m => m.id);
+    if (cliAtivo && data) {
+      const idsNaoLidas = data.filter(m => m.remetente_id !== cliAtivo.id && !m.lida).map(m => m.id);
       if (idsNaoLidas.length > 0) {
         await supabase.from("mensagens_conversa").update({ lida: true }).in("id", idsNaoLidas);
       }
@@ -473,5 +510,13 @@ export default function MensagensPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function MensagensPage() {
+  return (
+    <Suspense fallback={null}>
+      <MensagensInner />
+    </Suspense>
   );
 }

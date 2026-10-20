@@ -112,7 +112,7 @@ export default function Pesquisa() {
         .from("clientes")
         .select("id, nome, codigo_cliente, cidade, pais")
         .eq("modo_lojista", true)
-        .ilike("nome", `%${variantes[0]}%`)
+        .or(variantes.map(v => `nome.ilike.%${v}%,codigo_cliente.ilike.%${v}%`).join(","))
         .limit(6),
     ]);
 

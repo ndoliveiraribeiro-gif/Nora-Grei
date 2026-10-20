@@ -139,13 +139,16 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         </div>
       </div>
 
-      {/* Barra de partilha */}
+      {/* Barra de partilha + Contactar */}
       <div className="loja-share-bar">
         <span className="share-label">Link</span>
         <span className="share-url">noragrei.com/loja/{loja.codigo_cliente}</span>
         <button className="share-copy" onClick={() => {
           navigator.clipboard.writeText(`${window.location.origin}/loja/${loja.codigo_cliente}`);
         }}>Copiar ↗</button>
+        <a href={`/mensagens?lojista=${loja.id}`} className="share-copy" style={{textDecoration:"none",display:"inline-block"}}>
+          {t.contactar || "Contactar"}
+        </a>
       </div>
 
       <section className="pecas-sec">
