@@ -17,7 +17,13 @@ const T = {
     porque: { label: "A nossa missão", titulo: "Porque a moda deve acompanhar a tua vida,", tituloSub: "não ocupar o teu armário.", pontos: ["Menos desperdício.", "Mais exclusividade.", "Mais liberdade.", "Moda consciente."] },
     numeros: [{ val:"500+",label:"Alugueres realizados" },{ val:"120+",label:"Peças exclusivas" },{ val:"4.9★",label:"Avaliação média" },{ val:"48h",label:"Entrega rápida" }],
     sustentabilidade: { label:"Moda consciente", titulo:"Cada peça vive várias histórias.", stats:[{ val:"70%",label:"Água poupada vs comprar" },{ val:"5×",label:"Reutilizações por peça" },{ val:"60%",label:"Emissões reduzidas" }] },
-    lojista: { label:"Para quem tem peças", titulo:"Tens peças para alugar?", sub:"Abre a tua loja, define os teus preços e deixa a Nora Grei tratar do resto.", btnMain:"Abrir a minha loja", btnSec:"Explorar catálogo" },
+    lojista: { label:"O teu armário trabalha por ti", titulo:"O teu guarda-roupa tem valor.", sub:"As lojistas Nora Grei não vendem — curadoreiam. Cada peça que partilhas torna-se parte de uma coleção reconhecida.", btnMain:"Abrir a minha loja", btnSec:"Ver a colecção",
+      pilares: [
+        { label:"Rendimento passivo", desc:"As tuas peças alugueres enquanto estão no teu armário." },
+        { label:"Reputação acumulada", desc:"Nível, avaliações e confiança que crescem com cada aluguer." },
+        { label:"Sem compromisso", desc:"Tu defines os preços, as datas e as condições. Sempre." },
+      ]
+    },
     cta: { titulo:"O teu guarda-roupa infinito", sub:"começa aqui.", btn:"Explorar colecção", tag:"Moda exclusiva. Sem excessos." },
     strip: ["Envio gratuito", "Depósito 100% devolvido", "Peças inspeccionadas", "Cancele quando quiser", "Moda consciente"],
     footer: {
@@ -65,7 +71,13 @@ const T = {
     porque: { label: "Notre mission", titulo: "Parce que la mode doit suivre votre vie,", tituloSub: "pas occuper votre placard.", pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode responsable."] },
     numeros: [{ val:"500+",label:"Locations réalisées" },{ val:"120+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
     sustentabilidade: { label:"Mode responsable", titulo:"Chaque pièce vit plusieurs histoires.", stats:[{ val:"70%",label:"Eau économisée vs achat" },{ val:"5×",label:"Réutilisations par pièce" },{ val:"60%",label:"Émissions réduites" }] },
-    lojista: { label:"Pour ceux qui ont des pièces", titulo:"Vous avez des pièces à louer ?", sub:"Ouvrez votre boutique, fixez vos prix et laissez Nora Grei s'occuper du reste.", btnMain:"Ouvrir ma boutique", btnSec:"Explorer le catalogue" },
+    lojista: { label:"Votre garde-robe travaille pour vous", titulo:"Votre garde-robe a de la valeur.", sub:"Les boutiques Nora Grei ne vendent pas — elles font de la curation. Chaque pièce partagée rejoint une collection reconnue.", btnMain:"Ouvrir ma boutique", btnSec:"Voir la collection",
+      pilares: [
+        { label:"Revenu passif", desc:"Vos pièces louent pendant qu'elles sont dans votre armoire." },
+        { label:"Réputation accumulée", desc:"Niveau, avis et confiance qui grandissent à chaque location." },
+        { label:"Sans engagement", desc:"Vous fixez les prix, les dates et les conditions. Toujours." },
+      ]
+    },
     cta: { titulo:"Votre garde-robe infinie", sub:"commence ici.", btn:"Explorer la collection", tag:"Mode exclusive. Sans excès." },
     strip: ["Livraison gratuite", "Dépôt 100% remboursé", "Pièces inspectées", "Annulez à tout moment", "Mode responsable"],
     footer: {
@@ -113,7 +125,13 @@ const T = {
     porque: { label: "Mūsų misija", titulo: "Nes mada turi atitikti jūsų gyvenimą,", tituloSub: "o ne užimti jūsų spintą.", pontos: ["Mažiau švaistymo.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."] },
     numeros: [{ val:"500+",label:"Įvykdytų nuomų" },{ val:"120+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
     sustentabilidade: { label:"Sąmoninga mada", titulo:"Kiekvienas drabužis turi kelias istorijas.", stats:[{ val:"70%",label:"Sutaupyto vandens vs pirkimas" },{ val:"5×",label:"Pakartotiniai naudojimai" },{ val:"60%",label:"Sumažintos emisijos" }] },
-    lojista: { label:"Tiems, kurie turi drabužių", titulo:"Turite drabužių nuomoti?", sub:"Atidarykite parduotuvę, nustatykite kainas — Nora Grei pasirūpins likusiu.", btnMain:"Atidaryti parduotuvę", btnSec:"Naršyti katalogą" },
+    lojista: { label:"Jūsų spinta dirba už jus", titulo:"Jūsų spinta turi vertę.", sub:"Nora Grei parduotuvės ne parduoda — jos kuria kolekciją. Kiekvienas drabužis tampa pripažintos kolekcijos dalimi.", btnMain:"Atidaryti parduotuvę", btnSec:"Žiūrėti kolekciją",
+      pilares: [
+        { label:"Pasyvios pajamos", desc:"Jūsų drabužiai nuomojami kol jie yra jūsų spintoje." },
+        { label:"Sukaupta reputacija", desc:"Lygis, atsiliepimai ir pasitikėjimas auga su kiekviena nuoma." },
+        { label:"Be įsipareigojimų", desc:"Jūs nustatote kainas, datas ir sąlygas. Visada." },
+      ]
+    },
     cta: { titulo:"Jūsų begalinė spinta", sub:"prasideda čia.", btn:"Naršyti kolekciją", tag:"Išskirtinė mada. Be perteklių." },
     strip: ["Nemokamas pristatymas", "100% grąžinamas užstatas", "Patikrinti drabužiai", "Atšaukite bet kada", "Sąmoninga mada"],
     footer: {
@@ -354,6 +372,7 @@ export default function Home() {
   const [pwaPrompt, setPwaPrompt] = useState(null);
   const [pwaInstalado, setPwaInstalado] = useState(false);
   const [cestoCont, setCestoCont] = useState(0);
+  const [numerosReais, setNumerosReais] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -361,6 +380,7 @@ export default function Home() {
     supabase.auth.getSession().then(({ data }) => { if (data.session) setUserLogado(true); });
     carregarCampanha();
     carregarConteudo();
+    carregarNumeros();
 
     const lerCesto = () => {
       try { setCestoCont(JSON.parse(localStorage.getItem("ng_cesto") || "[]").length); } catch (_) { setCestoCont(0); }
@@ -403,6 +423,29 @@ export default function Home() {
     }
   };
   const dispensarPwa = () => { setPwaBanner(false); localStorage.setItem("ng_pwa_dismiss","1"); };
+
+  const carregarNumeros = async () => {
+    const [
+      { count: totalAlugueres },
+      { count: totalPecas },
+      { data: avaliacoes },
+      { count: totalLojistas },
+    ] = await Promise.all([
+      supabase.from("alugueres").select("*", { count: "exact", head: true }).in("estado", ["concluido","devolvido"]),
+      supabase.from("pecas").select("*", { count: "exact", head: true }),
+      supabase.from("avaliacoes").select("classificacao"),
+      supabase.from("clientes").select("*", { count: "exact", head: true }).eq("e_lojista", true),
+    ]);
+    const media = avaliacoes && avaliacoes.length > 0
+      ? (avaliacoes.reduce((s, a) => s + (a.classificacao || 5), 0) / avaliacoes.length).toFixed(1)
+      : "5.0";
+    setNumerosReais({
+      alugueres: totalAlugueres || 0,
+      pecas: totalPecas || 0,
+      avaliacao: media,
+      lojistas: totalLojistas || 0,
+    });
+  };
 
   const carregarCampanha = async () => {
     const agora = new Date().toISOString();
@@ -1051,6 +1094,17 @@ export default function Home() {
         <p className="lojista-sec-label">{t.lojista.label}</p>
         <h2 className="lojista-sec-titulo">{t.lojista.titulo}</h2>
         <p className="lojista-sec-sub">{t.lojista.sub}</p>
+
+        {/* Pilares de valor — sem revelar mecânica */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"1.5rem",margin:"2rem 0 2.5rem",maxWidth:"700px"}}>
+          {t.lojista.pilares.map((p, i) => (
+            <div key={i} style={{borderLeft:"2px solid rgba(196,168,130,0.4)",paddingLeft:"1rem"}}>
+              <div style={{fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"rgba(196,168,130,0.7)",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{p.label}</div>
+              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.1rem",fontWeight:300,color:"rgba(248,247,245,0.9)",lineHeight:1.35}}>{p.desc}</div>
+            </div>
+          ))}
+        </div>
+
         <div className="lojista-sec-btns">
           <a href="/perfil" className="lojista-sec-btn-main">{t.lojista.btnMain}</a>
           <a href="/catalogo" className="lojista-sec-btn-sec">{t.lojista.btnSec}</a>
