@@ -149,6 +149,194 @@ const T = {
   },
 };
 
+// ── Tour animado "Como funciona" ─────────────────────────────────────────────
+const TOUR_SLIDES = [
+  {
+    id: "escolhe",
+    cor: "#c4748a",
+    iconePhone: (
+      <div style={{display:"flex",flexDirection:"column",gap:"0.5rem"}}>
+        <div style={{background:"#1a0a10",borderRadius:"6px",overflow:"hidden",height:"90px",position:"relative"}}>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,rgba(0,0,0,0.7),transparent)",display:"flex",alignItems:"flex-end",padding:"0.5rem"}}>
+            <span style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:"0.65rem",fontStyle:"italic"}}>Vestido Seda Noite</span>
+          </div>
+          <div style={{position:"absolute",top:"0.4rem",right:"0.4rem",background:"#c4748a",color:"#fff",fontSize:"0.45rem",padding:"0.1rem 0.3rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>35€/dia</div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.35rem"}}>
+          {["08 Jun","09 Jun","10 Jun","11 Jun"].map((d,i) => (
+            <div key={i} style={{background:i===1?"#c4748a":"#f0eeeb",borderRadius:"3px",padding:"0.25rem",textAlign:"center",fontSize:"0.5rem",color:i===1?"#fff":"#5a5855",fontFamily:"'Jost',sans-serif"}}>
+              {d}
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#080808",borderRadius:"3px",padding:"0.45rem",textAlign:"center",fontSize:"0.55rem",color:"#fff",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif"}}>
+          Reservar →
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "recebe",
+    cor: "#89c4e1",
+    iconePhone: (
+      <div style={{display:"flex",flexDirection:"column",gap:"0.5rem",alignItems:"center"}}>
+        <div style={{width:"52px",height:"52px",borderRadius:"50%",background:"linear-gradient(135deg,#e8f4f9,#c5e8f5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.6rem"}}>📦</div>
+        <div style={{width:"100%",background:"#f0eeeb",borderRadius:"4px",padding:"0.5rem 0.6rem"}}>
+          <div style={{fontSize:"0.48rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#5a5855",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>Estado do envio</div>
+          {["Encomenda confirmada","A caminho de ti","Entregue ✓"].map((s,i) => (
+            <div key={i} style={{display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.2rem 0"}}>
+              <div style={{width:"5px",height:"5px",borderRadius:"50%",background:i===2?"#27ae60":i===1?"#89c4e1":"#d5d2ca",flexShrink:0}} />
+              <span style={{fontSize:"0.48rem",color:i===2?"#27ae60":i===1?"#080808":"#aaa",fontFamily:"'Jost',sans-serif",fontWeight:i===2?600:400}}>{s}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{fontSize:"0.5rem",color:"#5a5855",fontFamily:"'Jost',sans-serif",textAlign:"center"}}>Entrega em 48h • Higienizada ✓</div>
+      </div>
+    ),
+  },
+  {
+    id: "usa",
+    cor: "#c4a882",
+    iconePhone: (
+      <div style={{display:"flex",flexDirection:"column",gap:"0.5rem"}}>
+        <div style={{background:"linear-gradient(135deg,#f5ede0,#e8d4b8)",borderRadius:"6px",height:"80px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"2rem"}}>✨</div>
+        <div style={{display:"flex",gap:"0.4rem"}}>
+          {[1,2,3].map(i => (
+            <div key={i} style={{flex:1,background:i===2?"#c4a882":"#f0eeeb",borderRadius:"3px",height:"28px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:i===2?"0.8rem":"0.6rem"}}>
+              {i===2?"❤️":"📸"}
+            </div>
+          ))}
+        </div>
+        <div style={{fontSize:"0.48rem",color:"#5a5855",fontFamily:"'Jost',sans-serif",textAlign:"center",lineHeight:1.4}}>Usa, fotografa, partilha.<br/>O guarda-roupa que se renova.</div>
+      </div>
+    ),
+  },
+  {
+    id: "devolve",
+    cor: "#27ae60",
+    iconePhone: (
+      <div style={{display:"flex",flexDirection:"column",gap:"0.5rem",alignItems:"center"}}>
+        <div style={{width:"100%",background:"#f0f9f4",border:"1.5px solid #27ae60",borderRadius:"4px",padding:"0.55rem 0.6rem"}}>
+          <div style={{fontSize:"0.48rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#27ae60",fontFamily:"'Jost',sans-serif",fontWeight:600,marginBottom:"0.3rem"}}>Caução devolvida</div>
+          <div style={{fontFamily:"Georgia,serif",fontSize:"1.2rem",fontWeight:300,color:"#27ae60"}}>+ 85,00 €</div>
+          <div style={{fontSize:"0.45rem",color:"#5a9a6e",fontFamily:"'Jost',sans-serif",marginTop:"0.15rem"}}>Crédito no cartão em 3–5 dias úteis</div>
+        </div>
+        <div style={{display:"flex",gap:"0.4rem",width:"100%"}}>
+          <div style={{flex:1,background:"#f0eeeb",borderRadius:"3px",padding:"0.3rem",textAlign:"center"}}>
+            <div style={{fontSize:"0.7rem"}}>↺</div>
+            <div style={{fontSize:"0.42rem",color:"#5a5855",fontFamily:"'Jost',sans-serif",marginTop:"0.1rem"}}>Nova peça?</div>
+          </div>
+          <div style={{flex:1,background:"#080808",borderRadius:"3px",padding:"0.3rem",textAlign:"center",cursor:"pointer"}}>
+            <div style={{fontSize:"0.7rem",color:"#fff"}}>✦</div>
+            <div style={{fontSize:"0.42rem",color:"rgba(255,255,255,0.7)",fontFamily:"'Jost',sans-serif",marginTop:"0.1rem"}}>Ver colecção</div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+];
+
+function TourAnimado({ lang, passos }) {
+  const [slide, setSlide] = useState(0);
+  const [animDir, setAnimDir] = useState(1); // 1=forward, -1=back
+  const [animating, setAnimating] = useState(false);
+  const timerRef = useRef(null);
+  const total = TOUR_SLIDES.length;
+
+  const ir = (idx, dir) => {
+    if (animating || idx === slide) return;
+    setAnimDir(dir);
+    setAnimating(true);
+    setTimeout(() => { setSlide(idx); setAnimating(false); }, 280);
+  };
+  const seguinte = () => ir((slide + 1) % total, 1);
+  const anterior = () => ir((slide - 1 + total) % total, -1);
+
+  useEffect(() => {
+    timerRef.current = setTimeout(seguinte, 3200);
+    return () => clearTimeout(timerRef.current);
+  }, [slide]);
+
+  const s = TOUR_SLIDES[slide];
+  const p = passos[slide];
+
+  return (
+    <div style={{marginTop:"1.5rem"}}>
+      {/* Phone mockup + conteúdo */}
+      <div style={{display:"flex",flexDirection:"column",gap:"1.5rem",alignItems:"center"}}>
+
+        {/* Phone */}
+        <div style={{
+          width:"160px",height:"280px",
+          background:"#080808",borderRadius:"24px",
+          padding:"10px",position:"relative",
+          boxShadow:"0 20px 60px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.06)",
+          flexShrink:0,
+        }}>
+          {/* notch */}
+          <div style={{position:"absolute",top:"10px",left:"50%",transform:"translateX(-50%)",width:"40px",height:"5px",background:"#1a1816",borderRadius:"3px",zIndex:2}} />
+          {/* ecrã */}
+          <div style={{
+            width:"100%",height:"100%",borderRadius:"16px",
+            background:"#f8f7f5",overflow:"hidden",
+            display:"flex",flexDirection:"column",
+            opacity: animating ? 0 : 1,
+            transform: animating ? `translateX(${animDir * 12}px)` : "translateX(0)",
+            transition:"opacity 0.25s ease, transform 0.25s ease",
+          }}>
+            {/* barra topo */}
+            <div style={{background:s.cor,padding:"0.55rem 0.7rem",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:"Georgia,serif",fontSize:"0.6rem",fontWeight:300,letterSpacing:"0.2em",textTransform:"uppercase",color:"rgba(255,255,255,0.9)"}}>Nora Grei</span>
+              <span style={{background:"rgba(255,255,255,0.2)",color:"#fff",fontSize:"0.45rem",padding:"0.1rem 0.3rem",borderRadius:"2px",letterSpacing:"0.08em"}}>0{slide+1}/04</span>
+            </div>
+            {/* conteúdo */}
+            <div style={{flex:1,padding:"0.7rem 0.65rem",display:"flex",flexDirection:"column",justifyContent:"center"}}>
+              {s.iconePhone}
+            </div>
+          </div>
+          {/* botão home */}
+          <div style={{position:"absolute",bottom:"4px",left:"50%",transform:"translateX(-50%)",width:"30px",height:"3px",background:"rgba(255,255,255,0.15)",borderRadius:"2px"}} />
+        </div>
+
+        {/* Texto do passo */}
+        <div style={{
+          width:"100%",maxWidth:"360px",
+          opacity: animating ? 0 : 1,
+          transform: animating ? `translateY(6px)` : "translateY(0)",
+          transition:"opacity 0.25s ease, transform 0.25s ease",
+        }}>
+          <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.6rem"}}>
+            <div style={{width:"32px",height:"32px",background:s.cor,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <span style={{fontFamily:"Georgia,serif",fontSize:"0.85rem",fontWeight:300,color:"#fff"}}>{p.num}</span>
+            </div>
+            <h3 style={{fontFamily:"Georgia,serif",fontSize:"1.25rem",fontWeight:400,color:"#080808",margin:0}}>{p.titulo}</h3>
+          </div>
+          <p style={{fontSize:"0.85rem",color:"#5a5855",lineHeight:1.65,margin:0}}>{p.desc}</p>
+        </div>
+      </div>
+
+      {/* Navegação */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"1.25rem",marginTop:"1.75rem"}}>
+        <button onClick={anterior} style={{background:"none",border:"1px solid #d5d2ca",color:"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Anterior">←</button>
+        <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+          {TOUR_SLIDES.map((_,i) => (
+            <button key={i} onClick={() => ir(i, i > slide ? 1 : -1)} style={{width: i===slide ? "20px" : "6px",height:"6px",borderRadius:"3px",background:i===slide ? TOUR_SLIDES[i].cor : "#d5d2ca",border:"none",cursor:"pointer",padding:0,transition:"all 0.35s ease"}} aria-label={`Passo ${i+1}`} />
+          ))}
+        </div>
+        <button onClick={seguinte} style={{background:"none",border:"1px solid #d5d2ca",color:"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Seguinte">→</button>
+      </div>
+
+      {/* CTA abaixo do tour */}
+      <div style={{textAlign:"center",marginTop:"1.75rem"}}>
+        <a href="/catalogo" style={{fontSize:"0.72rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#c4748a",color:"#fff",padding:"0.85rem 2rem",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:500,display:"inline-block",transition:"background 0.2s"}}>
+          Explorar colecção →
+        </a>
+      </div>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function Home() {
   const [lang, setLang] = useState("pt");
   const [userLogado, setUserLogado] = useState(false);
@@ -796,18 +984,11 @@ export default function Home() {
         </section>
       )}
 
-      {/* COMO FUNCIONA */}
-      <section className="sec" id="como" style={{background:"var(--white)"}}>
+      {/* COMO FUNCIONA — TOUR ANIMADO */}
+      <section className="sec" id="como" style={{background:"var(--white)",paddingBottom:"2.5rem"}}>
         <p className="sec-label">{t.como.label}</p>
         <h2 className="sec-titulo">{t.como.titulo}</h2>
-        <div className="como-grid">
-          {t.como.passos.map((p, i) => (
-            <div key={i} className="como-passo">
-              <div className="como-num-wrap"><div className="como-num">{p.num}</div></div>
-              <div><h3 className="como-titulo">{p.titulo}</h3><p className="como-desc">{p.desc}</p></div>
-            </div>
-          ))}
-        </div>
+        <TourAnimado lang={lang} passos={t.como.passos} />
       </section>
 
       {/* TRUST */}
