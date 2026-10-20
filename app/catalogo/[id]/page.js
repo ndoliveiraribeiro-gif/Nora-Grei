@@ -112,6 +112,19 @@ export default function PecaDetalhe() {
         // Verificar se peça está na wishlist
         supabase.from("wishlist").select("id").eq("cliente_id", data.session.user.id).eq("peca_id", id).maybeSingle()
           .then(({ data: w }) => { if (w) setNaWishlist(true); });
+        // Regista evento de visualização para o algoritmo de recomendação
+        supabase.from("pecas").select("categoria, preco_aluguer_dia").eq("id", id).single()
+          .then(({ data: p }) => {
+            if (!p) return;
+            supabase.from("eventos_utilizador").insert({
+              cliente_id: data.session.user.id,
+              tipo: "view_peca",
+              objeto_id: id,
+              objeto_tipo: "peca",
+              valor: p.preco_aluguer_dia,
+              meta: { categoria: p.categoria },
+            }).then(() => {});
+          });
       }
     });
   }, [id]);
@@ -125,6 +138,15 @@ export default function PecaDetalhe() {
     } else {
       await supabase.from("wishlist").insert({ cliente_id: userLogado.id, peca_id: id });
       setNaWishlist(true);
+      // Regista favorito com peso maior no algoritmo
+      if (peca) supabase.from("eventos_utilizador").insert({
+        cliente_id: userLogado.id,
+        tipo: "favorito",
+        objeto_id: id,
+        objeto_tipo: "peca",
+        valor: peca.preco_aluguer_dia,
+        meta: { categoria: peca.categoria },
+      }).then(() => {});
     }
     setWishlistLoading(false);
   };

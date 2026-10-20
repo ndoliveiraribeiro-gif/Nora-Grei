@@ -246,7 +246,29 @@ export default function Catalogo() {
         };
       });
 
-      setPecas([...formatadas, ...formatadasLoj]);
+      const todasPecas = [...formatadas, ...formatadasLoj];
+
+      // Personalização por perfil de interesse (utilizador autenticado)
+      const { data: sessao } = await supabase.auth.getSession();
+      if (sessao?.session?.user) {
+        const uid = sessao.session.user.id;
+        const { data: perfil } = await supabase.rpc("perfil_interesse", { p_cliente_id: uid });
+        if (perfil && perfil.length > 0) {
+          // Cria mapa categoria -> peso
+          const pesos = {};
+          perfil.forEach(r => { pesos[r.categoria] = Number(r.peso); });
+          const maxPeso = Math.max(...Object.values(pesos));
+          // Score: normalizado 0-10 por categoria + boost peças disponíveis
+          const scorePeca = (p) => {
+            const catScore = ((pesos[p.categoria] || 0) / maxPeso) * 10;
+            const dispScore = p.estado === "disponivel" ? 2 : 0;
+            return catScore + dispScore;
+          };
+          todasPecas.sort((a, b) => scorePeca(b) - scorePeca(a));
+        }
+      }
+
+      setPecas(todasPecas);
     } catch (e) {
       console.error("Erro ao carregar peças:", e);
     }
