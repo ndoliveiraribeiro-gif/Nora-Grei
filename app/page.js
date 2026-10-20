@@ -617,7 +617,7 @@ export default function Home() {
         .valor-linha{width:100%;height:1px;background:var(--g2)}
         /* LOJISTA EDITORIAL */
         .lojista-editorial{display:grid;grid-template-columns:1fr;background:var(--black)}
-        .lojista-ed-visual{background:linear-gradient(160deg,#1a0a10 0%,#080808 100%);padding:3rem 1.5rem;display:flex;flex-direction:column;justify-content:space-between;gap:2rem;min-height:280px}
+        .lojista-ed-visual{background:linear-gradient(160deg,#2a1520 0%,#1a0d14 100%);padding:2.5rem 1.5rem;display:flex;flex-direction:column;justify-content:space-between;gap:1.5rem;min-height:220px}
         .lojista-ed-monogram{font-family:var(--serif);font-size:4rem;font-weight:300;color:rgba(196,168,130,0.15);letter-spacing:0.1em;line-height:1}
         .lojista-ed-nums{display:flex;gap:2rem;margin-top:auto}
         .lojista-ed-num strong{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--rosa);display:block;line-height:1}
@@ -648,13 +648,13 @@ export default function Home() {
         .como-desc{font-size:0.82rem;color:var(--g4);line-height:1.55}
 
         /* PORQUE */
-        .porque{background:linear-gradient(135deg,#080808 0%,#1a0a10 100%);padding:2rem 1.5rem}
-        .porque-titulo{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.4rem);font-weight:300;line-height:1.2;color:#fff;margin-bottom:1.5rem}
-        .porque-titulo em{font-style:italic;color:rgba(255,255,255,0.4);display:block}
-        .porque-ponto{display:flex;align-items:center;gap:1rem;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+        .porque{background:var(--cream);border-top:1px solid var(--g2);padding:2rem 1.5rem}
+        .porque-titulo{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.4rem);font-weight:300;line-height:1.2;color:var(--ink);margin-bottom:1.5rem}
+        .porque-titulo em{font-style:italic;color:var(--rosa);display:block}
+        .porque-ponto{display:flex;align-items:center;gap:1rem;padding:0.65rem 0;border-bottom:1px solid var(--g2)}
         .porque-ponto:last-child{border-bottom:none}
         .porque-dot{width:6px;height:6px;border-radius:50%;background:var(--rosa);flex-shrink:0}
-        .porque-text{font-family:var(--serif);font-size:1.15rem;font-weight:300;color:rgba(255,255,255,0.85)}
+        .porque-text{font-family:var(--serif);font-size:1.15rem;font-weight:300;color:var(--ink)}
 
         /* CATEGORIAS */
         .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--g2)}
@@ -790,8 +790,8 @@ export default function Home() {
           .valor-bloco{border-bottom:none;border-right:1px solid var(--g2);padding:3.5rem 4rem}
           .valor-bloco:last-child{border-right:none}
           .lojista-editorial{grid-template-columns:1fr 1fr}
-          .lojista-ed-visual{min-height:420px;padding:4rem}
-          .lojista-ed-texto{padding:4rem}
+          .lojista-ed-visual{min-height:320px;padding:3rem}
+          .lojista-ed-texto{padding:3rem}
           .destaque-grid{grid-template-columns:repeat(4,1fr)}
           .destaque-grid .destaque-card-wrap:first-child{grid-column:1/3}
           .numeros{grid-template-columns:repeat(4,1fr)}
@@ -799,7 +799,7 @@ export default function Home() {
           .numero:nth-child(even){border-right:1px solid rgba(255,255,255,0.08)}
           .sec{padding:2.5rem 4rem}
           .como-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
-          .porque{display:grid;grid-template-columns:1fr 1fr;gap:4rem;padding:2.5rem 4rem;align-items:center}
+          .porque{display:grid;grid-template-columns:1fr 1fr;gap:3rem;padding:2rem 4rem;align-items:center}
           .cat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
           .cat-card{aspect-ratio:3/4}
           .sustent{padding:2.5rem 4rem}
