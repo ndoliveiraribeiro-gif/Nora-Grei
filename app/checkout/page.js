@@ -441,6 +441,7 @@ function CheckoutContent() {
   const [saldoCreditos, setSaldoCreditos] = useState(0);
   const [usarCreditos, setUsarCreditos] = useState(false);
   const [lojistaTrataHigienizacao, setLojistaTrataHigienizacao] = useState(true);
+  const [portesValor, setPortesValor] = useState(null); // null = a calcular, 0 = grátis, X = valor
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -486,12 +487,32 @@ function CheckoutContent() {
         .eq("id", pecaId)
         .single();
       if (data) {
-        setPeca({ ...data, categoria: data.categorias?.nome || "" });
+        const categoria = data.categorias?.nome || "";
+        setPeca({ ...data, categoria });
         if (stockId) {
           const st = data.stock_tamanhos?.find(s => s.id === stockId);
           if (st) setTamanhoNome(st.tamanho);
         }
         await carregarDatasOcupadas(data, stockId);
+
+        // Lookup portes: volume da categoria → tarifa por país
+        if (categoria) {
+          const paisCliente = lang === "fr" ? "FR" : lang === "lt" ? "LT" : "PT";
+          const { data: volData } = await supabase
+            .from("logistica_volumes").select("volume").eq("categoria", categoria).maybeSingle();
+          if (volData?.volume) {
+            const { data: tarifaData } = await supabase
+              .from("logistica_tarifas")
+              .select("valor_ida, valor_volta")
+              .eq("pais", paisCliente).eq("volume", volData.volume).eq("ativo", true)
+              .maybeSingle();
+            if (tarifaData) {
+              // aluguer = ida + volta; venda = só ida
+              const totalPortes = (tarifaData.valor_ida || 0) + (tarifaData.valor_volta || 0);
+              setPortesValor(totalPortes);
+            }
+          }
+        }
       }
     }
 
@@ -633,7 +654,8 @@ function CheckoutContent() {
   const tudoAutomatico = pagamentoSelecionado?.automatico && (valorDeposito === 0 || depositoSelecionado?.automatico);
 
   const higienizacaoValor = (peca?.higienizacao_ativa && lojistaTrataHigienizacao) ? (parseFloat(peca.higienizacao_valor) || 0) : 0;
-  const totalSemCreditos = valorAluguer + higienizacaoValor + (deposito === "cartao" ? valorDeposito : 0);
+  const portesTotal = entrega === "envio" ? (portesValor || 0) : 0;
+  const totalSemCreditos = valorAluguer + higienizacaoValor + portesTotal + (deposito === "cartao" ? valorDeposito : 0);
   const creditosAplicados = usarCreditos ? Math.min(saldoCreditos, totalSemCreditos) : 0;
   const totalAgora = Math.max(0, totalSemCreditos - creditosAplicados);
 
@@ -1100,6 +1122,12 @@ function CheckoutContent() {
                     </div>
                   )}
                   {higienizacaoValor > 0 && <div className="r-linha"><span>{i.higienizacao}</span><span>{higienizacaoValor.toFixed(2)}€</span></div>}
+                  {entrega === "envio" && (
+                    <div className="r-linha">
+                      <span>Portes (ida + volta)</span>
+                      <span>{portesValor === null ? "A calcular" : portesValor === 0 ? "A definir" : `${portesTotal.toFixed(2)}€`}</span>
+                    </div>
+                  )}
                   <div className="r-linha">
                     <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
                     <span>{valorDeposito}€</span>
