@@ -2957,7 +2957,7 @@ export default function Perfil() {
                     return (
                       <div style={{background:"var(--white)",padding:"1.1rem",marginTop:"0.6rem",borderTop:"3px solid #f39c12"}}>
                         <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#b8860b",fontWeight:600,marginBottom:"0.75rem"}}>
-                          💡 {pecasSemMovimento.length} peça{pecasSemMovimento.length!==1?"s":""} sem alugueres nos últimos 30 dias
+                          💡 {pecasSemMovimento.length} {({pt:`peça${pecasSemMovimento.length!==1?"s":""} sem alugueres nos últimos 30 dias`,fr:`pièce${pecasSemMovimento.length!==1?"s":""} sans location ces 30 derniers jours`,lt:`daiktas${pecasSemMovimento.length!==1?"ų":""} be nuomos per pastarąsias 30 dienų`})[lang]||`peça${pecasSemMovimento.length!==1?"s":""} sem alugueres nos últimos 30 dias`}
                         </div>
                         <div style={{display:"flex",flexDirection:"column",gap:"0.5rem"}}>
                           {pecasSemMovimento.slice(0,3).map(p => {
@@ -2973,22 +2973,22 @@ export default function Perfil() {
                                 <div style={{flex:1,minWidth:0}}>
                                   <div style={{fontSize:"0.78rem",fontFamily:"var(--serif)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.nome}</div>
                                   <div style={{fontSize:"0.68rem",color:"var(--g4)",marginTop:"0.15rem"}}>
-                                    {precoAtual > 0 ? `${precoAtual}€/dia · ` : ""}{totalAlugueres} aluguer{totalAlugueres!==1?"es":""} no total
+                                    {precoAtual > 0 ? `${precoAtual}€/dia · ` : ""}{totalAlugueres} {({pt:`aluguer${totalAlugueres!==1?"es":""} no total`,fr:`location${totalAlugueres!==1?"s":""} au total`,lt:`nuoma${totalAlugueres!==1?"s":""} iš viso`})[lang]||`aluguer${totalAlugueres!==1?"es":""} no total`}
                                   </div>
                                   {precoAtual > 0 && (
                                     <div style={{fontSize:"0.65rem",color:"#8a6a00",marginTop:"0.1rem"}}>
-                                      Sugestão: baixar para {precoSugerido}€/dia para ganhar visibilidade
+                                      {({pt:`Sugestão: baixar para ${precoSugerido}€/dia para ganhar visibilidade`,fr:`Suggestion: baisser à ${precoSugerido}€/jour pour gagner en visibilité`,lt:`Pasiūlymas: sumažinti iki ${precoSugerido}€/dieną, kad padidėtų matomumas`})[lang]||`Sugestão: baixar para ${precoSugerido}€/dia para ganhar visibilidade`}
                                     </div>
                                   )}
                                 </div>
                                 <div style={{display:"flex",flexDirection:"column",gap:"0.3rem",flexShrink:0}}>
                                   <button onClick={()=>{setEditarPeca({...p});}}
                                     style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.3rem 0.55rem",background:"#f39c12",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
-                                    Editar preço
+                                    {({pt:"Editar preço",fr:"Modifier prix",lt:"Keisti kainą"})[lang]||"Editar preço"}
                                   </button>
                                   <button onClick={()=>{setTabLoja("pecas"); setPecaSimuladorAberta(p.id);}}
                                     style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.3rem 0.55rem",background:"none",border:"1.5px solid #f39c12",color:"#b8860b",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
-                                    Simular
+                                    {({pt:"Simular",fr:"Simuler",lt:"Simuliuoti"})[lang]||"Simular"}
                                   </button>
                                 </div>
                               </div>
@@ -2996,7 +2996,7 @@ export default function Perfil() {
                           })}
                           {pecasSemMovimento.length > 3 && (
                             <div style={{fontSize:"0.72rem",color:"var(--g4)",textAlign:"center",paddingTop:"0.25rem"}}>
-                              + {pecasSemMovimento.length - 3} peça{pecasSemMovimento.length-3!==1?"s":""} sem movimento — ver tab Peças
+                              + {pecasSemMovimento.length - 3} {({pt:`peça${pecasSemMovimento.length-3!==1?"s":""} sem movimento — ver tab Peças`,fr:`pièce${pecasSemMovimento.length-3!==1?"s":""} sans mouvement — voir onglet Pièces`,lt:`daiktas${pecasSemMovimento.length-3!==1?"ų":""} be judėjimo — žiūrėti skirtuką Daiktai`})[lang]||`peça${pecasSemMovimento.length-3!==1?"s":""} sem movimento — ver tab Peças`}
                             </div>
                           )}
                         </div>
@@ -3040,7 +3040,7 @@ export default function Perfil() {
                         </button>
                         <button onClick={()=>setPecaSimuladorAberta(prev => prev===p.id ? null : p.id)}
                           style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid #89c4e1",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"#4a9ec4",whiteSpace:"nowrap",fontWeight:600}}>
-                          📊 Simular
+                          📊 {({pt:"Simular",fr:"Simuler",lt:"Simuliuoti"})[lang]||"Simular"}
                         </button>
                         <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
                       </div>
@@ -3094,22 +3094,22 @@ export default function Perfil() {
                       ].filter((v,i,a) => a.indexOf(v)===i && v > 0);
                       return (
                         <div style={{padding:"1rem 1.5rem 1.25rem",background:"#f0f8fd",borderTop:"1px solid #c8e6f5"}}>
-                          <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#4a9ec4",fontWeight:600,marginBottom:"0.75rem"}}>📊 Simulador de rendimento</div>
+                          <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#4a9ec4",fontWeight:600,marginBottom:"0.75rem"}}>📊 {({pt:"Simulador de rendimento",fr:"Simulateur de revenus",lt:"Pajamų simuliatorius"})[lang]||"Simulador de rendimento"}</div>
                           {precoAtual === 0 ? (
-                            <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>Define um preço por dia para simular o rendimento.</div>
+                            <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>{({pt:"Define um preço por dia para simular o rendimento.",fr:"Définissez un prix par jour pour simuler les revenus.",lt:"Nustatykite dienos kainą, kad galėtumėte simuliuoti pajamas."})[lang]||"Define um preço por dia para simular o rendimento."}</div>
                           ) : (
                             <>
                               <div style={{fontSize:"0.68rem",color:"var(--g4)",marginBottom:"0.75rem",lineHeight:1.5}}>
-                                Rotação estimada para esta categoria: <strong style={{color:"#4a9ec4"}}>{rotBase.toFixed(1)}×/mês</strong> · baseado em benchmarks do sector
+                                {({pt:"Rotação estimada para esta categoria:",fr:"Rotation estimée pour cette catégorie :",lt:"Numatoma šios kategorijos rotacija:"})[lang]||"Rotação estimada para esta categoria:"} <strong style={{color:"#4a9ec4"}}>{rotBase.toFixed(1)}×/{({pt:"mês",fr:"mois",lt:"mėn"})[lang]||"mês"}</strong> · {({pt:"baseado em benchmarks do sector",fr:"basé sur des benchmarks du secteur",lt:"remiantis sektoriaus etalonais"})[lang]||"baseado em benchmarks do sector"}
                               </div>
                               {/* tabela de simulação */}
                               <div style={{overflowX:"auto"}}>
                                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:"0.72rem"}}>
                                   <thead>
                                     <tr style={{background:"#d8eef9"}}>
-                                      <th style={{padding:"0.4rem 0.6rem",textAlign:"left",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>Preço/dia</th>
+                                      <th style={{padding:"0.4rem 0.6rem",textAlign:"left",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>{({pt:"Preço/dia",fr:"Prix/jour",lt:"Kaina/dieną"})[lang]||"Preço/dia"}</th>
                                       {simMeses.map(m=>(
-                                        <th key={m} style={{padding:"0.4rem 0.6rem",textAlign:"right",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>{m} meses</th>
+                                        <th key={m} style={{padding:"0.4rem 0.6rem",textAlign:"right",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>{m} {({pt:"meses",fr:"mois",lt:"mėn."})[lang]||"meses"}</th>
                                       ))}
                                     </tr>
                                   </thead>
@@ -3119,7 +3119,7 @@ export default function Perfil() {
                                       return (
                                         <tr key={preco} style={{background:isAtual?"#e0f2fe":"#fff",borderBottom:"1px solid #c8e6f5"}}>
                                           <td style={{padding:"0.45rem 0.6rem",fontWeight:isAtual?600:400,color:isAtual?"#4a9ec4":"var(--fg)"}}>
-                                            {preco}€{isAtual?" ← atual":""}
+                                            {preco}€{isAtual?` ← ${({pt:"atual",fr:"actuel",lt:"dabartinis"})[lang]||"atual"}`:""}
                                           </td>
                                           {simMeses.map(m=>{
                                             const alugueres = Math.round(rotBase * m);
@@ -3138,11 +3138,11 @@ export default function Perfil() {
                                 </table>
                               </div>
                               <div style={{fontSize:"0.62rem",color:"#7ab5ce",marginTop:"0.5rem",lineHeight:1.45}}>
-                                Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas.
+                                {({pt:"Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas.",fr:"Valeurs nettes après commission Nora Grei (10%). Estimations basées sur la rotation moyenne de la catégorie — non garanties.",lt:"Grynosios vertės po Nora Grei komisinio mokesčio (10%). Įvertinimai pagrįsti vidutine kategorijos rotacija — negarantuojama."})[lang]||"Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas."}
                               </div>
                               <button onClick={()=>setEditarPeca({...p})}
                                 style={{marginTop:"0.75rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.85rem",background:"#4a9ec4",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}>
-                                Editar preço desta peça →
+                                {({pt:"Editar preço desta peça →",fr:"Modifier le prix de cette pièce →",lt:"Keisti šio daikto kainą →"})[lang]||"Editar preço desta peça →"}
                               </button>
                             </>
                           )}
