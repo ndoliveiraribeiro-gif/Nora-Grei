@@ -78,27 +78,39 @@ export default function Pesquisa() {
     const termo = q.trim();
 
     // Pesquisar peças Nora Grei (tabela principal)
-    const { data: ngData } = await supabase
+    const { data: ngData, error: ngErr } = await supabase
       .from("pecas")
-      .select("id, nome, fotos, preco_aluguer_dia, cor, categorias(nome)")
-      .or(`nome.ilike.%${termo}%,cor.ilike.%${termo}%`)
+      .select("id, nome, fotos, preco_aluguer_dia, cor, descricao, categorias(nome)")
+      .ilike("nome", `%${termo}%`)
       .limit(20);
 
+    // Se nome não encontrou, tenta cor também
+    const { data: ngDataCor } = !ngData?.length ? await supabase
+      .from("pecas")
+      .select("id, nome, fotos, preco_aluguer_dia, cor, descricao, categorias(nome)")
+      .ilike("cor", `%${termo}%`)
+      .limit(10) : { data: [] };
+
+    console.log("[pesquisa] pecas NG:", ngData?.length, ngErr);
+
     // Pesquisar peças lojistas
-    const { data: ljData } = await supabase
+    const { data: ljData, error: ljErr } = await supabase
       .from("pecas_lojista")
       .select("id, nome, fotos, preco_aluguer_dia, preco_venda, categoria, cor, cliente_id, clientes:cliente_id(nome, codigo_cliente)")
-      .eq("estado", "disponivel")
-      .or(`nome.ilike.%${termo}%,categoria.ilike.%${termo}%,cor.ilike.%${termo}%`)
+      .ilike("nome", `%${termo}%`)
       .limit(12);
 
-    // Normalizar peças NG para o mesmo formato
-    const ngFormatadas = (ngData || []).map(p => ({
+    console.log("[pesquisa] pecas lojista:", ljData?.length, ljErr);
+
+    // Normalizar peças NG para o mesmo formato (merge nome + cor results, dedup)
+    const ngTodas = [...(ngData || []), ...(ngDataCor || [])].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+    const ngFormatadas = ngTodas.map(p => ({
       ...p,
       _fonte: "ng",
-      categoria: p.categorias?.nome || p.categoria || "",
+      categoria: p.categorias?.nome || "",
     }));
     const ljFormatadas = (ljData || []).map(p => ({ ...p, _fonte: "lojista" }));
+    console.log("[pesquisa] total:", ngFormatadas.length + ljFormatadas.length);
 
     // Pesquisar lojas
     const { data: ls } = await supabase
