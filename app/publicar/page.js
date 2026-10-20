@@ -15,8 +15,56 @@ const PECA_VAZIA = {
   preco_aluguer_dia: "", preco_venda: "", valor_peca: "",
   tem_defeito: false, descricao_defeito: "",
   ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }],
-  link_compra_externa: "",
+  link_compra_externa: "", idade_peca: "1a2",
 };
+
+// ── Estimativa de valor de mercado ──────────────────────────────────────────
+const MARCAS_PREMIUM = [
+  "hermès","hermes","chanel","louis vuitton","lv","gucci","prada","bottega veneta",
+  "dior","christian dior","saint laurent","ysl","celine","céline","givenchy",
+  "valentino","versace","balenciaga","jacquemus","loewe","loro piana","brunello cucinelli",
+  "max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren",
+];
+const MARCAS_ALTA = [
+  "zara","mango","&other stories","other stories","cos","arket","massimo dutti",
+  "pedro del hierro","escorpion","escorpión","hugo boss","boss","calvin klein","ck",
+  "tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda",
+  "weekday","monki","stradivarius","bershka","pull&bear","sfera","phase eight",
+  "whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje","ba&sh",
+];
+
+function fatorMarca(marca = "") {
+  const m = marca.toLowerCase().trim();
+  if (MARCAS_PREMIUM.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
+  if (MARCAS_ALTA.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
+  return { fator: 0.32, tier: "massmarket" };
+}
+
+const FATOR_ESTADO = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
+const FATOR_IDADE  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
+
+// Mapa categoria publicar → rotação mensal (alugueres/mês)
+const ROTACAO_CAT = {
+  Vestidos: 1.8, Fatos: 1.5, Macacões: 1.4, Conjuntos: 1.3,
+  Casacos: 1.0, Saias: 1.2, Calças: 1.1, Blusas: 1.1,
+  Camisas: 1.0, Kaftans: 0.9, Malas: 2.0, Acessórios: 1.6,
+  _default: 1.2,
+};
+
+function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria }) {
+  const p = parseFloat(valor_peca) || 0;
+  if (!p) return null;
+  const { fator: fm, tier } = fatorMarca(marca);
+  const fe = FATOR_ESTADO[condicao] ?? 0.68;
+  const fi = FATOR_IDADE[idade_peca] ?? 0.85;
+  const valorMercado = Math.round(p * fm * fe * fi);
+  const precoAluguerDia = Math.max(5, Math.round(valorMercado * 0.08 / 5) * 5);
+  const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
+  const rotMes = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
+  const alugueresMes = rotMes.toFixed(1);
+  const ganho12m = Math.round(precoAluguerDia * 4 * rotMes * 12 * 0.9); // ~4 dias/aluguer, 90% ocup, 12 meses
+  return { valorMercado, precoAluguerDia, precoVendaUsada, alugueresMes, ganho12m, tier };
+}
 
 export default function PublicarPage() {
   const [user, setUser] = useState(null);
@@ -638,6 +686,71 @@ export default function PublicarPage() {
             <h1 className="pub-titulo">Preços e disponibilidade</h1>
             <p className="pub-subtitulo">Define como a peça estará disponível — para alugar, vender, ou ambos.</p>
 
+            {/* ── Estimativa inteligente ── */}
+            {(() => {
+              const est = calcEstimativa(peca);
+              if (!est) return null;
+              const tierLabel = { premium: "✦ Marca premium", alta: "Marca alta", massmarket: "Marca standard" }[est.tier];
+              return (
+                <div style={{
+                  background: "linear-gradient(135deg,#1a1816 0%,#2d2926 100%)",
+                  borderRadius: 14, padding: "1.1rem 1.25rem",
+                  marginBottom: "0.75rem", color: "#fff",
+                }}>
+                  <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem" }}>
+                    Estimativa Nora Grei · {tierLabel}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem", marginBottom: "0.85rem" }}>
+                    <div>
+                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.valorMercado}</div>
+                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>valor de mercado</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.precoAluguerDia}</div>
+                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>aluguer/dia sugerido</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>~{est.alugueresMes}×</div>
+                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>rotações/mês</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: "0.75rem", lineHeight: 1.4 }}>
+                    Potencial: <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> em 12 meses de alugueres + venda usada a <strong style={{ color: "#fff" }}>€{est.precoVendaUsada}</strong>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      style={{ flex: 1, padding: "0.55rem", background: "#c4748a", border: "none", borderRadius: 8, color: "#fff", fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit" }}
+                      onClick={() => setPeca(prev => ({
+                        ...prev,
+                        preco_aluguer_dia: est.precoAluguerDia.toString(),
+                        preco_venda: est.precoVendaUsada.toString(),
+                      }))}
+                    >
+                      Usar sugestão
+                    </button>
+                    <div style={{ flex: 1, padding: "0.55rem", background: "rgba(255,255,255,0.07)", borderRadius: 8, fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", lineHeight: 1.3 }}>
+                      Ou ajusta manualmente abaixo
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Idade da peça */}
+            <div className="pub-card" style={{ marginBottom: "0.75rem" }}>
+              <p className="pub-card-t">Idade da peça</p>
+              <div className="pub-grid2">
+                {[["novo","Menos de 1 ano"],["1a2","1 a 2 anos"],["2a4","2 a 4 anos"],["4mais","Mais de 4 anos"]].map(([v, l]) => (
+                  <button
+                    key={v}
+                    className={`tipo-btn${peca.idade_peca === v ? " active" : ""}`}
+                    onClick={() => setP("idade_peca", v)}
+                    style={{ fontSize: "0.72rem" }}
+                  >{l}</button>
+                ))}
+              </div>
+            </div>
+
             {/* Tipo */}
             <div className="pub-card">
               <p className="pub-card-t">Disponível para</p>
@@ -667,11 +780,7 @@ export default function PublicarPage() {
                     type="number"
                     min="0"
                     value={peca.valor_peca}
-                    onChange={e => {
-                      const v = e.target.value;
-                      const sugestao = v && parseFloat(v) > 0 ? Math.round(parseFloat(v) * 0.08) : "";
-                      setPeca(prev => ({ ...prev, valor_peca: v, preco_aluguer_dia: prev.preco_aluguer_dia || sugestao.toString() }));
-                    }}
+                    onChange={e => setP("valor_peca", e.target.value)}
                     placeholder="200"
                   />
                   <span className="pub-hint">Valor original de compra — usado para calcular a caução.</span>
@@ -682,11 +791,11 @@ export default function PublicarPage() {
                   <div className="pub-fg">
                     <label className="pub-label" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                       Aluguer / dia (€) *
-                      {peca.valor_peca && parseFloat(peca.valor_peca) > 0 && (
+                      {(() => { const est = calcEstimativa(peca); return est ? (
                         <span style={{ fontSize: "0.55rem", background: "#e8f5e9", color: "#27ae60", padding: "0.1rem 0.35rem", fontWeight: 600 }}>
-                          sugerido: {Math.round(parseFloat(peca.valor_peca) * 0.08)}€
+                          sugerido: €{est.precoAluguerDia}
                         </span>
-                      )}
+                      ) : null; })()}
                     </label>
                     <input
                       className="pub-input"
@@ -716,7 +825,9 @@ export default function PublicarPage() {
                       onChange={e => setP("preco_venda", e.target.value)}
                       placeholder="150"
                     />
-                    <span className="pub-hint">Preço de venda da peça em segunda mão.</span>
+                    {(() => { const est = calcEstimativa(peca); return est ? (
+                      <span className="pub-hint">Estimativa: €{est.precoVendaUsada} com base no estado e marca.</span>
+                    ) : <span className="pub-hint">Preço de venda da peça em segunda mão.</span>; })()}
                   </div>
                 )}
 
