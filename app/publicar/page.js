@@ -189,6 +189,7 @@ export default function PublicarPage() {
   const validarPasso3 = () => {
     const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
     const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
+    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) { setErro("O valor original da peça nova é obrigatório — é a base para calcular o aluguer e o preço usado."); return false; }
     if (precisaAluguer && !peca.preco_aluguer_dia) { setErro("Indica o preço de aluguer por dia."); return false; }
     if (precisaVenda && !peca.preco_venda) { setErro("Indica o preço de venda."); return false; }
     setErro(""); return true;
@@ -774,7 +775,9 @@ export default function PublicarPage() {
 
                 {/* Valor nova */}
                 <div className="pub-fg">
-                  <label className="pub-label">Valor peça nova (€)</label>
+                  <label className="pub-label">
+                    Valor peça nova (€) <span style={{color:"#c4748a"}}>*</span>
+                  </label>
                   <input
                     className="pub-input"
                     type="number"
@@ -782,8 +785,9 @@ export default function PublicarPage() {
                     value={peca.valor_peca}
                     onChange={e => setP("valor_peca", e.target.value)}
                     placeholder="200"
+                    style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
                   />
-                  <span className="pub-hint">Valor original de compra — usado para calcular a caução.</span>
+                  <span className="pub-hint">Obrigatório — é a âncora para calcular o preço de aluguer, caução e valor de venda usada.</span>
                 </div>
 
                 {/* Preço aluguer */}
