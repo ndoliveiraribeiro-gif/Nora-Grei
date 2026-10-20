@@ -49,6 +49,86 @@ const ESTADO_INFO = {
   },
 };
 
+// ── Tooltip de ajuda contextual ──────────────────────────────────────────────
+function Tooltip({ texto }) {
+  const [aberto, setAberto] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!aberto) return;
+    const fechar = (e) => { if (ref.current && !ref.current.contains(e.target)) setAberto(false); };
+    document.addEventListener("mousedown", fechar);
+    document.addEventListener("touchstart", fechar);
+    return () => { document.removeEventListener("mousedown", fechar); document.removeEventListener("touchstart", fechar); };
+  }, [aberto]);
+  return (
+    <span ref={ref} style={{position:"relative",display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}>
+      <button
+        onClick={e => { e.stopPropagation(); setAberto(v => !v); }}
+        style={{width:15,height:15,borderRadius:"50%",border:"1px solid #89c4e1",background:aberto?"#89c4e1":"transparent",color:aberto?"#fff":"#89c4e1",fontSize:"0.55rem",fontWeight:700,lineHeight:1,cursor:"pointer",padding:0,fontFamily:"var(--sans)",flexShrink:0,marginLeft:"0.3rem"}}
+        aria-label="Ajuda"
+      >?</button>
+      {aberto && (
+        <span style={{position:"absolute",bottom:"calc(100% + 6px)",left:"50%",transform:"translateX(-50%)",background:"#1a1816",color:"#f0ede8",fontSize:"0.68rem",lineHeight:1.5,padding:"0.5rem 0.7rem",borderRadius:"4px",whiteSpace:"normal",width:"200px",zIndex:9999,boxShadow:"0 4px 16px rgba(0,0,0,0.25)",pointerEvents:"none"}}>
+          {texto}
+          <span style={{position:"absolute",top:"100%",left:"50%",transform:"translateX(-50%)",borderWidth:"5px",borderStyle:"solid",borderColor:"#1a1816 transparent transparent transparent"}}/>
+        </span>
+      )}
+    </span>
+  );
+}
+// ── Nudge de primeiro uso (aparece uma vez em secções vazias) ─────────────────
+const NUDGE_STORAGE_KEY = "ng_nudges_vistos_v1";
+function getNudgesVistos() {
+  try { return new Set(JSON.parse(localStorage.getItem(NUDGE_STORAGE_KEY) || "[]")); }
+  catch { return new Set(); }
+}
+function marcarNudgeVisto(id) {
+  try {
+    const vistos = getNudgesVistos();
+    vistos.add(id);
+    localStorage.setItem(NUDGE_STORAGE_KEY, JSON.stringify([...vistos]));
+  } catch {}
+}
+
+function NudgeBanner({ id, icone, titulo, descricao, ctaLabel, onCta, onFechar }) {
+  const [visto, setVisto] = useState(() => {
+    try { return getNudgesVistos().has(id); } catch { return false; }
+  });
+  if (visto) return null;
+  const fechar = () => { marcarNudgeVisto(id); setVisto(true); if (onFechar) onFechar(); };
+  return (
+    <div style={{
+      background:"linear-gradient(135deg,#eef7fc,#e6f3f9)",
+      border:"1.5px solid #89c4e1",
+      borderRadius:"6px",
+      padding:"1rem 1.25rem",
+      marginBottom:"1.25rem",
+      display:"flex",
+      gap:"0.85rem",
+      alignItems:"flex-start",
+      position:"relative",
+    }}>
+      <div style={{fontSize:"1.4rem",lineHeight:1,flexShrink:0,marginTop:"0.1rem"}}>{icone}</div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:"0.8rem",fontWeight:700,color:"#2a7a9f",marginBottom:"0.25rem",fontFamily:"var(--sans)",letterSpacing:"0.02em"}}>{titulo}</div>
+        <div style={{fontSize:"0.78rem",color:"#3a5a6e",lineHeight:1.55,marginBottom:"0.6rem"}}>{descricao}</div>
+        {ctaLabel && onCta && (
+          <button
+            onClick={() => { fechar(); onCta(); }}
+            style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",background:"#89c4e1",color:"#fff",border:"none",padding:"0.35rem 0.85rem",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}
+          >{ctaLabel}</button>
+        )}
+      </div>
+      <button
+        onClick={fechar}
+        aria-label="Fechar"
+        style={{position:"absolute",top:"0.5rem",right:"0.6rem",background:"none",border:"none",cursor:"pointer",color:"#89c4e1",fontSize:"1rem",lineHeight:1,padding:"0.1rem",fontFamily:"var(--sans)"}}
+      >×</button>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function useCountdownDetalhado(dataAlvo) {
   const [tempo, setTempo] = useState("");
   useEffect(() => {
@@ -1840,14 +1920,14 @@ export default function Perfil() {
         <div className="nivel-card">
           <div className="nivel-top">
             <div>
-              <div style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}</div>
+              <div style={{fontSize:'0.72rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--g6)',marginBottom:'0.4rem'}}>{i.nivelConfianca}<Tooltip texto="O teu nível determina a percentagem de caução cobrada ao cliente no início de cada aluguer. Nível Bronze: 100% do valor da peça; Prata: 75%; Ouro: 50%; Platina: sem caução. Sobe de nível completando alugueres com sucesso." /></div>
               <div className="nivel-badge" style={{color: nv.cor}}>
                 <span style={{fontWeight:700}}>{nv.nome}</span>
               </div>
             </div>
             <div style={{textAlign:'right'}}>
               <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:300,color:nv.cor}}>{nv.caucao===0?i.semCaucao:nv.caucao+"%"}</div>
-              <div style={{fontSize:'0.75rem',color:'var(--g6)'}}>{i.caucao}</div>
+              <div style={{fontSize:'0.75rem',color:'var(--g6)'}}>{i.caucao}<Tooltip texto="Depósito de segurança retido no cartão do cliente durante o aluguer. Devolvido automaticamente após a peça ser verificada. Quanto mais alto o teu nível de confiança, menor a caução exigida." /></div>
             </div>
           </div>
           {nv.proximo && (
@@ -2366,7 +2446,7 @@ export default function Perfil() {
                   {/* Taxa de ocupação */}
                   <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
-                      <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)"}}>Taxa de ocupação (30 dias)</span>
+                      <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)",display:"inline-flex",alignItems:"center"}}>Taxa de ocupação (30 dias)<Tooltip texto="Percentagem de dias em que as tuas peças estiveram alugadas nos últimos 30 dias. Acima de 50% é bom; abaixo de 25% pode indicar preço alto ou falta de visibilidade." /></span>
                       <span style={{fontFamily:"var(--serif)",fontSize:"1.2rem",color:taxaOcupacao>=50?"#27ae60":taxaOcupacao>=25?"#f39c12":"#e74c3c"}}>{taxaOcupacao}%</span>
                     </div>
                     <div style={{height:6,background:"#f0eeeb"}}>
@@ -2420,7 +2500,19 @@ export default function Perfil() {
             {tabLoja === "pecas" && (
               <div className="card" style={{padding:0}}>
                 <div style={{padding:"1rem 1.5rem",borderBottom:"1px solid var(--g1)",display:"flex",justifyContent:"flex-end"}}><button onClick={()=>setShowNovaPeca(true)} style={{fontSize:"0.75rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"var(--black)",color:"#fff",padding:"0.5rem 1rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>+ Adicionar peça</button></div>
-                {pecasLoja.length === 0 ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p> : pecasLoja.map(p=>{
+                {pecasLoja.length === 0 ? (
+                  <div style={{padding:"1.25rem 1.5rem 1.5rem"}}>
+                    <NudgeBanner
+                      id="nudge_primeira_peca"
+                      icone="👗"
+                      titulo="A tua loja está vazia — vamos mudar isso"
+                      descricao="Adiciona a tua primeira peça em menos de 3 minutos. Tira uma boa fotografia, escreve uma descrição curta e define o preço — é tudo. Lojas com pelo menos 3 peças recebem 4× mais visitas."
+                      ctaLabel="Adicionar primeira peça"
+                      onCta={() => setShowNovaPeca(true)}
+                    />
+                    <p style={{textAlign:"center",fontSize:"0.85rem",color:"var(--g4)"}}>Ainda sem peças.</p>
+                  </div>
+                ) : pecasLoja.map(p=>{
                   const urlPeca = typeof window !== "undefined" ? `${window.location.origin}/loja/${codigoLoja}/peca/${p.id}` : "";
                   const urlAfiliado = user ? `${urlPeca}?ref=${user.id}` : urlPeca;
                   return (
@@ -2662,9 +2754,9 @@ export default function Perfil() {
 
               // Sub-tabs header
               const SUB_TABS = [
-                { id:"alugueres", label:"Ganhos Aluguer & Venda", cor:"#27ae60" },
-                { id:"afiliado",  label:"Ganhos Afiliado",        cor:"#c4a882" },
-                { id:"boosters",  label:"Custos Boosters",        cor:"#c4748a" },
+                { id:"alugueres", label:"Ganhos Aluguer & Venda", cor:"#27ae60", tooltip: null },
+                { id:"afiliado",  label:"Ganhos Afiliado",        cor:"#c4a882", tooltip:"Créditos que ganhas por promover outras lojas — via link ?ref= ou código pessoal. Não são alugueres teus; são comissões por trazer clientes à plataforma." },
+                { id:"boosters",  label:"Custos Boosters",        cor:"#c4748a", tooltip:"Ferramentas pagas para dar destaque às tuas peças (visibilidade, notificações, link externo). Debitados imediatamente por cartão, saldo de alugueres ou créditos afiliado." },
               ];
 
               return (
@@ -2673,8 +2765,8 @@ export default function Perfil() {
                   <div style={{display:"flex",gap:"1px",background:"var(--g2)",marginBottom:"1rem",overflowX:"auto"}}>
                     {SUB_TABS.map(t => (
                       <button key={t.id} onClick={() => setSubTabCustos(t.id)}
-                        style={{flex:"1 0 auto",padding:"0.6rem 0.75rem",background:subTabCustos===t.id?"var(--bg)":"var(--g1)",border:"none",cursor:"pointer",fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:subTabCustos===t.id?700:400,color:subTabCustos===t.id?t.cor:"#aaa",borderBottom:subTabCustos===t.id?`2px solid ${t.cor}`:"2px solid transparent",whiteSpace:"nowrap",transition:"all 0.15s"}}>
-                        {t.label}
+                        style={{flex:"1 0 auto",padding:"0.6rem 0.75rem",background:subTabCustos===t.id?"var(--bg)":"var(--g1)",border:"none",cursor:"pointer",fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:subTabCustos===t.id?700:400,color:subTabCustos===t.id?t.cor:"#aaa",borderBottom:subTabCustos===t.id?`2px solid ${t.cor}`:"2px solid transparent",whiteSpace:"nowrap",transition:"all 0.15s",display:"inline-flex",alignItems:"center",gap:"0.2rem"}}>
+                        {t.label}{t.tooltip && <Tooltip texto={t.tooltip} />}
                       </button>
                     ))}
                   </div>
@@ -2686,10 +2778,12 @@ export default function Perfil() {
                       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"var(--g2)",marginBottom:"1rem"}}>
                         {[
                           {val:`${totalGanhos.toFixed(2)}€`, lbl:"Total acumulado", cor:"#27ae60"},
-                          {val:`${totalPendente.toFixed(2)}€`, lbl:"Pendente de liquidação", cor:"#b8860b"},
+                          {val:`${totalPendente.toFixed(2)}€`, lbl:"Pendente de liquidação", cor:"#b8860b", tooltip:"Valor que ainda não foi transferido para o teu IBAN. As liquidações são processadas até 10 dias úteis após a verificação da peça devolvida."},
                         ].map((k,i) => (
                           <div key={i} style={{background:"var(--bg)",padding:"1rem"}}>
-                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.2rem"}}>{k.lbl}</div>
+                            <div style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginBottom:"0.2rem",display:"inline-flex",alignItems:"center"}}>
+                              {k.lbl}{k.tooltip && <Tooltip texto={k.tooltip} />}
+                            </div>
                             <div style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,color:k.cor}}>{k.val}</div>
                           </div>
                         ))}
@@ -2739,7 +2833,17 @@ export default function Perfil() {
                         <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4a882",fontWeight:600,marginBottom:"0.5rem",paddingBottom:"0.5rem",borderBottom:"1px solid var(--g1)"}}>Comissões recebidas</p>
                         <p style={{fontSize:"0.75rem",color:"#aaa",marginBottom:"1rem",lineHeight:1.5}}>Ganhos ao partilhar o teu link ou código com clientes de outras lojas na plataforma.</p>
                         {afiliadosList.length === 0 ? (
-                          <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"2rem 0"}}>Ainda não há comissões de afiliado registadas.</p>
+                          <div>
+                            <NudgeBanner
+                              id="nudge_afiliado"
+                              icone="🔗"
+                              titulo="Como ganhar créditos de afiliado"
+                              descricao="Partilha o teu link pessoal (?ref=...) em qualquer peça da plataforma — nas redes sociais, em grupos ou com amigas. Quando alguém alugar via esse link, recebes uma comissão automática. Sem esforço extra."
+                              ctaLabel="Copiar o meu link"
+                              onCta={() => setShowReferralBanner(true)}
+                            />
+                            <p style={{color:"#aaa",fontSize:"0.85rem",textAlign:"center",padding:"1rem 0 2rem"}}>Ainda não há comissões de afiliado registadas.</p>
+                          </div>
                         ) : afiliadosList.map(c => (
                           <div key={c.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.65rem 0",borderBottom:"1px solid var(--g1)"}}>
                             <div>
@@ -2774,6 +2878,18 @@ export default function Perfil() {
                           </div>
                         ))}
                       </div>
+
+                      {/* Nudge se ainda não tem boosters */}
+                      {boostersLoja.length === 0 && (
+                        <NudgeBanner
+                          id="nudge_boosters"
+                          icone="🚀"
+                          titulo="Dá mais visibilidade às tuas peças"
+                          descricao="Os Boosters colocam as tuas peças em destaque na listagem e enviam notificações a clientes que já as viram. Úteis quando há mais concorrência na mesma categoria. Podes activar por semana, sem compromisso."
+                          ctaLabel="Ver boosters disponíveis"
+                          onCta={() => setTabLoja("pecas")}
+                        />
+                      )}
 
                       {/* Ferramentas activas actualmente */}
                       {boostersLoja.length > 0 && (
