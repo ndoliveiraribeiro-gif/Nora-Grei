@@ -753,12 +753,14 @@ export default function Home() {
         .pwa-banner-ios{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.5;padding:0.75rem;background:rgba(255,255,255,0.07);border-radius:4px;display:flex;flex-direction:column;gap:0.35rem}
         .pwa-ios-step{display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap}
         .pwa-ios-step strong{color:#fff;font-weight:500}
-        .pwa-sec{padding:3rem 1.5rem;background:var(--g1);border-top:1px solid var(--g2);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem}
+        .pwa-sec{padding:3.5rem 1.5rem;background:var(--black);display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.5rem}
+        .pwa-sec-icon{width:56px;height:56px;border-radius:14px;background:var(--rosa);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.3rem;font-weight:300;letter-spacing:0.08em;color:#fff;flex-shrink:0}
         .pwa-sec-txt{}
-        .pwa-sec-titulo{font-family:var(--serif);font-size:1.4rem;font-weight:300;margin-bottom:0.35rem}
-        .pwa-sec-sub{font-size:0.8rem;color:var(--g4);line-height:1.5}
-        .pwa-sec-btn{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);font-weight:500;padding:0.9rem 2rem;background:var(--black);color:var(--white);border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;text-decoration:none;display:inline-block}
-        .pwa-sec-btn:hover{background:#2a2926}
+        .pwa-sec-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:var(--sans);margin-bottom:0.6rem}
+        .pwa-sec-titulo{font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:300;color:var(--white);margin-bottom:0.4rem}
+        .pwa-sec-sub{font-size:0.85rem;color:rgba(255,255,255,0.5);line-height:1.6;max-width:38ch;margin:0 auto}
+        .pwa-sec-btn{font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;font-family:var(--sans);font-weight:500;padding:0.9rem 2.4rem;background:var(--white);color:var(--black);border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;text-decoration:none;display:inline-block}
+        .pwa-sec-btn:hover{background:var(--gold)}
 
         /* RESPONSIVE DESKTOP */
         @media(min-width:769px){
@@ -788,7 +790,9 @@ export default function Home() {
           .depo-sec{padding:3.5rem 4rem}
           .destaque-sec{padding:2rem 4rem 2.5rem}
           .destaque-grid{grid-template-columns:repeat(3,1fr);gap:1.25rem}
-          .pwa-sec{flex-direction:row;justify-content:space-between;text-align:left;padding:2.5rem 4rem}
+          .pwa-sec{flex-direction:row;justify-content:center;align-items:center;gap:3rem;text-align:left;padding:3rem 4rem}
+          .pwa-sec-txt{text-align:left}
+          .pwa-sec-sub{margin:0}
         }
         @media(min-width:1200px){
           .cat-grid{grid-template-columns:repeat(4,1fr)}
@@ -1136,7 +1140,9 @@ export default function Home() {
       {/* PWA SECTION */}
       {!pwaInstalado && (
         <div className="pwa-sec">
+          <div className="pwa-sec-icon">NG</div>
           <div className="pwa-sec-txt">
+            <div className="pwa-sec-label">App Nora Grei</div>
             <div className="pwa-sec-titulo">{t.pwa.secTitulo}</div>
             <div className="pwa-sec-sub">{t.pwa.secSub}</div>
           </div>
