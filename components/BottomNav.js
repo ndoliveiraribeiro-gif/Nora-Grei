@@ -56,7 +56,7 @@ export default function BottomNav() {
     return pathname?.startsWith(href);
   };
 
-  // Links secundários que aparecem no drawer "Mais"
+  // Links secundários que aparecem no drawer "Mais" — sempre 4 itens (grelha 2×2)
   const maisItems = [
     {
       href: "/feed", label: i.feed,
@@ -66,10 +66,14 @@ export default function BottomNav() {
       href: "/mensagens", label: i.mensagens,
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
     },
-    ...(userLogado ? [{
+    {
+      href: "/perfil", label: i.perfil,
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    },
+    {
       href: "/publicar", label: i.publicar,
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-    }] : []),
+    },
   ];
 
   return (
