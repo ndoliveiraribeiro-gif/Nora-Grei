@@ -859,19 +859,11 @@ export default function Home() {
           .nav{padding:1.25rem 4rem}
           .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
-        /* BOTTOM NAV MOBILE */
-        .mob-nav{display:none}
         @media(max-width:768px){
           .nav{padding:0.9rem 1.25rem}
           .nav-links,.nav-right .nb-o,.nav-right .nb-f{display:none}
           .nav-right{gap:0.5rem}
           .hero-sound{bottom:4rem}
-          .mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--white);border-top:1px solid var(--g2);height:60px;align-items:stretch}
-          .mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:var(--g4);transition:color 0.15s;padding:0.3rem 0}
-          .mob-nav-item.destaque{color:var(--rosa)}
-          .mob-nav-item:active{opacity:0.6}
-          .mob-nav-icon{font-size:1.1rem;line-height:1}
-          .mob-nav-label{font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
         }
       `}</style>
 
@@ -1259,37 +1251,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* BOTTOM NAV MOBILE */}
-      <nav className="mob-nav">
-        <a href="/" className="mob-nav-item">
-          <span className="mob-nav-icon">⌂</span>
-          <span className="mob-nav-label">{t.bottomNav.inicio}</span>
-        </a>
-        <a href="/catalogo" className="mob-nav-item">
-          <span className="mob-nav-icon">◻</span>
-          <span className="mob-nav-label">{t.bottomNav.catalogo}</span>
-        </a>
-        <a href="/lojas" className="mob-nav-item destaque">
-          <span className="mob-nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l1-5h16l1 5"/>
-              <path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/>
-              <path d="M9 9v12M15 9v12"/>
-              <path d="M3 9h18"/>
-              <rect x="9" y="14" width="6" height="6" rx="0.5"/>
-            </svg>
-          </span>
-          <span className="mob-nav-label">{t.nav.lojas}</span>
-        </a>
-        <a href="/pesquisa" className="mob-nav-item">
-          <span className="mob-nav-icon">🔍</span>
-          <span className="mob-nav-label">Pesquisa</span>
-        </a>
-        <a href={userLogado ? "/perfil" : "/entrar"} className="mob-nav-item">
-          <span className="mob-nav-icon">◯</span>
-          <span className="mob-nav-label">{userLogado ? t.bottomNav.perfil : t.nav.entrar}</span>
-        </a>
-      </nav>
 
     </>
   );

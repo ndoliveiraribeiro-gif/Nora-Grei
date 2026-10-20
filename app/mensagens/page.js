@@ -105,7 +105,7 @@ function MensagensInner() {
 
   const iniciar = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = "/login"; return; }
+    if (!user) { window.location.href = "/entrar"; return; }
     const { data: cli } = await supabase.from("clientes").select("id, nome, modo_lojista").eq("id", user.id).maybeSingle();
     if (!cli) { setLoading(false); return; }
     setCliente(cli);
@@ -291,7 +291,7 @@ function MensagensInner() {
   if (!cliente) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif", gap: "1rem" }}>
       <p style={{ fontSize: "0.85rem", color: "#888" }}>Sem sessão activa.</p>
-      <a href="/login" style={{ fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#080808" }}>Login →</a>
+      <a href="/entrar" style={{ fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#080808" }}>Entrar →</a>
     </div>
   );
 

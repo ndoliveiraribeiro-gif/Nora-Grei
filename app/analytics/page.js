@@ -10,24 +10,33 @@ export default function Analytics() {
   const [aiInsight, setAiInsight] = useState("");
   const [periodo, setPeriodo] = useState("30");
 
-  useEffect(() => { carregarDados(); }, [periodo]);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) { window.location.href = "/entrar"; return; }
+      carregarDados();
+    });
+  }, [periodo]);
 
   const carregarDados = async () => {
     setLoading(true);
-    const desde = new Date();
-    desde.setDate(desde.getDate() - parseInt(periodo));
+    try {
+      const desde = new Date();
+      desde.setDate(desde.getDate() - parseInt(periodo));
 
-    const { data } = await supabase
-      .from("analytics_alugueres")
-      .select("*")
-      .gte("created_at", desde.toISOString());
+      const { data } = await supabase
+        .from("analytics_alugueres")
+        .select("*")
+        .gte("created_at", desde.toISOString());
 
-    const { data: camp } = await supabase
-      .from("campanha_stats")
-      .select("*");
+      const { data: camp } = await supabase
+        .from("campanha_stats")
+        .select("*");
 
-    if (data) setDados(data);
-    if (camp) setCampanhas(camp);
+      if (data) setDados(data);
+      if (camp) setCampanhas(camp);
+    } catch (err) {
+      console.error("Erro ao carregar analytics:", err);
+    }
     setLoading(false);
   };
 

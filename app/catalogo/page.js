@@ -466,24 +466,6 @@ export default function Catalogo() {
         .cat-empty { padding:4rem 1rem; text-align:center; font-family:var(--sans); font-size:1rem; font-weight:400; color:#3a3835; }
         .cat-loading { padding:4rem; text-align:center; font-size:0.78rem; color:#3a3835; letter-spacing:0.2em; text-transform:uppercase; }
 
-        /* ── BOTTOM NAV ── */
-        .bottom-nav {
-          position:fixed; bottom:0; left:0; right:0; z-index:100;
-          display:flex; align-items:stretch;
-          background:rgba(248,247,245,0.98); backdrop-filter:blur(20px);
-          border-top:1px solid var(--grey-200);
-          height:56px;
-        }
-        .bn-item {
-          flex:1; display:flex; flex-direction:column; align-items:center;
-          justify-content:center; gap:0.2rem; text-decoration:none;
-          color:#5a5855; border:none; background:none; cursor:pointer;
-          font-family:var(--sans); font-size:0.65rem; font-weight:500;
-          letter-spacing:0.08em; text-transform:uppercase;
-          transition:color 0.12s;
-        }
-        .bn-item.active { color:var(--black); }
-        .bn-item svg { flex-shrink:0; }
 
         /* TABLET ≥ 600px */
         @media (min-width:600px) {
@@ -627,30 +609,6 @@ export default function Catalogo() {
         </div>
       )}
 
-      {/* ── BOTTOM NAV (mobile only) ── */}
-      <nav className="bottom-nav">
-        <a href="/" className="bn-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Início
-        </a>
-        <a href="/catalogo" className="bn-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Catálogo
-        </a>
-        <a href="/pedidos" className="bn-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Pedidos
-        </a>
-        <a href="/cesto" className="bn-item" style={{position:"relative"}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          {cestoCont > 0 && <span style={{position:"absolute",top:"4px",right:"calc(50% - 14px)",background:"var(--rosa)",color:"#fff",fontSize:"0.68rem",fontFamily:"'Jost',sans-serif",fontWeight:600,width:"13px",height:"13px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{cestoCont > 9 ? "9+" : cestoCont}</span>}
-          Cesto
-        </a>
-        <a href="/perfil" className="bn-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Perfil
-        </a>
-      </nav>
     </>
   );
 }
