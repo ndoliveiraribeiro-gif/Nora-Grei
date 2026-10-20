@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const T = {
   pt: {
     nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Vestido","Casaco","Blazer","Conjunto"] },
+    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no armário","a mala","o casaco","o vestido","a camisola","a calça"] },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -587,9 +587,9 @@ export default function Home() {
         .hero-eyebrow{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:1rem}
         /* texto rotativo */
         .hero-rotary{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2.8rem,9vw,8rem);line-height:0.95;color:var(--white);overflow:hidden;height:1.05em;margin-bottom:0.6rem}
-        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 12s cubic-bezier(0.77,0,0.18,1) infinite}
+        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 24s cubic-bezier(0.77,0,0.18,1) infinite}
         .hero-rotary-inner span{display:block;height:1.05em;line-height:1.05}
-        @keyframes rotaryScroll{0%,18%{transform:translateY(0)}25%,43%{transform:translateY(-1.05em)}50%,68%{transform:translateY(-2.1em)}75%,93%{transform:translateY(-3.15em)}100%{transform:translateY(-4.2em)}}
+        @keyframes rotaryScroll{0%,10%{transform:translateY(0)}12.5%,22.5%{transform:translateY(-1.05em)}25%,35%{transform:translateY(-2.1em)}37.5%,47.5%{transform:translateY(-3.15em)}50%,60%{transform:translateY(-4.2em)}62.5%,72.5%{transform:translateY(-5.25em)}75%,85%{transform:translateY(-6.3em)}87.5%,97.5%{transform:translateY(-7.35em)}100%{transform:translateY(-8.4em)}}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.4rem,8vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
         .hero-sub{font-family:var(--serif);font-size:clamp(0.95rem,1.8vw,1.3rem);font-weight:300;color:rgba(255,255,255,0.62);line-height:1.55;margin-bottom:clamp(1.75rem,4vh,3rem);max-width:50ch}
         @media(max-width:600px){
