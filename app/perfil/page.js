@@ -1100,6 +1100,7 @@ export default function Perfil() {
   const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
+  const [reembolsosPendentes, setReembolsosPendentes] = useState([]);
   const [wishlistPecas, setWishlistPecas] = useState([]);
   const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1221,6 +1222,10 @@ export default function Perfil() {
         if (c.candidatura_lojista) setCandidaturaLojista(c.candidatura_lojista);
       }
     }
+
+    // reembolsos pendentes de escolha do cliente
+    const { data: rp } = await supabase.from("reembolsos_pendentes").select("*, alugueres_lojista(id, pecas_lojista(nome))").eq("cliente_id", user.id).eq("estado", "aguarda_escolha").order("created_at", { ascending: false });
+    if (rp) setReembolsosPendentes(rp);
 
     const { data: al } = await supabase.from("alugueres").select("*, stock_tamanhos(tamanho, pecas(nome, codigo_referencia, preco_aluguer_dia, fotos))").eq("cliente_id", user.id).order("created_at", { ascending: false });
     if (al) {
@@ -1648,17 +1653,47 @@ export default function Perfil() {
   const cancelarAluguerLojista = async (aluguer) => {
     // 1. Muda estado para cancelado
     await atualizarEstadoAluguer(aluguer.id, "cancelado", { cancelado_por: "lojista", cancelado_em: new Date().toISOString() });
-    // 2. Gera crédito para o cliente pelo valor total pago
+    // 2. Cria pedido de reembolso pendente — cliente escolhe crédito ou dinheiro
+    // (crédito automático ou Stripe refund serão implementados quando integração estiver ativa)
     if (aluguer.cliente_id && aluguer.valor_aluguer) {
-      await supabase.from("creditos_afiliado").insert({
+      // buscar recibo para ter metodo_pagamento
+      const { data: recibo } = await supabase.from("recibos").select("id, metodo_pagamento").eq("aluguer_id", aluguer.id).maybeSingle();
+      await supabase.from("reembolsos_pendentes").insert({
+        aluguer_id: aluguer.id,
         cliente_id: aluguer.cliente_id,
+        lojista_id: aluguer.lojista_id,
         valor: aluguer.valor_aluguer,
-        origem: "cancelamento_lojista",
-        usado: false,
+        metodo_pagamento: recibo?.metodo_pagamento || null,
+        recibo_id: recibo?.id || null,
+        estado: "aguarda_escolha",
         created_at: new Date().toISOString(),
       });
     }
     setModalCancelarLojista(null);
+  };
+
+  const escolherReembolso = async (reembolsoId, escolha) => {
+    const agora = new Date().toISOString();
+    if (escolha === "credito") {
+      // crédito imediato na conta
+      const rp = reembolsosPendentes.find(r => r.id === reembolsoId);
+      if (rp) {
+        await supabase.from("creditos_afiliado").insert({
+          cliente_id: rp.cliente_id,
+          valor: rp.valor,
+          origem: "cancelamento_lojista",
+          usado: false,
+          created_at: agora,
+        });
+      }
+    }
+    // em ambos os casos regista a escolha — "dinheiro" fica para a Nora Grei processar
+    await supabase.from("reembolsos_pendentes").update({
+      estado: escolha === "credito" ? "credito" : "reembolso_dinheiro",
+      escolha_cliente: escolha,
+      escolha_em: agora,
+    }).eq("id", reembolsoId);
+    setReembolsosPendentes(prev => prev.filter(r => r.id !== reembolsoId));
   };
 
   const mudarPassword = async () => {
@@ -1852,6 +1887,30 @@ export default function Perfil() {
         {/* TAB PEDIDOS */}
         {tabAtiva === "pedidos" && (
           <div style={{padding:"0 0 2rem"}}>
+            {reembolsosPendentes.length > 0 && (
+              <div style={{marginBottom:"1.5rem"}}>
+                {reembolsosPendentes.map(rp => (
+                  <div key={rp.id} style={{background:"#fff8e1",border:"1.5px solid #f9a825",borderRadius:10,padding:"1.25rem 1.5rem",marginBottom:"0.75rem"}}>
+                    <div style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c17f00",fontWeight:600,marginBottom:"0.5rem"}}>⚠ Reserva cancelada pelo lojista</div>
+                    <div style={{fontSize:"0.82rem",color:"#3f3e3c",marginBottom:"0.35rem"}}><strong>{rp.alugueres_lojista?.pecas_lojista?.nome}</strong></div>
+                    <div style={{fontSize:"0.78rem",color:"#3f3e3c",marginBottom:"1rem"}}>
+                      O teu aluguer foi cancelado. Como preferes receber o reembolso de <strong>€{rp.valor?.toFixed(2)}</strong>?
+                    </div>
+                    <div style={{display:"flex",gap:"0.75rem",flexWrap:"wrap"}}>
+                      <button onClick={()=>escolherReembolso(rp.id,"credito")} style={{flex:1,minWidth:140,padding:"0.7rem 1rem",background:"#c4748a",color:"#fff",border:"none",borderRadius:6,fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>
+                        Crédito na conta
+                      </button>
+                      <button onClick={()=>escolherReembolso(rp.id,"dinheiro")} style={{flex:1,minWidth:140,padding:"0.7rem 1rem",background:"#fff",color:"#3f3e3c",border:"1.5px solid #ccc",borderRadius:6,fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>
+                        Devolução pelo método original
+                      </button>
+                    </div>
+                    <div style={{fontSize:"0.67rem",color:"#9c9894",marginTop:"0.75rem",lineHeight:1.4}}>
+                      Crédito: disponível imediatamente para próximas reservas. · Devolução em dinheiro: processada pela Nora Grei nos próximos 10 dias úteis.
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             {alugueresAtivos.length === 0 && alugueresHistorico.length === 0 ? (
               <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
                 <p style={{marginBottom:"0.75rem",fontSize:"0.85rem"}}>{i.semPedidos}</p>

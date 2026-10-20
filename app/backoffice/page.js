@@ -393,6 +393,7 @@ const CATEGORIAS_VARIAVEIS = ["Compra de stock", "Envio/Logística", "Higieniza�
 function Caixa() {
   const [movimentos, setMovimentos] = useState([]);
   const [despesas, setDespesas] = useState([]);
+  const [reembolsosDinheiro, setReembolsosDinheiro] = useState([]);
   const [loading, setLoading] = useState(true);
   const [novaDespesa, setNovaDespesa] = useState({ descricao: "", tipo_custo: "variavel", categoria: CATEGORIAS_VARIAVEIS[0], valor: "", data: new Date().toISOString().split("T")[0] });
   const [aGuardar, setAGuardar] = useState(false);
@@ -400,12 +401,21 @@ function Caixa() {
 
   useEffect(() => { carregarCaixa(); }, []);
 
+  const processarReembolso = async (id) => {
+    await supabase.from("reembolsos_pendentes").update({
+      estado: "processado",
+      processado_em: new Date().toISOString(),
+    }).eq("id", id);
+    setReembolsosDinheiro(prev => prev.filter(r => r.id !== id));
+  };
+
   const carregarCaixa = async () => {
     setLoading(true);
-    const [recibosRes, alugueresRes, despesasRes] = await Promise.all([
+    const [recibosRes, alugueresRes, despesasRes, reembolsosRes] = await Promise.all([
       supabase.from("recibos").select("*, clientes(nome, codigo_cliente, nif), alugueres(desconto_cesto, valor_aluguer)").eq("estado", "pago").order("created_at", { ascending: false }),
       supabase.from("alugueres").select("id, valor_aluguer, deposito_valor, deposito_estado, caucao_libertada_em, clientes(nome, codigo_cliente)").eq("deposito_estado", "libertado").not("caucao_libertada_em", "is", null),
       supabase.from("despesas").select("*").order("data", { ascending: false }),
+      supabase.from("reembolsos_pendentes").select("*, alugueres_lojista(id, pecas_lojista(nome)), clientes:cliente_id(nome, email, iban)").eq("estado", "reembolso_dinheiro").order("escolha_em", { ascending: true }),
     ]);
 
     const entradas = (recibosRes.data || []).map(r => ({
@@ -431,6 +441,7 @@ function Caixa() {
     const todos = [...entradas, ...saidasCaucao, ...saidasDespesas].sort((a, b) => new Date(b.data) - new Date(a.data));
     setMovimentos(todos);
     setDespesas(despesasRes.data || []);
+    setReembolsosDinheiro(reembolsosRes.data || []);
     setLoading(false);
   };
 
@@ -482,6 +493,31 @@ function Caixa() {
     <>
       <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>Caixa</h1>
       <p style={{ fontSize:"0.82rem",color:"#888",marginBottom:"2rem" }}>Livro de caixa diário — entradas e saídas reais</p>
+
+      {reembolsosDinheiro.length > 0 && (
+        <div style={{ background:"#fff8e1",border:"1.5px solid #f9a825",borderRadius:10,padding:"1.5rem",marginBottom:"2rem" }}>
+          <div style={{ fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#c17f00",fontWeight:700,marginBottom:"1rem" }}>
+            ⚠ Reembolsos por processar ({reembolsosDinheiro.length})
+          </div>
+          <p style={{ fontSize:"0.78rem",color:"#5a4a00",marginBottom:"1.25rem",lineHeight:1.5 }}>
+            Estes clientes cancelaram por iniciativa do lojista e optaram por reembolso em dinheiro. Após transferência bancária, marcar como processado.
+          </p>
+          {reembolsosDinheiro.map(r => (
+            <div key={r.id} style={{ display:"flex",alignItems:"center",gap:"1rem",padding:"0.85rem 1rem",background:"#fff",borderRadius:6,marginBottom:"0.5rem",flexWrap:"wrap" }}>
+              <div style={{ flex:1,minWidth:180 }}>
+                <div style={{ fontSize:"0.8rem",fontWeight:600,color:"#1a1816" }}>{r.clientes?.nome || "—"}</div>
+                <div style={{ fontSize:"0.72rem",color:"#888" }}>{r.alugueres_lojista?.pecas_lojista?.nome} · {r.metodo_pagamento_original || "MB/MBWay"}</div>
+                {r.clientes?.iban && <div style={{ fontSize:"0.72rem",fontFamily:"monospace",color:"#3f3e3c",marginTop:"0.2rem" }}>IBAN: {r.clientes.iban}</div>}
+                <div style={{ fontSize:"0.68rem",color:"#aaa" }}>Pedido: {r.escolha_em ? new Date(r.escolha_em).toLocaleDateString("pt-PT") : "—"}</div>
+              </div>
+              <div style={{ fontSize:"1.1rem",fontWeight:700,color:"#1a1816",minWidth:70,textAlign:"right" }}>€{r.valor?.toFixed(2)}</div>
+              <button onClick={() => processarReembolso(r.id)} style={{ padding:"0.6rem 1.1rem",background:"#27ae60",color:"#fff",border:"none",borderRadius:4,fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap" }}>
+                ✓ Processado
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={CARD}>
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem" }}>
