@@ -34,19 +34,33 @@ export async function POST(request) {
               },
               {
                 type: "text",
-                text: `Analisa esta imagem e responde APENAS com JSON válido, sem texto adicional.
+                text: `Analisa esta imagem para uma plataforma de moda de luxo em segunda mão. Responde APENAS com JSON válido, sem texto adicional.
 
-Verifica:
-1. A imagem mostra uma peça de roupa, acessório ou calçado real (não uma ilustração digital, screenshot, meme, imagem de texto, rosto sem roupa, paisagem, comida, animal, ou qualquer outra coisa)?
-2. A imagem tem qualidade suficiente para uma loja de moda (não é desfocada, muito escura, ou com conteúdo inadequado)?
+Avalia estes critérios — qualquer falha torna a imagem inválida:
+
+CONTEÚDO (obrigatório):
+- Deve mostrar uma peça de roupa, acessório ou calçado real
+- Não aceitar: screenshots, memes, texto, paisagens, comida, animais, rostos sem roupa, ilustrações digitais, catálogos escaneados, imagens de produto de loja online (fundo branco puro com mannequin digital)
+
+QUALIDADE (obrigatório):
+- Nitidez: imagem focada e clara, não desfocada nem tremida
+- Exposição: bem iluminada, não muito escura nem sobreexposta
+- Resolução: detalhe suficiente para ver textura e cor reais
+- Enquadramento: peça visível e centrada, não cortada de forma estranha
+
+SEGURANÇA (obrigatório):
+- Sem conteúdo adulto, violento ou ofensivo
+- Sem marcas d'água de outros sites de venda
 
 Responde com este JSON exato:
-{"valida": true/false, "categoria": "roupa|acessorio|calcado|outro", "motivo": "descrição curta em português do que vês na imagem"}
+{"valida": true/false, "categoria": "roupa|acessorio|calcado|outro", "motivo": "descrição curta em português — se inválida, explica o problema principal"}
 
-Exemplos de resposta:
-{"valida": true, "categoria": "roupa", "motivo": "Vestido de noite azul em fundo neutro"}
-{"valida": false, "categoria": "outro", "motivo": "Screenshot de ecrã com texto"}
-{"valida": false, "categoria": "outro", "motivo": "Fotografia de paisagem"}`,
+Exemplos:
+{"valida": true, "categoria": "roupa", "motivo": "Camisola branca de malha, boa iluminação e foco"}
+{"valida": false, "categoria": "roupa", "motivo": "Imagem muito escura, peça quase invisível"}
+{"valida": false, "categoria": "roupa", "motivo": "Foto desfocada, qualidade insuficiente"}
+{"valida": false, "categoria": "outro", "motivo": "Screenshot de página web"}
+{"valida": false, "categoria": "outro", "motivo": "Fotografia de paisagem, sem peça de roupa"}`,
               },
             ],
           },
