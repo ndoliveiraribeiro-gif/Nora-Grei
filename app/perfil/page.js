@@ -1130,6 +1130,7 @@ export default function Perfil() {
   const [modalEnvio, setModalEnvio] = useState(null); // aluguer a marcar como enviado
   const [trackingInfo, setTrackingInfo] = useState({ transportadora: "", numero: "" });
   const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
+  const [modalCancelarLojista, setModalCancelarLojista] = useState(null); // lojista cancela por indisponibilidade
   const [fotosLojista, setFotosLojista] = useState([]);
   const [uploadProgressLoja, setUploadProgressLoja] = useState("");
   const [fotoValidacao, setFotoValidacao] = useState([]); // [{ok, motivo, categoria}] por foto
@@ -1642,6 +1643,22 @@ export default function Perfil() {
       const { data: als } = await supabase.from("alugueres_lojista").select("*, clientes(nome, email, telefone, cidade), pecas_lojista(nome, fotos, preco_aluguer_dia), stock_lojista(tamanho)").eq("lojista_id", session.user.id).order("created_at", { ascending: false });
       if (als) setAlugueresLoja(als);
     }
+  };
+
+  const cancelarAluguerLojista = async (aluguer) => {
+    // 1. Muda estado para cancelado
+    await atualizarEstadoAluguer(aluguer.id, "cancelado", { cancelado_por: "lojista", cancelado_em: new Date().toISOString() });
+    // 2. Gera crédito para o cliente pelo valor total pago
+    if (aluguer.cliente_id && aluguer.valor_aluguer) {
+      await supabase.from("creditos_afiliado").insert({
+        cliente_id: aluguer.cliente_id,
+        valor: aluguer.valor_aluguer,
+        origem: "cancelamento_lojista",
+        usado: false,
+        created_at: new Date().toISOString(),
+      });
+    }
+    setModalCancelarLojista(null);
   };
 
   const mudarPassword = async () => {
@@ -2835,10 +2852,12 @@ export default function Perfil() {
                       </>}
                       {a.estado === "confirmado" && <>
                         <button onClick={()=>{setModalEnvio(a);setTrackingInfo({transportadora:"",numero:""});}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#8e44ad",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>📦 Marcar enviado</button>
+                        <button onClick={()=>setModalCancelarLojista(a)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"var(--sans)"}}>⚠ Cancelar reserva</button>
                       </>}
                       {(a.estado === "enviado" || a.estado === "ativo") && <>
                         <button onClick={()=>atualizarEstadoAluguer(a.id,"em_devolucao")} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"#e67e22",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>↩ Devolução iniciada</button>
                         {a.clientes?.email && <a href={`mailto:${a.clientes.email}`} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>✉ Contactar</a>}
+                        <button onClick={()=>setModalCancelarLojista(a)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"var(--sans)"}}>⚠ Cancelar reserva</button>
                       </>}
                       {a.estado === "em_devolucao" && <>
                         <button onClick={()=>setModalVerificar(a)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.9rem",background:"var(--black)",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>🔍 Verificar peça</button>
@@ -3338,6 +3357,22 @@ export default function Perfil() {
               <button onClick={()=>setModalVerificar(null)} style={{padding:"0.75rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
             <p style={{fontSize:"0.7rem",color:"var(--g4)",marginTop:"1.25rem",lineHeight:1.5}}>Após confirmação, a Nora Grei processa: devolução do depósito ao cliente (peça OK) ou abertura de disputa (peça danificada). O teu pagamento é transferido nos 10 dias úteis seguintes, deduzida a comissão Nora Grei.</p>
+          </div>
+        </div>
+      )}
+      {modalCancelarLojista && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#fff",padding:"2rem",maxWidth:"420px",width:"100%"}}>
+            <h3 style={{fontFamily:"var(--serif)",fontSize:"1.4rem",fontWeight:300,marginBottom:"0.75rem"}}>Cancelar reserva</h3>
+            <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"0.25rem"}}>{modalCancelarLojista.pecas_lojista?.nome} · {modalCancelarLojista.clientes?.nome}</p>
+            <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.25rem"}}>Valor da reserva: <strong>€{modalCancelarLojista.valor_aluguer?.toFixed(2)}</strong></p>
+            <div style={{background:"#fff8e1",border:"1px solid #f9a825",borderRadius:6,padding:"0.75rem 1rem",fontSize:"0.75rem",color:"#5a4a00",lineHeight:1.5,marginBottom:"1.5rem"}}>
+              ⚠ Ao cancelares esta reserva, o valor total (€{modalCancelarLojista.valor_aluguer?.toFixed(2)}) será creditado automaticamente na conta da cliente para usar numa futura reserva. Esta ação não pode ser desfeita.
+            </div>
+            <div style={{display:"flex",gap:"0.75rem"}}>
+              <button onClick={()=>cancelarAluguerLojista(modalCancelarLojista)} style={{flex:1,padding:"0.85rem",background:"#e74c3c",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Confirmar cancelamento</button>
+              <button onClick={()=>setModalCancelarLojista(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Voltar</button>
+            </div>
           </div>
         </div>
       )}

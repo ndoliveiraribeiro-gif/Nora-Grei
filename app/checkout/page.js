@@ -34,6 +34,7 @@ const t = {
     depositoVal: "Depósito (devolvido)",
     total: "Total a pagar agora",
     totalSemDeposito: "* O depósito será devolvido após inspeção da peça",
+    avisoSemCancelamento: "⚠️ Após confirmação e pagamento não é possível cancelar este aluguer. Em caso de não comparência a caução não é devolvida.",
     confirmar: "Pagar agora",
     confirmarPendente: "Confirmar pedido",
     login: "Precisa de fazer login para continuar",
@@ -111,6 +112,7 @@ const t = {
     depositoVal: "Dépôt (remboursé)",
     total: "Total à payer maintenant",
     totalSemDeposito: "* Le dépôt sera remboursé après inspection de la pièce",
+    avisoSemCancelamento: "⚠️ Après confirmation et paiement, il n'est pas possible d'annuler cette location. En cas d'absence, le dépôt n'est pas remboursé.",
     confirmar: "Payer maintenant",
     confirmarPendente: "Confirmer la commande",
     login: "Vous devez vous connecter pour continuer",
@@ -188,6 +190,7 @@ const t = {
     depositoVal: "Užstatas (grąžinamas)",
     total: "Iš viso mokėti dabar",
     totalSemDeposito: "* Užstatas bus grąžintas po drabužio patikrinimo",
+    avisoSemCancelamento: "⚠️ Patvirtinus ir apmokėjus nuomą, atšaukimas negalimas. Neatvykus užstatas negrąžinamas.",
     confirmar: "Mokėti dabar",
     confirmarPendente: "Patvirtinti užsakymą",
     login: "Norėdami tęsti, turite prisijungti",
@@ -1042,6 +1045,16 @@ function CheckoutContent() {
                   <div className="r-total"><span>{i.total}</span><span>{totalAgora.toFixed(2)}€</span></div>
                   <p className="r-nota">{i.totalSemDeposito}</p>
                 </>
+              )}
+              {!modoCompra && (
+                <div style={{
+                  background: "#fff8e1", border: "1px solid #f9a825",
+                  borderRadius: 8, padding: "0.75rem 1rem",
+                  fontSize: "0.75rem", color: "#5a4a00", lineHeight: 1.5,
+                  marginBottom: "0.75rem",
+                }}>
+                  {i.avisoSemCancelamento}
+                </div>
               )}
               {erro && <div className="erro">{erro}</div>}
               <button className="btn" onClick={confirmar} disabled={loading || (!modoCompra && (!dataInicio || !dataFim))}>
