@@ -438,6 +438,8 @@ function CheckoutContent() {
   const [afiliadoErro, setAfiliadoErro] = useState("");
   const [afiliadoOk, setAfiliadoOk] = useState(false);
   const [refAfiliadoId, setRefAfiliadoId] = useState(null); // UUID do afiliado via link ?ref=
+  const [saldoCreditos, setSaldoCreditos] = useState(0);
+  const [usarCreditos, setUsarCreditos] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -462,6 +464,19 @@ function CheckoutContent() {
   const carregarDados = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
+
+    // Buscar saldo de créditos do cliente
+    if (user) {
+      const { data: creditos } = await supabase
+        .from("creditos_afiliado")
+        .select("valor")
+        .eq("cliente_id", user.id)
+        .eq("usado", false);
+      if (creditos && creditos.length > 0) {
+        const total = creditos.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+        setSaldoCreditos(Math.round(total * 100) / 100);
+      }
+    }
 
     if (pecaId) {
       const { data } = await supabase
@@ -616,7 +631,9 @@ function CheckoutContent() {
   const depositoSelecionado = i.depositoOpcoes.find(p => p.id === deposito);
   const tudoAutomatico = pagamentoSelecionado?.automatico && (valorDeposito === 0 || depositoSelecionado?.automatico);
 
-  const totalAgora = valorAluguer + HIGIENIZACAO + (deposito === "cartao" ? valorDeposito : 0);
+  const totalSemCreditos = valorAluguer + HIGIENIZACAO + (deposito === "cartao" ? valorDeposito : 0);
+  const creditosAplicados = usarCreditos ? Math.min(saldoCreditos, totalSemCreditos) : 0;
+  const totalAgora = Math.max(0, totalSemCreditos - creditosAplicados);
 
   const verificarConflito = async () => {
     if (!stockId || !dataInicio || !dataFim) return false;
@@ -1027,6 +1044,33 @@ function CheckoutContent() {
                 {afiliadoErro && <p style={{fontSize:"0.75rem",color:"#e74c3c",marginTop:"0.3rem"}}>{afiliadoErro}</p>}
               </div>
 
+              {/* CRÉDITOS — só aparecem se o cliente tiver saldo */}
+              {saldoCreditos > 0 && (
+                <div style={{
+                  background: "#f0faf0", border: "1px solid #b2dfdb",
+                  padding: "0.75rem 1rem", marginBottom: "0.75rem",
+                  display: "flex", alignItems: "center", gap: "0.75rem",
+                  cursor: "pointer"
+                }} onClick={() => setUsarCreditos(v => !v)}>
+                  <div style={{
+                    width: 18, height: 18, border: `2px solid ${usarCreditos ? "#27ae60" : "#ccc"}`,
+                    background: usarCreditos ? "#27ae60" : "#fff",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, transition: "all 0.15s"
+                  }}>
+                    {usarCreditos && <span style={{color:"#fff",fontSize:"0.7rem",lineHeight:1}}>✓</span>}
+                  </div>
+                  <div>
+                    <p style={{fontSize:"0.82rem",fontWeight:500,color:"#1a1816",fontFamily:"'Jost',sans-serif"}}>
+                      Usar {saldoCreditos.toFixed(2)}€ em créditos
+                    </p>
+                    <p style={{fontSize:"0.72rem",color:"#5a5855",fontFamily:"'Jost',sans-serif"}}>
+                      Saldo disponível na tua conta Nora Grei
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {modoCompra ? (
                 <>
                   <div className="r-linha"><span>Peça usada</span><span>{peca?.preco_avulso?.toFixed(2)}€</span></div>
@@ -1037,6 +1081,7 @@ function CheckoutContent() {
                 <>
                   <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguerBase.toFixed(2)}€`}</span></div>
                   {descontoAfiliado > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Desconto ({afiliadoAtivo?.desconto_pct}% — {codigoAfiliado})</span><span>−{descontoAfiliado.toFixed(2)}€</span></div>}
+                  {creditosAplicados > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Créditos Nora Grei</span><span>−{creditosAplicados.toFixed(2)}€</span></div>}
                   <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
                   <div className="r-linha">
                     <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>

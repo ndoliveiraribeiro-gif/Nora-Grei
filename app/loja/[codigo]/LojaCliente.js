@@ -2,6 +2,17 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
+function Estrelas({ nota, size = "0.85rem" }) {
+  const arredondado = Math.round(nota);
+  return (
+    <span style={{ display: "inline-flex", gap: "0.1rem" }}>
+      {[1, 2, 3, 4, 5].map(v => (
+        <span key={v} style={{ fontSize: size, color: v <= arredondado ? "#c4748a" : "rgba(255,255,255,0.2)" }}>★</span>
+      ))}
+    </span>
+  );
+}
+
 const T = {
   pt: {
     voltar: "← Lojistas",
@@ -45,11 +56,68 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
   const [lang, setLang] = useState("pt");
   const [loja] = useState(lojaInicial);
   const [pecas] = useState(pecasIniciais || []);
+  const [media, setMedia] = useState(null);
+  const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
+  const [aSegui, setASegui] = useState(false);
+  const [seguirLoading, setSeguirLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved);
-  }, []);
+    if (loja?.id) {
+      carregarAvaliacoes(loja.id);
+      carregarSeguir(loja.id);
+    }
+  }, [loja?.id]);
+
+  const carregarAvaliacoes = async (lojistaId) => {
+    const { data: avs } = await supabase
+      .from("avaliacoes_lojista")
+      .select("nota_cliente_lojista, nota_plataforma")
+      .eq("lojista_id", lojistaId);
+    if (!avs || avs.length === 0) return;
+    const notas = [
+      ...avs.filter(a => a.nota_cliente_lojista != null).map(a => a.nota_cliente_lojista),
+      ...avs.filter(a => a.nota_plataforma != null).map(a => a.nota_plataforma),
+    ];
+    if (notas.length > 0) {
+      const m = notas.reduce((s, n) => s + n, 0) / notas.length;
+      setMedia(m.toFixed(1));
+      setTotalAvaliacoes(avs.filter(a => a.nota_cliente_lojista != null).length);
+    }
+  };
+
+  const carregarSeguir = async (lojistaId) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    setCurrentUserId(user.id);
+    const { data } = await supabase
+      .from("follows")
+      .select("lojista_id")
+      .eq("follower_id", user.id)
+      .eq("lojista_id", lojistaId)
+      .maybeSingle();
+    setASegui(!!data);
+  };
+
+  const toggleSeguir = async () => {
+    if (!currentUserId || seguirLoading) return;
+    setSeguirLoading(true);
+    if (aSegui) {
+      await supabase.from("follows").delete()
+        .eq("follower_id", currentUserId)
+        .eq("lojista_id", loja.id);
+      setASegui(false);
+    } else {
+      await supabase.from("follows").upsert(
+        { follower_id: currentUserId, lojista_id: loja.id },
+        { onConflict: "follower_id,lojista_id" }
+      );
+      setASegui(true);
+    }
+    setSeguirLoading(false);
+  };
 
   const t = T[lang] || T.pt;
   const initials = loja?.nome ? loja.nome.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
@@ -84,6 +152,15 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         .loja-header-desc{font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.6;margin-top:1rem;max-width:520px}
         .loja-header-ano{font-size:0.58rem;letter-spacing:0.15em;color:rgba(255,255,255,0.25);font-family:var(--sans);margin-top:0.75rem}
         .loja-header-deco{position:absolute;right:-1rem;top:-1rem;font-family:var(--serif);font-size:8rem;font-weight:300;color:rgba(255,255,255,0.04);line-height:1;pointer-events:none;user-select:none}
+        .loja-header-meta{display:flex;align-items:center;gap:1rem;margin-top:0.85rem;flex-wrap:wrap}
+        .loja-rating-bloco{display:flex;align-items:center;gap:0.4rem;text-decoration:none;cursor:pointer}
+        .loja-rating-num{font-size:0.78rem;font-weight:500;color:#fff;font-family:var(--sans)}
+        .loja-rating-count{font-size:0.62rem;color:rgba(255,255,255,0.35);font-family:var(--sans)}
+        .btn-seguir{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--sans);padding:0.3rem 0.85rem;border:1px solid;cursor:pointer;transition:all 0.2s;background:none;border-radius:0}
+        .btn-seguir.ativo{border-color:var(--rosa);color:var(--rosa)}
+        .btn-seguir.inativo{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.6)}
+        .btn-seguir:hover.inativo{border-color:var(--rosa);color:var(--rosa)}
+        .btn-seguir:hover.ativo{border-color:rgba(255,255,255,0.5);color:rgba(255,255,255,0.5)}
 
         .loja-share-bar{background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.08);padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
         .share-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);font-family:var(--sans)}
@@ -135,6 +212,26 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
             )}
             {loja.descricao && <p className="loja-header-desc">{loja.descricao}</p>}
             {anoMembro && <p className="loja-header-ano">Membro desde {anoMembro}</p>}
+            <div className="loja-header-meta">
+              {media && (
+                <a href={`/loja/${loja.codigo_cliente}/avaliacoes`} className="loja-rating-bloco">
+                  <span className="loja-rating-num">{media}</span>
+                  <Estrelas nota={parseFloat(media)} size="0.78rem" />
+                  {totalAvaliacoes > 0 && (
+                    <span className="loja-rating-count">({totalAvaliacoes})</span>
+                  )}
+                </a>
+              )}
+              {currentUserId && (
+                <button
+                  onClick={toggleSeguir}
+                  disabled={seguirLoading}
+                  className={`btn-seguir ${aSegui ? "ativo" : "inativo"}`}
+                >
+                  {aSegui ? "✓ A seguir" : "+ Seguir"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
