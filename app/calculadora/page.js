@@ -517,6 +517,19 @@ export default function Calculadora() {
 
             <a href="/registar?lojista=1" className="btn">Publicar a minha peça agora</a>
             <a href="/lojas" className="btn btn-outline">Ver como outras lojistas fazem →</a>
+
+            {/* Disclaimer */}
+            <p style={{
+              fontSize:"0.7rem",
+              color:"var(--sub)",
+              lineHeight:1.55,
+              textAlign:"center",
+              padding:"1.25rem 0.5rem 0",
+              borderTop:"1px solid var(--border)",
+              marginTop:"0.5rem"
+            }}>
+              ⓘ Os valores apresentados são <strong>estimativas indicativas</strong> baseadas em benchmarks do sector de moda em segunda mão e aluguer, ajustadas pela categoria e estado da peça. A rotação real depende da procura, sazonalidade, visibilidade da peça na plataforma e condições de mercado. <strong>Não constituem garantia de rendimento.</strong>
+            </p>
           </>
         )}
 
