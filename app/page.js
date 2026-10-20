@@ -50,10 +50,10 @@ const T = {
     destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
     pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações.", btn: "Instalar agora", iosP1: "1 · Toca em", iosP2: "⬆️ Partilhar", iosP3: "na barra do Safari", iosP4: "2 · Escolhe", iosP5: "\"Adicionar ao ecrã inicial\"", iosP6: "3 · Toca em", iosP7: "\"Adicionar\"", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
     trust: { label: "Porque nos escolhem", items: [
-      { icon: "✦", titulo: "Peças únicas", desc: "Cada peça é seleccionada a pensar na mulher que quer ser diferente em cada ocasião." },
-      { icon: "◎", titulo: "Caução garantida", desc: "O depósito é devolvido na totalidade quando a peça chega em boas condições." },
-      { icon: "↺", titulo: "Guarda-roupa infinito", desc: "Aluga quantas vezes quiseres. Sem limites, sem acumulação, sem culpa." },
-      { icon: "♡", titulo: "Higienização profissional", desc: "Cada peça é limpa e inspeccionada antes de chegar até ti." },
+      { num: "01", titulo: "Peças únicas", desc: "Cada peça é seleccionada a pensar na mulher que quer ser diferente em cada ocasião." },
+      { num: "02", titulo: "Caução garantida", desc: "O depósito é devolvido na totalidade quando a peça chega em boas condições." },
+      { num: "03", titulo: "Guarda-roupa infinito", desc: "Aluga quantas vezes quiseres. Sem limites, sem acumulação, sem culpa." },
+      { num: "04", titulo: "Higienização profissional", desc: "Cada peça é limpa e inspeccionada antes de chegar até ti." },
     ]},
     instagram: { label: "Inspira-te", titulo: "Segue-nos no Instagram", sub: "Vê como as nossas clientes usam as peças.", btn: "Ver @noragrei" },
   },
@@ -104,10 +104,10 @@ const T = {
     destaque: { label: "Sélection de la semaine", verTodas: "Voir toute la collection", alugar: "Louer", reservar: "Indisponible — Réserver", dispEm: "Disponible dans" },
     pwa: { titulo: "Installer l'app Nora Grei", sub: "Accès rapide à la collection, commandes et notifications — sans encombrer.", btn: "Installer", ios: "Dans Safari, appuyez sur  puis \"Sur l'écran d'accueil\".", dispensar: "Plus tard", secTitulo: "Vous avez l'app?", secSub: "Installez sur votre téléphone pour accéder à la collection en un clic.", secBtn: "Installer l'app" },
     trust: { label: "Pourquoi nous choisir", items: [
-      { icon: "✦", titulo: "Pièces uniques", desc: "Chaque pièce est sélectionnée pour la femme qui veut être différente à chaque occasion." },
-      { icon: "◎", titulo: "Dépôt garanti", desc: "Le dépôt est intégralement remboursé lorsque la pièce arrive en bon état." },
-      { icon: "↺", titulo: "Garde-robe infinie", desc: "Louez autant que vous voulez. Sans limites, sans accumulation, sans culpabilité." },
-      { icon: "♡", titulo: "Nettoyage professionnel", desc: "Chaque pièce est nettoyée et inspectée avant de vous être livrée." },
+      { num: "01", titulo: "Pièces uniques", desc: "Chaque pièce est sélectionnée pour la femme qui veut être différente à chaque occasion." },
+      { num: "02", titulo: "Dépôt garanti", desc: "Le dépôt est intégralement remboursé lorsque la pièce arrive en bon état." },
+      { num: "03", titulo: "Garde-robe infinie", desc: "Louez autant que vous voulez. Sans limites, sans accumulation, sans culpabilité." },
+      { num: "04", titulo: "Nettoyage professionnel", desc: "Chaque pièce est nettoyée et inspectée avant de vous être livrée." },
     ]},
     instagram: { label: "Inspirez-vous", titulo: "Suivez-nous sur Instagram", sub: "Voyez comment nos clientes portent les pièces.", btn: "Voir @noragrei" },
   },
@@ -158,10 +158,10 @@ const T = {
     destaque: { label: "Savaitės atranka", verTodas: "Žiūrėti visą kolekciją", alugar: "Nuomoti", reservar: "Neprieinama — Rezervuoti", dispEm: "Prieinama po" },
     pwa: { titulo: "Įdiekite Nora Grei programėlę", sub: "Greita prieiga prie kolekcijos, užsakymų ir pranešimų — neužimant vietos.", btn: "Įdiegti", ios: "Safari, bakstelėkite  ir tada \"Pridėti prie pradžios ekrano\".", dispensar: "Vėliau", secTitulo: "Turite programėlę?", secSub: "Įdiekite telefone ir pasiekite kolekciją vienu prisilietimu.", secBtn: "Įdiegti programėlę" },
     trust: { label: "Kodėl mus renkasi", items: [
-      { icon: "✦", titulo: "Unikalūs drabužiai", desc: "Kiekvienas drabužis atrinktas moteriai, kuri nori būti skirtinga kiekvienai progai." },
-      { icon: "◎", titulo: "Užstatas garantuotas", desc: "Užstatas grąžinamas visas, kai drabužis grąžinamas geros būklės." },
-      { icon: "↺", titulo: "Begalinė spinta", desc: "Nuomokite kiek tik norite. Be apribojimų, be kaupimo, be kaltės." },
-      { icon: "♡", titulo: "Profesionalus valymas", desc: "Kiekvienas drabužis išvalomas ir patikrinamas prieš pristatant." },
+      { num: "01", titulo: "Unikalūs drabužiai", desc: "Kiekvienas drabužis atrinktas moteriai, kuri nori būti skirtinga kiekvienai progai." },
+      { num: "02", titulo: "Užstatas garantuotas", desc: "Užstatas grąžinamas visas, kai drabužis grąžinamas geros būklės." },
+      { num: "03", titulo: "Begalinė spinta", desc: "Nuomokite kiek tik norite. Be apribojimų, be kaupimo, be kaltės." },
+      { num: "04", titulo: "Profesionalus valymas", desc: "Kiekvienas drabužis išvalomas ir patikrinamas prieš pristatant." },
     ]},
     instagram: { label: "Įkvėpkitės", titulo: "Sekite mus Instagram", sub: "Žiūrėkite, kaip mūsų klientės dėvi drabužius.", btn: "Žiūrėti @noragrei" },
   },
@@ -254,7 +254,7 @@ const TOUR_SLIDES = [
   },
 ];
 
-function TourAnimado({ lang, passos }) {
+function TourAnimado({ lang, passos, dark=false }) {
   const [slide, setSlide] = useState(0);
   const [animDir, setAnimDir] = useState(1); // 1=forward, -1=back
   const [animating, setAnimating] = useState(false);
@@ -327,26 +327,26 @@ function TourAnimado({ lang, passos }) {
             <div style={{width:"32px",height:"32px",background:s.cor,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
               <span style={{fontFamily:"Georgia,serif",fontSize:"0.85rem",fontWeight:300,color:"#fff"}}>{p.num}</span>
             </div>
-            <h3 style={{fontFamily:"Georgia,serif",fontSize:"1.25rem",fontWeight:400,color:"#080808",margin:0}}>{p.titulo}</h3>
+            <h3 style={{fontFamily:"Georgia,serif",fontSize:"1.25rem",fontWeight:400,color:dark?"rgba(255,255,255,0.95)":"#080808",margin:0}}>{p.titulo}</h3>
           </div>
-          <p style={{fontSize:"0.85rem",color:"#5a5855",lineHeight:1.65,margin:0}}>{p.desc}</p>
+          <p style={{fontSize:"0.85rem",color:dark?"rgba(255,255,255,0.6)":"#5a5855",lineHeight:1.65,margin:0}}>{p.desc}</p>
         </div>
       </div>
 
       {/* Navegação */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"1.25rem",marginTop:"1.75rem"}}>
-        <button onClick={anterior} style={{background:"none",border:"1px solid #d5d2ca",color:"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Anterior">←</button>
+        <button onClick={anterior} style={{background:"none",border:`1px solid ${dark?"rgba(255,255,255,0.2)":"#d5d2ca"}`,color:dark?"rgba(255,255,255,0.7)":"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Anterior">←</button>
         <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
           {TOUR_SLIDES.map((_,i) => (
-            <button key={i} onClick={() => ir(i, i > slide ? 1 : -1)} style={{width: i===slide ? "20px" : "6px",height:"6px",borderRadius:"3px",background:i===slide ? TOUR_SLIDES[i].cor : "#d5d2ca",border:"none",cursor:"pointer",padding:0,transition:"all 0.35s ease"}} aria-label={`Passo ${i+1}`} />
+            <button key={i} onClick={() => ir(i, i > slide ? 1 : -1)} style={{width: i===slide ? "20px" : "6px",height:"6px",borderRadius:"3px",background:i===slide ? TOUR_SLIDES[i].cor : (dark?"rgba(255,255,255,0.2)":"#d5d2ca"),border:"none",cursor:"pointer",padding:0,transition:"all 0.35s ease"}} aria-label={`Passo ${i+1}`} />
           ))}
         </div>
-        <button onClick={seguinte} style={{background:"none",border:"1px solid #d5d2ca",color:"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Seguinte">→</button>
+        <button onClick={seguinte} style={{background:"none",border:`1px solid ${dark?"rgba(255,255,255,0.2)":"#d5d2ca"}`,color:dark?"rgba(255,255,255,0.7)":"#5a5855",width:"36px",height:"36px",cursor:"pointer",fontSize:"0.9rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}} aria-label="Seguinte">→</button>
       </div>
 
       {/* CTA abaixo do tour */}
-      <div style={{textAlign:"center",marginTop:"1.75rem"}}>
-        <a href="/catalogo" style={{fontSize:"0.72rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"#c4748a",color:"#fff",padding:"0.85rem 2rem",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:500,display:"inline-block",transition:"background 0.2s"}}>
+      <div style={{textAlign:"center",marginTop:"1.75rem",padding:"0 1.5rem"}}>
+        <a href="/catalogo" style={{fontSize:"0.72rem",letterSpacing:"0.18em",textTransform:"uppercase",background:dark?"#fff":"#c4748a",color:dark?"#c4748a":"#fff",padding:"0.85rem 2rem",textDecoration:"none",fontFamily:"'Jost',sans-serif",fontWeight:500,display:"inline-block",transition:"all 0.2s"}}>
           Explorar colecção →
         </a>
       </div>
@@ -675,7 +675,7 @@ export default function Home() {
         .trust-sec{padding:1.75rem 1.5rem;background:var(--g1)}
         .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2);margin-top:1.25rem}
         .trust-item{background:var(--white);padding:1.25rem 1.25rem}
-        .trust-icon{font-size:1.1rem;color:var(--rosa);margin-bottom:0.5rem;display:block}
+        .trust-num{font-family:var(--serif);font-size:0.7rem;letter-spacing:0.18em;color:var(--rosa);margin-bottom:0.6rem;display:block;font-weight:400}
         .trust-titulo{font-family:var(--serif);font-size:1rem;font-weight:400;margin-bottom:0.25rem}
         .trust-desc{font-size:0.78rem;color:var(--g4);line-height:1.55}
 
@@ -1056,13 +1056,22 @@ export default function Home() {
         </section>
       )}
 
+      {/* COMO FUNCIONA — TOUR ANIMADO */}
+      <section id="como" style={{background:"var(--rosa)",padding:"3rem 0 3.5rem"}}>
+        <div style={{padding:"0 1.5rem"}}>
+          <p className="sec-label" style={{color:"rgba(255,255,255,0.7)",letterSpacing:"0.22em"}}>{t.como.label}</p>
+          <h2 style={{fontFamily:"var(--serif)",fontSize:"clamp(1.8rem,5vw,2.8rem)",fontWeight:300,color:"#fff",marginBottom:"2rem",lineHeight:1.2}}>{t.como.titulo}</h2>
+        </div>
+        <TourAnimado lang={lang} passos={t.como.passos} dark={true} />
+      </section>
+
       {/* TRUST */}
       <section className="trust-sec">
         <p className="sec-label">{t.trust.label}</p>
         <div className="trust-grid">
           {t.trust.items.map((item, i) => (
             <div key={i} className="trust-item">
-              <span className="trust-icon">{item.icon}</span>
+              <span className="trust-num">{item.num}</span>
               <div className="trust-titulo">{item.titulo}</div>
               <div className="trust-desc">{item.desc}</div>
             </div>
@@ -1081,13 +1090,6 @@ export default function Home() {
             <div key={i} className="porque-ponto"><div className="porque-dot" /><div className="porque-text">{p}</div></div>
           ))}
         </div>
-      </section>
-
-      {/* COMO FUNCIONA — TOUR ANIMADO */}
-      <section className="sec" id="como" style={{background:"var(--white)",paddingBottom:"2.5rem"}}>
-        <p className="sec-label">{t.como.label}</p>
-        <h2 className="sec-titulo">{t.como.titulo}</h2>
-        <TourAnimado lang={lang} passos={t.como.passos} />
       </section>
 
       {/* INSTAGRAM */}
