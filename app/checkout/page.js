@@ -392,7 +392,7 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
       <div className="talao-sep" />
       <div className="talao-linha"><span>{i.aluguer}</span><span>{valorAluguer.toFixed(2)}€</span></div>
       {recibo.valor_higienizacao > 0 && <div className="talao-linha"><span>{i.higienizacao}</span><span>{recibo.valor_higienizacao}€</span></div>}
-      {recibo.valor_seguro > 0 && <div className="talao-linha"><span>Proteção Nora Grei</span><span>{recibo.valor_seguro}€</span></div>}
+      {recibo.valor_seguro > 0 && <div className="talao-linha"><span>Taxa de segurança</span><span>{recibo.valor_seguro}€</span></div>}
       <div className="talao-linha"><span>{i.deposito}</span><span>{valorDeposito.toFixed(2)}€</span></div>
       <div className="talao-sep" />
       <div className="talao-total"><span>{i.total}</span><span>{recibo.valor_total.toFixed(2)}€</span></div>
@@ -1132,7 +1132,7 @@ function CheckoutContent() {
                     </div>
                   )}
                   {higienizacaoValor > 0 && <div className="r-linha"><span>{i.higienizacao}</span><span>{higienizacaoValor.toFixed(2)}€</span></div>}
-                  {seguroValor > 0 && <div className="r-linha"><span>Proteção Nora Grei</span><span>{seguroValor.toFixed(2)}€</span></div>}
+                  {seguroValor > 0 && <div className="r-linha"><span>Taxa de segurança</span><span>{seguroValor.toFixed(2)}€</span></div>}
                   {entrega === "envio" && (
                     <div className="r-linha">
                       <span>Portes (ida + volta)</span>
