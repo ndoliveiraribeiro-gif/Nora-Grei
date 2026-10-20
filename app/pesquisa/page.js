@@ -77,13 +77,28 @@ export default function Pesquisa() {
     setLoading(true);
     const termo = q.trim();
 
-    // Pesquisar peças
-    const { data: ps } = await supabase
+    // Pesquisar peças Nora Grei (tabela principal)
+    const { data: ngData } = await supabase
+      .from("pecas")
+      .select("id, nome, fotos, preco_aluguer_dia, cor, categorias(nome)")
+      .or(`nome.ilike.%${termo}%,cor.ilike.%${termo}%`)
+      .limit(20);
+
+    // Pesquisar peças lojistas
+    const { data: ljData } = await supabase
       .from("pecas_lojista")
       .select("id, nome, fotos, preco_aluguer_dia, preco_venda, categoria, cor, cliente_id, clientes:cliente_id(nome, codigo_cliente)")
       .eq("estado", "disponivel")
       .or(`nome.ilike.%${termo}%,categoria.ilike.%${termo}%,cor.ilike.%${termo}%`)
-      .limit(24);
+      .limit(12);
+
+    // Normalizar peças NG para o mesmo formato
+    const ngFormatadas = (ngData || []).map(p => ({
+      ...p,
+      _fonte: "ng",
+      categoria: p.categorias?.nome || p.categoria || "",
+    }));
+    const ljFormatadas = (ljData || []).map(p => ({ ...p, _fonte: "lojista" }));
 
     // Pesquisar lojas
     const { data: ls } = await supabase
@@ -93,7 +108,7 @@ export default function Pesquisa() {
       .or(`nome.ilike.%${termo}%,cidade.ilike.%${termo}%`)
       .limit(8);
 
-    setPecas(ps || []);
+    setPecas([...ngFormatadas, ...ljFormatadas]);
     setLojas(ls || []);
     setBuscado(true);
     setLoading(false);
@@ -220,7 +235,7 @@ export default function Pesquisa() {
                 <div className="secao-label">{t.pecas} ({pecas.length})</div>
                 <div className="grid-pecas">
                   {pecas.map(p => (
-                    <a key={p.id} href={`/loja/${p.clientes?.codigo_cliente}/peca/${p.id}`} className="peca-card">
+                    <a key={`${p._fonte}-${p.id}`} href={p._fonte === "lojista" ? `/loja/${p.clientes?.codigo_cliente}/peca/${p.id}` : `/catalogo/${p.id}`} className="peca-card">
                       {p.fotos?.[0]
                         ? <img src={p.fotos[0]} className="peca-foto" alt={p.nome} />
                         : <div className="peca-foto-ph"><span className="peca-foto-ph-txt">NG</span></div>
