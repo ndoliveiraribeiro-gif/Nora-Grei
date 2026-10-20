@@ -3417,17 +3417,35 @@ export default function Perfil() {
             </div>
 
             {/* Tipo — alugar / vender / ambos */}
-            <div className="fg" style={{marginBottom:"1rem"}}>
-              <label className="lbl">Disponível para</label>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
-                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
-                  <button key={val} type="button" onClick={()=>setEditarPeca(p=>({...p,tipo:val}))}
-                    style={{padding:"0.6rem 0.4rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:(editarPeca.tipo||"alugar")===val?"var(--black)":"#e2dfda",background:(editarPeca.tipo||"alugar")===val?"var(--black)":"#fff",color:(editarPeca.tipo||"alugar")===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {(()=>{
+              const est = calcEstimativaP(editarPeca);
+              const opcoesE = [
+                { val:"alugar",  titulo:"Alugar",          icone:"↻", desc:"Rendimento recorrente", detalhe: est ? `€${est.ganho12m}/ano` : "rendimento recorrente", cor:"#c4748a" },
+                { val:"comprar", titulo:"Vender",           icone:"→", desc:"Liquidez imediata",     detalhe: est ? `€${est.precoVendaUsada} imediato` : "liquidez imediata", cor:"#5b8a6b" },
+                { val:"ambos",   titulo:"Alugar e Vender",  icone:"◈", desc:"Máxima flexibilidade",  detalhe: est ? `€${est.precoVendaUsada} + rendas` : "máxima flexibilidade", cor:"#7a6a9e" },
+              ];
+              return (
+                <div className="fg" style={{marginBottom:"1rem"}}>
+                  <label className="lbl">Disponível para</label>
+                  <div style={{display:"flex",flexDirection:"column",gap:"0.45rem"}}>
+                    {opcoesE.map(({val,titulo,icone,desc,detalhe,cor})=>{
+                      const ativo=(editarPeca.tipo||"alugar")===val;
+                      return (
+                        <button key={val} type="button" onClick={()=>setEditarPeca(p=>({...p,tipo:val}))}
+                          style={{display:"flex",alignItems:"center",gap:"0.75rem",padding:"0.65rem 0.85rem",border:ativo?`2px solid ${cor}`:"1.5px solid #e2dfda",borderRadius:9,background:ativo?`${cor}12`:"#fff",cursor:"pointer",textAlign:"left",fontFamily:"inherit",width:"100%",transition:"all 0.15s"}}>
+                          <span style={{fontSize:"1.1rem",lineHeight:1,color:ativo?cor:"#bbb",minWidth:22,textAlign:"center"}}>{icone}</span>
+                          <div style={{flex:1}}>
+                            <div style={{fontSize:"0.73rem",fontWeight:600,letterSpacing:"0.06em",textTransform:"uppercase",color:ativo?cor:"#1a1816",marginBottom:"0.15rem",fontFamily:"inherit"}}>{titulo}</div>
+                            <div style={{fontSize:"0.65rem",color:"#999",lineHeight:1.3}}>{desc}</div>
+                          </div>
+                          <div style={{fontSize:"0.65rem",fontWeight:600,color:ativo?cor:"#ccc",textAlign:"right",whiteSpace:"nowrap"}}>{detalhe}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Valor nova + idade */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.75rem"}}>
@@ -3653,17 +3671,35 @@ export default function Perfil() {
             </div>
 
             {/* Tipo — alugar / vender / ambos */}
-            <div className="fg" style={{marginBottom:"1rem"}}>
-              <label className="lbl">Disponível para *</label>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem"}}>
-                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val,label])=>(
-                  <button key={val} type="button" onClick={()=>setNovaPeca(p=>({...p,tipo:val}))}
-                    style={{padding:"0.6rem 0.4rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1.5px solid",borderColor:novaPeca.tipo===val?"var(--black)":"#e2dfda",background:novaPeca.tipo===val?"var(--black)":"#fff",color:novaPeca.tipo===val?"#fff":"var(--g6)",cursor:"pointer",transition:"all 0.15s"}}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {(()=>{
+              const estN = calcEstimativaP(novaPeca);
+              const opcoesN = [
+                { val:"alugar",  titulo:"Alugar",          icone:"↻", desc:"Rendimento recorrente", detalhe: estN ? `€${estN.ganho12m}/ano` : "rendimento recorrente", cor:"#c4748a" },
+                { val:"comprar", titulo:"Vender",           icone:"→", desc:"Liquidez imediata",     detalhe: estN ? `€${estN.precoVendaUsada} imediato` : "liquidez imediata", cor:"#5b8a6b" },
+                { val:"ambos",   titulo:"Alugar e Vender",  icone:"◈", desc:"Máxima flexibilidade",  detalhe: estN ? `€${estN.precoVendaUsada} + rendas` : "máxima flexibilidade", cor:"#7a6a9e" },
+              ];
+              return (
+                <div className="fg" style={{marginBottom:"1rem"}}>
+                  <label className="lbl">Disponível para *</label>
+                  <div style={{display:"flex",flexDirection:"column",gap:"0.45rem"}}>
+                    {opcoesN.map(({val,titulo,icone,desc,detalhe,cor})=>{
+                      const ativo=novaPeca.tipo===val;
+                      return (
+                        <button key={val} type="button" onClick={()=>setNovaPeca(p=>({...p,tipo:val}))}
+                          style={{display:"flex",alignItems:"center",gap:"0.75rem",padding:"0.65rem 0.85rem",border:ativo?`2px solid ${cor}`:"1.5px solid #e2dfda",borderRadius:9,background:ativo?`${cor}12`:"#fff",cursor:"pointer",textAlign:"left",fontFamily:"inherit",width:"100%",transition:"all 0.15s"}}>
+                          <span style={{fontSize:"1.1rem",lineHeight:1,color:ativo?cor:"#bbb",minWidth:22,textAlign:"center"}}>{icone}</span>
+                          <div style={{flex:1}}>
+                            <div style={{fontSize:"0.73rem",fontWeight:600,letterSpacing:"0.06em",textTransform:"uppercase",color:ativo?cor:"#1a1816",marginBottom:"0.15rem",fontFamily:"inherit"}}>{titulo}</div>
+                            <div style={{fontSize:"0.65rem",color:"#999",lineHeight:1.3}}>{desc}</div>
+                          </div>
+                          <div style={{fontSize:"0.65rem",fontWeight:600,color:ativo?cor:"#ccc",textAlign:"right",whiteSpace:"nowrap"}}>{detalhe}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Valor nova + sugestão aluguer */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"0.25rem"}}>

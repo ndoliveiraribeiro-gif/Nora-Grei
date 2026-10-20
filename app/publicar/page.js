@@ -862,21 +862,86 @@ export default function PublicarPage() {
               </div>
             </div>
 
-            {/* Tipo */}
-            <div className="pub-card">
-              <p className="pub-card-t">Disponível para</p>
-              <div className="pub-grid3">
-                {[["alugar","Alugar"],["comprar","Vender"],["ambos","Alugar e Vender"]].map(([val, label]) => (
-                  <button
-                    key={val}
-                    className={`tipo-btn${peca.tipo === val ? " active" : ""}`}
-                    onClick={() => setP("tipo", val)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Tipo — cards com contexto financeiro */}
+            {(() => {
+              const est = calcEstimativa(peca);
+              const ganhoAluguer = est ? `€${est.ganho12m}/ano` : null;
+              const ganhoVenda = est ? `€${est.precoVendaUsada} imediato` : null;
+              const ganhoAmbos = est ? `€${est.precoVendaUsada} + rendas` : null;
+              const opcoes = [
+                {
+                  val: "alugar",
+                  titulo: "Alugar",
+                  icone: "↻",
+                  desc: "Peça fica no teu armário a gerar rendimento",
+                  detalhe: ganhoAluguer ? `Potencial ${ganhoAluguer}` : "Rendimento recorrente",
+                  cor: "#c4748a",
+                },
+                {
+                  val: "comprar",
+                  titulo: "Vender",
+                  icone: "→",
+                  desc: "Venda rápida, espaço liberto no armário",
+                  detalhe: ganhoVenda ? `Receber ${ganhoVenda}` : "Liquidez imediata",
+                  cor: "#5b8a6b",
+                },
+                {
+                  val: "ambos",
+                  titulo: "Alugar e Vender",
+                  icone: "◈",
+                  desc: "Alugas enquanto encontras comprador",
+                  detalhe: ganhoAmbos ? `${ganhoAmbos}` : "Máxima flexibilidade",
+                  cor: "#7a6a9e",
+                },
+              ];
+              return (
+                <div className="pub-card">
+                  <p className="pub-card-t">Disponível para</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    {opcoes.map(({ val, titulo, icone, desc, detalhe, cor }) => {
+                      const ativo = peca.tipo === val;
+                      return (
+                        <button
+                          key={val}
+                          onClick={() => setP("tipo", val)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: "0.85rem",
+                            padding: "0.75rem 1rem",
+                            border: ativo ? `2px solid ${cor}` : "1.5px solid #e2dfda",
+                            borderRadius: 10,
+                            background: ativo ? `${cor}12` : "#fff",
+                            cursor: "pointer", textAlign: "left",
+                            transition: "all 0.15s", fontFamily: "inherit",
+                            width: "100%",
+                          }}
+                        >
+                          <span style={{
+                            fontSize: "1.3rem", lineHeight: 1,
+                            color: ativo ? cor : "#aaa",
+                            minWidth: 28, textAlign: "center",
+                          }}>{icone}</span>
+                          <div style={{ flex: 1 }}>
+                            <div style={{
+                              fontSize: "0.78rem", fontWeight: 600,
+                              letterSpacing: "0.06em", textTransform: "uppercase",
+                              color: ativo ? cor : "#1a1816", marginBottom: "0.2rem",
+                              fontFamily: "inherit",
+                            }}>{titulo}</div>
+                            <div style={{ fontSize: "0.7rem", color: "#888", lineHeight: 1.4 }}>{desc}</div>
+                          </div>
+                          <div style={{
+                            fontSize: "0.68rem", fontWeight: 600,
+                            color: ativo ? cor : "#bbb",
+                            textAlign: "right", whiteSpace: "nowrap",
+                            lineHeight: 1.3,
+                          }}>{detalhe}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Preços */}
             <div className="pub-card">
