@@ -334,14 +334,15 @@ export default function PublicarPage() {
     </div>
   );
 
-  const isModoLojista = cliente?.candidatura_lojista === "aprovada";
+  // lojista activo = modo_lojista true E lojista_estado não é "inativo"
+  const isModoLojista = cliente?.modo_lojista === true && cliente?.lojista_estado !== "inativo";
   if (!isModoLojista) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2", padding: "2rem", textAlign: "center" }}>
       <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
       {!cliente ? (
-        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Não foi possível carregar o teu perfil. Tenta novamente ou contacta o suporte.</p>
-      ) : cliente.candidatura_lojista === "pendente" ? (
-        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>A tua candidatura a lojista está <strong>pendente de aprovação</strong>. Receberás uma notificação quando for aprovada.</p>
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Não foi possível carregar o teu perfil. Tenta novamente.</p>
+      ) : cliente.lojista_estado === "inativo" ? (
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>A tua conta de lojista está <strong>inativa</strong>. Contacta a Nora Grei para reativar.</p>
       ) : (
         <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.</p>
       )}
