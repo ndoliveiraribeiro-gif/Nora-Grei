@@ -22,23 +22,41 @@ function fatorMarcaP(marca = "") {
 const FATOR_ESTADO_P = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
 const FATOR_IDADE_P  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
 const ROTACAO_CAT_P = {
-  Vestidos: 1.8, Fatos: 1.5, Macacões: 1.4, Conjuntos: 1.3,
-  Casacos: 1.0, Saias: 1.2, Calças: 1.1, Blusas: 1.1,
-  Camisas: 1.0, Kaftans: 0.9, Malas: 2.0, Acessórios: 1.6,
-  _default: 1.2,
+  Vestidos:   { rot: 1.8, dias: 3.5, fp: 0.10 },
+  Fatos:      { rot: 1.5, dias: 4.0, fp: 0.09 },
+  Macacões:   { rot: 1.4, dias: 3.5, fp: 0.09 },
+  Conjuntos:  { rot: 1.3, dias: 3.5, fp: 0.09 },
+  Casacos:    { rot: 1.0, dias: 5.0, fp: 0.07 },
+  Saias:      { rot: 1.2, dias: 3.0, fp: 0.08 },
+  Calças:     { rot: 1.1, dias: 3.0, fp: 0.07 },
+  Blusas:     { rot: 1.1, dias: 3.0, fp: 0.07 },
+  Camisas:    { rot: 1.0, dias: 3.0, fp: 0.07 },
+  Kaftans:    { rot: 0.9, dias: 5.0, fp: 0.08 },
+  Malas:      { rot: 2.0, dias: 4.0, fp: 0.12 },
+  Acessórios: { rot: 1.6, dias: 3.0, fp: 0.10 },
+  _default:   { rot: 1.2, dias: 3.5, fp: 0.08 },
 };
+function fatorEstadoIdadeP(condicao, idade_peca) {
+  const fe = FATOR_ESTADO_P[condicao] ?? 0.68;
+  const fi = FATOR_IDADE_P[idade_peca] ?? 0.85;
+  const combinado = fe * fi;
+  if (combinado < 0.30) return combinado * 0.85;
+  if (combinado > 0.85) return combinado * 1.05;
+  return combinado;
+}
 function calcEstimativaP({ valor_peca, marca, condicao, idade_peca, categoria }) {
   const p = parseFloat(valor_peca) || 0;
   if (!p) return null;
   const { fator: fm, tier } = fatorMarcaP(marca);
-  const fe = FATOR_ESTADO_P[condicao] ?? 0.68;
-  const fi = FATOR_IDADE_P[idade_peca] ?? 0.85;
-  const valorMercado = Math.round(p * fm * fe * fi);
-  const precoAluguerDia = Math.max(5, Math.round(valorMercado * 0.08 / 5) * 5);
+  const fei = fatorEstadoIdadeP(condicao, idade_peca);
+  const valorMercado = Math.round(p * fm * fei);
+  const cat = ROTACAO_CAT_P[categoria] ?? ROTACAO_CAT_P._default;
+  const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
+  const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
   const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
-  const rotMes = ROTACAO_CAT_P[categoria] ?? ROTACAO_CAT_P._default;
-  const ganho12m = Math.round(precoAluguerDia * 4 * rotMes * 12 * 0.9);
-  return { valorMercado, precoAluguerDia, precoVendaUsada, rotMes: rotMes.toFixed(1), ganho12m, tier };
+  const caucao = Math.round(valorMercado * 0.30 / 10) * 10;
+  const ganho12m = Math.round(precoAluguerDia * cat.dias * cat.rot * 12 * 0.90 * 0.90);
+  return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier };
 }
 
 const NIVEL_NOMES_PERFIL = {
@@ -3444,22 +3462,26 @@ export default function Perfil() {
                       {est.tier === "premium" ? "marca premium" : est.tier === "alta" ? "marca alta" : "mass market"}
                     </span>
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.5rem",marginBottom:"0.75rem"}}>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"0.4rem",marginBottom:"0.6rem"}}>
                     <div style={{textAlign:"center"}}>
-                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#f5f3ef"}}>{est.valorMercado}€</div>
-                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>valor mercado</div>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{est.valorMercado}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>mercado</div>
                     </div>
-                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826",borderRight:"1px solid #2a2826"}}>
-                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#c4748a"}}>{est.precoAluguerDia}€</div>
-                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer / dia</div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#c4748a"}}>{est.precoAluguerDia}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer/dia</div>
                     </div>
-                    <div style={{textAlign:"center"}}>
-                      <div style={{fontSize:"1.1rem",fontWeight:700,color:"#f5f3ef"}}>{est.precoVendaUsada}€</div>
-                      <div style={{fontSize:"0.6rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda usada</div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{est.precoVendaUsada}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda usada</div>
+                    </div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#a8d8a8"}}>{est.caucao}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>caução</div>
                     </div>
                   </div>
-                  <div style={{fontSize:"0.7rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
-                    ~{est.rotMes} alugueres/mês · potencial {est.ganho12m}€ em 12 meses
+                  <div style={{fontSize:"0.68rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
+                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial {est.ganho12m}€ em 12 meses
                   </div>
                   <button type="button"
                     onClick={()=>setEditarPeca(p=>({...p,preco_aluguer_dia:est.precoAluguerDia,preco_venda:est.precoVendaUsada}))}

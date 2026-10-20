@@ -15,7 +15,7 @@ const PECA_VAZIA = {
   preco_aluguer_dia: "", preco_venda: "", valor_peca: "",
   tem_defeito: false, descricao_defeito: "",
   ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }],
-  link_compra_externa: "", idade_peca: "1a2",
+  link_compra_externa: "", idade_peca: "1a2", valor_peca_desconhecido: false,
 };
 
 // ── Estimativa de valor de mercado ──────────────────────────────────────────
@@ -43,27 +43,53 @@ function fatorMarca(marca = "") {
 const FATOR_ESTADO = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
 const FATOR_IDADE  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
 
-// Mapa categoria publicar → rotação mensal (alugueres/mês)
+// Mapa categoria → { rotação mensal, dias médios por aluguer, fator preço base }
+// fatorPreco: percentagem do valorMercado a cobrar por dia — varia com procura da categoria
 const ROTACAO_CAT = {
-  Vestidos: 1.8, Fatos: 1.5, Macacões: 1.4, Conjuntos: 1.3,
-  Casacos: 1.0, Saias: 1.2, Calças: 1.1, Blusas: 1.1,
-  Camisas: 1.0, Kaftans: 0.9, Malas: 2.0, Acessórios: 1.6,
-  _default: 1.2,
+  //                          rot/mês  diasAlug  fatorPreco
+  Vestidos:   { rot: 1.8, dias: 3.5, fp: 0.10 },
+  Fatos:      { rot: 1.5, dias: 4.0, fp: 0.09 },
+  Macacões:   { rot: 1.4, dias: 3.5, fp: 0.09 },
+  Conjuntos:  { rot: 1.3, dias: 3.5, fp: 0.09 },
+  Casacos:    { rot: 1.0, dias: 5.0, fp: 0.07 },
+  Saias:      { rot: 1.2, dias: 3.0, fp: 0.08 },
+  Calças:     { rot: 1.1, dias: 3.0, fp: 0.07 },
+  Blusas:     { rot: 1.1, dias: 3.0, fp: 0.07 },
+  Camisas:    { rot: 1.0, dias: 3.0, fp: 0.07 },
+  Kaftans:    { rot: 0.9, dias: 5.0, fp: 0.08 },
+  Malas:      { rot: 2.0, dias: 4.0, fp: 0.12 },
+  Acessórios: { rot: 1.6, dias: 3.0, fp: 0.10 },
+  _default:   { rot: 1.2, dias: 3.5, fp: 0.08 },
 };
+
+// Fator de interação não-linear entre estado e idade
+// Peças muito usadas E velhas degradam-se mais depressa que a multiplicação simples sugere
+function fatorEstadoIdade(condicao, idade_peca) {
+  const fe = FATOR_ESTADO[condicao] ?? 0.68;
+  const fi = FATOR_IDADE[idade_peca] ?? 0.85;
+  // Se ambos são baixos, aplicar penalização extra
+  const combinado = fe * fi;
+  if (combinado < 0.30) return combinado * 0.85; // penalização extra peças muito degradadas
+  if (combinado > 0.85) return combinado * 1.05; // ligeiro bónus peças quase novas
+  return combinado;
+}
 
 function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria }) {
   const p = parseFloat(valor_peca) || 0;
   if (!p) return null;
   const { fator: fm, tier } = fatorMarca(marca);
-  const fe = FATOR_ESTADO[condicao] ?? 0.68;
-  const fi = FATOR_IDADE[idade_peca] ?? 0.85;
-  const valorMercado = Math.round(p * fm * fe * fi);
-  const precoAluguerDia = Math.max(5, Math.round(valorMercado * 0.08 / 5) * 5);
+  const fei = fatorEstadoIdade(condicao, idade_peca);
+  const valorMercado = Math.round(p * fm * fei);
+  const cat = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
+  // Preço aluguer/dia: baseado na procura da categoria (fatorPreco) + ajuste de tier
+  const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
+  const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
   const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
-  const rotMes = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
-  const alugueresMes = rotMes.toFixed(1);
-  const ganho12m = Math.round(precoAluguerDia * 4 * rotMes * 12 * 0.9); // ~4 dias/aluguer, 90% ocup, 12 meses
-  return { valorMercado, precoAluguerDia, precoVendaUsada, alugueresMes, ganho12m, tier };
+  // Caução: 30% do valor de mercado (cobre risco de dano)
+  const caucao = Math.round(valorMercado * 0.30 / 10) * 10;
+  // Ganho em 12 meses: dias médios por aluguer × rotação × 12 meses × 90% ocupação × (1-10% comissão)
+  const ganho12m = Math.round(precoAluguerDia * cat.dias * cat.rot * 12 * 0.90 * 0.90);
+  return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier };
 }
 
 export default function PublicarPage() {
@@ -182,7 +208,12 @@ export default function PublicarPage() {
 
   const validarPasso2 = () => {
     if (!peca.nome.trim()) { setErro("O nome da peça é obrigatório."); return false; }
-    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) { setErro("Indica o valor original da peça nova — precisamos dele para calcular os preços."); return false; }
+    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
+      const msg = peca.valor_peca_desconhecido
+        ? "Insere uma estimativa do valor de mercado — mesmo aproximada ajuda a calcular os preços."
+        : "Indica o valor original da peça nova — precisamos dele para calcular os preços. Se não sabes, clica em «Não sei o preço original».";
+      setErro(msg); return false;
+    }
     if (!peca.categoria) { setErro("Seleciona uma categoria."); return false; }
     setErro(""); return true;
   };
@@ -190,7 +221,12 @@ export default function PublicarPage() {
   const validarPasso3 = () => {
     const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
     const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
-    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) { setErro("O valor original da peça nova é obrigatório — é a base para calcular o aluguer e o preço usado."); return false; }
+    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
+      const msg = peca.valor_peca_desconhecido
+        ? "Insere uma estimativa do valor de mercado para continuar."
+        : "O valor da peça é obrigatório — é a base para calcular o aluguer e o preço usado. Se não sabes, clica em «Não sei o preço original» no passo anterior.";
+      setErro(msg); return false;
+    }
     if (precisaAluguer && !peca.preco_aluguer_dia) { setErro("Indica o preço de aluguer por dia."); return false; }
     if (precisaVenda && !peca.preco_venda) { setErro("Indica o preço de venda."); return false; }
     setErro(""); return true;
@@ -554,16 +590,38 @@ export default function PublicarPage() {
                   <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder="Zara, Mango, Gucci..." />
                 </div>
                 <div className="pub-fg">
-                  <label className="pub-label">Valor peça nova (€) <span style={{color:"#c4748a"}}>*</span></label>
-                  <input
-                    className="pub-input"
-                    type="number" min="0"
-                    value={peca.valor_peca}
-                    onChange={e => setP("valor_peca", e.target.value)}
-                    placeholder="Ex: 200"
-                    style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
-                  />
-                  <span className="pub-hint">Preço original quando era nova — base do aluguer e da venda usada.</span>
+                  <label className="pub-label" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    <span>Valor peça nova (€) {!peca.valor_peca_desconhecido && <span style={{color:"#c4748a"}}>*</span>}</span>
+                    <button type="button"
+                      onClick={()=>setP("valor_peca_desconhecido", !peca.valor_peca_desconhecido)}
+                      style={{fontSize:"0.6rem",color:peca.valor_peca_desconhecido?"#c4748a":"#888580",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",padding:0}}>
+                      {peca.valor_peca_desconhecido ? "✕ cancelar" : "Não sei o preço original"}
+                    </button>
+                  </label>
+                  {peca.valor_peca_desconhecido ? (
+                    <>
+                      <input
+                        className="pub-input"
+                        type="number" min="0"
+                        value={peca.valor_peca}
+                        onChange={e => setP("valor_peca", e.target.value)}
+                        placeholder="Estimativa de valor (ex: 120)"
+                      />
+                      <span className="pub-hint" style={{color:"#b35900"}}>⚠ Inserir uma estimativa do valor de mercado actual — os cálculos ficarão menos precisos.</span>
+                    </>
+                  ) : (
+                    <>
+                      <input
+                        className="pub-input"
+                        type="number" min="0"
+                        value={peca.valor_peca}
+                        onChange={e => setP("valor_peca", e.target.value)}
+                        placeholder="Ex: 200"
+                        style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
+                      />
+                      <span className="pub-hint">Preço original quando era nova — base do aluguer e da venda usada.</span>
+                    </>
+                  )}
                 </div>
                 <div className="pub-fg">
                   <label className="pub-label">Cor principal</label>
@@ -693,20 +751,21 @@ export default function PublicarPage() {
                   <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#888580", marginBottom: "0.6rem" }}>
                     Estimativa automática
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.5rem" }}>
                     {[
-                      ["Aluguer / dia", `€${est.precoAluguerDia}`],
-                      ["Venda usada", `€${est.precoVendaUsada}`],
-                      ["Valor mercado", `€${est.valorMercado}`],
-                    ].map(([l, v]) => (
+                      ["Aluguer / dia", `€${est.precoAluguerDia}`, "#c4748a"],
+                      ["Venda usada", `€${est.precoVendaUsada}`, "#1a1816"],
+                      ["Valor mercado", `€${est.valorMercado}`, "#1a1816"],
+                      ["Caução", `€${est.caucao}`, "#27ae60"],
+                    ].map(([l, v, cor]) => (
                       <div key={l} style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: "1.1rem", fontFamily: "serif", fontWeight: 400, color: "#1a1816" }}>{v}</div>
-                        <div style={{ fontSize: "0.62rem", color: "#888580", marginTop: "0.15rem" }}>{l}</div>
+                        <div style={{ fontSize: "1rem", fontFamily: "serif", fontWeight: 400, color: cor }}>{v}</div>
+                        <div style={{ fontSize: "0.6rem", color: "#888580", marginTop: "0.15rem" }}>{l}</div>
                       </div>
                     ))}
                   </div>
                   <div style={{ fontSize: "0.68rem", color: "#888580", marginTop: "0.6rem", borderTop: "1px solid #e2dfda", paddingTop: "0.5rem" }}>
-                    No passo seguinte podes aceitar ou ajustar estes valores.
+                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial €{est.ganho12m} em 12 meses
                   </div>
                 </div>
               );
@@ -746,22 +805,26 @@ export default function PublicarPage() {
                   <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem" }}>
                     Estimativa Nora Grei · {tierLabel}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem", marginBottom: "0.85rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.6rem", marginBottom: "0.85rem" }}>
                     <div>
-                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.valorMercado}</div>
-                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>valor de mercado</div>
+                      <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.valorMercado}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>valor mercado</div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.precoAluguerDia}</div>
-                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>aluguer/dia sugerido</div>
+                    <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
+                      <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1, color: "#e8a0b0" }}>€{est.precoAluguerDia}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>aluguer/dia</div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: "1.45rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>~{est.alugueresMes}×</div>
-                      <div style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>rotações/mês</div>
+                    <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
+                      <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.precoVendaUsada}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>venda usada</div>
+                    </div>
+                    <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
+                      <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1, color: "#a8d8a8" }}>€{est.caucao}</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>caução</div>
                     </div>
                   </div>
                   <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: "0.75rem", lineHeight: 1.4 }}>
-                    Potencial: <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> em 12 meses de alugueres + venda usada a <strong style={{ color: "#fff" }}>€{est.precoVendaUsada}</strong>
+                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> em 12 meses
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <button
