@@ -1170,6 +1170,7 @@ export default function Perfil() {
   const [pagamentosBooster, setPagamentosBooster] = useState([]);
   const [subTabCustos, setSubTabCustos] = useState("alugueres");
   const [pecaLinksAberta, setPecaLinksAberta] = useState(null);
+  const [pecaSimuladorAberta, setPecaSimuladorAberta] = useState(null); // id da peça com simulador aberto
   const [avaliacoesLoja, setAvaliacoesLoja] = useState([]); // avaliacoes_lojista para cálculo de nota média
   const [higienizacaoLojista, setHigienizacaoLojista] = useState({}); // { categoria: valor }
   const [higienizacaoPadrao, setHigienizacaoPadrao] = useState({}); // fallback da plataforma
@@ -2942,6 +2943,66 @@ export default function Perfil() {
                       </div>
                     );
                   })()}
+                  {/* ── OPTIMIZAÇÃO DE PEÇAS ── */}
+                  {(() => {
+                    const agora30 = new Date(Date.now() - 30*24*60*60*1000);
+                    // peças sem nenhum aluguer nos últimos 30 dias
+                    const idsComAluguer30 = new Set(
+                      alugueresLoja
+                        .filter(a => a.data_inicio && new Date(a.data_inicio) >= agora30)
+                        .map(a => a.peca_lojista_id)
+                    );
+                    const pecasSemMovimento = pecasLoja.filter(p => !idsComAluguer30.has(p.id));
+                    if (pecasSemMovimento.length === 0) return null;
+                    return (
+                      <div style={{background:"var(--white)",padding:"1.1rem",marginTop:"0.6rem",borderTop:"3px solid #f39c12"}}>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#b8860b",fontWeight:600,marginBottom:"0.75rem"}}>
+                          💡 {pecasSemMovimento.length} peça{pecasSemMovimento.length!==1?"s":""} sem alugueres nos últimos 30 dias
+                        </div>
+                        <div style={{display:"flex",flexDirection:"column",gap:"0.5rem"}}>
+                          {pecasSemMovimento.slice(0,3).map(p => {
+                            const precoAtual = p.preco_aluguer_dia || 0;
+                            const precoSugerido = Math.max(5, Math.round(precoAtual * 0.85 / 5) * 5);
+                            const totalAlugueres = alugueresLoja.filter(a => a.peca_lojista_id === p.id).length;
+                            return (
+                              <div key={p.id} style={{display:"flex",gap:"0.75rem",alignItems:"center",padding:"0.75rem",background:"#fffbf0",border:"1px solid #f0d58a"}}>
+                                {p.fotos?.[0]
+                                  ? <img src={p.fotos[0]} style={{width:40,height:50,objectFit:"cover",flexShrink:0}} alt=""/>
+                                  : <div style={{width:40,height:50,background:"#f0d58a",flexShrink:0}}/>
+                                }
+                                <div style={{flex:1,minWidth:0}}>
+                                  <div style={{fontSize:"0.78rem",fontFamily:"var(--serif)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.nome}</div>
+                                  <div style={{fontSize:"0.68rem",color:"var(--g4)",marginTop:"0.15rem"}}>
+                                    {precoAtual > 0 ? `${precoAtual}€/dia · ` : ""}{totalAlugueres} aluguer{totalAlugueres!==1?"es":""} no total
+                                  </div>
+                                  {precoAtual > 0 && (
+                                    <div style={{fontSize:"0.65rem",color:"#8a6a00",marginTop:"0.1rem"}}>
+                                      Sugestão: baixar para {precoSugerido}€/dia para ganhar visibilidade
+                                    </div>
+                                  )}
+                                </div>
+                                <div style={{display:"flex",flexDirection:"column",gap:"0.3rem",flexShrink:0}}>
+                                  <button onClick={()=>{setEditarPeca({...p});}}
+                                    style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.3rem 0.55rem",background:"#f39c12",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
+                                    Editar preço
+                                  </button>
+                                  <button onClick={()=>{setTabLoja("pecas"); setPecaSimuladorAberta(p.id);}}
+                                    style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.3rem 0.55rem",background:"none",border:"1.5px solid #f39c12",color:"#b8860b",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
+                                    Simular
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {pecasSemMovimento.length > 3 && (
+                            <div style={{fontSize:"0.72rem",color:"var(--g4)",textAlign:"center",paddingTop:"0.25rem"}}>
+                              + {pecasSemMovimento.length - 3} peça{pecasSemMovimento.length-3!==1?"s":""} sem movimento — ver tab Peças
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {diasTeste>0 && <div style={{marginTop:"0.6rem",fontSize:"0.75rem",color:"var(--g4)",textAlign:"center",padding:"0.6rem",background:"var(--g1)"}}>{diasTeste} dias de período teste restantes</div>}
                 </div>
               );
@@ -2976,6 +3037,10 @@ export default function Perfil() {
                         <button onClick={()=>setPecaLinksAberta(prev => prev===p.id ? null : p.id)}
                           style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid #c4a882",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"#c4a882",whiteSpace:"nowrap",fontWeight:600}}>
                           🔗 Links
+                        </button>
+                        <button onClick={()=>setPecaSimuladorAberta(prev => prev===p.id ? null : p.id)}
+                          style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid #89c4e1",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"#4a9ec4",whiteSpace:"nowrap",fontWeight:600}}>
+                          📊 Simular
                         </button>
                         <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
                       </div>
@@ -3014,6 +3079,76 @@ export default function Perfil() {
                         <div style={{fontSize:"0.65rem",color:"#9c9894",marginTop:"0.4rem"}}>Instagram e TikTok copiam o link — cola na bio ou caption.</div>
                       </div>
                     )}
+                    {/* ── SIMULADOR DE PREÇO ── */}
+                    {pecaSimuladorAberta === p.id && (() => {
+                      const precoAtual = p.preco_aluguer_dia || 0;
+                      // rotação estimada por categoria
+                      const rotCat = { vestidos:2.2, casacos:1.5, blazers:1.8, calcado:1.6, malas:2.0, acessorios:2.0 };
+                      const catKey = (p.categoria||"").toLowerCase().replace(/\s/g,"");
+                      const rotBase = Object.entries(rotCat).find(([k])=>catKey.includes(k))?.[1] || 1.8;
+                      const simMeses = [6, 12, 24];
+                      const simPrecos = [
+                        Math.max(5, Math.round(precoAtual * 0.75 / 5) * 5),
+                        precoAtual,
+                        Math.round(precoAtual * 1.20 / 5) * 5,
+                      ].filter((v,i,a) => a.indexOf(v)===i && v > 0);
+                      return (
+                        <div style={{padding:"1rem 1.5rem 1.25rem",background:"#f0f8fd",borderTop:"1px solid #c8e6f5"}}>
+                          <div style={{fontSize:"0.6rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#4a9ec4",fontWeight:600,marginBottom:"0.75rem"}}>📊 Simulador de rendimento</div>
+                          {precoAtual === 0 ? (
+                            <div style={{fontSize:"0.75rem",color:"var(--g4)"}}>Define um preço por dia para simular o rendimento.</div>
+                          ) : (
+                            <>
+                              <div style={{fontSize:"0.68rem",color:"var(--g4)",marginBottom:"0.75rem",lineHeight:1.5}}>
+                                Rotação estimada para esta categoria: <strong style={{color:"#4a9ec4"}}>{rotBase.toFixed(1)}×/mês</strong> · baseado em benchmarks do sector
+                              </div>
+                              {/* tabela de simulação */}
+                              <div style={{overflowX:"auto"}}>
+                                <table style={{width:"100%",borderCollapse:"collapse",fontSize:"0.72rem"}}>
+                                  <thead>
+                                    <tr style={{background:"#d8eef9"}}>
+                                      <th style={{padding:"0.4rem 0.6rem",textAlign:"left",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>Preço/dia</th>
+                                      {simMeses.map(m=>(
+                                        <th key={m} style={{padding:"0.4rem 0.6rem",textAlign:"right",color:"#4a9ec4",fontWeight:600,letterSpacing:"0.08em",fontSize:"0.62rem",textTransform:"uppercase"}}>{m} meses</th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {simPrecos.map((preco,idx) => {
+                                      const isAtual = preco === precoAtual;
+                                      return (
+                                        <tr key={preco} style={{background:isAtual?"#e0f2fe":"#fff",borderBottom:"1px solid #c8e6f5"}}>
+                                          <td style={{padding:"0.45rem 0.6rem",fontWeight:isAtual?600:400,color:isAtual?"#4a9ec4":"var(--fg)"}}>
+                                            {preco}€{isAtual?" ← atual":""}
+                                          </td>
+                                          {simMeses.map(m=>{
+                                            const alugueres = Math.round(rotBase * m);
+                                            const bruto = preco * alugueres;
+                                            const liquido = bruto * 0.90;
+                                            return (
+                                              <td key={m} style={{padding:"0.45rem 0.6rem",textAlign:"right",color:isAtual?"#4a9ec4":"var(--fg)",fontWeight:isAtual?600:400}}>
+                                                {liquido.toFixed(0)}€
+                                              </td>
+                                            );
+                                          })}
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                              <div style={{fontSize:"0.62rem",color:"#7ab5ce",marginTop:"0.5rem",lineHeight:1.45}}>
+                                Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas.
+                              </div>
+                              <button onClick={()=>setEditarPeca({...p})}
+                                style={{marginTop:"0.75rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.85rem",background:"#4a9ec4",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}>
+                                Editar preço desta peça →
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                   );
                 })}
