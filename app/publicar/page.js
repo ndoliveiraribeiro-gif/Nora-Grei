@@ -182,6 +182,7 @@ export default function PublicarPage() {
 
   const validarPasso2 = () => {
     if (!peca.nome.trim()) { setErro("O nome da peça é obrigatório."); return false; }
+    if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) { setErro("Indica o valor original da peça nova — precisamos dele para calcular os preços."); return false; }
     if (!peca.categoria) { setErro("Seleciona uma categoria."); return false; }
     setErro(""); return true;
   };
@@ -553,6 +554,18 @@ export default function PublicarPage() {
                   <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder="Zara, Mango, Gucci..." />
                 </div>
                 <div className="pub-fg">
+                  <label className="pub-label">Valor peça nova (€) <span style={{color:"#c4748a"}}>*</span></label>
+                  <input
+                    className="pub-input"
+                    type="number" min="0"
+                    value={peca.valor_peca}
+                    onChange={e => setP("valor_peca", e.target.value)}
+                    placeholder="Ex: 200"
+                    style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
+                  />
+                  <span className="pub-hint">Preço original quando era nova — base do aluguer e da venda usada.</span>
+                </div>
+                <div className="pub-fg">
                   <label className="pub-label">Cor principal</label>
                   <input className="pub-input" value={peca.cor} onChange={e => setP("cor", e.target.value)} placeholder="Azul marinho" list="cores-lista" />
                   <datalist id="cores-lista">
@@ -666,6 +679,38 @@ export default function PublicarPage() {
                 ))}
               </div>
             </div>
+
+            {/* Preview de preços — aparece assim que valor_peca está preenchido */}
+            {(() => {
+              const est = calcEstimativa(peca);
+              if (!est) return null;
+              return (
+                <div style={{
+                  background: "#f0eeeb", border: "1px solid #e2dfda",
+                  borderRadius: 12, padding: "0.9rem 1rem",
+                  marginBottom: "0.75rem",
+                }}>
+                  <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#888580", marginBottom: "0.6rem" }}>
+                    Estimativa automática
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem" }}>
+                    {[
+                      ["Aluguer / dia", `€${est.precoAluguerDia}`],
+                      ["Venda usada", `€${est.precoVendaUsada}`],
+                      ["Valor mercado", `€${est.valorMercado}`],
+                    ].map(([l, v]) => (
+                      <div key={l} style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: "1.1rem", fontFamily: "serif", fontWeight: 400, color: "#1a1816" }}>{v}</div>
+                        <div style={{ fontSize: "0.62rem", color: "#888580", marginTop: "0.15rem" }}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#888580", marginTop: "0.6rem", borderTop: "1px solid #e2dfda", paddingTop: "0.5rem" }}>
+                    No passo seguinte podes aceitar ou ajustar estes valores.
+                  </div>
+                </div>
+              );
+            })()}
 
             {erro && <div className="pub-erro">{erro}</div>}
 
