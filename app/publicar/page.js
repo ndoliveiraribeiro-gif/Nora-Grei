@@ -110,7 +110,12 @@ export default function PublicarPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { setLoading(false); return; }
       setUser(session.user);
-      const { data: cli } = await supabase.from("clientes").select("*").eq("id", session.user.id).single();
+      let { data: cli } = await supabase.from("clientes").select("*").eq("id", session.user.id).maybeSingle();
+      // fallback: alguns registos usam user_id em vez de id como FK do auth
+      if (!cli) {
+        const { data: cli2 } = await supabase.from("clientes").select("*").eq("user_id", session.user.id).maybeSingle();
+        cli = cli2;
+      }
       setCliente(cli);
       setLoading(false);
     });
@@ -333,7 +338,13 @@ export default function PublicarPage() {
   if (!isModoLojista) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2", padding: "2rem", textAlign: "center" }}>
       <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
-      <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.</p>
+      {!cliente ? (
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Não foi possível carregar o teu perfil. Tenta novamente ou contacta o suporte.</p>
+      ) : cliente.candidatura_lojista === "pendente" ? (
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>A tua candidatura a lojista está <strong>pendente de aprovação</strong>. Receberás uma notificação quando for aprovada.</p>
+      ) : (
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.</p>
+      )}
       <a href="/perfil" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>Ir para o perfil</a>
     </div>
   );
