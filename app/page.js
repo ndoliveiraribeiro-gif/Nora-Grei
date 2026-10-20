@@ -579,19 +579,19 @@ export default function Home() {
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 20%);filter:brightness(0.52);transition:opacity 1s ease;opacity:0}
         .hero-bg img.visivel{opacity:1}
         .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center 30%}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.96) 0%,rgba(8,8,8,0.82) 30%,rgba(8,8,8,0.3) 55%,rgba(8,8,8,0.35) 100%);z-index:1}
-        @media(min-width:601px){.hero-overlay{background:linear-gradient(to top,rgba(8,8,8,0.88) 0%,rgba(8,8,8,0.2) 55%,rgba(8,8,8,0.45) 100%)}}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.88) 0%,rgba(8,8,8,0.65) 30%,rgba(8,8,8,0.2) 55%,rgba(8,8,8,0.28) 100%);z-index:1}
+        @media(min-width:601px){.hero-overlay{background:linear-gradient(to top,rgba(8,8,8,0.80) 0%,rgba(8,8,8,0.15) 55%,rgba(8,8,8,0.38) 100%)}}
         .hero-sound{position:absolute;bottom:1.5rem;right:max(1.5rem,env(safe-area-inset-right,0px));z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s;border-radius:2px}
         .hero-sound:hover{background:rgba(255,255,255,0.22)}
         .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:0 max(1.5rem,env(safe-area-inset-left,0px)) clamp(5rem,10vh,7rem);color:#fff}
-        .hero-eyebrow{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:1rem}
+        .hero-eyebrow{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.82);margin-bottom:1rem}
         /* texto rotativo */
         .hero-rotary{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2.8rem,9vw,8rem);line-height:0.95;color:var(--white);overflow:hidden;height:1.05em;margin-bottom:0.6rem}
         .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 15s cubic-bezier(0.77,0,0.18,1) infinite}
         .hero-rotary-inner span{display:block;height:1.05em;line-height:1.05}
         @keyframes rotaryScroll{0%,8%{transform:translateY(0)}10%,18%{transform:translateY(-1.05em)}20%,28%{transform:translateY(-2.1em)}30%,38%{transform:translateY(-3.15em)}40%,48%{transform:translateY(-4.2em)}50%,58%{transform:translateY(-5.25em)}60%,68%{transform:translateY(-6.3em)}70%,78%{transform:translateY(-7.35em)}80%,88%{transform:translateY(-8.4em)}90%,98%{transform:translateY(-9.45em)}100%{transform:translateY(-10.5em)}}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.4rem,8vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
-        .hero-sub{font-family:var(--serif);font-size:clamp(0.95rem,1.8vw,1.3rem);font-weight:300;color:rgba(255,255,255,0.62);line-height:1.55;margin-bottom:clamp(1.75rem,4vh,3rem);max-width:50ch}
+        .hero-sub{font-family:var(--serif);font-size:clamp(0.95rem,1.8vw,1.3rem);font-weight:300;color:rgba(255,255,255,0.82);line-height:1.55;margin-bottom:clamp(1.75rem,4vh,3rem);max-width:50ch}
         @media(max-width:600px){
           .hero-eyebrow{margin-bottom:0.75rem}
           .hero-sub{font-size:0.9rem;max-width:36ch;margin-bottom:1.75rem}
