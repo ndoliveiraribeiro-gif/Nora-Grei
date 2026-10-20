@@ -2250,6 +2250,27 @@ export default function Perfil() {
               const receitaTotal = concluidos.reduce((s,a)=>s+(a.valor_aluguer||0)*0.9,0);
               const ativos = alugueresLoja.filter(a=>["ativo","enviado"].includes(a.estado));
               const pendentesAcao = alugueresLoja.filter(a=>["pendente","em_devolucao"].includes(a.estado));
+
+              // ── CHECKLIST DE ONBOARDING ──────────────────────────────
+              const temFoto = !!(perfil?.avatar_url);
+              const temPecas = pecasLoja.length > 0;
+              const temPecaLink = pecasLoja.some(p => p.link_compra_externa);
+              const temAluguerConcluido = alugueresLoja.some(a => ["devolvido","devolvido_danificado"].includes(a.estado));
+              const temBooster = boostersLoja.length > 0;
+              const temCodigo = !!codigoAfiliado?.codigo;
+              const passos = [
+                { id:"foto",   feito: temFoto,             label: "Adiciona uma foto de perfil",        dica: "Lojas com foto têm 2× mais confiança dos clientes.", acao: null },
+                { id:"peca",   feito: temPecas,            label: "Publica a tua primeira peça",        dica: "Fotografa bem e escreve uma boa descrição — faz toda a diferença.", acao: () => setTabLoja("pecas") },
+                { id:"link",   feito: temPecaLink,         label: "Ativa um link externo numa peça",    dica: "Permite que os clientes comprem nova se quiserem — tu ganhas comissão.", acao: () => setTabLoja("pecas") },
+                { id:"alug",   feito: temAluguerConcluido, label: "Completa o teu primeiro aluguer",    dica: "O primeiro vai sempre parecer mais difícil — depois flui naturalmente.", acao: () => setTabLoja("alugueres") },
+                { id:"boost",  feito: temBooster,          label: "Experimenta um Booster de destaque", dica: "Boosters aumentam visibilidade quando há concorrência na mesma categoria.", acao: () => setTabLoja("custos") },
+                { id:"codigo", feito: temCodigo,           label: "Partilha o teu link de convite",     dica: "Cada compra via link teu gera crédito automático — sem esforço extra.", acao: () => setShowReferralBanner(true) },
+              ];
+              const feitos = passos.filter(p=>p.feito).length;
+              const pct = Math.round(feitos/passos.length*100);
+              const lojaCompleta = feitos === passos.length;
+              const proximoPasso = passos.find(p=>!p.feito);
+              // ── FIM CHECKLIST ────────────────────────────────────────
               // Peça estrela do mês
               const recMes = {};
               doMes.forEach(a=>{
@@ -2272,6 +2293,45 @@ export default function Perfil() {
               const taxaOcupacao = diasPossiveis>0 ? Math.min(100,Math.round(diasOcupados/diasPossiveis*100)) : 0;
               return (
                 <div>
+                  {/* ── CHECKLIST ONBOARDING ── */}
+                  {!lojaCompleta && (
+                    <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem",borderTop:"3px solid #89c4e1"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
+                        <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#4a9ec4",fontWeight:600}}>Primeiros passos</span>
+                        <span style={{fontSize:"0.72rem",fontWeight:600,color:"#4a9ec4"}}>{feitos}/{passos.length}</span>
+                      </div>
+                      {/* barra de progresso */}
+                      <div style={{height:5,background:"#e8f4fb",marginBottom:"0.75rem"}}>
+                        <div style={{height:"100%",width:`${pct}%`,background:"#89c4e1",transition:"width 0.5s"}}/>
+                      </div>
+                      {/* lista de passos */}
+                      <div style={{display:"flex",flexDirection:"column",gap:"0.45rem"}}>
+                        {passos.map((p,idx) => (
+                          <div key={p.id} style={{display:"flex",alignItems:"flex-start",gap:"0.6rem",opacity:p.feito?0.45:1}}>
+                            <span style={{fontSize:"1rem",flexShrink:0,marginTop:"0.05rem"}}>{p.feito?"✅":"⬜"}</span>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{fontSize:"0.75rem",fontWeight:p.feito?400:500,color:"var(--black)",textDecoration:p.feito?"line-through":"none"}}>{p.label}</div>
+                              {!p.feito && idx===passos.findIndex(x=>!x.feito) && (
+                                <div style={{fontSize:"0.68rem",color:"var(--g4)",marginTop:"0.1rem",lineHeight:1.4}}>{p.dica}</div>
+                              )}
+                            </div>
+                            {!p.feito && p.acao && idx===passos.findIndex(x=>!x.feito) && (
+                              <button onClick={p.acao} style={{fontSize:"0.62rem",padding:"0.2rem 0.5rem",background:"#89c4e1",color:"#fff",border:"none",cursor:"pointer",borderRadius:"2px",flexShrink:0,fontFamily:"var(--sans)",letterSpacing:"0.08em"}}>Ir →</button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {lojaCompleta && (
+                    <div style={{background:"#e8f5e9",border:"1px solid #a8d5b5",padding:"0.85rem 1rem",marginBottom:"0.6rem",display:"flex",alignItems:"center",gap:"0.75rem"}}>
+                      <span style={{fontSize:"1.3rem"}}>🎉</span>
+                      <div>
+                        <div style={{fontSize:"0.72rem",fontWeight:600,color:"#1e7e3e"}}>Loja completa — parabéns!</div>
+                        <div style={{fontSize:"0.68rem",color:"#2e7d4f",marginTop:"0.1rem"}}>Tens tudo configurado. Continua a publicar peças e a partilhar o teu link.</div>
+                      </div>
+                    </div>
+                  )}
                   {/* Alertas de ação */}
                   {pendentesAcao.length>0 && (
                     <div style={{background:"#fff8e1",border:"1.5px solid #f39c12",padding:"0.85rem 1rem",marginBottom:"1rem",display:"flex",alignItems:"center",gap:"0.75rem",cursor:"pointer"}} onClick={()=>setTabLoja("alugueres")}>
