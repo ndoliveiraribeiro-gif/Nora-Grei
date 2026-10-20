@@ -392,6 +392,7 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
       <div className="talao-sep" />
       <div className="talao-linha"><span>{i.aluguer}</span><span>{valorAluguer.toFixed(2)}€</span></div>
       {recibo.valor_higienizacao > 0 && <div className="talao-linha"><span>{i.higienizacao}</span><span>{recibo.valor_higienizacao}€</span></div>}
+      {recibo.valor_seguro > 0 && <div className="talao-linha"><span>Proteção Nora Grei</span><span>{recibo.valor_seguro}€</span></div>}
       <div className="talao-linha"><span>{i.deposito}</span><span>{valorDeposito.toFixed(2)}€</span></div>
       <div className="talao-sep" />
       <div className="talao-total"><span>{i.total}</span><span>{recibo.valor_total.toFixed(2)}€</span></div>
@@ -655,7 +656,15 @@ function CheckoutContent() {
 
   const higienizacaoValor = (peca?.higienizacao_ativa && lojistaTrataHigienizacao) ? (parseFloat(peca.higienizacao_valor) || 0) : 0;
   const portesTotal = entrega === "envio" ? (portesValor || 0) : 0;
-  const totalSemCreditos = valorAluguer + higienizacaoValor + portesTotal + (deposito === "cartao" ? valorDeposito : 0);
+  const calcSeguro = (v) => {
+    if (v <= 5) return Math.round(v * 0.20 * 100) / 100;
+    if (v <= 19) return Math.round(v * 0.12 * 100) / 100;
+    if (v <= 40) return Math.round(v * 0.08 * 100) / 100;
+    if (v <= 50) return Math.round(v * 0.06 * 100) / 100;
+    return Math.round(v * 0.05 * 100) / 100;
+  };
+  const seguroValor = !modoCompra && valorAluguer > 0 ? calcSeguro(valorAluguer) : 0;
+  const totalSemCreditos = valorAluguer + higienizacaoValor + portesTotal + seguroValor + (deposito === "cartao" ? valorDeposito : 0);
   const creditosAplicados = usarCreditos ? Math.min(saldoCreditos, totalSemCreditos) : 0;
   const totalAgora = Math.max(0, totalSemCreditos - creditosAplicados);
 
@@ -784,6 +793,7 @@ function CheckoutContent() {
         metodo_pagamento: pagamento,
         valor_aluguer: valorAluguer,
         valor_higienizacao: higienizacaoValor,
+        valor_seguro: seguroValor,
         valor_deposito: valorDeposito,
         valor_total: totalAgora,
         estado: tudoConfirmado ? "pago" : "pendente",
@@ -1122,6 +1132,7 @@ function CheckoutContent() {
                     </div>
                   )}
                   {higienizacaoValor > 0 && <div className="r-linha"><span>{i.higienizacao}</span><span>{higienizacaoValor.toFixed(2)}€</span></div>}
+                  {seguroValor > 0 && <div className="r-linha"><span>Proteção Nora Grei</span><span>{seguroValor.toFixed(2)}€</span></div>}
                   {entrega === "envio" && (
                     <div className="r-linha">
                       <span>Portes (ida + volta)</span>
