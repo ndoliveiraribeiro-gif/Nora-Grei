@@ -14,6 +14,7 @@ const PECA_VAZIA = {
   tipo: "alugar", descricao: "", material: "",
   preco_aluguer_dia: "", preco_venda: "", valor_peca: "",
   tem_defeito: false, descricao_defeito: "",
+  higienizacao_ativa: false, higienizacao_valor: "",
   ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }],
   link_compra_externa: "", idade_peca: "1a2", valor_peca_desconhecido: false,
 };
@@ -256,6 +257,8 @@ export default function PublicarPage() {
         condicao: peca.condicao || "como_novo",
         tem_defeito: peca.tem_defeito || false,
         descricao_defeito: peca.tem_defeito ? (peca.descricao_defeito || null) : null,
+        higienizacao_ativa: peca.higienizacao_ativa || false,
+        higienizacao_valor: peca.higienizacao_ativa ? (parseFloat(peca.higienizacao_valor) || null) : null,
         ocasioes: peca.ocasioes,
         link_compra_externa: peca.link_compra_externa.trim() || null,
         link_externo_ativo: false,
@@ -677,6 +680,42 @@ export default function PublicarPage() {
                 ) : (
                   <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
                     A peça está em perfeitas condições.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Higienização */}
+            <div className="pub-card">
+              <p className="pub-card-t">Higienização</p>
+              <div className={`defeito-box${peca.higienizacao_ativa ? " ativo" : ""}`}>
+                <label className="defeito-label">
+                  <input
+                    type="checkbox"
+                    checked={peca.higienizacao_ativa}
+                    onChange={e => setP("higienizacao_ativa", e.target.checked)}
+                    style={{ width: "1rem", height: "1rem", cursor: "pointer", accentColor: "#c4748a" }}
+                  />
+                  Esta peça requer higienização profissional
+                </label>
+                {peca.higienizacao_ativa ? (
+                  <div style={{ marginTop: "0.75rem" }}>
+                    <label className="pub-label" style={{ fontSize: "0.72rem" }}>Custo de higienização (€)</label>
+                    <input
+                      className="pub-input"
+                      type="number" min="0" step="0.5"
+                      value={peca.higienizacao_valor}
+                      onChange={e => setP("higienizacao_valor", e.target.value)}
+                      placeholder="ex: 6.00"
+                      style={{ marginTop: "0.4rem", maxWidth: 140 }}
+                    />
+                    <p style={{ fontSize: "0.65rem", color: "#9c9894", marginTop: "0.4rem", lineHeight: 1.5 }}>
+                      Valor cobrado ao cliente no checkout. Define de acordo com a tua lavandaria parceira.
+                    </p>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
+                    Sem taxa de higienização — a limpeza é tratada internamente.
                   </p>
                 )}
               </div>

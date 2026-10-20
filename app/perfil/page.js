@@ -1124,7 +1124,7 @@ export default function Perfil() {
   const [urlCheckTimer, setUrlCheckTimer] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
   const [showNovaPeca, setShowNovaPeca] = useState(false);
-  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+  const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", higienizacao_ativa: false, higienizacao_valor: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
@@ -1590,6 +1590,8 @@ export default function Perfil() {
       condicao: novaPeca.condicao||"como_novo",
       tem_defeito: novaPeca.tem_defeito||false,
       descricao_defeito: novaPeca.tem_defeito?(novaPeca.descricao_defeito||null):null,
+      higienizacao_ativa: novaPeca.higienizacao_ativa||false,
+      higienizacao_valor: novaPeca.higienizacao_ativa?(parseFloat(novaPeca.higienizacao_valor)||null):null,
       ocasioes: novaPeca.ocasioes,
       link_compra_externa: novaPeca.link_compra_externa||null,
       link_externo_ativo: false,
@@ -1626,7 +1628,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setShowNovaPeca(false);
-    setNovaPeca({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
+    setNovaPeca({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", higienizacao_ativa: false, higienizacao_valor: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
     setFotosLojista([]);
     setFotoValidacao([]);
     setUploadProgressLoja("");
@@ -1652,6 +1654,8 @@ export default function Perfil() {
       condicao: editarPeca.condicao || "como_novo",
       tem_defeito: editarPeca.tem_defeito || false,
       descricao_defeito: editarPeca.tem_defeito ? (editarPeca.descricao_defeito || null) : null,
+      higienizacao_ativa: editarPeca.higienizacao_ativa || false,
+      higienizacao_valor: editarPeca.higienizacao_ativa ? (parseFloat(editarPeca.higienizacao_valor) || null) : null,
       ocasioes: editarPeca.ocasioes || [],
       link_compra_externa: editarPeca.link_compra_externa || null,
     }).eq("id", editarPeca.id);
@@ -3706,6 +3710,22 @@ export default function Perfil() {
               {!editarPeca.tem_defeito && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
             </div>
 
+            {/* Higienização */}
+            <div style={{marginBottom:"1rem",padding:"0.85rem 1rem",border:`1.5px solid ${editarPeca.higienizacao_ativa?"#c4748a":"var(--g2)"}`,background:editarPeca.higienizacao_ativa?"#fdf5f8":"#fafafa"}}>
+              <label style={{display:"flex",alignItems:"center",gap:"0.6rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:editarPeca.higienizacao_ativa?"#c4748a":"var(--g4)",fontWeight:600}}>
+                <input type="checkbox" checked={editarPeca.higienizacao_ativa||false} onChange={e=>setEditarPeca(p=>({...p,higienizacao_ativa:e.target.checked,higienizacao_valor:""}))} style={{width:"1rem",height:"1rem",cursor:"pointer",accentColor:"#c4748a"}} />
+                Requer higienização profissional
+              </label>
+              {editarPeca.higienizacao_ativa && (
+                <div style={{marginTop:"0.6rem"}}>
+                  <label className="lbl" style={{fontSize:"0.68rem"}}>Custo (€)</label>
+                  <input className="inp" type="number" min="0" step="0.5" value={editarPeca.higienizacao_valor||""} onChange={e=>setEditarPeca(p=>({...p,higienizacao_valor:e.target.value}))} placeholder="ex: 6.00" style={{maxWidth:120,marginTop:"0.3rem"}} />
+                  <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>Cobrado ao cliente no checkout.</span>
+                </div>
+              )}
+              {!editarPeca.higienizacao_ativa && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>Sem taxa — limpeza tratada internamente.</span>}
+            </div>
+
             {/* Descrição */}
             <div className="fg" style={{marginBottom:"1rem"}}>
               <label className="lbl">Descrição</label>
@@ -3958,6 +3978,22 @@ export default function Perfil() {
                 <textarea className="inp" value={novaPeca.descricao_defeito} onChange={e=>setNovaPeca(p=>({...p,descricao_defeito:e.target.value}))} style={{resize:"vertical",minHeight:"60px",marginTop:"0.6rem",border:"1.5px solid #e74c3c"}} placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..." />
               )}
               {!novaPeca.tem_defeito && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>A peça está em perfeitas condições para aluguer.</span>}
+            </div>
+
+            {/* Higienização */}
+            <div style={{marginBottom:"1rem",padding:"0.85rem 1rem",border:`1.5px solid ${novaPeca.higienizacao_ativa?"#c4748a":"var(--g2)"}`,background:novaPeca.higienizacao_ativa?"#fdf5f8":"#fafafa"}}>
+              <label style={{display:"flex",alignItems:"center",gap:"0.6rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:novaPeca.higienizacao_ativa?"#c4748a":"var(--g4)",fontWeight:600}}>
+                <input type="checkbox" checked={novaPeca.higienizacao_ativa} onChange={e=>setNovaPeca(p=>({...p,higienizacao_ativa:e.target.checked,higienizacao_valor:""}))} style={{width:"1rem",height:"1rem",cursor:"pointer",accentColor:"#c4748a"}} />
+                Requer higienização profissional
+              </label>
+              {novaPeca.higienizacao_ativa && (
+                <div style={{marginTop:"0.6rem"}}>
+                  <label className="lbl" style={{fontSize:"0.68rem"}}>Custo (€)</label>
+                  <input className="inp" type="number" min="0" step="0.5" value={novaPeca.higienizacao_valor} onChange={e=>setNovaPeca(p=>({...p,higienizacao_valor:e.target.value}))} placeholder="ex: 6.00" style={{maxWidth:120,marginTop:"0.3rem"}} />
+                  <span style={{fontSize:"0.65rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>Cobrado ao cliente no checkout.</span>
+                </div>
+              )}
+              {!novaPeca.higienizacao_ativa && <span style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.3rem",display:"block"}}>Sem taxa — limpeza tratada internamente.</span>}
             </div>
 
             {/* Descrição */}
