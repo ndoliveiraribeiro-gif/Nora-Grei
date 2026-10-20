@@ -2754,6 +2754,84 @@ export default function Perfil() {
                     </div>
                     <div style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.35rem"}}>{taxaOcupacao<25?"Preço pode estar alto ou peças precisam de mais visibilidade":taxaOcupacao<50?"A crescer — considera promover no feed":taxaOcupacao<75?"Boa ocupação":"Excelente — considera subir preço ou adicionar stock"}</div>
                   </div>
+                  {/* ── SAÚDE OPERACIONAL ── */}
+                  {(() => {
+                    const total = alugueresLoja.length;
+                    if (total === 0) return null;
+                    const canceladosPorLojista = alugueresLoja.filter(a => a.estado === "cancelado" && a.cancelado_por === "lojista");
+                    const danificados = alugueresLoja.filter(a => a.estado === "devolvido_danificado");
+                    const naoDevolvidos = alugueresLoja.filter(a => a.estado === "nao_devolvido");
+                    const custoCancelamentos = canceladosPorLojista.reduce((s,a) => s+(a.valor_aluguer||0), 0);
+                    const taxaCancelamento = total > 0 ? Math.round(canceladosPorLojista.length / total * 100) : 0;
+                    // aviso de risco de suspensão: ≥3 cancelamentos sem justificação
+                    const riscoSuspensao = canceladosPorLojista.length >= 3;
+                    // score de reputação: começa em 100, -10 por cancelamento, -15 por dano, -20 por não devolução
+                    const scoreBase = 100 - canceladosPorLojista.length*10 - danificados.length*15 - naoDevolvidos.length*20;
+                    const score = Math.max(0, Math.min(100, scoreBase));
+                    const scoreCor = score >= 80 ? "#27ae60" : score >= 50 ? "#f39c12" : "#e74c3c";
+                    const scoreLabel = score >= 80 ? "Bom" : score >= 50 ? "A melhorar" : "Crítico";
+                    const temProblemas = canceladosPorLojista.length > 0 || danificados.length > 0 || naoDevolvidos.length > 0;
+                    return (
+                      <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem",marginTop:"0.6rem",borderTop:`3px solid ${scoreCor}`}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.85rem"}}>
+                          <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600}}>Saúde operacional</span>
+                          <div style={{display:"flex",alignItems:"center",gap:"0.4rem"}}>
+                            <span style={{fontFamily:"var(--serif)",fontSize:"1.3rem",color:scoreCor,fontWeight:300}}>{score}</span>
+                            <span style={{fontSize:"0.65rem",color:scoreCor,fontWeight:600,letterSpacing:"0.08em"}}>{scoreLabel}</span>
+                          </div>
+                        </div>
+                        {riscoSuspensao && (
+                          <div style={{background:"#ffeaea",border:"1px solid #e74c3c",padding:"0.6rem 0.85rem",marginBottom:"0.85rem",borderRadius:4,fontSize:"0.72rem",color:"#c0392b",lineHeight:1.4}}>
+                            ⚠ Atenção: {canceladosPorLojista.length} cancelamentos por tua iniciativa. Ao atingir 3 cancelamentos sem justificação válida, a conta pode ser suspensa temporariamente.
+                          </div>
+                        )}
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem"}}>
+                          {[
+                            {
+                              val: canceladosPorLojista.length,
+                              lbl: "Cancelamentos teus",
+                              sub: custoCancelamentos > 0 ? `${custoCancelamentos.toFixed(0)}€ em créditos gerados` : "Sem custo ainda",
+                              cor: canceladosPorLojista.length === 0 ? "#27ae60" : canceladosPorLojista.length < 3 ? "#f39c12" : "#e74c3c",
+                              ico: canceladosPorLojista.length === 0 ? "✓" : "✕",
+                            },
+                            {
+                              val: `${taxaCancelamento}%`,
+                              lbl: "Taxa cancelamento",
+                              sub: `${total} alugueres no total`,
+                              cor: taxaCancelamento === 0 ? "#27ae60" : taxaCancelamento < 10 ? "#f39c12" : "#e74c3c",
+                              ico: null,
+                            },
+                            {
+                              val: danificados.length,
+                              lbl: "Peças devolvidas c/ danos",
+                              sub: danificados.length > 0 ? "Revê condição das peças antes de enviar" : "Sem ocorrências",
+                              cor: danificados.length === 0 ? "#27ae60" : "#e74c3c",
+                              ico: danificados.length === 0 ? "✓" : "⚠",
+                            },
+                            {
+                              val: naoDevolvidos.length,
+                              lbl: "Não devolvidos",
+                              sub: naoDevolvidos.length > 0 ? "Casos em aberto com a Nora Grei" : "Sem ocorrências",
+                              cor: naoDevolvidos.length === 0 ? "#27ae60" : "#e74c3c",
+                              ico: naoDevolvidos.length === 0 ? "✓" : "⚠",
+                            },
+                          ].map((k,idx) => (
+                            <div key={idx} style={{padding:"0.75rem",background:"#fafaf9",border:`1px solid ${k.cor}22`}}>
+                              <div style={{display:"flex",alignItems:"baseline",gap:"0.35rem"}}>
+                                <span style={{fontFamily:"var(--serif)",fontSize:"1.5rem",fontWeight:300,color:k.cor,lineHeight:1}}>{k.val}</span>
+                                {k.ico && <span style={{fontSize:"0.75rem",color:k.cor}}>{k.ico}</span>}
+                              </div>
+                              <div style={{fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--g4)",margin:"0.2rem 0 0.15rem",fontWeight:600}}>{k.lbl}</div>
+                              <div style={{fontSize:"0.63rem",color:"#aaa",lineHeight:1.3}}>{k.sub}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {!temProblemas && (
+                          <div style={{fontSize:"0.7rem",color:"#27ae60",marginTop:"0.75rem",textAlign:"center"}}>✓ Excelente — zero cancelamentos, zero ocorrências</div>
+                        )}
+                      </div>
+                    );
+                  })()}
                   {/* Peça estrela do mês */}
                   {estrela && (
                     <div style={{background:"var(--white)",padding:"1.1rem",display:"flex",gap:"1rem",alignItems:"center"}}>
