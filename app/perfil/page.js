@@ -1100,6 +1100,12 @@ export default function Perfil() {
   const [ganhos, setGanhos] = useState({ referrals: [], config: null, totalPendente: 0, totalPago: 0 });
   const [codigoAfiliado, setCodigoAfiliado] = useState(null);
   const [creditosAfiliado, setCreditosAfiliado] = useState({ total: 0, disponiveis: 0, lista: [] });
+  // Transferência de crédito
+  const [showTransfCredito, setShowTransfCredito] = useState(false);
+  const [transfDestinatario, setTransfDestinatario] = useState("");
+  const [transfValor, setTransfValor] = useState("");
+  const [transfStatus, setTransfStatus] = useState(null); // null | "loading" | "ok" | "erro"
+  const [transfMsg, setTransfMsg] = useState("");
   const [boostersLoja, setBoostersLoja] = useState([]);
   const [tiposBoosters, setTiposBoosters] = useState([]);
   const [boostersLoading, setBoostersLoading] = useState(false);
@@ -1278,6 +1284,59 @@ export default function Perfil() {
       } catch(e) {}
       setDetectandoLoc(false);
     }, () => setDetectandoLoc(false));
+  };
+
+  // ── TRANSFERIR CRÉDITO ENTRE UTILIZADORES ─────────────────────────────
+  const transferirCredito = async () => {
+    setTransfStatus("loading");
+    setTransfMsg("");
+    const valor = parseFloat(transfValor);
+    if (!transfDestinatario.trim() || isNaN(valor) || valor <= 0) {
+      setTransfStatus("erro"); setTransfMsg("Preenche o destinatário e um valor válido."); return;
+    }
+    if (valor > creditosAfiliado.disponiveis) {
+      setTransfStatus("erro"); setTransfMsg("Saldo insuficiente."); return;
+    }
+    try {
+      // Encontrar destinatário pelo codigo_cliente
+      const { data: dest } = await supabase
+        .from("clientes").select("id, nome")
+        .eq("codigo_cliente", transfDestinatario.toLowerCase().trim())
+        .neq("id", user.id).maybeSingle();
+      if (!dest) { setTransfStatus("erro"); setTransfMsg("Utilizador não encontrado."); return; }
+
+      // Marcar créditos como usados (até cobrir o valor)
+      let restante = valor;
+      const creditosDisponiveis = creditosAfiliado.lista
+        .filter(c => !c.usado && (c.valor||0) > 0)
+        .sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+      for (const c of creditosDisponiveis) {
+        if (restante <= 0) break;
+        const usar = Math.min(c.valor, restante);
+        await supabase.from("creditos_afiliado").update({ usado: true }).eq("id", c.id);
+        restante -= usar;
+      }
+
+      // Adicionar crédito ao destinatário
+      await supabase.from("creditos_afiliado").insert({
+        cliente_id: dest.id,
+        valor,
+        motivo: `Transferido por ${codigoLoja || user.id}`,
+        ref_tipo: "transferencia",
+        ref_id: user.id,
+        usado: false,
+      });
+
+      setTransfStatus("ok");
+      setTransfMsg(`€${valor.toFixed(2)} transferidos para ${dest.nome} com sucesso.`);
+      // Refrescar saldo local
+      const novoDisp = creditosAfiliado.disponiveis - valor;
+      setCreditosAfiliado(prev => ({ ...prev, disponiveis: Math.max(0, novoDisp) }));
+      setTransfDestinatario(""); setTransfValor("");
+    } catch(e) {
+      setTransfStatus("erro"); setTransfMsg("Erro inesperado. Tenta novamente.");
+    }
   };
 
   // ── URL PERSONALIZADO DA LOJA ──────────────────────────────────────────
@@ -1823,7 +1882,7 @@ export default function Perfil() {
             </div>
 
             {/* Créditos disponíveis */}
-            <div style={{padding:"1rem",background:"linear-gradient(135deg,#fdf6ee,#faf3e8)",border:"1.5px solid #c4a882",marginBottom:"1.25rem",display:"flex",alignItems:"center",gap:"1rem"}}>
+            <div style={{padding:"1rem",background:"linear-gradient(135deg,#fdf6ee,#faf3e8)",border:"1.5px solid #c4a882",marginBottom:"0.75rem",display:"flex",alignItems:"center",gap:"1rem"}}>
               <div style={{textAlign:"center",flex:1}}>
                 <div style={{fontSize:"1.8rem",fontFamily:"var(--serif)",color:"#c4a882",fontWeight:600,lineHeight:1}}>€{creditosAfiliado.disponiveis.toFixed(2)}</div>
                 <div style={{fontSize:"0.6rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#7a6a5a",marginTop:"0.25rem",fontFamily:"var(--sans)"}}>Créditos disponíveis</div>
@@ -1833,6 +1892,55 @@ export default function Perfil() {
                 <div style={{fontSize:"1.8rem",fontFamily:"var(--serif)",color:"#9c9894",fontWeight:600,lineHeight:1}}>€{creditosAfiliado.total.toFixed(2)}</div>
                 <div style={{fontSize:"0.6rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#9c9894",marginTop:"0.25rem",fontFamily:"var(--sans)"}}>Total ganho</div>
               </div>
+            </div>
+
+            {/* Transferir crédito */}
+            <div style={{marginBottom:"1.25rem"}}>
+              <button
+                onClick={() => { setShowTransfCredito(v => !v); setTransfStatus(null); setTransfMsg(""); }}
+                style={{width:"100%",padding:"0.6rem 1rem",background:"none",border:"1.5px solid #c4a882",color:"#c4a882",fontSize:"0.65rem",letterSpacing:"0.14em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}}
+              >
+                <span>↔ Transferir crédito para outro utilizador</span>
+                <span>{showTransfCredito ? "▲" : "▼"}</span>
+              </button>
+              {showTransfCredito && (
+                <div style={{padding:"1rem",background:"#fff",border:"1px solid #e8d8c8",borderTop:"none"}}>
+                  <div style={{fontSize:"0.72rem",color:"#7a6a5a",marginBottom:"0.75rem",lineHeight:1.5}}>
+                    Transfere créditos da tua conta para outro utilizador — ela pode usar em alugueres ou devolver-te em dinheiro.
+                  </div>
+                  <div style={{display:"flex",gap:"0.5rem",marginBottom:"0.5rem",flexWrap:"wrap"}}>
+                    <input
+                      type="text"
+                      placeholder="URL da loja (ex: nunoribeiro)"
+                      value={transfDestinatario}
+                      onChange={e => { setTransfDestinatario(e.target.value); setTransfStatus(null); }}
+                      style={{flex:2,minWidth:120,padding:"0.5rem 0.75rem",border:"1px solid #e2dfda",fontSize:"0.78rem",fontFamily:"var(--sans)",outline:"none",background:"#f8f7f5"}}
+                    />
+                    <input
+                      type="number"
+                      min="0.50"
+                      step="0.50"
+                      max={creditosAfiliado.disponiveis}
+                      placeholder="€ valor"
+                      value={transfValor}
+                      onChange={e => { setTransfValor(e.target.value); setTransfStatus(null); }}
+                      style={{flex:1,minWidth:80,padding:"0.5rem 0.75rem",border:"1px solid #e2dfda",fontSize:"0.78rem",fontFamily:"var(--sans)",outline:"none",background:"#f8f7f5"}}
+                    />
+                    <button
+                      onClick={transferirCredito}
+                      disabled={transfStatus === "loading"}
+                      style={{padding:"0.5rem 1rem",background:"#c4a882",color:"#fff",border:"none",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer",whiteSpace:"nowrap",opacity:transfStatus==="loading"?0.6:1}}
+                    >
+                      {transfStatus === "loading" ? "..." : "Transferir"}
+                    </button>
+                  </div>
+                  {transfMsg && (
+                    <div style={{fontSize:"0.75rem",color:transfStatus==="ok"?"#27ae60":"#c0392b",padding:"0.4rem 0.5rem",background:transfStatus==="ok"?"#f0fff4":"#fff5f5",border:`1px solid ${transfStatus==="ok"?"#a8e6c0":"#f5c6cb"}`}}>
+                      {transfMsg}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Como funciona */}
@@ -1874,9 +1982,9 @@ export default function Perfil() {
               <div style={{fontFamily:"var(--sans)",fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link — para bio, WhatsApp e mensagens</div>
               <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
                 <div style={{flex:1,fontSize:"0.72rem",color:"#5a5855",background:"#f8f7f5",padding:"0.5rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
-                  {typeof window !== "undefined" ? `${window.location.origin}?ref=${user?.id?.slice(0,8)}…` : "noragrei.com?ref=…"}
+                  {typeof window !== "undefined" ? `${window.location.origin}?ref=${codigoLoja || user?.id?.slice(0,8)}` : "noragrei.com?ref=…"}
                 </div>
-                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}?ref=${user?.id}`); } catch {} }}
+                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}?ref=${codigoLoja || user?.id}`); } catch {} }}
                   style={{padding:"0.5rem 0.85rem",background:"#c4748a",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",whiteSpace:"nowrap",fontWeight:600}}>
                   Copiar
                 </button>
@@ -3600,9 +3708,9 @@ export default function Perfil() {
               <div style={{fontSize:"0.65rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#c4748a",fontWeight:600,marginBottom:"0.5rem"}}>O teu link de convite para abertura de loja</div>
               <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
                 <div style={{flex:1,fontSize:"0.72rem",color:"#5a5855",background:"#fff",padding:"0.55rem 0.75rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"1px solid #e2dfda",fontFamily:"monospace"}}>
-                  {typeof window !== "undefined" ? `${window.location.origin}/registar?ref=${user?.id?.slice(0,8)}…` : "noragrei.com/registar?ref=…"}
+                  {typeof window !== "undefined" ? `${window.location.origin}/registar?ref=${codigoLoja || user?.id?.slice(0,8)}` : "noragrei.com/registar?ref=…"}
                 </div>
-                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/registar?ref=${user?.id}`); } catch {} }}
+                <button onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/registar?ref=${codigoLoja || user?.id}`); } catch {} }}
                   style={{padding:"0.55rem 0.85rem",background:"#c4748a",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",whiteSpace:"nowrap",fontWeight:600}}>
                   Copiar
                 </button>

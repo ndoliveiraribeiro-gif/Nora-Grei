@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const t = {
@@ -74,7 +75,10 @@ const t = {
   },
 };
 
-export default function Registar() {
+function RegistarInner() {
+  const searchParams = useSearchParams();
+  const refCodigo = searchParams.get("ref"); // codigo_cliente do referidor
+
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -123,6 +127,45 @@ export default function Registar() {
         setLoading(false);
         return;
       }
+
+      // ── Processar referido ────────────────────────────────────
+      if (refCodigo) {
+        try {
+          // Encontrar o referidor pelo seu codigo_cliente
+          const { data: referidor } = await supabase
+            .from("clientes")
+            .select("id, nome")
+            .eq("codigo_cliente", refCodigo.toLowerCase())
+            .neq("id", novoUser.id)
+            .maybeSingle();
+
+          if (referidor) {
+            // Registar a relação de referido
+            await supabase.from("referrals").insert({
+              referidor_id: referidor.id,
+              referido_id: novoUser.id,
+              ref_codigo: refCodigo.toLowerCase(),
+              status: "pendente", // activa quando o referido faz 1.º aluguer
+              comissao_gerada: 0,
+              comissao_paga: false,
+            });
+
+            // Crédito de boas-vindas ao referidor (€5 por novo registo)
+            await supabase.from("creditos_afiliado").insert({
+              cliente_id: referidor.id,
+              valor: 5.00,
+              motivo: `Registo via referido — ${nome}`,
+              ref_tipo: "registo",
+              ref_id: novoUser.id,
+              usado: false,
+            });
+          }
+        } catch (errRef) {
+          console.error("Erro ao processar referido:", errRef);
+          // Não bloquear o registo por erro no referral
+        }
+      }
+      // ─────────────────────────────────────────────────────────
     } else {
       console.error("signUp não devolveu user — registo em clientes não foi criado");
     }
@@ -270,5 +313,13 @@ export default function Registar() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function Registar() {
+  return (
+    <Suspense fallback={null}>
+      <RegistarInner />
+    </Suspense>
   );
 }
