@@ -852,11 +852,19 @@ export default function Home() {
           .nav{padding:1.25rem 4rem}
           .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
+        /* BOTTOM NAV MOBILE */
+        .mob-nav{display:none}
         @media(max-width:768px){
           .nav{padding:0.9rem 1.25rem}
           .nav-links,.nav-right .nb-o,.nav-right .nb-f{display:none}
           .nav-right{gap:0.5rem}
           .hero-sound{bottom:4rem}
+          .mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--white);border-top:1px solid var(--g2);height:60px;align-items:stretch}
+          .mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;text-decoration:none;color:var(--g4);transition:color 0.15s;padding:0.3rem 0}
+          .mob-nav-item.destaque{color:var(--rosa)}
+          .mob-nav-item:active{opacity:0.6}
+          .mob-nav-icon{font-size:1.1rem;line-height:1}
+          .mob-nav-label{font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
         }
       `}</style>
 
@@ -1243,6 +1251,30 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* BOTTOM NAV MOBILE */}
+      <nav className="mob-nav">
+        <a href="/" className="mob-nav-item">
+          <span className="mob-nav-icon">⌂</span>
+          <span className="mob-nav-label">{t.bottomNav.inicio}</span>
+        </a>
+        <a href="/catalogo" className="mob-nav-item">
+          <span className="mob-nav-icon">◻</span>
+          <span className="mob-nav-label">{t.bottomNav.catalogo}</span>
+        </a>
+        <a href="/lojas" className="mob-nav-item destaque">
+          <span className="mob-nav-icon" style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:300}}>NG</span>
+          <span className="mob-nav-label">{t.nav.lojas}</span>
+        </a>
+        <a href="/pesquisa" className="mob-nav-item">
+          <span className="mob-nav-icon">🔍</span>
+          <span className="mob-nav-label">Pesquisa</span>
+        </a>
+        <a href={userLogado ? "/perfil" : "/entrar"} className="mob-nav-item">
+          <span className="mob-nav-icon">◯</span>
+          <span className="mob-nav-label">{userLogado ? t.bottomNav.perfil : t.nav.entrar}</span>
+        </a>
+      </nav>
 
     </>
   );
