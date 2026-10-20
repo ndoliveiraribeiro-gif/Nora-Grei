@@ -116,8 +116,8 @@ export default function Pesquisa() {
     const { data: ls } = await supabase
       .from("clientes")
       .select("id, nome, codigo_cliente, cidade, pais")
-      .eq("is_lojista", true)
-      .or(`nome.ilike.%${termo}%,cidade.ilike.%${termo}%`)
+      .eq("modo_lojista", true)
+      .ilike("nome", `%${termo}%`)
       .limit(8);
 
     setPecas([...ngFormatadas, ...ljFormatadas]);
