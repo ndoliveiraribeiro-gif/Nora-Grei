@@ -72,39 +72,54 @@ export default function Pesquisa() {
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
+  // Gera variantes fuzzy do termo: prefixos e substrings para apanhar erros de digitação
+  const variantesFuzzy = (termo) => {
+    const t = termo.toLowerCase().trim();
+    const vars = new Set([t]);
+    // prefixo mínimo de 3 chars
+    if (t.length >= 4) vars.add(t.slice(0, t.length - 1));
+    if (t.length >= 5) vars.add(t.slice(0, t.length - 2));
+    // Sem vogais duplas (ex: "casaaco" -> "casaco")
+    vars.add(t.replace(/(.)\1+/g, "$1"));
+    // Normalizar acentos simples
+    vars.add(t.normalize("NFD").replace(/[̀-ͯ]/g, ""));
+    return [...vars].filter(v => v.length >= 3);
+  };
+
   const pesquisar = async (q) => {
     if (!q || q.trim().length < 2) return;
     setLoading(true);
     const termo = q.trim();
+    const variantes = variantesFuzzy(termo);
 
-    // Uma query só — tudo em paralelo
-    const [
-      { data: ngData },
-      { data: ljData },
-      { data: ls },
-    ] = await Promise.all([
+    // Construir filtro OR com todas as variantes
+    const filtroNome = variantes.map(v => `nome.ilike.%${v}%`).join(",");
+    const filtroCor  = variantes.map(v => `cor.ilike.%${v}%`).join(",");
+    const filtroLj   = variantes.map(v => `nome.ilike.%${v}%,categoria.ilike.%${v}%,cor.ilike.%${v}%`).join(",");
+
+    const [{ data: ngData }, { data: ljData }, { data: ls }] = await Promise.all([
       supabase
         .from("pecas")
         .select("id, nome, fotos, preco_aluguer_dia, cor, categorias(nome)")
-        .or(`nome.ilike.%${termo}%,cor.ilike.%${termo}%`)
+        .or(`${filtroNome},${filtroCor}`)
         .limit(30),
       supabase
         .from("pecas_lojista")
         .select("id, nome, fotos, preco_aluguer_dia, preco_venda, categoria, cor, cliente_id, clientes:cliente_id(nome, codigo_cliente)")
-        .or(`nome.ilike.%${termo}%,categoria.ilike.%${termo}%,cor.ilike.%${termo}%`)
+        .or(filtroLj)
         .limit(20),
       supabase
         .from("clientes")
         .select("id, nome, codigo_cliente, cidade, pais")
         .eq("modo_lojista", true)
-        .ilike("nome", `%${termo}%`)
+        .ilike("nome", `%${variantes[0]}%`)
         .limit(6),
     ]);
 
     const todasPecas = [
       ...(ngData || []).map(p => ({ ...p, _fonte: "ng", categoria: p.categorias?.nome || "" })),
       ...(ljData || []).map(p => ({ ...p, _fonte: "lojista" })),
-    ];
+    ].filter((p, i, arr) => arr.findIndex(x => x.id === p.id && x._fonte === p._fonte) === i);
 
     setPecas(todasPecas);
     setLojas(ls || []);
