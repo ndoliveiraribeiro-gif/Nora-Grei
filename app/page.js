@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const T = {
   pt: {
     nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no armário","a mala","o casaco","o vestido","a camisola","a calça"] },
+    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."] },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -60,7 +60,7 @@ const T = {
   },
   fr: {
     nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","le sac","le manteau","la robe","le pull","le pantalon"] },
+    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."] },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -115,7 +115,7 @@ const T = {
   },
   lt: {
     nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","spintoje","rankinę","paltą","suknelę","megztinį","kelnes"] },
+    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."] },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
@@ -587,9 +587,9 @@ export default function Home() {
         .hero-eyebrow{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:1rem}
         /* texto rotativo */
         .hero-rotary{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2.8rem,9vw,8rem);line-height:0.95;color:var(--white);overflow:hidden;height:1.05em;margin-bottom:0.6rem}
-        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 12s cubic-bezier(0.77,0,0.18,1) infinite}
+        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 15s cubic-bezier(0.77,0,0.18,1) infinite}
         .hero-rotary-inner span{display:block;height:1.05em;line-height:1.05}
-        @keyframes rotaryScroll{0%,10%{transform:translateY(0)}12.5%,22.5%{transform:translateY(-1.05em)}25%,35%{transform:translateY(-2.1em)}37.5%,47.5%{transform:translateY(-3.15em)}50%,60%{transform:translateY(-4.2em)}62.5%,72.5%{transform:translateY(-5.25em)}75%,85%{transform:translateY(-6.3em)}87.5%,97.5%{transform:translateY(-7.35em)}100%{transform:translateY(-8.4em)}}
+        @keyframes rotaryScroll{0%,8%{transform:translateY(0)}10%,18%{transform:translateY(-1.05em)}20%,28%{transform:translateY(-2.1em)}30%,38%{transform:translateY(-3.15em)}40%,48%{transform:translateY(-4.2em)}50%,58%{transform:translateY(-5.25em)}60%,68%{transform:translateY(-6.3em)}70%,78%{transform:translateY(-7.35em)}80%,88%{transform:translateY(-8.4em)}90%,98%{transform:translateY(-9.45em)}100%{transform:translateY(-10.5em)}}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.4rem,8vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
         .hero-sub{font-family:var(--serif);font-size:clamp(0.95rem,1.8vw,1.3rem);font-weight:300;color:rgba(255,255,255,0.62);line-height:1.55;margin-bottom:clamp(1.75rem,4vh,3rem);max-width:50ch}
         @media(max-width:600px){
