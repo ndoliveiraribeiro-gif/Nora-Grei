@@ -5,188 +5,96 @@ import { supabase } from "@/lib/supabase";
 
 const T = {
   pt: {
-    pecas: "Peças disponíveis", vender: "À venda", alugar: "Alugar", comprar: "Comprar", comprarNova: "Comprar nova", usada: "Usada", dispDia: "/dia", semPecas: "Esta loja ainda não tem peças disponíveis.", disponivel: "Disponível", indisponivel: "Indisponível", voltar: "← Catálogo", lojaDeLabel: "Loja de", contactar: "Contactar lojista", verDetalhe: "Ver detalhe", todasOcasiao: "Todas as ocasiões", ocasiao: "Por ocasião",
+    voltar: "← Lojistas",
+    alugar: "Alugar",
+    comprar: "Comprar",
+    dia: "/dia",
+    semPecas: "Esta loja ainda não tem peças.",
+    loading: "A carregar...",
+    notFound: "Loja não encontrada.",
+    pecas: "Peças",
+    contactar: "Contactar",
+    membro: "Membro Nora Grei",
   },
   fr: {
-    pecas: "Pièces disponibles", vender: "À vendre", alugar: "Louer", comprar: "Acheter", comprarNova: "Acheter neuf", usada: "Occasion", dispDia: "/jour", semPecas: "Cette boutique n'a pas encore de pièces disponibles.", disponivel: "Disponible", indisponivel: "Indisponible", voltar: "← Catalogue", lojaDeLabel: "Boutique de", contactar: "Contacter le vendeur", verDetalhe: "Voir le détail", todasOcasiao: "Toutes les occasions", ocasiao: "Par occasion",
+    voltar: "← Boutiques",
+    alugar: "Louer",
+    comprar: "Acheter",
+    dia: "/jour",
+    semPecas: "Cette boutique n'a pas encore de pièces.",
+    loading: "Chargement...",
+    notFound: "Boutique introuvable.",
+    pecas: "Pièces",
+    contactar: "Contacter",
+    membro: "Membre Nora Grei",
   },
   lt: {
-    pecas: "Turimi drabužiai", vender: "Parduodama", alugar: "Nuomoti", comprar: "Pirkti", comprarNova: "Pirkti naują", usada: "Naudota", dispDia: "/d.", semPecas: "Ši parduotuvė dar neturi drabužių.", disponivel: "Prieinama", indisponivel: "Neprieinama", voltar: "← Katalogas", lojaDeLabel: "Parduotuvė", contactar: "Susisiekti", verDetalhe: "Žiūrėti", todasOcasiao: "Visos progos", ocasiao: "Pagal progą",
+    voltar: "← Parduotuvės",
+    alugar: "Nuomoti",
+    comprar: "Pirkti",
+    dia: "/d.",
+    semPecas: "Ši parduotuvė dar neturi drabužių.",
+    loading: "Kraunama...",
+    notFound: "Parduotuvė nerasta.",
+    pecas: "Drabužiai",
+    contactar: "Susisiekti",
+    membro: "Nora Grei narė",
   },
 };
 
-// Ocasiões sem emojis (profissional)
-const OCASIOES_LOJA = {
-  pt: [
-    { key: "Casamento", label: "Casamento" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Cocktail" },
-    { key: "Festa", label: "Festa" }, { key: "Jantar", label: "Jantar" }, { key: "Trabalho", label: "Trabalho" },
-    { key: "Dia a dia", label: "Dia a dia" }, { key: "Praia", label: "Praia" }, { key: "Férias", label: "Férias" },
-  ],
-  fr: [
-    { key: "Casamento", label: "Mariage" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Cocktail" },
-    { key: "Festa", label: "Fête" }, { key: "Jantar", label: "Dîner" }, { key: "Trabalho", label: "Travail" },
-    { key: "Dia a dia", label: "Quotidien" }, { key: "Praia", label: "Plage" }, { key: "Férias", label: "Vacances" },
-  ],
-  lt: [
-    { key: "Casamento", label: "Vestuvės" }, { key: "Gala", label: "Gala" }, { key: "Cocktail", label: "Kokteilis" },
-    { key: "Festa", label: "Šventė" }, { key: "Jantar", label: "Vakarienė" }, { key: "Trabalho", label: "Darbas" },
-    { key: "Dia a dia", label: "Kasdien" }, { key: "Praia", label: "Paplūdimys" }, { key: "Férias", label: "Atostogos" },
-  ],
-};
-
-export default function LojaPublica() {
+export default function LojaPage() {
   const { codigo } = useParams();
   const [lang, setLang] = useState("pt");
-  const [lojista, setLojista] = useState(null);
-  const [timers, setTimers] = useState({});
+  const [loja, setLoja] = useState(null);
   const [pecas, setPecas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState("todos");
-  const [filtroOcasiao, setFiltroOcasiao] = useState("todas");
-  const [filtroCategoria, setFiltroCategoria] = useState("todas");
-  const [filtroTamanho, setFiltroTamanho] = useState("todos");
-  const [filtroCor, setFiltroCor] = useState("todas");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mediaRating, setMediaRating] = useState(null);
-  const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
-  const [user, setUser] = useState(null);
-  const [seguindo, setSeguindo] = useState(false);
-  const [seguidores, setSeguidores] = useState(0);
-  const [seguindoLoading, setSeguindoLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved);
-    carregarLoja();
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null));
+    if (codigo) carregar(codigo);
   }, [codigo]);
 
-  const carregarLoja = async () => {
-    setLoading(true);
-    const { data: cli } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais").eq("codigo_cliente", codigo).maybeSingle();
-    if (!cli) { setLoading(false); return; }
-    setLojista(cli);
-    const { data: ps } = await supabase.from("pecas_lojista").select("*, stock_lojista(id, tamanho, quantidade_disponivel)").eq("cliente_id", cli.id).eq("estado", "disponivel").order("created_at", { ascending: false });
+  const carregar = async (cod) => {
+    // Carregar dados da lojista
+    const { data: cliente } = await supabase
+      .from("clientes")
+      .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
+      .eq("codigo_cliente", cod)
+      .eq("modo_lojista", true)
+      .maybeSingle();
+
+    if (!cliente) { setNotFound(true); setLoading(false); return; }
+    setLoja(cliente);
+
+    // Carregar peças desta lojista
+    const { data: ps } = await supabase
+      .from("pecas")
+      .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor, categorias(nome)")
+      .eq("cliente_id", cliente.id)
+      .not("fotos", "is", null)
+      .neq("fotos", "{}")
+      .order("created_at", { ascending: false });
+
     setPecas(ps || []);
-
-    // Buscar timers para peças esgotadas
-    if (ps && ps.length > 0) {
-      const stockIds = ps.flatMap(p => (p.stock_lojista || []).map(s => s.id));
-      if (stockIds.length > 0) {
-        const { data: alugAtivos } = await supabase
-          .from("alugueres_lojista")
-          .select("stock_lojista_id, data_fim, data_disponivel_novamente, pecas_lojista_id")
-          .in("stock_lojista_id", stockIds)
-          .eq("estado", "ativo")
-          .order("data_fim", { ascending: false });
-        if (alugAtivos) {
-          // Mapear por peca id → data_fim mais distante
-          const timerMap = {};
-          for (const p of ps) {
-            const stockIds_p = (p.stock_lojista || []).map(s => s.id);
-            const alugsDaPeca = alugAtivos.filter(a => stockIds_p.includes(a.stock_lojista_id));
-            if (alugsDaPeca.length > 0) {
-              const maisRecente = alugsDaPeca[0];
-              timerMap[p.id] = maisRecente.data_disponivel_novamente || maisRecente.data_fim;
-            }
-          }
-          setTimers(timerMap);
-        }
-      }
-    }
-
-    // Média de avaliações do lojista
-    const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista").eq("lojista_id", cli.id).not("nota_cliente_lojista","is",null);
-    if (avs && avs.length > 0) {
-      const media = avs.reduce((s,a) => s + a.nota_cliente_lojista, 0) / avs.length;
-      setMediaRating(media.toFixed(1));
-      setTotalAvaliacoes(avs.length);
-    }
-
-    // Seguidores
-    const { count: numSeg } = await supabase.from("follows").select("*", { count: "exact", head: true }).eq("lojista_id", cli.id);
-    setSeguidores(numSeg || 0);
-
-    // Verificar se utilizador atual segue
-    const { data: sess } = await supabase.auth.getSession();
-    if (sess?.session?.user) {
-      const { data: follow } = await supabase.from("follows").select("id").eq("follower_id", sess.session.user.id).eq("lojista_id", cli.id).maybeSingle();
-      if (follow) setSeguindo(true);
-    }
-
     setLoading(false);
   };
 
-  const toggleSeguir = async () => {
-    if (!user) { window.location.href = "/entrar"; return; }
-    setSeguindoLoading(true);
-    if (seguindo) {
-      await supabase.from("follows").delete().eq("follower_id", user.id).eq("lojista_id", lojista.id);
-      setSeguindo(false);
-      setSeguidores(s => Math.max(0, s - 1));
-    } else {
-      await supabase.from("follows").insert({ follower_id: user.id, lojista_id: lojista.id });
-      setSeguindo(true);
-      setSeguidores(s => s + 1);
-    }
-    setSeguindoLoading(false);
-  };
-
-  function MiniTimer({ dataFim }) {
-    const [tempo, setTempo] = useState("");
-    useEffect(() => {
-      if (!dataFim) return;
-      const calc = () => {
-        const diff = new Date(dataFim) - new Date();
-        if (diff <= 0) { setTempo("em breve"); return; }
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        setTempo(d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`);
-      };
-      calc();
-      const iv = setInterval(calc, 60000);
-      return () => clearInterval(iv);
-    }, [dataFim]);
-    return <span className="tag tag-timer">⏱ {tempo}</span>;
-  }
-
   const t = T[lang] || T.pt;
-  const temNoraGrei = pecas.some(p => p.origem === "Nora Grei");
-  const ocasioesDisponiveis = OCASIOES_LOJA[lang] || OCASIOES_LOJA.pt;
-
-  // Derivar listas únicas para filtros dinâmicos
-  const categoriasDisponiveis = [...new Set(pecas.map(p => p.categoria).filter(Boolean))].sort();
-  const tamanhosTodos = pecas.flatMap(p => (p.stock_lojista || []).map(s => s.tamanho).filter(Boolean));
-  const tamanhosDisponiveis = [...new Set(tamanhosTodos)].sort();
-  const coresDisponiveis = [...new Set(pecas.map(p => p.cor).filter(Boolean))].sort();
-
-  const pecasFiltradas = pecas
-    .filter(p => {
-      if (filtro === "alugar") return !!p.preco_aluguer_dia;
-      if (filtro === "comprar") return !!p.preco_venda;
-      if (filtro === "comprar_nova") return p.origem === "Nora Grei";
-      if (filtro === "usada") return p.origem !== "Nora Grei";
-      return true;
-    })
-    .filter(p => filtroOcasiao === "todas" || (Array.isArray(p.ocasioes) && p.ocasioes.includes(filtroOcasiao)))
-    .filter(p => filtroCategoria === "todas" || p.categoria === filtroCategoria)
-    .filter(p => filtroTamanho === "todos" || (p.stock_lojista || []).some(s => s.tamanho === filtroTamanho))
-    .filter(p => filtroCor === "todas" || p.cor === filtroCor)
-    .filter(p => {
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      return (p.nome || "").toLowerCase().includes(q) || (p.categoria || "").toLowerCase().includes(q) || (p.cor || "").toLowerCase().includes(q);
-    });
+  const initials = loja?.nome ? loja.nome.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
+  const anoMembro = loja?.created_at ? new Date(loja.created_at).getFullYear() : null;
 
   if (loading) return (
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Jost',sans-serif",fontSize:"0.8rem",letterSpacing:"0.2em",color:"#888",textTransform:"uppercase"}}>...</div>
+    <div style={{minHeight:"100svh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Jost',sans-serif",fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#5a5855"}}>
+      {t.loading}
+    </div>
   );
 
-  if (!lojista) return (
-    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Jost',sans-serif",gap:"1rem"}}>
-      <p style={{fontSize:"0.85rem",color:"#888"}}>Loja não encontrada.</p>
-      <a href="/catalogo" style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#080808"}}>← Catálogo</a>
+  if (notFound) return (
+    <div style={{minHeight:"100svh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"1rem",fontFamily:"'Jost',sans-serif",color:"#5a5855"}}>
+      <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>{t.notFound}</p>
+      <a href="/lojas" style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>{t.voltar}</a>
     </div>
   );
 
@@ -195,241 +103,100 @@ export default function LojaPublica() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--black:#080808;--white:#f8f7f5;--g1:#f0eeeb;--g2:#e2dfda;--g4:#5a5855;--rosa:#c4748a;--serif:'Cormorant Garamond',serif;--sans:'Jost',sans-serif}
-        body{background:var(--white);color:var(--black);font-family:var(--sans);-webkit-font-smoothing:antialiased}
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);padding:1rem 2rem;padding-top:max(1rem,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between}
-        .nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--black)}
-        .nav-back{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none}
+        :root{--cream:#f8f7f5;--white:#fff;--g1:#f0eeeb;--g2:#e2dfda;--g4:#5a5855;--ink:#1a1816;--rosa:#c4748a;--serif:'Cormorant Garamond',serif;--sans:'Jost',sans-serif}
+        html,body{overflow-x:hidden;background:var(--cream);color:var(--ink);font-family:var(--sans)}
 
-        /* ── HERO ── */
-        .hero-loja{padding:6.5rem 2rem 2.5rem;text-align:center;background:linear-gradient(180deg,#f5f2ee 0%,var(--white) 100%);border-bottom:1px solid var(--g2);position:relative}
-        .hero-loja::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(196,116,138,0.06) 0%,transparent 70%);pointer-events:none}
-        .loja-nome{font-family:var(--serif);font-size:clamp(2.2rem,7vw,4.5rem);font-weight:300;letter-spacing:0.04em;line-height:1.1;margin-bottom:0.6rem;text-wrap:balance}
-        .loja-local{font-size:0.78rem;color:var(--g4);letter-spacing:0.18em;text-transform:uppercase}
-        .hero-meta{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:1rem;flex-wrap:wrap}
-        .hero-rating-link{display:flex;align-items:center;gap:0.35rem;text-decoration:none;color:inherit}
-        .hero-stars span{font-size:0.9rem}
-        .hero-rating-val{font-size:0.8rem;font-weight:500}
-        .hero-rating-count{font-size:0.72rem;color:var(--g4);text-decoration:underline;text-underline-offset:2px}
-        .hero-sep{width:1px;height:14px;background:var(--g2)}
-        .hero-seguidores{font-size:0.72rem;color:var(--g4);letter-spacing:0.08em}
-        .btn-seguir{margin-top:1.5rem;padding:0.65rem 2.5rem;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans);cursor:pointer;transition:all 0.25s;border-radius:0;display:inline-block}
-        .btn-seguir.off{background:var(--rosa);color:#fff;border:1.5px solid var(--rosa)}
-        .btn-seguir.off:hover{background:#b5627a;border-color:#b5627a}
-        .btn-seguir.on{background:transparent;color:var(--black);border:1.5px solid var(--g2)}
-        .btn-seguir.on:hover{border-color:var(--g4)}
+        /* HEADER LOJA */
+        .loja-header{background:var(--ink);padding:2.5rem 1.5rem;position:relative;overflow:hidden}
+        .loja-header-voltar{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.45);text-decoration:none;font-family:var(--sans);display:inline-block;margin-bottom:2rem;transition:color 0.2s}
+        .loja-header-voltar:hover{color:rgba(255,255,255,0.8)}
+        .loja-header-inner{display:flex;align-items:flex-start;gap:1.5rem}
+        .loja-avatar-lg{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.08);overflow:hidden;border:2px solid rgba(255,255,255,0.15);flex-shrink:0}
+        .loja-avatar-lg img{width:100%;height:100%;object-fit:cover}
+        .loja-avatar-lg-initials{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.8rem;font-weight:300;color:var(--rosa)}
+        .loja-header-info{flex:1;min-width:0}
+        .loja-header-membro{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);margin-bottom:0.4rem}
+        .loja-header-nome{font-family:var(--serif);font-size:clamp(1.8rem,6vw,3rem);font-weight:300;color:#fff;line-height:1.1;margin-bottom:0.5rem}
+        .loja-header-local{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:var(--sans)}
+        .loja-header-desc{font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.6;margin-top:1rem;max-width:520px}
+        .loja-header-ano{font-size:0.58rem;letter-spacing:0.15em;color:rgba(255,255,255,0.25);font-family:var(--sans);margin-top:0.75rem}
+        .loja-header-deco{position:absolute;right:-1rem;top:-1rem;font-family:var(--serif);font-size:8rem;font-weight:300;color:rgba(255,255,255,0.04);line-height:1;pointer-events:none;user-select:none}
 
-        /* ── FILTROS ── */
-        .filtros-wrap{border-bottom:1px solid var(--g2)}
-        .filtros{display:flex;justify-content:center;gap:0;padding:0 1rem;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
-        .filtros::-webkit-scrollbar{display:none}
-        .filtro-btn{padding:0.9rem 1.2rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--sans);color:var(--g4);transition:all 0.18s;white-space:nowrap;flex-shrink:0}
-        .filtro-btn:hover{color:var(--black)}
-        .filtro-btn.on{color:var(--black);border-bottom-color:var(--rosa);font-weight:500}
-        .ocasioes-wrap{padding:0.75rem 1.5rem 0.9rem;display:flex;gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-        .ocasioes-wrap::-webkit-scrollbar{display:none}
-        .pill{font-size:0.72rem;letter-spacing:0.05em;padding:0.32rem 0.8rem;border-radius:999px;border:1px solid var(--g2);background:transparent;color:var(--g4);cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;transition:all 0.15s}
-        .pill:hover{border-color:var(--rosa);color:var(--rosa)}
-        .pill.on{background:var(--rosa);border-color:var(--rosa);color:#fff}
-        .search-loja{display:flex;align-items:center;gap:0.6rem;padding:0.7rem 1.5rem;border-bottom:1px solid var(--g2);background:var(--white)}
-        .search-loja-icon{font-size:0.9rem;color:var(--g4);flex-shrink:0}
-        .search-loja-input{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:0.85rem;color:var(--black);outline:none;min-width:0}
-        .search-loja-input::placeholder{color:var(--g4)}
-        .search-loja-clear{background:none;border:none;cursor:pointer;font-size:0.85rem;color:var(--g4);padding:0;flex-shrink:0}
-        .filtros-extra{padding:0.5rem 1.5rem 0.6rem;display:flex;gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:1px solid var(--g2)}
-        .filtros-extra::-webkit-scrollbar{display:none}
-        .chip-select{font-size:0.7rem;letter-spacing:0.08em;padding:0.28rem 0.7rem;border-radius:0;border:1px solid var(--g2);background:transparent;color:var(--g4);cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;transition:all 0.15s;appearance:none;-webkit-appearance:none}
-        .chip-select:focus{outline:none;border-color:var(--black)}
-        .chip-select.ativo{border-color:var(--rosa);color:var(--rosa);background:rgba(196,116,138,0.06)}
-        .filtros-ativos{font-size:0.68rem;color:var(--g4);padding:0 1.5rem 0.5rem;letter-spacing:0.08em}
-        .filtros-ativos span{color:var(--rosa);cursor:pointer;margin-left:0.3rem}
+        /* PEÇAS */
+        .pecas-sec{padding:2rem 1.5rem}
+        .pecas-label{font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);margin-bottom:1.25rem}
+        .pecas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .peca-card{display:block;text-decoration:none;background:var(--white);border:1px solid var(--g2);overflow:hidden;transition:border-color 0.2s}
+        .peca-card:hover{border-color:var(--rosa)}
+        .peca-img{aspect-ratio:3/4;overflow:hidden;background:var(--g1)}
+        .peca-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease}
+        .peca-card:hover .peca-img img{transform:scale(1.03)}
+        .peca-info{padding:0.75rem}
+        .peca-cat{font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--g4);font-family:var(--sans);margin-bottom:0.2rem}
+        .peca-nome{font-family:var(--serif);font-size:0.95rem;font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:0.35rem}
+        .peca-precos{display:flex;gap:0.6rem;align-items:baseline;flex-wrap:wrap}
+        .peca-aluguer{font-size:0.72rem;color:var(--rosa);font-family:var(--sans);font-weight:500}
+        .peca-venda{font-size:0.65rem;color:var(--g4);font-family:var(--sans)}
 
-        /* ── GRID ── */
-        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--g2)}
-        @media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr)}}
-        @media(min-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
-        .peca-card{background:var(--white);text-decoration:none;color:var(--black);display:block;transition:background 0.2s}
-        .peca-card:hover{background:var(--g1)}
-        .peca-foto{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
-        .peca-foto-ph{width:100%;aspect-ratio:3/4;background:linear-gradient(160deg,#ede9e4 0%,#e8e2db 100%);display:flex;align-items:center;justify-content:center}
-        .peca-foto-ph-txt{font-family:var(--serif);font-size:1.8rem;font-weight:300;color:rgba(0,0,0,0.12);letter-spacing:0.15em}
-        .peca-info{padding:0.85rem 1rem 1rem}
-        .peca-nome{font-family:var(--sans);font-size:0.88rem;font-weight:500;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .peca-preco{font-size:0.82rem;color:var(--g4)}
-        .peca-tags{display:flex;gap:0.35rem;margin-top:0.5rem;flex-wrap:wrap}
-        .tag{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.18rem 0.45rem;background:var(--g1);color:var(--g4)}
-        .tag-rosa{background:rgba(196,116,138,0.1);color:var(--rosa)}
-        .tag-timer{background:#fff8e1;color:#b8860b;font-variant-numeric:tabular-nums}
-        .sem-pecas{text-align:center;padding:6rem 2rem;font-size:0.82rem;color:var(--g4);letter-spacing:0.08em}
+        .sem-pecas{padding:3rem 1.5rem;text-align:center;font-family:var(--serif);font-size:1.1rem;font-weight:300;color:var(--g4)}
+
+        @media(min-width:600px){.pecas-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(min-width:900px){
+          .loja-header{padding:3rem 4rem}
+          .pecas-sec{padding:2.5rem 4rem}
+          .pecas-grid{grid-template-columns:repeat(4,1fr);gap:10px}
+          .loja-avatar-lg{width:88px;height:88px}
+        }
       `}</style>
 
-      {/* Banner de gestão — visível apenas para o dono da loja */}
-      {user && lojista && user.id === lojista.id && (
-        <div style={{position:"fixed",top:0,left:0,right:0,zIndex:200,background:"var(--black)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.45rem 2rem",fontFamily:"var(--sans)"}}>
-          <span style={{fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",opacity:0.7}}>Modo lojista — vista pública da tua loja</span>
-          <div style={{display:"flex",gap:"0.5rem"}}>
-            <a href="/perfil#loja-dashboard" onClick={e=>{e.preventDefault();window.location.href="/perfil";}} style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>← Dashboard</a>
-            <a href="/perfil" style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#fff",textDecoration:"none",padding:"0.25rem 0.6rem",border:"1px solid rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>Perfil</a>
+      {/* HEADER */}
+      <div className="loja-header">
+        <a href="/lojas" className="loja-header-voltar">{t.voltar}</a>
+        <div className="loja-header-deco">NG</div>
+        <div className="loja-header-inner">
+          <div className="loja-avatar-lg">
+            {loja.foto_perfil
+              ? <img src={loja.foto_perfil} alt={loja.nome} />
+              : <div className="loja-avatar-lg-initials">{initials}</div>
+            }
+          </div>
+          <div className="loja-header-info">
+            <p className="loja-header-membro">{t.membro}</p>
+            <h1 className="loja-header-nome">{loja.nome}</h1>
+            {(loja.cidade || loja.pais) && (
+              <p className="loja-header-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</p>
+            )}
+            {loja.descricao && <p className="loja-header-desc">{loja.descricao}</p>}
+            {anoMembro && <p className="loja-header-ano">Membro desde {anoMembro}</p>}
           </div>
         </div>
-      )}
-      <nav className="nav" style={user && lojista && user.id === lojista.id ? {top:"32px"} : {}}>
-        <a href="/" className="nav-logo">Nora Grei</a>
-        <div style={{display:"flex",alignItems:"center",gap:"1.5rem"}}>
-          <div style={{display:"flex",gap:"0.4rem"}}>
-            {["pt","fr","lt"].map(l => (
-              <button key={l} onClick={() => { localStorage.setItem("ng_lang",l); setLang(l); }} style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",color:lang===l?"var(--black)":"var(--g4)",fontWeight:lang===l?500:300}}>{l.toUpperCase()}</button>
+      </div>
+
+      {/* PEÇAS */}
+      <section className="pecas-sec">
+        <p className="pecas-label">{t.pecas} — {pecas.length}</p>
+        {pecas.length === 0 ? (
+          <p className="sem-pecas">{t.semPecas}</p>
+        ) : (
+          <div className="pecas-grid">
+            {pecas.map(p => (
+              <a key={p.id} href={`/catalogo/${p.id}`} className="peca-card">
+                <div className="peca-img">
+                  {p.fotos?.[0] && <img src={p.fotos[0]} alt={p.nome} loading="lazy" />}
+                </div>
+                <div className="peca-info">
+                  {p.categorias?.nome && <p className="peca-cat">{p.categorias.nome}</p>}
+                  <p className="peca-nome">{p.nome}</p>
+                  <div className="peca-precos">
+                    {p.preco_aluguer_dia && <span className="peca-aluguer">{p.preco_aluguer_dia}€{t.dia}</span>}
+                    {p.preco_venda && <span className="peca-venda">{p.preco_venda}€</span>}
+                  </div>
+                </div>
+              </a>
             ))}
           </div>
-          <a href="/pesquisa" aria-label="Pesquisar" style={{display:"flex",alignItems:"center",color:"var(--g4)",textDecoration:"none",lineHeight:1}}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </a>
-          <a href="/catalogo" className="nav-back">{t.voltar}</a>
-        </div>
-      </nav>
-
-      <div className="hero-loja" style={user && lojista && user.id === lojista.id ? {paddingTop:"9.5rem"} : {}}>
-        <h1 className="loja-nome">{lojista.nome}</h1>
-        {lojista.cidade && <p className="loja-local">{lojista.cidade}{lojista.pais ? `, ${lojista.pais}` : ""}</p>}
-        <div className="hero-meta">
-          {mediaRating && (
-            <>
-              <a href={`/loja/${codigo}/avaliacoes`} className="hero-rating-link">
-                <span className="hero-stars">
-                  {[1,2,3,4,5].map(v=><span key={v} style={{color:v<=Math.round(mediaRating)?"var(--rosa)":"var(--g2)"}}>★</span>)}
-                </span>
-                <span className="hero-rating-val">{mediaRating}</span>
-                <span className="hero-rating-count">({totalAvaliacoes})</span>
-              </a>
-              <span className="hero-sep"/>
-            </>
-          )}
-          {seguidores > 0 && (
-            <span className="hero-seguidores">{seguidores} {seguidores === 1 ? "seguidor" : "seguidores"}</span>
-          )}
-        </div>
-        <button
-          onClick={toggleSeguir}
-          disabled={seguindoLoading}
-          className={`btn-seguir ${seguindo ? "on" : "off"}`}
-        >
-          {seguindo ? "✓ A seguir" : "+ Seguir"}
-        </button>
-      </div>
-
-      {/* Filtros principais */}
-      <div className="filtros-wrap">
-        {/* Barra de pesquisa interna */}
-        <div className="search-loja">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16" style={{flexShrink:0,color:"var(--g4)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input
-            className="search-loja-input"
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder={lang==="fr" ? "Rechercher dans cette boutique..." : lang==="lt" ? "Ieškoti šioje parduotuvėje..." : "Pesquisar nesta loja..."}
-          />
-          {searchQuery && <button className="search-loja-clear" onClick={() => setSearchQuery("")}>✕</button>}
-        </div>
-        <div className="filtros">
-          {[
-            {id:"todos",       label:{pt:"Todos",fr:"Tous",lt:"Visi"}},
-            {id:"alugar",      label:{pt:t.alugar,fr:t.alugar,lt:t.alugar}},
-            {id:"comprar",     label:{pt:t.comprar,fr:t.comprar,lt:t.comprar}},
-            ...(temNoraGrei ? [{id:"comprar_nova", label:{pt:t.comprarNova,fr:t.comprarNova,lt:t.comprarNova}}] : []),
-            {id:"usada",       label:{pt:t.usada,fr:t.usada,lt:t.usada}},
-          ].map(f => (
-            <button key={f.id} className={`filtro-btn${filtro===f.id?" on":""}`} onClick={() => setFiltro(f.id)}>{f.label[lang]||f.label.pt}</button>
-          ))}
-        </div>
-        {/* Pills de ocasião */}
-        <div className="ocasioes-wrap">
-          <button onClick={()=>setFiltroOcasiao("todas")} className={`pill${filtroOcasiao==="todas"?" on":""}`}>{t.todasOcasiao}</button>
-          {ocasioesDisponiveis.map(o => (
-            <button key={o.key} onClick={()=>setFiltroOcasiao(o.key)} className={`pill${filtroOcasiao===o.key?" on":""}`}>{o.label}</button>
-          ))}
-        </div>
-        {/* Filtros extra: categoria, tamanho, cor */}
-        {(categoriasDisponiveis.length > 0 || tamanhosDisponiveis.length > 0 || coresDisponiveis.length > 0) && (
-          <div className="filtros-extra">
-            {categoriasDisponiveis.length > 0 && (
-              <select
-                className={`chip-select${filtroCategoria !== "todas" ? " ativo" : ""}`}
-                value={filtroCategoria}
-                onChange={e => setFiltroCategoria(e.target.value)}
-              >
-                <option value="todas">{lang==="fr" ? "Catégorie" : lang==="lt" ? "Kategorija" : "Categoria"}</option>
-                {categoriasDisponiveis.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            )}
-            {tamanhosDisponiveis.length > 0 && (
-              <select
-                className={`chip-select${filtroTamanho !== "todos" ? " ativo" : ""}`}
-                value={filtroTamanho}
-                onChange={e => setFiltroTamanho(e.target.value)}
-              >
-                <option value="todos">{lang==="fr" ? "Taille" : lang==="lt" ? "Dydis" : "Tamanho"}</option>
-                {tamanhosDisponiveis.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            )}
-            {coresDisponiveis.length > 0 && (
-              <select
-                className={`chip-select${filtroCor !== "todas" ? " ativo" : ""}`}
-                value={filtroCor}
-                onChange={e => setFiltroCor(e.target.value)}
-              >
-                <option value="todas">{lang==="fr" ? "Couleur" : lang==="lt" ? "Spalva" : "Cor"}</option>
-                {coresDisponiveis.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            )}
-            {(filtroCategoria !== "todas" || filtroTamanho !== "todos" || filtroCor !== "todas") && (
-              <button
-                className="chip-select"
-                style={{color:"var(--rosa)",borderColor:"var(--rosa)",cursor:"pointer"}}
-                onClick={() => { setFiltroCategoria("todas"); setFiltroTamanho("todos"); setFiltroCor("todas"); }}
-              >
-                ✕ {lang==="fr" ? "Réinitialiser" : lang==="lt" ? "Atstatyti" : "Limpar"}
-              </button>
-            )}
-          </div>
         )}
-      </div>
-
-      {pecasFiltradas.length === 0 ? (
-        <div className="sem-pecas">{t.semPecas}</div>
-      ) : (
-        <div className="grid">
-          {pecasFiltradas.map(p => (
-            <a key={p.id} href={`/loja/${codigo}/peca/${p.id}`} className="peca-card">
-              {p.fotos?.[0] ? <img src={p.fotos[0]} className="peca-foto" alt={p.nome} /> : <div className="peca-foto-ph"><span className="peca-foto-ph-txt">NG</span></div>}
-              <div className="peca-info">
-                <div className="peca-nome">{p.nome}</div>
-                <div className="peca-preco">
-                  {p.preco_aluguer_dia && <span>{p.preco_aluguer_dia}€{t.dispDia}</span>}
-                  {p.preco_aluguer_dia && p.preco_venda && <span style={{margin:"0 0.4rem",color:"var(--g2)"}}>·</span>}
-                  {p.preco_venda && <span>{p.preco_venda}€</span>}
-                </div>
-                <div className="peca-tags">
-                  {p.origem === "Nora Grei"
-                    ? <span className="tag" style={{background:"#c4a882",color:"#fff",border:"none",fontWeight:600,letterSpacing:"0.08em"}}>Nora Grei</span>
-                    : <span className="tag" style={{background:"var(--g1)",color:"var(--g6)",border:"none"}}>{t.usada}</span>
-                  }
-                  {p.preco_aluguer_dia && <span className="tag tag-rosa">{t.alugar}</span>}
-                  {p.preco_venda && <span className="tag">{t.comprar}</span>}
-                  {Array.isArray(p.ocasioes) && p.ocasioes[0] && (
-                    <span className="tag" style={{background:"transparent",border:"1px solid var(--g2)",color:"var(--g4)",fontSize:"0.68rem"}}>{p.ocasioes[0]}</span>
-                  )}
-                  {p.stock_lojista?.every(s => s.quantidade_disponivel === 0) && (
-                    timers[p.id]
-                      ? <MiniTimer dataFim={timers[p.id]} />
-                      : <span className="tag">{t.indisponivel}</span>
-                  )}
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
+      </section>
     </>
   );
 }
