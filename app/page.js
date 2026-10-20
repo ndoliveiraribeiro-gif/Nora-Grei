@@ -17,7 +17,7 @@ const T = {
     porque: { label: "A nossa missão", titulo: "Porque a moda deve acompanhar a tua vida,", tituloSub: "não ocupar o teu armário.", pontos: ["Menos desperdício.", "Mais exclusividade.", "Mais liberdade.", "Moda consciente."] },
     numeros: [{ val:"500+",label:"Alugueres realizados" },{ val:"120+",label:"Peças exclusivas" },{ val:"4.9★",label:"Avaliação média" },{ val:"48h",label:"Entrega rápida" }],
     sustentabilidade: { label:"Moda consciente", titulo:"Cada peça vive várias histórias.", stats:[{ val:"70%",label:"Água poupada vs comprar" },{ val:"5×",label:"Reutilizações por peça" },{ val:"60%",label:"Emissões reduzidas" }] },
-    lojista: { label:"O teu armário trabalha por ti", titulo:"O teu guarda-roupa tem valor.", sub:"As lojistas Nora Grei não vendem — curadoreiam. Cada peça que partilhas torna-se parte de uma coleção reconhecida.", btnMain:"Abrir a minha loja", btnSec:"Ver a colecção",
+    lojista: { label:"O teu armário trabalha por ti", titulo:"O teu guarda-roupa tem valor.", sub:"As lojistas Nora Grei não vendem — curadoreiam. Cada peça que partilhas torna-se parte de uma coleção reconhecida.", btnMain:"Abrir a minha loja", btnCalc:"Calcular o meu rendimento →", btnSec:"Ver a colecção",
       pilares: [
         { label:"Rendimento passivo", desc:"As tuas peças alugueres enquanto estão no teu armário." },
         { label:"Reputação acumulada", desc:"Nível, avaliações e confiança que crescem com cada aluguer." },
@@ -72,7 +72,7 @@ const T = {
     porque: { label: "Notre mission", titulo: "Parce que la mode doit suivre votre vie,", tituloSub: "pas occuper votre placard.", pontos: ["Moins de gaspillage.", "Plus d'exclusivité.", "Plus de liberté.", "Mode responsable."] },
     numeros: [{ val:"500+",label:"Locations réalisées" },{ val:"120+",label:"Pièces exclusives" },{ val:"4.9★",label:"Note moyenne" },{ val:"48h",label:"Livraison rapide" }],
     sustentabilidade: { label:"Mode responsable", titulo:"Chaque pièce vit plusieurs histoires.", stats:[{ val:"70%",label:"Eau économisée vs achat" },{ val:"5×",label:"Réutilisations par pièce" },{ val:"60%",label:"Émissions réduites" }] },
-    lojista: { label:"Votre garde-robe travaille pour vous", titulo:"Votre garde-robe a de la valeur.", sub:"Les boutiques Nora Grei ne vendent pas — elles font de la curation. Chaque pièce partagée rejoint une collection reconnue.", btnMain:"Ouvrir ma boutique", btnSec:"Voir la collection",
+    lojista: { label:"Votre garde-robe travaille pour vous", titulo:"Votre garde-robe a de la valeur.", sub:"Les boutiques Nora Grei ne vendent pas — elles font de la curation. Chaque pièce partagée rejoint une collection reconnue.", btnMain:"Ouvrir ma boutique", btnCalc:"Calculer mes revenus →", btnSec:"Voir la collection",
       pilares: [
         { label:"Revenu passif", desc:"Vos pièces louent pendant qu'elles sont dans votre armoire." },
         { label:"Réputation accumulée", desc:"Niveau, avis et confiance qui grandissent à chaque location." },
@@ -127,7 +127,7 @@ const T = {
     porque: { label: "Mūsų misija", titulo: "Nes mada turi atitikti jūsų gyvenimą,", tituloSub: "o ne užimti jūsų spintą.", pontos: ["Mažiau švaistymo.", "Daugiau išskirtinumo.", "Daugiau laisvės.", "Sąmoninga mada."] },
     numeros: [{ val:"500+",label:"Įvykdytų nuomų" },{ val:"120+",label:"Išskirtinių drabužių" },{ val:"4.9★",label:"Vidutinis įvertinimas" },{ val:"48h",label:"Greitas pristatymas" }],
     sustentabilidade: { label:"Sąmoninga mada", titulo:"Kiekvienas drabužis turi kelias istorijas.", stats:[{ val:"70%",label:"Sutaupyto vandens vs pirkimas" },{ val:"5×",label:"Pakartotiniai naudojimai" },{ val:"60%",label:"Sumažintos emisijos" }] },
-    lojista: { label:"Jūsų spinta dirba už jus", titulo:"Jūsų spinta turi vertę.", sub:"Nora Grei parduotuvės ne parduoda — jos kuria kolekciją. Kiekvienas drabužis tampa pripažintos kolekcijos dalimi.", btnMain:"Atidaryti parduotuvę", btnSec:"Žiūrėti kolekciją",
+    lojista: { label:"Jūsų spinta dirba už jus", titulo:"Jūsų spinta turi vertę.", sub:"Nora Grei parduotuvės ne parduoda — jos kuria kolekciją. Kiekvienas drabužis tampa pripažintos kolekcijos dalimi.", btnMain:"Atidaryti parduotuvę", btnCalc:"Skaičiuoti pajamas →", btnSec:"Žiūrėti kolekciją",
       pilares: [
         { label:"Pasyvios pajamos", desc:"Jūsų drabužiai nuomojami kol jie yra jūsų spintoje." },
         { label:"Sukaupta reputacija", desc:"Lygis, atsiliepimai ir pasitikėjimas auga su kiekviena nuoma." },
@@ -645,6 +645,8 @@ export default function Home() {
         .lojista-ed-pilar::before{content:"";width:16px;height:1px;background:var(--rosa);flex-shrink:0}
         .lojista-ed-btn{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--white);color:var(--black);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;align-self:flex-start;transition:background 0.2s}
         .lojista-ed-btn:hover{background:var(--gold)}
+        .lojista-ed-calc{font-size:0.72rem;letter-spacing:0.08em;color:rgba(255,255,255,0.45);text-decoration:none;font-family:var(--sans);font-weight:400;align-self:flex-start;margin-top:0.25rem;transition:color 0.2s;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:1px}
+        .lojista-ed-calc:hover{color:rgba(255,255,255,0.8)}
 
         /* SECTIONS */
         .sec{padding:2rem 1.5rem}
@@ -1201,6 +1203,7 @@ export default function Home() {
             ))}
           </div>
           <a href="/perfil" className="lojista-ed-btn">{t.lojista.btnMain}</a>
+          <a href="/calculadora" className="lojista-ed-calc">{t.lojista.btnCalc}</a>
         </div>
       </section>
 
