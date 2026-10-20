@@ -56,6 +56,7 @@ const T = {
       { num: "04", titulo: "Higienização profissional", desc: "Cada peça é limpa e inspeccionada antes de chegar até ti." },
     ]},
     instagram: { label: "Inspira-te", titulo: "Segue-nos no Instagram", sub: "Vê como as nossas clientes usam as peças.", btn: "Ver @noragrei" },
+    lojasSec: { label: "Marketplace", titulo: "Lojas em destaque.", sub: "Lojistas curadoras que partilham as suas peças na plataforma Nora Grei.", verTodas: "Ver todas as lojas", verLoja: "Ver loja" },
   },
   fr: {
     nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
@@ -110,6 +111,7 @@ const T = {
       { num: "04", titulo: "Nettoyage professionnel", desc: "Chaque pièce est nettoyée et inspectée avant de vous être livrée." },
     ]},
     instagram: { label: "Inspirez-vous", titulo: "Suivez-nous sur Instagram", sub: "Voyez comment nos clientes portent les pièces.", btn: "Voir @noragrei" },
+    lojasSec: { label: "Marketplace", titulo: "Boutiques en vedette.", sub: "Des curatrices qui partagent leurs pièces sur la plateforme Nora Grei.", verTodas: "Voir toutes les boutiques", verLoja: "Voir la boutique" },
   },
   lt: {
     nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
@@ -164,6 +166,7 @@ const T = {
       { num: "04", titulo: "Profesionalus valymas", desc: "Kiekvienas drabužis išvalomas ir patikrinamas prieš pristatant." },
     ]},
     instagram: { label: "Įkvėpkitės", titulo: "Sekite mus Instagram", sub: "Žiūrėkite, kaip mūsų klientės dėvi drabužius.", btn: "Žiūrėti @noragrei" },
+    lojasSec: { label: "Marketplace", titulo: "Išskirtinės parduotuvės.", sub: "Kuratorės, dalinančios savo drabužius Nora Grei platformoje.", verTodas: "Žiūrėti visas parduotuves", verLoja: "Žiūrėti parduotuvę" },
   },
 };
 
@@ -373,6 +376,7 @@ export default function Home() {
   const [pwaInstalado, setPwaInstalado] = useState(false);
   const [cestoCont, setCestoCont] = useState(0);
   const [numerosReais, setNumerosReais] = useState(null);
+  const [lojas, setLojas] = useState([]);
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -434,7 +438,7 @@ export default function Home() {
       supabase.from("alugueres").select("*", { count: "exact", head: true }).in("estado", ["concluido","devolvido"]),
       supabase.from("pecas").select("*", { count: "exact", head: true }),
       supabase.from("avaliacoes").select("classificacao"),
-      supabase.from("clientes").select("*", { count: "exact", head: true }).eq("e_lojista", true),
+      supabase.from("clientes").select("*", { count: "exact", head: true }).eq("modo_lojista", true),
     ]);
     const media = avaliacoes && avaliacoes.length > 0
       ? (avaliacoes.reduce((s, a) => s + (a.classificacao || 5), 0) / avaliacoes.length).toFixed(1)
@@ -472,6 +476,9 @@ export default function Home() {
     if (cfg && cfg.video_landing_url) setVideoUrl(cfg.video_landing_url);
 
     const { data: todasPecas } = await supabase.from("pecas").select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)").not("fotos", "is", null).neq("fotos", "{}");
+
+    const { data: lojasData } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao").eq("modo_lojista", true).limit(6);
+    if (lojasData) setLojas(lojasData);
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
       const escolhida = todasPecas.find(p => p.id === cfg.hero_peca_id);
@@ -703,6 +710,24 @@ export default function Home() {
         .sustent-stat{background:var(--white);padding:1rem 1.25rem;margin-bottom:1px;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--rosa)}
         .sustent-val{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--rosa)}
         .sustent-label{font-size:0.78rem;color:var(--g4);text-align:right;max-width:20ch}
+
+        /* LOJAS DESTAQUE */
+        .lojas-sec{padding:2.5rem 1.5rem;background:var(--cream);border-top:1px solid var(--g2)}
+        .lojas-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.75rem;gap:1rem}
+        .lojas-header-left{}
+        .lojas-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .loja-card{display:block;text-decoration:none;background:var(--white);border:1px solid var(--g2);padding:1.25rem 1rem;display:flex;flex-direction:column;gap:0.5rem;transition:border-color 0.2s}
+        .loja-card:hover{border-color:var(--rosa)}
+        .loja-avatar{width:40px;height:40px;border-radius:50%;background:var(--g1);overflow:hidden;flex-shrink:0;border:1.5px solid var(--g2)}
+        .loja-avatar img{width:100%;height:100%;object-fit:cover}
+        .loja-avatar-initials{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;font-weight:300;color:var(--rosa)}
+        .loja-nome{font-family:var(--serif);font-size:1rem;font-weight:400;color:var(--ink);line-height:1.2}
+        .loja-cidade{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--g4);font-family:var(--sans)}
+        .loja-cta{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);margin-top:0.25rem}
+        .lojas-ver-todas{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--rosa);text-decoration:none;font-family:var(--sans);white-space:nowrap;align-self:flex-end}
+        .lojas-ver-todas:hover{opacity:0.7}
+        @media(min-width:600px){.lojas-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(min-width:769px){.lojas-sec{padding:3rem 4rem}.lojas-grid{grid-template-columns:repeat(3,1fr)}}
 
         /* CTA FINAL */
         /* SECÇÃO LOJISTA */
@@ -1093,6 +1118,38 @@ export default function Home() {
       </section>
 
       {/* INSTAGRAM */}
+      {/* LOJAS EM DESTAQUE */}
+      {lojas.length > 0 && (
+        <section className="lojas-sec">
+          <div className="lojas-header">
+            <div className="lojas-header-left">
+              <p className="sec-label">{t.lojasSec.label}</p>
+              <h2 style={{fontFamily:"var(--serif)",fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:300,color:"var(--ink)",lineHeight:1.2,margin:0}}>{t.lojasSec.titulo}</h2>
+              <p style={{fontSize:"0.78rem",color:"var(--g4)",marginTop:"0.5rem",lineHeight:1.5,maxWidth:"360px"}}>{t.lojasSec.sub}</p>
+            </div>
+            <a href="/lojas" className="lojas-ver-todas">{t.lojasSec.verTodas} →</a>
+          </div>
+          <div className="lojas-grid">
+            {lojas.map(loja => {
+              const initials = loja.nome ? loja.nome.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase() : "NG";
+              return (
+                <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
+                  <div className="loja-avatar">
+                    {loja.foto_perfil
+                      ? <img src={loja.foto_perfil} alt={loja.nome} />
+                      : <div className="loja-avatar-initials">{initials}</div>
+                    }
+                  </div>
+                  <div className="loja-nome">{loja.nome}</div>
+                  {loja.cidade && <div className="loja-cidade">{loja.cidade}{loja.pais ? `, ${loja.pais}` : ""}</div>}
+                  <div className="loja-cta">{t.lojasSec.verLoja} →</div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="insta-sec">
         <p className="insta-label">{t.instagram.label}</p>
         <div className="insta-titulo">{t.instagram.titulo}</div>
