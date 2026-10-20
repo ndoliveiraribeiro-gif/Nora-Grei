@@ -1037,13 +1037,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* COMO FUNCIONA — TOUR ANIMADO */}
-      <section className="sec" id="como" style={{background:"var(--white)",paddingBottom:"2.5rem"}}>
-        <p className="sec-label">{t.como.label}</p>
-        <h2 className="sec-titulo">{t.como.titulo}</h2>
-        <TourAnimado lang={lang} passos={t.como.passos} />
-      </section>
-
       {/* TRUST */}
       <section className="trust-sec">
         <p className="sec-label">{t.trust.label}</p>
@@ -1069,6 +1062,13 @@ export default function Home() {
             <div key={i} className="porque-ponto"><div className="porque-dot" /><div className="porque-text">{p}</div></div>
           ))}
         </div>
+      </section>
+
+      {/* COMO FUNCIONA — TOUR ANIMADO */}
+      <section className="sec" id="como" style={{background:"var(--white)",paddingBottom:"2.5rem"}}>
+        <p className="sec-label">{t.como.label}</p>
+        <h2 className="sec-titulo">{t.como.titulo}</h2>
+        <TourAnimado lang={lang} passos={t.como.passos} />
       </section>
 
       {/* PRODUTOS EM DESTAQUE */}
