@@ -635,6 +635,16 @@ export default function Home() {
         .trust-titulo{font-family:var(--serif);font-size:1rem;font-weight:400;margin-bottom:0.25rem}
         .trust-desc{font-size:0.78rem;color:var(--g4);line-height:1.55}
 
+        /* PRODUTOS DESTAQUE */
+        .produtos-destaque{padding:2rem 1rem;background:var(--black)}
+        .produtos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+        .produto-card{position:relative;overflow:hidden;aspect-ratio:3/4;display:block;background:var(--g1);text-decoration:none}
+        .produto-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease}
+        .produto-card:hover img{transform:scale(1.04)}
+        .produto-card-nome{position:absolute;bottom:0;left:0;right:0;padding:0.5rem 0.75rem;background:linear-gradient(transparent,rgba(8,8,8,0.7));font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;font-family:var(--sans)}
+        @media(min-width:600px){.produtos-grid{grid-template-columns:repeat(4,1fr)}}
+        @media(min-width:769px){.produtos-destaque{padding:2.5rem 2rem}.produtos-grid{gap:8px}}
+
         /* INSTAGRAM */
         .insta-sec{padding:2rem 1.5rem;background:var(--black);text-align:center}
         .insta-label{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500;margin-bottom:0.6rem}
@@ -1061,19 +1071,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* NÚMEROS */}
-      <div className="numeros">
-        {t.numeros.map((n, i) => (
-          <div key={i} className="numero"><div className="numero-val">{n.val}</div><div className="numero-label">{n.label}</div></div>
-        ))}
-      </div>
+      {/* PRODUTOS EM DESTAQUE */}
+      <section className="produtos-destaque">
+        <p className="sec-label" style={{textAlign:"center",marginBottom:"1rem"}}>{t.instagram.label}</p>
+        <div className="produtos-grid">
+          {pecasDestaque.filter(p => p.fotos?.length > 0).slice(0, 8).map((p, i) => (
+            <a key={p.id || i} href={`/catalogo/${p.id}`} className="produto-card">
+              <img src={p.fotos[0]} alt={p.nome || ""} />
+              {p.nome && <span className="produto-card-nome">{p.nome}</span>}
+            </a>
+          ))}
+        </div>
+        <div style={{textAlign:"center",marginTop:"2rem"}}>
+          <a href="/catalogo" className="insta-btn">{t.instagram.btn} ↗</a>
+        </div>
+      </section>
 
       {/* INSTAGRAM */}
       <section className="insta-sec">
         <p className="insta-label">{t.instagram.label}</p>
         <div className="insta-titulo">{t.instagram.titulo}</div>
         <p className="insta-sub">{t.instagram.sub}</p>
-        <a href="https://instagram.com/noragrei" target="_blank" rel="noopener noreferrer" className="insta-btn">{t.instagram.btn} ↗</a>
+        <a href="https://www.instagram.com/nora_grei" target="_blank" rel="noopener noreferrer" className="insta-btn">{t.instagram.btn} ↗</a>
       </section>
 
       {/* SUSTENTABILIDADE */}
@@ -1150,7 +1169,7 @@ export default function Home() {
           <span className="footer-copy">{t.footer.copy}</span>
           <div className="footer-social">
             <span className="footer-social-label">{t.footer.social}</span>
-            <a href="https://instagram.com/noragrei" target="_blank" rel="noopener noreferrer" className="footer-social-link">Instagram</a>
+            <a href="https://www.instagram.com/nora_grei" target="_blank" rel="noopener noreferrer" className="footer-social-link">Instagram</a>
             <a href="https://www.noragrei.com" target="_blank" rel="noopener noreferrer" className="footer-social-link">noragrei.com</a>
           </div>
         </div>
