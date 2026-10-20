@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const T = {
   pt: {
     nav: { catalogo: "Colecção", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Sem comprar.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona" },
+    hero: { eyebrow: "Nova colecção — Outono/Inverno 2026", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Vestido","Casaco","Blazer","Conjunto"] },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -59,7 +59,7 @@ const T = {
   },
   fr: {
     nav: { catalogo: "Collection", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Sans acheter.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche" },
+    hero: { eyebrow: "Nouvelle collection — Automne/Hiver 2026", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Robe","Manteau","Blazer","Ensemble"] },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -113,7 +113,7 @@ const T = {
   },
   lt: {
     nav: { catalogo: "Kolekcija", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nepirkdami.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia" },
+    hero: { eyebrow: "Nauja kolekcija — 2026 ruduo/žiema", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Suknelė","Paltas","Švarkas","Komplektas"] },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
@@ -532,44 +532,69 @@ export default function Home() {
         @media(max-width:768px){body{padding-bottom:72px}}
 
         /* NAV */
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 4rem;padding-top:max(1rem,env(safe-area-inset-top));transition:all 0.3s;background:rgba(248,247,245,0.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2)}
-        .nav.scrolled{padding:0.75rem 4rem;box-shadow:0 2px 20px rgba(0,0,0,0.06)}
-        .logo{display:flex;flex-direction:column;text-decoration:none;color:var(--black)}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem max(1.5rem,env(safe-area-inset-left,0px));padding-top:max(1.25rem,env(safe-area-inset-top));transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,padding 0.3s;background:linear-gradient(to bottom,rgba(8,8,8,0.6) 0%,transparent 100%);border-bottom:1px solid transparent}
+        .nav.scrolled{background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);box-shadow:0 2px 20px rgba(0,0,0,0.06);padding:0.85rem max(1.5rem,env(safe-area-inset-left,0px))}
+        .logo{display:flex;flex-direction:column;text-decoration:none;color:#fff;transition:color 0.4s}
+        .nav.scrolled .logo{color:var(--black)}
         .logo-name{font-family:var(--serif);font-size:1.35rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;line-height:1}
-        .logo-tag{font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--g4);margin-top:0.15rem}
+        .logo-tag{font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-top:0.15rem;transition:color 0.4s}
+        .nav.scrolled .logo-tag{color:var(--g4)}
         .nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
-        .nav-links a{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;transition:color 0.2s}
-        .nav-links a:hover{color:var(--black)}
+        .nav-links a{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.65);text-decoration:none;transition:color 0.2s}
+        .nav-links a:hover{color:#fff}
+        .nav.scrolled .nav-links a{color:var(--g4)}
+        .nav.scrolled .nav-links a:hover{color:var(--black)}
         .nav-right{display:flex;align-items:center;gap:0.75rem}
         .nav-lang{display:flex;gap:0.3rem;align-items:center}
-        .lang-btn{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--g4);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:0;transition:color 0.2s}
-        .lang-btn.on{color:var(--black);font-weight:500}
-        .lang-sep{color:var(--g2);font-size:0.65rem}
+        .lang-btn{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:0;transition:color 0.2s}
+        .lang-btn.on{color:#fff;font-weight:500}
+        .lang-sep{color:rgba(255,255,255,0.2);font-size:0.65rem}
+        .nav.scrolled .lang-btn{color:var(--g4)}
+        .nav.scrolled .lang-btn.on{color:var(--black)}
+        .nav.scrolled .lang-sep{color:var(--g2)}
         .nb{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.6rem 1.1rem;text-decoration:none;font-family:var(--sans);transition:all 0.2s;white-space:nowrap}
-        .nb-o{color:var(--black);border:1px solid var(--g2)}
-        .nb-o:hover{border-color:var(--black)}
-        .nb-f{background:var(--black);color:var(--white);border:1px solid var(--black)}
-        .nb-f:hover{background:#2a2926}
+        .nb-o{color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.3)}
+        .nb-o:hover{color:#fff;border-color:#fff}
+        .nav.scrolled .nb-o{color:var(--black);border-color:var(--g2)}
+        .nav.scrolled .nb-o:hover{border-color:var(--black)}
+        .nb-f{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.35);backdrop-filter:blur(4px)}
+        .nb-f:hover{background:rgba(255,255,255,0.25)}
+        .nav.scrolled .nb-f{background:var(--black);color:var(--white);border-color:var(--black)}
+        .nav.scrolled .nb-f:hover{background:#2a2926}
+        /* ícones nav (lupa/cesto) */
+        .nav-right svg{color:rgba(255,255,255,0.75);transition:color 0.4s}
+        .nav-right a:hover svg{color:#fff}
+        .nav.scrolled .nav-right svg{color:var(--black)}
 
         /* HERO */
-        .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;padding-top:72px}
+        .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;background:var(--black)}
         .hero-bg{position:absolute;inset:0;z-index:0}
         .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 15%);filter:brightness(0.55);transition:opacity 1s ease;opacity:0}
         .hero-bg img.visivel{opacity:1}
-        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center center}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,8,0.15) 0%,rgba(8,8,8,0.45) 50%,rgba(8,8,8,0.82) 100%);z-index:1}
-        .hero-sound{position:absolute;top:1rem;right:1rem;z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s;border-radius:2px}
+        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.88) 0%,rgba(8,8,8,0.2) 55%,rgba(8,8,8,0.45) 100%);z-index:1}
+        .hero-sound{position:absolute;bottom:1.5rem;right:max(1.5rem,env(safe-area-inset-right,0px));z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s;border-radius:2px}
         .hero-sound:hover{background:rgba(255,255,255,0.22)}
-        @media(min-width:769px){.hero>.hero-sound{display:none!important}}
-        .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:2.5rem 1.5rem 3rem;color:#fff}
-        .hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem}
+        .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:0 max(2rem,env(safe-area-inset-left,0px)) clamp(3.5rem,8vh,6rem);color:#fff}
+        .hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:1.25rem}
+        /* texto rotativo */
+        .hero-rotary{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(3.2rem,10vw,8rem);line-height:0.95;color:var(--white);overflow:hidden;height:1.05em;margin-bottom:0.75rem}
+        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 12s cubic-bezier(0.77,0,0.18,1) infinite}
+        .hero-rotary-inner span{display:block;height:1.05em;line-height:1.05}
+        @keyframes rotaryScroll{0%,18%{transform:translateY(0)}25%,43%{transform:translateY(-1.05em)}50%,68%{transform:translateY(-2.1em)}75%,93%{transform:translateY(-3.15em)}100%{transform:translateY(-4.2em)}}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
-        .hero-sub{font-family:var(--serif);font-size:clamp(2.8rem,9.5vw,5.5rem);font-weight:300;font-style:italic;color:rgba(255,255,255,0.65);line-height:1.02;margin-bottom:1.5rem}
+        .hero-sub{font-family:var(--serif);font-size:clamp(1rem,2vw,1.35rem);font-weight:300;color:rgba(255,255,255,0.6);line-height:1.55;margin-bottom:clamp(2rem,4vh,3rem);max-width:50ch}
+        /* scroll cue */
+        .hero-scroll-cue{position:absolute;bottom:clamp(1.5rem,4vh,2.5rem);right:max(2rem,env(safe-area-inset-right,0px));z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .hero-scroll-cue span{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(248,247,245,0.3);writing-mode:vertical-rl}
+        .hero-scroll-line{width:1px;height:44px;background:rgba(248,247,245,0.1);position:relative;overflow:hidden}
+        .hero-scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:1px;height:100%;background:var(--gold);animation:scrollDrop 2.4s ease-in-out infinite}
+        @keyframes scrollDrop{0%{top:-100%}100%{top:200%}}
         .hero-desc{font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:45ch;line-height:1.8;margin-bottom:2rem}
-        .hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
-        .hero-cta1{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--rosa);color:#fff;padding:1rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;transition:background 0.2s;flex:1;text-align:center;max-width:220px}
-        .hero-cta1:hover{background:#a85c72}
-        .hero-cta2{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:1rem 1.5rem;transition:all 0.2s;flex:1;text-align:center;max-width:180px}
+        .hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+        .hero-cta1{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;background:var(--white);color:var(--black);padding:0.9rem 2.2rem;text-decoration:none;font-family:var(--sans);font-weight:500;transition:background 0.2s;white-space:nowrap}
+        .hero-cta1:hover{background:var(--gold);color:var(--black)}
+        .hero-cta2{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:0.9rem 2.2rem;transition:all 0.2s;white-space:nowrap}
         .hero-cta2:hover{color:#fff;border-color:#fff}
 
         /* STRIP */
@@ -737,28 +762,8 @@ export default function Home() {
 
         /* RESPONSIVE DESKTOP */
         @media(min-width:769px){
-          .hero{flex-direction:row;padding-top:80px;min-height:100vh}
-          .hero-bg{display:none}
-          .hero-overlay{display:none}
-          .hero-content{color:var(--black);background:var(--white);flex:1;justify-content:center;padding:5rem 3rem 5rem 4rem}
-          .hero-eyebrow{color:var(--g4)}
-          .hero-titulo{color:var(--black);font-size:clamp(3rem,4.5vw,5rem)}
-          .hero-sub{color:var(--g4);font-size:clamp(3rem,4.5vw,5rem)}
-          .hero-desc{color:#1a1a18}
-          .hero-cta1{max-width:none;flex:0}
-          .hero-cta2{color:var(--g4);border-color:var(--g2);max-width:none;flex:0}
-          .hero-cta2:hover{color:var(--black);border-color:var(--black)}
-          .hero-right-desktop{flex:1;position:relative;overflow:hidden;min-height:100%;background:linear-gradient(135deg,#1a0a10 0%,#2d1520 40%,#0d0d0d 100%)}
-          .hero-right-desktop video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
-          .hero-right-desktop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);transition:transform 6s ease,opacity 1s ease;opacity:0}
-          .hero-right-desktop img.visivel{opacity:1}
-          .hero-right-desktop:hover img{transform:scale(1.03)}
-          .hero-right-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-          .hero-right-placeholder-logo{font-family:var(--serif);font-size:clamp(3rem,6vw,5rem);font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.12)}
-          .hero-right-placeholder-tag{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.08)}
-          .hero-caption{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem 2rem;background:linear-gradient(to top,rgba(8,8,8,0.6),transparent);color:#fff;display:flex;justify-content:space-between;align-items:flex-end}
-          .hero-caption-nome{font-family:var(--serif);font-size:1.1rem;font-style:italic;font-weight:300}
-          .hero-caption-preco{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
+          .hero{min-height:100svh}
+          .hero-content{padding:0 4rem clamp(4rem,9vh,7rem)}
           .quick-access{grid-template-columns:repeat(4,1fr)}
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:2rem 1.5rem}
@@ -774,7 +779,7 @@ export default function Home() {
           footer{padding:3rem 4rem 2rem}
           .footer-cols{grid-template-columns:repeat(3,1fr);gap:3rem;margin-bottom:2rem}
           .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
-          .nav{padding:1.1rem 3rem}
+          .nav{padding:1.25rem 3rem}
           .cupao-banner{bottom:0;padding:1rem 3rem}
           .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
           .cupao-actions{flex:0}
@@ -792,10 +797,10 @@ export default function Home() {
           .destaque-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem}
         }
         @media(max-width:768px){
-          .hero-right-desktop{display:none}
           .nav{padding:0.9rem 1.25rem}
           .nav-links,.nav-right .nb-o,.nav-right .nb-f{display:none}
           .nav-right{gap:0.5rem}
+          .hero-sound{bottom:4rem}
         }
       `}</style>
 
@@ -897,43 +902,33 @@ export default function Home() {
         <div className="hero-overlay" />
         <div className="hero-content">
           <p className="hero-eyebrow">{t.hero.eyebrow}</p>
-          <h1 className="hero-titulo">{t.hero.titulo}</h1>
+          {t.hero.rotary && (
+            <div className="hero-rotary">
+              <div className="hero-rotary-inner">
+                {[...t.hero.rotary, t.hero.rotary[0]].map((word, i) => (
+                  <span key={i}>{word}</span>
+                ))}
+              </div>
+            </div>
+          )}
           <p className="hero-sub">{t.hero.sub}</p>
-          <p className="hero-desc">{t.hero.desc}</p>
           <div className="hero-btns">
             <a href="/catalogo" className="hero-cta1">{t.hero.cta1}</a>
             <a href="#como" className="hero-cta2">{t.hero.cta2} →</a>
           </div>
         </div>
         {videoUrl && (
-          <button className="hero-sound" style={{display:"block"}} onClick={() => { const v = document.querySelector(".hero-bg video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
-            {videoComSom ? "🔊 Som" : "🔇 Sem som"}
+          <button className="hero-sound" onClick={() => {
+            const videos = document.querySelectorAll(".hero-bg video");
+            videos.forEach(v => { v.muted = videoComSom; });
+            setVideoComSom(!videoComSom);
+          }}>
+            {videoComSom ? "🔊" : "🔇"}
           </button>
         )}
-        <div className="hero-right-desktop">
-          {videoUrl
-            ? <video src={videoUrl} autoPlay muted loop playsInline preload="auto" ref={el => {
-                if (!el) return;
-                el.muted = true;
-                const tryPlay = () => el.play().catch(() => setTimeout(tryPlay, 500));
-                if (el.readyState >= 3) tryPlay();
-                else el.addEventListener("canplay", tryPlay, { once: true });
-              }} />
-            : heroPeca?.fotos?.filter(Boolean)[0]
-              ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt={heroPeca.nome || "Nora Grei"} className={heroCarregado ? "visivel" : ""} />
-              : <div className="hero-right-placeholder"><span className="hero-right-placeholder-logo">Nora Grei</span><span className="hero-right-placeholder-tag">Alugar ou Comprar</span></div>
-          }
-          {!videoUrl && (
-            <div className="hero-caption">
-              <span className="hero-caption-nome">{heroPeca ? heroPeca.nome : "Vestido Seda Noite"}</span>
-              <span className="hero-caption-preco">{heroPeca?.preco_aluguer_dia ? `${heroPeca.preco_aluguer_dia}€ / dia` : "35€ / dia"}</span>
-            </div>
-          )}
-          {videoUrl && (
-            <button className="hero-sound" style={{position:"absolute",bottom:"1.5rem",right:"1.5rem"}} onClick={() => { const v = document.querySelector(".hero-right-desktop video"); if (v) { v.muted = videoComSom; setVideoComSom(!videoComSom); } }}>
-              {videoComSom ? "🔊 Som" : "🔇 Sem som"}
-            </button>
-          )}
+        <div className="hero-scroll-cue">
+          <span>scroll</span>
+          <div className="hero-scroll-line" />
         </div>
       </section>
 
