@@ -391,7 +391,7 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
       )}
       <div className="talao-sep" />
       <div className="talao-linha"><span>{i.aluguer}</span><span>{valorAluguer.toFixed(2)}€</span></div>
-      <div className="talao-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
+      {recibo.valor_higienizacao > 0 && <div className="talao-linha"><span>{i.higienizacao}</span><span>{recibo.valor_higienizacao}€</span></div>}
       <div className="talao-linha"><span>{i.deposito}</span><span>{valorDeposito.toFixed(2)}€</span></div>
       <div className="talao-sep" />
       <div className="talao-total"><span>{i.total}</span><span>{recibo.valor_total.toFixed(2)}€</span></div>
@@ -440,6 +440,7 @@ function CheckoutContent() {
   const [refAfiliadoId, setRefAfiliadoId] = useState(null); // UUID do afiliado via link ?ref=
   const [saldoCreditos, setSaldoCreditos] = useState(0);
   const [usarCreditos, setUsarCreditos] = useState(false);
+  const [lojistaTrataHigienizacao, setLojistaTrataHigienizacao] = useState(true);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -631,7 +632,8 @@ function CheckoutContent() {
   const depositoSelecionado = i.depositoOpcoes.find(p => p.id === deposito);
   const tudoAutomatico = pagamentoSelecionado?.automatico && (valorDeposito === 0 || depositoSelecionado?.automatico);
 
-  const totalSemCreditos = valorAluguer + HIGIENIZACAO + (deposito === "cartao" ? valorDeposito : 0);
+  const higienizacaoValor = (peca?.higienizacao_ativa && lojistaTrataHigienizacao) ? (parseFloat(peca.higienizacao_valor) || 0) : 0;
+  const totalSemCreditos = valorAluguer + higienizacaoValor + (deposito === "cartao" ? valorDeposito : 0);
   const creditosAplicados = usarCreditos ? Math.min(saldoCreditos, totalSemCreditos) : 0;
   const totalAgora = Math.max(0, totalSemCreditos - creditosAplicados);
 
@@ -759,7 +761,7 @@ function CheckoutContent() {
         cliente_id: user.id,
         metodo_pagamento: pagamento,
         valor_aluguer: valorAluguer,
-        valor_higienizacao: HIGIENIZACAO,
+        valor_higienizacao: higienizacaoValor,
         valor_deposito: valorDeposito,
         valor_total: totalAgora,
         estado: tudoConfirmado ? "pago" : "pendente",
@@ -1082,7 +1084,22 @@ function CheckoutContent() {
                   <div className="r-linha"><span>{i.aluguer} {numDias > 0 ? `(${i.dias(numDias)})` : ""}</span><span>{temGratis ? "—" : `${valorAluguerBase.toFixed(2)}€`}</span></div>
                   {descontoAfiliado > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Desconto ({afiliadoAtivo?.desconto_pct}% — {codigoAfiliado})</span><span>−{descontoAfiliado.toFixed(2)}€</span></div>}
                   {creditosAplicados > 0 && <div className="r-linha" style={{color:"#27ae60"}}><span>Créditos Nora Grei</span><span>−{creditosAplicados.toFixed(2)}€</span></div>}
-                  <div className="r-linha"><span>{i.higienizacao}</span><span>{HIGIENIZACAO}€</span></div>
+                  {peca?.higienizacao_ativa && (
+                    <div style={{marginBottom:"0.5rem",padding:"0.65rem 0.85rem",border:"1px solid #e2dfda",background:"#fafafa"}}>
+                      <p style={{fontSize:"0.72rem",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",color:"#5a5855",marginBottom:"0.5rem"}}>{i.higienizacao}</p>
+                      <div style={{display:"flex",flexDirection:"column",gap:"0.3rem"}}>
+                        <label style={{display:"flex",alignItems:"center",gap:"0.5rem",cursor:"pointer",fontSize:"0.8rem",color:lojistaTrataHigienizacao?"#1a1816":"#9c9894"}}>
+                          <input type="radio" name="hig" checked={lojistaTrataHigienizacao} onChange={()=>setLojistaTrataHigienizacao(true)} style={{accentColor:"#c4748a"}} />
+                          Tratada pela lojista — {parseFloat(peca.higienizacao_valor || 0).toFixed(2)}€
+                        </label>
+                        <label style={{display:"flex",alignItems:"center",gap:"0.5rem",cursor:"pointer",fontSize:"0.8rem",color:!lojistaTrataHigienizacao?"#1a1816":"#9c9894"}}>
+                          <input type="radio" name="hig" checked={!lojistaTrataHigienizacao} onChange={()=>setLojistaTrataHigienizacao(false)} style={{accentColor:"#c4748a"}} />
+                          Trato eu próprio/a — sem custo adicional
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                  {higienizacaoValor > 0 && <div className="r-linha"><span>{i.higienizacao}</span><span>{higienizacaoValor.toFixed(2)}€</span></div>}
                   <div className="r-linha">
                     <div><div>{i.depositoVal}</div>{descontoDeposito > 0 && <div className="desconto-caucao">{i.poupas} {descontoDeposito}€ ({nv.icon} {nv.nome})</div>}</div>
                     <span>{valorDeposito}€</span>
