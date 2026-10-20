@@ -604,14 +604,33 @@ export default function Home() {
         .strip-item::after{content:'✦';margin-left:2.5rem;color:rgba(255,255,255,0.4)}
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-        /* QUICK ACCESS */
-        .quick-access{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2)}
-        .qa-item{background:var(--white);padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:0.35rem;text-decoration:none;color:var(--black);transition:background 0.2s;position:relative;overflow:hidden;border:none}
-        .qa-item:hover{background:var(--g1)}
-        .qa-arrow{position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:0.9rem;color:var(--g2);transition:all 0.25s;font-family:var(--sans)}
-        .qa-item:hover .qa-arrow{color:var(--rosa);right:0.75rem}
-        .qa-label{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;padding-right:1.5rem}
-        .qa-desc{font-size:0.75rem;color:var(--g4);font-weight:300}
+        /* VALOR SPLIT */
+        .valor-split{display:grid;grid-template-columns:1fr;background:var(--g1)}
+        .valor-bloco{padding:2.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;border-bottom:1px solid var(--g2)}
+        .valor-bloco:last-child{border-bottom:none}
+        .valor-bloco-tag{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);font-weight:500}
+        .valor-bloco-titulo{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:300;line-height:1.15;color:var(--black)}
+        .valor-bloco-titulo strong{font-weight:400}
+        .valor-bloco-titulo em{font-style:italic;color:var(--g4)}
+        .valor-bloco-cta{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--black);text-decoration:none;border-bottom:1px solid var(--black);padding-bottom:2px;font-family:var(--sans);align-self:flex-start;transition:opacity 0.2s}
+        .valor-bloco-cta:hover{opacity:0.55}
+        .valor-linha{width:100%;height:1px;background:var(--g2)}
+        /* LOJISTA EDITORIAL */
+        .lojista-editorial{display:grid;grid-template-columns:1fr;background:var(--black)}
+        .lojista-ed-visual{background:linear-gradient(160deg,#1a0a10 0%,#080808 100%);padding:3rem 1.5rem;display:flex;flex-direction:column;justify-content:space-between;gap:2rem;min-height:280px}
+        .lojista-ed-monogram{font-family:var(--serif);font-size:4rem;font-weight:300;color:rgba(196,168,130,0.15);letter-spacing:0.1em;line-height:1}
+        .lojista-ed-nums{display:flex;gap:2rem;margin-top:auto}
+        .lojista-ed-num strong{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--rosa);display:block;line-height:1}
+        .lojista-ed-num span{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-family:var(--sans)}
+        .lojista-ed-texto{padding:2.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem}
+        .lojista-ed-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);font-weight:500}
+        .lojista-ed-titulo{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:300;color:#fff;line-height:1.2}
+        .lojista-ed-sub{font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.65;max-width:40ch}
+        .lojista-ed-pilares{display:flex;flex-direction:column;gap:0.6rem;margin:0.5rem 0}
+        .lojista-ed-pilar{font-size:0.72rem;letter-spacing:0.1em;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:0.6rem;font-family:var(--sans)}
+        .lojista-ed-pilar::before{content:"";width:16px;height:1px;background:var(--rosa);flex-shrink:0}
+        .lojista-ed-btn{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--white);color:var(--black);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;align-self:flex-start;transition:background 0.2s}
+        .lojista-ed-btn:hover{background:var(--gold)}
 
         /* SECTIONS */
         .sec{padding:2rem 1.5rem}
@@ -638,12 +657,12 @@ export default function Home() {
         .porque-text{font-family:var(--serif);font-size:1.15rem;font-weight:300;color:rgba(255,255,255,0.85)}
 
         /* CATEGORIAS */
-        .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--white)}
-        .cat-card{position:relative;overflow:hidden;aspect-ratio:1/1;text-decoration:none;display:block;background:var(--g1)}
-        .cat-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease}
-        .cat-card:hover img{transform:scale(1.05)}
-        .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.75) 0%,transparent 50%);display:flex;align-items:flex-end;padding:1.25rem}
-        .cat-nome{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:#fff;font-style:italic}
+        .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--g2)}
+        .cat-card{position:relative;overflow:hidden;aspect-ratio:3/4;text-decoration:none;display:block;background:var(--g1)}
+        .cat-card img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform 0.6s ease}
+        .cat-card:hover img{transform:scale(1.06)}
+        .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.82) 0%,rgba(8,8,8,0.1) 55%,transparent 100%);display:flex;align-items:flex-end;padding:1.25rem}
+        .cat-nome{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:#fff;font-style:italic}
 
         /* NÚMEROS */
         .numeros{display:grid;grid-template-columns:repeat(2,1fr);background:var(--black)}
@@ -730,12 +749,13 @@ export default function Home() {
         .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
 
         /* DESTAQUE */
-        .destaque-sec{padding:1.75rem 1.5rem 2rem;background:var(--white)}
-        .destaque-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem}
+        .destaque-sec{padding:0;background:var(--white)}
+        .destaque-header{display:flex;align-items:baseline;justify-content:space-between;padding:1.75rem 1.5rem 1.25rem}
         .destaque-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);font-weight:500}
         .destaque-ver{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--g4);text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:2px;transition:color 0.2s,border-color 0.2s}
         .destaque-ver:hover{color:var(--black);border-color:var(--black)}
-        .destaque-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
+        .destaque-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;background:var(--g2)}
+        .destaque-grid .destaque-card-wrap:first-child{grid-column:1/-1}
 
         /* PWA */
         .pwa-banner{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:0;right:0;z-index:210;background:var(--black);color:var(--white);padding:1.25rem 1.25rem 1rem;box-shadow:0 -4px 24px rgba(0,0,0,0.28);animation:slideUp 0.35s ease;display:flex;flex-direction:column;gap:0.75rem}
@@ -766,7 +786,14 @@ export default function Home() {
         @media(min-width:769px){
           .hero{min-height:100svh}
           .hero-content{padding:0 4rem clamp(4rem,9vh,7rem)}
-          .quick-access{grid-template-columns:repeat(4,1fr)}
+          .valor-split{grid-template-columns:1fr 1fr}
+          .valor-bloco{border-bottom:none;border-right:1px solid var(--g2);padding:3.5rem 4rem}
+          .valor-bloco:last-child{border-right:none}
+          .lojista-editorial{grid-template-columns:1fr 1fr}
+          .lojista-ed-visual{min-height:420px;padding:4rem}
+          .lojista-ed-texto{padding:4rem}
+          .destaque-grid{grid-template-columns:repeat(4,1fr)}
+          .destaque-grid .destaque-card-wrap:first-child{grid-column:1/3}
           .numeros{grid-template-columns:repeat(4,1fr)}
           .numero{padding:2rem 1.5rem}
           .numero:nth-child(even){border-right:1px solid rgba(255,255,255,0.08)}
@@ -945,28 +972,21 @@ export default function Home() {
         </div>
       </div>
 
-      {/* QUICK ACCESS */}
-      <div className="quick-access">
-        {t.quickAccess.map((item, idx) => {
-          const hrefs = ["/catalogo", userLogado ? "/perfil" : "/entrar", "/catalogo", "https://www.noragrei.com"];
-          const href = hrefs[idx];
-          const label = idx === 1 ? (userLogado ? item.label : item.labelGuest) : item.label;
-          const desc = idx === 1 ? (userLogado ? item.desc : item.descGuest) : item.desc;
-          return (
-            <a key={idx} href={href} className="qa-item" target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}>
-              <div className="qa-label">{label}</div>
-              <div className="qa-desc">{desc}</div>
-              <span className="qa-arrow">→</span>
-            </a>
-          );
-        })}
+      {/* VALOR SPLIT */}
+      <div className="valor-split">
+        <div className="valor-bloco">
+          <span className="valor-bloco-tag">{lang === "fr" ? "Pour qui loue" : lang === "lt" ? "Nuomojančioms" : "Para quem aluga"}</span>
+          <h2 className="valor-bloco-titulo">{lang === "fr" ? <>La pièce que vous vouliez porter<br />une fois. <em>Sans l'acheter.</em></> : lang === "lt" ? <>Drabužis, kurį norėjai nešioti<br />vieną kartą. <em>Neperkant.</em></> : <>A peça que querias usar<br />uma vez. <em>Sem a comprar.</em></>}</h2>
+          <a href="/catalogo" className="valor-bloco-cta">{lang === "fr" ? "Explorer la collection →" : lang === "lt" ? "Naršyti kolekciją →" : "Explorar colecção →"}</a>
+        </div>
+        <div className="valor-bloco">
+          <span className="valor-bloco-tag">{lang === "fr" ? "Pour qui a des pièces" : lang === "lt" ? "Turinčioms drabužių" : "Para quem tem peças"}</span>
+          <h2 className="valor-bloco-titulo">{lang === "fr" ? <>Votre garde-robe a de la valeur.<br /><strong>Laissez-la travailler pour vous.</strong></> : lang === "lt" ? <>Jūsų spinta turi vertę.<br /><strong>Leiskite jai dirbti už jus.</strong></> : <>O teu armário tem valor.<br /><strong>Deixa-o trabalhar por ti.</strong></>}</h2>
+          <a href="/perfil" className="valor-bloco-cta">{lang === "fr" ? "Ouvrir ma boutique →" : lang === "lt" ? "Atidaryti parduotuvę →" : "Abrir a minha loja →"}</a>
+        </div>
       </div>
 
       {/* CATEGORIAS */}
-      <section className="sec" style={{paddingBottom:0}}>
-        <p className="sec-label">{t.categorias.label}</p>
-        <h2 className="sec-titulo">{t.categorias.titulo}<br /><em>{t.categorias.tituloSub}</em></h2>
-      </section>
       <div className="cat-grid">
         {t.categorias.lista.map((nomeCat, i) => (
           <a key={i} href="/catalogo" className="cat-card">
@@ -990,7 +1010,7 @@ export default function Home() {
             {pecasDestaque.map((peca) => {
               const dispEstado = peca.disponivel !== false;
               return (
-                <div key={peca.id} style={{display:"flex",flexDirection:"column",background:"#f8f7f5",position:"relative",borderRadius:"2px",overflow:"hidden"}}>
+                <div key={peca.id} className="destaque-card-wrap" style={{display:"flex",flexDirection:"column",background:"#f8f7f5",position:"relative",overflow:"hidden"}}>
                   <a href={`/catalogo/${peca.id}`} style={{textDecoration:"none",color:"inherit",display:"block",position:"relative"}}>
                     <div style={{aspectRatio:"3/4",background:"#e8e5e0",overflow:"hidden",position:"relative"}}>
                       {peca.fotos?.[0]
@@ -1070,22 +1090,6 @@ export default function Home() {
         <TourAnimado lang={lang} passos={t.como.passos} />
       </section>
 
-      {/* PRODUTOS EM DESTAQUE */}
-      <section className="produtos-destaque">
-        <p className="sec-label" style={{textAlign:"center",marginBottom:"1rem"}}>{t.instagram.label}</p>
-        <div className="produtos-grid">
-          {pecasDestaque.filter(p => p.fotos?.length > 0).slice(0, 8).map((p, i) => (
-            <a key={p.id || i} href={`/catalogo/${p.id}`} className="produto-card">
-              <img src={p.fotos[0]} alt={p.nome || ""} />
-              {p.nome && <span className="produto-card-nome">{p.nome}</span>}
-            </a>
-          ))}
-        </div>
-        <div style={{textAlign:"center",marginTop:"2rem"}}>
-          <a href="/catalogo" className="insta-btn">{t.instagram.btn} ↗</a>
-        </div>
-      </section>
-
       {/* INSTAGRAM */}
       <section className="insta-sec">
         <p className="insta-label">{t.instagram.label}</p>
@@ -1107,25 +1111,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECÇÃO LOJISTA */}
-      <section className="lojista-sec">
-        <p className="lojista-sec-label">{t.lojista.label}</p>
-        <h2 className="lojista-sec-titulo">{t.lojista.titulo}</h2>
-        <p className="lojista-sec-sub">{t.lojista.sub}</p>
-
-        {/* Pilares de valor — sem revelar mecânica */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"1.5rem",margin:"2rem 0 2.5rem",maxWidth:"700px"}}>
-          {t.lojista.pilares.map((p, i) => (
-            <div key={i} style={{borderLeft:"2px solid rgba(196,168,130,0.4)",paddingLeft:"1rem"}}>
-              <div style={{fontSize:"0.68rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"rgba(196,168,130,0.7)",fontFamily:"'Jost',sans-serif",marginBottom:"0.3rem"}}>{p.label}</div>
-              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.1rem",fontWeight:300,color:"rgba(248,247,245,0.9)",lineHeight:1.35}}>{p.desc}</div>
-            </div>
-          ))}
+      {/* SECÇÃO LOJISTA EDITORIAL */}
+      <section className="lojista-editorial">
+        <div className="lojista-ed-visual">
+          <div className="lojista-ed-monogram">NG</div>
+          <div className="lojista-ed-nums">
+            {t.lojista.pilares?.slice(0,2).map((p, i) => (
+              <div key={i} className="lojista-ed-num">
+                <strong>{i === 0 ? "3×" : "0€"}</strong>
+                <span>{i === 0 ? (lang === "fr" ? "plus de portée" : lang === "lt" ? "daugiau pasiekiamumo" : "mais alcance") : (lang === "fr" ? "pour commencer" : lang === "lt" ? "pradžiai" : "para começar")}</span>
+              </div>
+            ))}
+          </div>
         </div>
-
-        <div className="lojista-sec-btns">
-          <a href="/perfil" className="lojista-sec-btn-main">{t.lojista.btnMain}</a>
-          <a href="/catalogo" className="lojista-sec-btn-sec">{t.lojista.btnSec}</a>
+        <div className="lojista-ed-texto">
+          <p className="lojista-ed-label">{t.lojista.label}</p>
+          <h2 className="lojista-ed-titulo">{t.lojista.titulo}</h2>
+          <p className="lojista-ed-sub">{t.lojista.sub}</p>
+          <div className="lojista-ed-pilares">
+            {t.lojista.pilares?.map((p, i) => (
+              <span key={i} className="lojista-ed-pilar">{p.label}</span>
+            ))}
+          </div>
+          <a href="/perfil" className="lojista-ed-btn">{t.lojista.btnMain}</a>
         </div>
       </section>
 
