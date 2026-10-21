@@ -11,7 +11,6 @@ async function getLoja(codigo) {
     .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
-  console.log("[getLoja] codigo:", codigo, "data:", data, "error:", error);
   return data || null;
 }
 
