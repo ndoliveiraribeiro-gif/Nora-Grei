@@ -21,6 +21,15 @@ const NIVEL = (n, lang = "pt") => {
   if (n >= 5)  return { nome: nm.prata,   icon: "🥈", descCaucao: 40, cor: "#95a5a6" };
   return             { nome: nm.bronze,   icon: "🥉", descCaucao: 0,  cor: "#cd7f32" };
 };
+// Taxa de proteção — mesma escala do checkout
+const calcSeguro = (v) => {
+  if (v <= 5)  return Math.round(v * 0.20 * 100) / 100;
+  if (v <= 19) return Math.round(v * 0.12 * 100) / 100;
+  if (v <= 40) return Math.round(v * 0.08 * 100) / 100;
+  if (v <= 50) return Math.round(v * 0.06 * 100) / 100;
+  return       Math.round(v * 0.05 * 100) / 100;
+};
+
 const calcularCaucaoRoi = (valorPeca, precoDia, totalAlugueres, nv) => {
   if (!valorPeca || valorPeca <= 0) return 0;
   const diasMedios = 3, aluguersMes = 4;
@@ -219,6 +228,7 @@ function Timer({ dataFim, lang, labelOverride }) {
 export default function PecaLojaPage() {
   const { codigo, id } = useParams();
   const [lang, setLang] = useState("pt");
+  const [modalPreco, setModalPreco] = useState(false);
   const [peca, setPeca] = useState(null);
   const [lojista, setLojista] = useState(null);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
@@ -476,13 +486,105 @@ export default function PecaLojaPage() {
           {lojista?.nome && <p className="badge-cat">{lojista.nome}</p>}
           <h1 className="nome">{peca.nome}</h1>
 
-          {/* Preço */}
-          {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && peca.preco_aluguer_dia && (
-            <div className="preco-row">
-              <span className="preco-val">{peca.preco_aluguer_dia}€</span>
-              <span className="preco-unit">{i.porcDia}</span>
-            </div>
-          )}
+          {/* Preço + taxa de proteção inline com ⓘ modal */}
+          {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && peca.preco_aluguer_dia && (() => {
+            const taxaProtecao = calcSeguro(peca.preco_aluguer_dia);
+            const totalComProtecao = Math.round((peca.preco_aluguer_dia + taxaProtecao) * 100) / 100;
+            return (
+              <>
+                <div className="preco-row">
+                  <span className="preco-val">{peca.preco_aluguer_dia}€</span>
+                  <span className="preco-unit">{i.porcDia}</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:"0.3rem",marginTop:"-0.3rem",marginBottom:"0.65rem"}}>
+                  <span style={{fontSize:"0.8rem",fontWeight:600,color:"var(--black)",fontFamily:"var(--sans)"}}>
+                    {totalComProtecao.toFixed(2)}€
+                    <span style={{fontWeight:400,color:"var(--g4)",fontSize:"0.72rem",marginLeft:"0.15rem"}}>{i.porcDia}</span>
+                  </span>
+                  <span style={{fontSize:"0.68rem",color:"var(--g4)",fontFamily:"var(--sans)"}}>
+                    {({pt:"incl. taxa de proteção",fr:"protection incluse",lt:"su apsaugos mokesčiu"})[lang]||"incl. taxa de proteção"}
+                  </span>
+                  <button
+                    onClick={()=>setModalPreco(true)}
+                    style={{background:"none",border:"none",padding:"0",cursor:"pointer",lineHeight:1,display:"flex",alignItems:"center",color:"var(--g4)",fontSize:"0.8rem"}}
+                    aria-label="Ver detalhes do preço"
+                  >ⓘ</button>
+                </div>
+
+                {/* Modal detalhes do preço — estilo Vinted */}
+                {modalPreco && (
+                  <div
+                    onClick={()=>setModalPreco(false)}
+                    style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}
+                  >
+                    <div
+                      onClick={e=>e.stopPropagation()}
+                      style={{background:"#fff",borderRadius:"12px",width:"100%",maxWidth:"420px",padding:"1.5rem",position:"relative",fontFamily:"var(--sans)"}}
+                    >
+                      {/* Título */}
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.25rem"}}>
+                        <span style={{fontSize:"1rem",fontWeight:700,color:"#1a1a1a"}}>
+                          {({pt:"Detalhes do preço",fr:"Détails du prix",lt:"Kainos detalės"})[lang]||"Detalhes do preço"}
+                        </span>
+                        <button onClick={()=>setModalPreco(false)} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.2rem",color:"#888",lineHeight:1}}>✕</button>
+                      </div>
+
+                      {/* Linha peça */}
+                      <div style={{display:"flex",alignItems:"center",gap:"0.75rem",paddingBottom:"0.85rem",borderBottom:"1px solid #f0ede9"}}>
+                        {peca.fotos?.[0] && (
+                          <img src={peca.fotos[0]} alt={peca.nome} style={{width:"44px",height:"44px",objectFit:"cover",borderRadius:"6px",flexShrink:0}} />
+                        )}
+                        <div style={{flex:1}}>
+                          <p style={{fontSize:"0.82rem",fontWeight:600,color:"#1a1a1a",margin:0,lineHeight:1.3}}>{peca.nome}</p>
+                          <p style={{fontSize:"0.9rem",fontWeight:700,color:"#1a1a1a",margin:"0.15rem 0 0"}}>{peca.preco_aluguer_dia.toFixed(2)} €</p>
+                        </div>
+                      </div>
+
+                      {/* Linha taxa de proteção */}
+                      <div style={{display:"flex",alignItems:"center",gap:"0.75rem",paddingTop:"0.85rem",paddingBottom:"0.85rem",borderBottom:"1px solid #f0ede9"}}>
+                        <div style={{width:"44px",height:"44px",background:"#e8f4f0",borderRadius:"6px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.3rem",flexShrink:0}}>🛡️</div>
+                        <div style={{flex:1}}>
+                          <p style={{fontSize:"0.82rem",fontWeight:600,color:"#1a1a1a",margin:0}}>
+                            {({pt:"Taxa de proteção Nora Grei",fr:"Protection Nora Grei",lt:"Nora Grei apsaugos mokestis"})[lang]||"Taxa de proteção Nora Grei"}
+                          </p>
+                          <p style={{fontSize:"0.9rem",fontWeight:700,color:"#1a1a1a",margin:"0.15rem 0 0"}}>{taxaProtecao.toFixed(2)} €</p>
+                        </div>
+                      </div>
+
+                      {/* Linha portes */}
+                      <div style={{display:"flex",alignItems:"center",gap:"0.75rem",paddingTop:"0.85rem",paddingBottom:"1rem"}}>
+                        <div style={{width:"44px",height:"44px",background:"#f0ede9",borderRadius:"6px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.3rem",flexShrink:0}}>📦</div>
+                        <div style={{flex:1}}>
+                          <p style={{fontSize:"0.82rem",fontWeight:600,color:"#1a1a1a",margin:0}}>
+                            {({pt:"Portes de envio",fr:"Frais de livraison",lt:"Pristatymo išlaidos"})[lang]||"Portes de envio"}
+                          </p>
+                          <p style={{fontSize:"0.75rem",color:"#888",margin:"0.15rem 0 0"}}>
+                            {({pt:"A selecionar no checkout",fr:"À choisir lors du paiement",lt:"Pasirinkti atsiskaitant"})[lang]||"A selecionar no checkout"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Nota proteção */}
+                      <p style={{fontSize:"0.72rem",color:"#888",lineHeight:1.5,borderTop:"1px solid #f0ede9",paddingTop:"0.85rem",margin:0}}>
+                        {({
+                          pt:"Todas as encomendas beneficiam da nossa política de proteção, transações seguras e assistência da nossa equipa.",
+                          fr:"Toutes les commandes bénéficient de notre politique de protection, de transactions sécurisées et de l'assistance de notre équipe.",
+                          lt:"Visos užsakymai naudojasi mūsų apsaugos politika, saugiomis operacijomis ir mūsų komandos pagalba."
+                        })[lang]||"Todas as encomendas beneficiam da nossa política de proteção, transações seguras e assistência da nossa equipa."}
+                      </p>
+
+                      <button
+                        onClick={()=>setModalPreco(false)}
+                        style={{marginTop:"1rem",width:"100%",padding:"0.85rem",background:"#1a2e22",color:"#fff",border:"none",borderRadius:"8px",fontSize:"0.9rem",fontWeight:600,cursor:"pointer",fontFamily:"var(--sans)"}}
+                      >
+                        {({pt:"OK, fechar",fr:"OK, fermer",lt:"Gerai, uždaryti"})[lang]||"OK, fechar"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {/* Banner economia */}
           {peca.valor_peca > 0 && peca.preco_aluguer_dia > 0 && (() => {

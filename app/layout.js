@@ -35,6 +35,8 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         {children}
         <ClientWidgets />
+        {/* Stripe.js — carregado globalmente, só usado quando necessário */}
+        <script src="https://js.stripe.com/v3/" async />
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

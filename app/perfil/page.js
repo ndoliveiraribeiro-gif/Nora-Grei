@@ -1140,9 +1140,12 @@ export default function Perfil() {
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
-  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false });
+  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false, cartao_numero: "", cartao_validade: "", cartao_cvv: "" });
   const [formLojistaMsg, setFormLojistaMsg] = useState("");
   const [formLojistaLoading, setFormLojistaLoading] = useState(false);
+  const [stripeDisponivel, setStripeDisponivel] = useState(false);
+  const [stripeCarregando, setStripeCarregando] = useState(true);
+  const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [novaPass, setNovaPass] = useState("");
   const [confirmarPass, setConfirmarPass] = useState("");
@@ -1490,6 +1493,50 @@ export default function Perfil() {
 
   const sair = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
 
+  // Iniciar SetupIntent Stripe quando o formulário de candidatura abre
+  useEffect(() => {
+    if (!showFormLojista) return;
+    let cancelled = false;
+    setStripeCarregando(true);
+    setStripeDisponivel(false);
+    setStripeClientSecret(null);
+    const iniciarStripe = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || cancelled) return;
+        const { data: perfil } = await supabase.from("clientes").select("email, nome").eq("id", user.id).single();
+        const res = await fetch("/api/stripe/setup-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cliente_id: user.id, email: perfil?.email || user.email, nome: perfil?.nome || "" }),
+        });
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.modo === "real" && json.client_secret) {
+          setStripeClientSecret(json.client_secret);
+          setStripeDisponivel(true);
+          // Montar Stripe Elements no container
+          if (window.Stripe) {
+            const stripe = window.Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+            const elements = stripe.elements({ clientSecret: json.client_secret });
+            const cardElement = elements.create("card", {
+              style: { base: { fontFamily: "'Jost', sans-serif", fontSize: "15px", color: "#1a1a1a" } },
+            });
+            cardElement.mount("#stripe-card-element");
+            window._stripeElements = { stripe, elements, cardElement };
+          }
+        }
+        // Se modo simulado, stripeDisponivel fica false — mostra campos manuais
+      } catch (e) {
+        // Silencioso — modo simulado activa automaticamente
+      } finally {
+        if (!cancelled) setStripeCarregando(false);
+      }
+    };
+    iniciarStripe();
+    return () => { cancelled = true; };
+  }, [showFormLojista]);
+
   const submeterCandidaturaLojista = async () => {
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
     if (!formLojista.nif.trim()) { setFormLojistaMsg("Indica o teu NIF (obrigatório por lei)."); return; }
@@ -1502,6 +1549,22 @@ export default function Perfil() {
     setFormLojistaMsg("");
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setFormLojistaLoading(false); return; }
+
+    // Se Stripe disponível, confirmar SetupIntent para guardar cartão
+    let stripePaymentMethodId = null;
+    if (stripeDisponivel && window._stripeElements) {
+      const { stripe, elements, cardElement } = window._stripeElements;
+      const { setupIntent, error: stripeErr } = await stripe.confirmCardSetup(stripeClientSecret, {
+        payment_method: { card: cardElement },
+      });
+      if (stripeErr) {
+        setFormLojistaMsg(`Erro no cartão: ${stripeErr.message}`);
+        setFormLojistaLoading(false);
+        return;
+      }
+      stripePaymentMethodId = setupIntent?.payment_method;
+    }
+
     const candidatura = {
       nome_loja: formLojista.nome_loja.trim(),
       descricao: formLojista.descricao.trim(),
@@ -1512,11 +1575,16 @@ export default function Perfil() {
       morada: formLojista.morada.trim(),
       tipo_pecas: formLojista.tipo_pecas.trim(),
       submetida_em: new Date().toISOString(),
+      stripe_configurado: !!stripePaymentMethodId,
     };
-    const { error } = await supabase.from("clientes").update({
+    const updateData = {
       candidatura_lojista: "pendente",
       lojista_candidatura_dados: candidatura,
-    }).eq("id", user.id);
+    };
+    if (stripePaymentMethodId) {
+      updateData.stripe_payment_method_id = stripePaymentMethodId;
+    }
+    const { error } = await supabase.from("clientes").update(updateData).eq("id", user.id);
     setFormLojistaLoading(false);
     if (error) {
       setFormLojistaMsg("Erro ao submeter. Tenta novamente.");
@@ -2579,9 +2647,58 @@ export default function Perfil() {
                   </div>
                 </div>
 
-                {/* 4. Confirmações */}
+                {/* 4. Cartão para débitos */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>4 · Cartão para débitos futuros</div>
+                  <div style={{background:"#fff8f0",border:"1px solid #f5e0c0",padding:"0.9rem 1rem",marginBottom:"1rem",fontSize:"0.78rem",color:"#7a4a00",lineHeight:1.6}}>
+                    ⚠️ O cartão não é cobrado agora. É guardado de forma segura (via Stripe) para débitos automáticos em caso de <strong>atraso na devolução (5€/dia)</strong> ou <strong>danos confirmados</strong> na peça.
+                  </div>
+
+                  {/* Campos de cartão — renderizados pelo Stripe Elements quando disponível */}
+                  <div id="stripe-card-container" style={{border:"1.5px solid #e2dfda",padding:"0.85rem 1rem",background:"#fff",marginBottom:"0.75rem",minHeight:"48px",display:"flex",alignItems:"center"}}>
+                    {stripeCarregando ? (
+                      <span style={{fontSize:"0.82rem",color:"var(--g4)"}}>A carregar campos de cartão…</span>
+                    ) : stripeDisponivel ? (
+                      /* Stripe Elements monta aqui quando disponível */
+                      <div id="stripe-card-element" style={{width:"100%"}} />
+                    ) : (
+                      /* Modo simulado — Stripe ainda não configurado */
+                      <div style={{width:"100%"}}>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:"0.5rem",alignItems:"center"}}>
+                          <input
+                            style={{padding:"0",border:"none",outline:"none",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",background:"transparent",letterSpacing:"0.08em",width:"100%"}}
+                            value={formLojista.cartao_numero || ""}
+                            onChange={e => setFormLojista(f => ({...f, cartao_numero: e.target.value}))}
+                            placeholder="•••• •••• •••• ••••"
+                            maxLength={19}
+                          />
+                          <input
+                            style={{padding:"0",border:"none",outline:"none",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",background:"transparent",width:"52px",textAlign:"center"}}
+                            value={formLojista.cartao_validade || ""}
+                            onChange={e => setFormLojista(f => ({...f, cartao_validade: e.target.value}))}
+                            placeholder="MM/AA"
+                            maxLength={5}
+                          />
+                          <input
+                            style={{padding:"0",border:"none",outline:"none",fontSize:"0.9rem",fontFamily:"'Jost',monospace",color:"var(--black)",background:"transparent",width:"40px",textAlign:"center"}}
+                            value={formLojista.cartao_cvv || ""}
+                            onChange={e => setFormLojista(f => ({...f, cartao_cvv: e.target.value}))}
+                            placeholder="CVV"
+                            maxLength={4}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p style={{fontSize:"0.72rem",color:"var(--g4)",lineHeight:1.5}}>
+                    🔒 Dados processados com encriptação Stripe. A Nora Grei nunca tem acesso ao número completo do cartão.
+                    {!stripeDisponivel && <span style={{color:"#b8860b"}}> (Stripe em activação — dados guardados após configuração)</span>}
+                  </p>
+                </div>
+
+                {/* 5. Confirmações */}
                 <div style={{marginBottom:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.25rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>4 · Confirmações obrigatórias</div>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.25rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>5 · Confirmações obrigatórias</div>
 
                   <label style={{display:"flex",gap:"0.75rem",alignItems:"flex-start",cursor:"pointer",padding:"0.9rem",background:"#fff",border:"1px solid #e8e3dc"}}>
                     <input type="checkbox" checked={formLojista.aceita_termos} onChange={e => setFormLojista(f => ({...f, aceita_termos: e.target.checked}))} style={{marginTop:"0.15rem",accentColor:"var(--black)",width:"16px",height:"16px",flexShrink:0}} />
