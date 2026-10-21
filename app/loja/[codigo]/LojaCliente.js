@@ -25,6 +25,10 @@ const T = {
     pecas: "Peças",
     contactar: "Contactar",
     membro: "Membro Nora Grei",
+    membroDesde: "Membro desde",
+    seguir: "+ Seguir",
+    aSeguir: "✓ A seguir",
+    copiar: "Copiar ↗",
   },
   fr: {
     voltar: "← Boutiques",
@@ -37,6 +41,10 @@ const T = {
     pecas: "Pièces",
     contactar: "Contacter",
     membro: "Membre Nora Grei",
+    membroDesde: "Membre depuis",
+    seguir: "+ Suivre",
+    aSeguir: "✓ Abonné(e)",
+    copiar: "Copier ↗",
   },
   lt: {
     voltar: "← Parduotuvės",
@@ -49,6 +57,10 @@ const T = {
     pecas: "Drabužiai",
     contactar: "Susisiekti",
     membro: "Nora Grei narė",
+    membroDesde: "Narė nuo",
+    seguir: "+ Sekti",
+    aSeguir: "✓ Sekama",
+    copiar: "Kopijuoti ↗",
   },
 };
 
@@ -211,7 +223,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
               <p className="loja-header-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</p>
             )}
             {loja.descricao && <p className="loja-header-desc">{loja.descricao}</p>}
-            {anoMembro && <p className="loja-header-ano">Membro desde {anoMembro}</p>}
+            {anoMembro && <p className="loja-header-ano">{t.membroDesde} {anoMembro}</p>}
             <div className="loja-header-meta">
               {media && (
                 <a href={`/loja/${loja.codigo_cliente}/avaliacoes`} className="loja-rating-bloco">
@@ -228,7 +240,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
                   disabled={seguirLoading}
                   className={`btn-seguir ${aSegui ? "ativo" : "inativo"}`}
                 >
-                  {aSegui ? "✓ A seguir" : "+ Seguir"}
+                  {aSegui ? t.aSeguir : t.seguir}
                 </button>
               )}
             </div>
@@ -242,7 +254,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         <span className="share-url">noragrei.com/loja/{loja.codigo_cliente}</span>
         <button className="share-copy" onClick={() => {
           navigator.clipboard.writeText(`${window.location.origin}/loja/${loja.codigo_cliente}`);
-        }}>Copiar ↗</button>
+        }}>{t.copiar}</button>
         <a href={`/mensagens?lojista=${loja.id}`} className="share-copy" style={{textDecoration:"none",display:"inline-block"}}>
           {t.contactar || "Contactar"}
         </a>
