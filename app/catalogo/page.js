@@ -41,8 +41,23 @@ function PecaCardLojista({ peca, lang }) {
             </div>
           )}
           <div style={{display:"flex",alignItems:"baseline",gap:"0.25rem",paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0"}}>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
-            <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
+            {peca.tipo === "comprar" || peca.tipo === "social" ? (
+              <>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_venda || peca.preco_aluguer_dia}€</span>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>{peca.tipo === "social" ? "preço livre" : "venda"}</span>
+              </>
+            ) : peca.tipo === "ambos" ? (
+              <>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",fontWeight:400,marginLeft:"0.4rem"}}>· {peca.preco_venda}€ venda</span>
+              </>
+            ) : (
+              <>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
+                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
+              </>
+            )}
           </div>
         </div>
       </a>
@@ -243,6 +258,8 @@ export default function Catalogo() {
           lojistaNome: p.clientes?.nome || "",
           lojistaId: p.clientes?.id || "",
           preco_aluguer_dia: p.preco_aluguer_dia || 0,
+          preco_venda: p.preco_venda || 0,
+          tipo: p.tipo || "alugar",
         };
       });
 
