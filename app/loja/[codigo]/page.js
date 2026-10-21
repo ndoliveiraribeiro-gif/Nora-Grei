@@ -21,8 +21,8 @@ async function getPecas(clienteId) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
   const { data } = await supabaseServer
-    .from("pecas")
-    .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor, categorias(nome)")
+    .from("pecas_lojista")
+    .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor")
     .eq("cliente_id", clienteId)
     .not("fotos", "is", null)
     .neq("fotos", "{}")
