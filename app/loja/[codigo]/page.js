@@ -6,11 +6,12 @@ async function getLoja(codigo) {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
-  const { data } = await supabaseServer
+  const { data, error } = await supabaseServer
     .from("clientes")
     .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
+  console.log("[getLoja] codigo:", codigo, "data:", data, "error:", error);
   return data || null;
 }
 
