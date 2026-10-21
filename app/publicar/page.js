@@ -618,6 +618,27 @@ export default function PublicarPage() {
   };
 
   const removerFoto = (i) => setFotos(prev => prev.filter((_, j) => j !== i));
+
+  // Comprime e redimensiona a foto para max 1200px, WEBP 75% — reduz egress ~80%
+  const comprimirFoto = (file) => new Promise((resolve) => {
+    const MAX = 1200;
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width: w, height: h } = img;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => resolve(blob || file), "image/webp", 0.75);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
   const setP = (k, v) => setPeca(prev => ({ ...prev, [k]: v }));
 
   // Obter dicionário da língua activa
@@ -697,11 +718,12 @@ export default function PublicarPage() {
         const urls = [];
         for (const foto of fotos) {
           const ext = foto.file.name.split(".").pop();
-          const path = `${novaPeca.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+          const path = `${novaPeca.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
           setProgresso(`${tl.aPublicar} ${foto.file.name}...`);
+          const blob = await comprimirFoto(foto.file);
           const { error: upErr } = await supabase.storage
             .from("pecas_lojista")
-            .upload(path, foto.file, { upsert: true });
+            .upload(path, blob, { upsert: true, contentType: "image/webp" });
           if (!upErr) {
             const { data } = supabase.storage.from("pecas_lojista").getPublicUrl(path);
             urls.push(data.publicUrl);
