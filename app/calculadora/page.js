@@ -1,5 +1,122 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+
+const T = {
+  pt: {
+    eyebrow: "Nora Grei · Calculadora",
+    titulo: <>Quanto vale<br/>o teu armário?</>,
+    subtitulo: "Introduz os dados da peça e vê quanto podes ganhar — antes e depois de a vender.",
+    precoLabel: "Preço original de compra",
+    precoHint: "Quanto pagaste pela peça quando era nova",
+    categoriaLabel: "Categoria",
+    estadoLabel: "Estado actual da peça",
+    idadeLabel: "Idade da peça",
+    usoLabel: "Quantas vezes a usaste",
+    mesesLabel: "Durante quantos meses queres alugar?",
+    mesesPeriodo: "Período de aluguer",
+    mesesUnidade: (n) => `${n} meses`,
+    mesesHint: "Depois vendes a peça usada com valor de ocasião",
+    heroLabel: "Total estimado — aluguer + venda final",
+    heroNota: (aluguer, venda) => `€${aluguer} em alugueres · €${venda} na venda final`,
+    ngDesc: "Alugueres + venda com valor de ocasião",
+    ngMais: (x) => `${x}× mais →`,
+    vintedMarca: "Vinted / Usada",
+    vintedDesc: "Venda única ao preço de mercado de ocasião",
+    ganhoText: (v) => <>Ganhas <strong>€{v} a mais</strong> do que se vendesses já na Vinted</>,
+    rotacaoLabel: "Rotação estimada",
+    rotacaoNum: (n, m) => `${n} alugueres em ${m} meses`,
+    rotacaoSub: (rpm, cat, est) => `~${rpm} por mês para ${cat} em estado ${est}. A peça fica disponível entre alugueres e deprecia de forma controlada.`,
+    breakdownLabel: "Como se chega ao valor",
+    bk1: "Valor de mercado estimado agora",
+    bk2: "Preço sugerido por aluguer",
+    bk3: (n, p) => `Receita bruta (${n}× €${p})`,
+    bk4: "Comissão Nora Grei (10%)",
+    bk5: "Líquido de alugueres",
+    bk6: (m) => `Valor residual da peça após ${m} meses`,
+    bk7: "Venda usada líquida (comissão 20% + envio)",
+    bkTotal: "Total recebido",
+    cta: "Publicar a minha peça agora",
+    ctaVer: "Ver como outras lojistas fazem →",
+    disclaimer: <>ⓘ Os valores apresentados são <strong>estimativas indicativas</strong> baseadas em benchmarks do sector de moda em segunda mão e aluguer, ajustadas pela categoria e estado da peça. A rotação real depende da procura, sazonalidade, visibilidade da peça na plataforma e condições de mercado. <strong>Não constituem garantia de rendimento.</strong></>,
+    semPreco: "Introduz o preço original para ver a estimativa",
+  },
+  fr: {
+    eyebrow: "Nora Grei · Calculatrice",
+    titulo: <>Combien vaut<br/>ta garde-robe ?</>,
+    subtitulo: "Saisis les données de ta pièce et vois combien tu peux gagner — avant et après la vendre.",
+    precoLabel: "Prix d'achat original",
+    precoHint: "Combien tu as payé la pièce neuve",
+    categoriaLabel: "Catégorie",
+    estadoLabel: "État actuel de la pièce",
+    idadeLabel: "Âge de la pièce",
+    usoLabel: "Combien de fois tu l'as portée",
+    mesesLabel: "Pendant combien de mois veux-tu louer ?",
+    mesesPeriodo: "Période de location",
+    mesesUnidade: (n) => `${n} mois`,
+    mesesHint: "Ensuite tu vends la pièce d'occasion",
+    heroLabel: "Total estimé — location + vente finale",
+    heroNota: (aluguer, venda) => `€${aluguer} en locations · €${venda} à la vente finale`,
+    ngDesc: "Locations + vente avec valeur d'occasion",
+    ngMais: (x) => `${x}× plus →`,
+    vintedMarca: "Vinted / Occasion",
+    vintedDesc: "Vente unique au prix du marché d'occasion",
+    ganhoText: (v) => <>Tu gagnes <strong>€{v} de plus</strong> qu'en vendant sur Vinted maintenant</>,
+    rotacaoLabel: "Rotation estimée",
+    rotacaoNum: (n, m) => `${n} locations en ${m} mois`,
+    rotacaoSub: (rpm, cat, est) => `~${rpm} par mois pour ${cat} en état ${est}. La pièce reste disponible entre les locations.`,
+    breakdownLabel: "Comment on arrive à ce chiffre",
+    bk1: "Valeur marchande estimée maintenant",
+    bk2: "Prix de location suggéré",
+    bk3: (n, p) => `Revenus bruts (${n}× €${p})`,
+    bk4: "Commission Nora Grei (10%)",
+    bk5: "Net locations",
+    bk6: (m) => `Valeur résiduelle après ${m} mois`,
+    bk7: "Vente d'occasion nette (commission 20% + envoi)",
+    bkTotal: "Total reçu",
+    cta: "Publier ma pièce maintenant",
+    ctaVer: "Voir comment d'autres boutiques font →",
+    disclaimer: <>ⓘ Les valeurs présentées sont des <strong>estimations indicatives</strong> basées sur des benchmarks du secteur mode de seconde main et location. La rotation réelle dépend de la demande, de la saisonnalité et de la visibilité. <strong>Elles ne constituent pas une garantie de revenus.</strong></>,
+    semPreco: "Saisis le prix original pour voir l'estimation",
+  },
+  lt: {
+    eyebrow: "Nora Grei · Skaičiuoklė",
+    titulo: <>Kiek verta<br/>tavo spinta?</>,
+    subtitulo: "Įvesk drabužio duomenis ir sužinok, kiek gali uždirbti — prieš ir po pardavimo.",
+    precoLabel: "Originali pirkimo kaina",
+    precoHint: "Kiek mokėjai už naują drabužį",
+    categoriaLabel: "Kategorija",
+    estadoLabel: "Dabartinė drabužio būklė",
+    idadeLabel: "Drabužio amžius",
+    usoLabel: "Kiek kartų dėvėjai",
+    mesesLabel: "Kiek mėnesių nori nuomoti?",
+    mesesPeriodo: "Nuomos laikotarpis",
+    mesesUnidade: (n) => `${n} mėn.`,
+    mesesHint: "Po to parduosi drabužį naudotą",
+    heroLabel: "Apskaičiuota suma — nuoma + galutinis pardavimas",
+    heroNota: (aluguer, venda) => `€${aluguer} iš nuomų · €${venda} iš galutinio pardavimo`,
+    ngDesc: "Nuomos + pardavimas su naudotos vertės kaina",
+    ngMais: (x) => `${x}× daugiau →`,
+    vintedMarca: "Vinted / Naudota",
+    vintedDesc: "Vienkartinis pardavimas naudotų prekių rinkos kaina",
+    ganhoText: (v) => <>Uždirbi <strong>€{v} daugiau</strong> nei parduodant dabar Vinted</>,
+    rotacaoLabel: "Apskaičiuotas apyvartumas",
+    rotacaoNum: (n, m) => `${n} nuomų per ${m} mėn.`,
+    rotacaoSub: (rpm, cat, est) => `~${rpm} per mėnesį kategorijai ${cat} būklėje ${est}. Drabužis lieka prieinamas tarp nuomų.`,
+    breakdownLabel: "Kaip gaunama suma",
+    bk1: "Apskaičiuota dabartinė rinkos vertė",
+    bk2: "Siūloma nuomos kaina",
+    bk3: (n, p) => `Bendros pajamos (${n}× €${p})`,
+    bk4: "Nora Grei komisinis (10%)",
+    bk5: "Grynos nuomų pajamos",
+    bk6: (m) => `Likutinė vertė po ${m} mėn.`,
+    bk7: "Grynos naudoto pardavimo pajamos (20% + siuntimas)",
+    bkTotal: "Iš viso gauta",
+    cta: "Publikuoti savo drabužį dabar",
+    ctaVer: "Peržiūrėti kitas parduotuves →",
+    disclaimer: <>ⓘ Pateiktos vertės yra <strong>orientacinės</strong>, pagrįstos antros rankos mados ir nuomos sektoriaus duomenimis. Reali apyvarta priklauso nuo paklausos, sezoniškumo ir drabužio matomumo. <strong>Tai nėra pajamų garantija.</strong></>,
+    semPreco: "Įvesk originalią kainą, kad pamatytum skaičiavimą",
+  },
+};
 
 // Comissões reais da plataforma
 const COMISSAO_ALUGUER = 0.10;
@@ -8,40 +125,40 @@ const CUSTO_HIGIENIZACAO = 8;
 const CUSTO_ENVIO = 6;
 
 // Fatores de depreciação por categoria
-const CATEGORIAS = [
-  { id: "luxo",    label: "Luxo / Designer",    fator: 0.70, rotacao: 2.5 },
-  { id: "mid",     label: "Mid-market",          fator: 0.42, rotacao: 1.8 },
-  { id: "festa",   label: "Festa / Ocasião",     fator: 0.55, rotacao: 1.2 },
-  { id: "casual",  label: "Casual / Dia-a-dia",  fator: 0.28, rotacao: 2.2 },
-  { id: "acessorio", label: "Acessório / Mala",  fator: 0.65, rotacao: 2.0 },
+const CATEGORIAS_DATA = [
+  { id: "luxo",      fator: 0.70, rotacao: 2.5, label: { pt: "Luxo / Designer",   fr: "Luxe / Créateur",    lt: "Prabanga / Dizaineris" } },
+  { id: "mid",       fator: 0.42, rotacao: 1.8, label: { pt: "Mid-market",         fr: "Milieu de gamme",    lt: "Vidutinė klasė" } },
+  { id: "festa",     fator: 0.55, rotacao: 1.2, label: { pt: "Festa / Ocasião",    fr: "Fête / Occasion",    lt: "Šventė / Proga" } },
+  { id: "casual",    fator: 0.28, rotacao: 2.2, label: { pt: "Casual / Dia-a-dia", fr: "Casual / Quotidien", lt: "Kasdieniai" } },
+  { id: "acessorio", fator: 0.65, rotacao: 2.0, label: { pt: "Acessório / Mala",   fr: "Accessoire / Sac",   lt: "Aksesuaras / Rankinė" } },
 ];
 
-const ESTADOS = [
-  { id: "novo",       label: "Nunca usado / com etiqueta", fator: 1.00 },
-  { id: "excelente",  label: "Excelente — como novo",      fator: 0.85 },
-  { id: "bom",        label: "Bom — uso cuidadoso",        fator: 0.65 },
-  { id: "aceitavel",  label: "Aceitável — uso visível",    fator: 0.40 },
+const ESTADOS_DATA = [
+  { id: "novo",      fator: 1.00, label: { pt: "Nunca usado / com etiqueta", fr: "Jamais porté / avec étiquette", lt: "Nenaudotas / su etiket." } },
+  { id: "excelente", fator: 0.85, label: { pt: "Excelente — como novo",      fr: "Excellent — comme neuf",        lt: "Puikus — kaip naujas" } },
+  { id: "bom",       fator: 0.65, label: { pt: "Bom — uso cuidadoso",        fr: "Bon — usage soigné",            lt: "Geras — atsargiai naudotas" } },
+  { id: "aceitavel", fator: 0.40, label: { pt: "Aceitável — uso visível",    fr: "Acceptable — usage visible",    lt: "Priimtinas — matomas naudojimas" } },
 ];
 
-const IDADES = [
-  { id: "novo",   label: "Menos de 1 ano",  fator: 1.00 },
-  { id: "1a2",    label: "1 a 2 anos",      fator: 0.85 },
-  { id: "2a4",    label: "2 a 4 anos",      fator: 0.70 },
-  { id: "4mais",  label: "Mais de 4 anos",  fator: 0.50 },
+const IDADES_DATA = [
+  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano",  fr: "Moins d'un an",   lt: "Mažiau nei 1 metai" } },
+  { id: "1a2",   fator: 0.85, label: { pt: "1 a 2 anos",      fr: "1 à 2 ans",        lt: "1–2 metai" } },
+  { id: "2a4",   fator: 0.70, label: { pt: "2 a 4 anos",      fr: "2 à 4 ans",        lt: "2–4 metai" } },
+  { id: "4mais", fator: 0.50, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",    lt: "Daugiau nei 4 metai" } },
 ];
 
-const USOS = [
-  { id: "nunca",  label: "Nunca / 1 vez",  fator: 1.00 },
-  { id: "pouco",  label: "2 a 5 vezes",    fator: 0.88 },
-  { id: "medio",  label: "6 a 15 vezes",   fator: 0.72 },
-  { id: "muito",  label: "Mais de 15×",    fator: 0.52 },
+const USOS_DATA = [
+  { id: "nunca", fator: 1.00, label: { pt: "Nunca / 1 vez",  fr: "Jamais / 1 fois",  lt: "Niekada / 1 kartą" } },
+  { id: "pouco", fator: 0.88, label: { pt: "2 a 5 vezes",    fr: "2 à 5 fois",        lt: "2–5 kartus" } },
+  { id: "medio", fator: 0.72, label: { pt: "6 a 15 vezes",   fr: "6 à 15 fois",       lt: "6–15 kartų" } },
+  { id: "muito", fator: 0.52, label: { pt: "Mais de 15×",    fr: "Plus de 15×",       lt: "Daugiau nei 15×" } },
 ];
 
 // Estimativa de preço Vinted por categoria (desconto agressivo)
 const VINTED_FATOR = { luxo: 0.35, mid: 0.20, festa: 0.25, casual: 0.15, acessorio: 0.30 };
 
 export default function Calculadora() {
-  const [step, setStep] = useState(0); // 0=intro, 1=inputs, 2=resultado
+  const [lang, setLang] = useState("pt");
   const [preco, setPreco] = useState("");
   const [categoria, setCategoria] = useState("mid");
   const [estado, setEstado] = useState("bom");
@@ -49,14 +166,25 @@ export default function Calculadora() {
   const [uso, setUso] = useState("pouco");
   const [meses, setMeses] = useState(12);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("ng_lang");
+    if (saved && T[saved]) setLang(saved);
+  }, []);
+
+  const t = T[lang] || T.pt;
+  const CATEGORIAS = CATEGORIAS_DATA.map(c => ({ ...c, label: c.label[lang] || c.label.pt }));
+  const ESTADOS    = ESTADOS_DATA.map(e => ({ ...e, label: e.label[lang] || e.label.pt }));
+  const IDADES     = IDADES_DATA.map(i => ({ ...i, label: i.label[lang] || i.label.pt }));
+  const USOS       = USOS_DATA.map(u => ({ ...u, label: u.label[lang] || u.label.pt }));
+
   const p = parseFloat(preco) || 0;
 
   const calc = useMemo(() => {
     if (!p) return null;
-    const cat = CATEGORIAS.find(c => c.id === categoria);
-    const est = ESTADOS.find(e => e.id === estado);
-    const id  = IDADES.find(i => i.id === idade);
-    const us  = USOS.find(u => u.id === uso);
+    const cat = CATEGORIAS_DATA.find(c => c.id === categoria);
+    const est = ESTADOS_DATA.find(e => e.id === estado);
+    const id  = IDADES_DATA.find(i => i.id === idade);
+    const us  = USOS_DATA.find(u => u.id === uso);
 
     // Valor de mercado estimado agora
     const valorMercado = p * cat.fator * est.fator * id.fator * us.fator;
@@ -97,7 +225,7 @@ export default function Calculadora() {
     };
   }, [p, categoria, estado, idade, uso, meses]);
 
-  const catObj = CATEGORIAS.find(c => c.id === categoria);
+  const catObj = CATEGORIAS_DATA.find(c => c.id === categoria);
 
   return (
     <>
@@ -363,14 +491,14 @@ export default function Calculadora() {
       <div className="wrap">
 
         <div className="pg-header">
-          <div className="pg-eyebrow">Nora Grei · Calculadora</div>
-          <h1 className="pg-titulo serif">Quanto vale<br/>o teu armário?</h1>
-          <p className="pg-sub">Introduz os dados da peça e vê quanto podes ganhar — antes e depois de a vender.</p>
+          <div className="pg-eyebrow">{t.eyebrow}</div>
+          <h1 className="pg-titulo serif">{t.titulo}</h1>
+          <p className="pg-sub">{t.subtitulo}</p>
         </div>
 
         {/* INPUTS */}
         <div className="card">
-          <div className="card-label">Preço original de compra</div>
+          <div className="card-label">{t.precoLabel}</div>
           <div className="preco-row">
             <span className="preco-prefix">€</span>
             <input
@@ -379,11 +507,11 @@ export default function Calculadora() {
               value={preco} onChange={e => setPreco(e.target.value)}
             />
           </div>
-          <p className="preco-hint">Quanto pagaste pela peça quando era nova</p>
+          <p className="preco-hint">{t.precoHint}</p>
         </div>
 
         <div className="card">
-          <div className="card-label">Categoria</div>
+          <div className="card-label">{t.categoriaLabel}</div>
           <div className="pills">
             {CATEGORIAS.map(c => (
               <button key={c.id} className={`pill${categoria === c.id ? " sel" : ""}`} onClick={() => setCategoria(c.id)}>{c.label}</button>
@@ -392,7 +520,7 @@ export default function Calculadora() {
         </div>
 
         <div className="card">
-          <div className="card-label">Estado actual da peça</div>
+          <div className="card-label">{t.estadoLabel}</div>
           <div className="pills">
             {ESTADOS.map(e => (
               <button key={e.id} className={`pill${estado === e.id ? " sel" : ""}`} onClick={() => setEstado(e.id)}>{e.label}</button>
@@ -401,7 +529,7 @@ export default function Calculadora() {
         </div>
 
         <div className="card">
-          <div className="card-label">Idade da peça</div>
+          <div className="card-label">{t.idadeLabel}</div>
           <div className="pills">
             {IDADES.map(i => (
               <button key={i.id} className={`pill${idade === i.id ? " sel" : ""}`} onClick={() => setIdade(i.id)}>{i.label}</button>
@@ -410,7 +538,7 @@ export default function Calculadora() {
         </div>
 
         <div className="card">
-          <div className="card-label">Quantas vezes a usaste</div>
+          <div className="card-label">{t.usoLabel}</div>
           <div className="pills">
             {USOS.map(u => (
               <button key={u.id} className={`pill${uso === u.id ? " sel" : ""}`} onClick={() => setUso(u.id)}>{u.label}</button>
@@ -419,13 +547,13 @@ export default function Calculadora() {
         </div>
 
         <div className="card">
-          <div className="card-label">Durante quantos meses queres alugar?</div>
+          <div className="card-label">{t.mesesLabel}</div>
           <div className="slider-header">
-            <span style={{fontSize:"0.78rem",color:"var(--sub)"}}>Período de aluguer</span>
-            <span className="slider-val">{meses} meses</span>
+            <span style={{fontSize:"0.78rem",color:"var(--sub)"}}>{t.mesesPeriodo}</span>
+            <span className="slider-val">{t.mesesUnidade(meses)}</span>
           </div>
           <input type="range" min="1" max="36" value={meses} onChange={e => setMeses(parseInt(e.target.value))} />
-          <p style={{fontSize:"0.7rem",color:"var(--sub)",marginTop:"0.5rem"}}>Depois vendes a peça usada com valor de ocasião</p>
+          <p style={{fontSize:"0.7rem",color:"var(--sub)",marginTop:"0.5rem"}}>{t.mesesHint}</p>
         </div>
 
         {/* RESULTADOS */}
@@ -433,11 +561,9 @@ export default function Calculadora() {
           <>
             {/* Hero total */}
             <div className="hero-res">
-              <div className="hero-label">Total estimado — aluguer + venda final</div>
+              <div className="hero-label">{t.heroLabel}</div>
               <div className="hero-valor">€{Math.round(calc.totalNG)}</div>
-              <div className="hero-nota">
-                €{Math.round(calc.liquidoAluguer)} em alugueres · €{Math.round(calc.vendaFinalLiquido)} na venda final
-              </div>
+              <div className="hero-nota">{t.heroNota(Math.round(calc.liquidoAluguer), Math.round(calc.vendaFinalLiquido))}</div>
             </div>
 
             {/* Comparação Vinted */}
@@ -445,78 +571,75 @@ export default function Calculadora() {
               <div className="comp-col ng">
                 <div className="comp-marca">Nora Grei</div>
                 <div className="comp-num">€{Math.round(calc.totalNG)}</div>
-                <div className="comp-desc">Alugueres + venda com valor de ocasião</div>
-                <div className="comp-badge">{calc.multiplicador.toFixed(1)}× mais →</div>
+                <div className="comp-desc">{t.ngDesc}</div>
+                <div className="comp-badge">{t.ngMais(calc.multiplicador.toFixed(1))}</div>
               </div>
               <div className="comp-col vinted">
-                <div className="comp-marca">Vinted / Usada</div>
+                <div className="comp-marca">{t.vintedMarca}</div>
                 <div className="comp-num">€{Math.round(calc.vendaVinted)}</div>
-                <div className="comp-desc">Venda única ao preço de mercado de ocasião</div>
+                <div className="comp-desc">{t.vintedDesc}</div>
               </div>
             </div>
 
             {/* Ganho extra */}
             <div className="ganho-banner">
-              <div className="ganho-text">
-                Ganhas <strong>€{Math.round(calc.ganhoExtra)} a mais</strong> do que se vendesses já na Vinted
-              </div>
+              <div className="ganho-text">{t.ganhoText(Math.round(calc.ganhoExtra))}</div>
               <div className="ganho-num">+€{Math.round(calc.ganhoExtra)}</div>
             </div>
 
             {/* Rotação estimada */}
             <div className="rotacao-card">
-              <div className="rotacao-label">Rotação estimada</div>
-              <div className="rotacao-num">{calc.alugueresTotal} alugueres em {meses} meses</div>
+              <div className="rotacao-label">{t.rotacaoLabel}</div>
+              <div className="rotacao-num">{t.rotacaoNum(calc.alugueresTotal, meses)}</div>
               <div className="rotacao-sub">
-                ~{calc.rotacaoMes.toFixed(1)} por mês para {catObj?.label} em estado {ESTADOS.find(e=>e.id===estado)?.label.split("—")[0].trim().toLowerCase()}.
-                A peça fica disponível entre alugueres e deprecia de forma controlada.
+                {t.rotacaoSub(calc.rotacaoMes.toFixed(1), catObj?.label[lang] || catObj?.label.pt, ESTADOS_DATA.find(e=>e.id===estado)?.label[lang]?.split("—")[0]?.trim().toLowerCase() || "")}
               </div>
             </div>
 
             {/* Breakdown */}
             <div className="card">
-              <div className="card-label">Como se chega ao valor</div>
+              <div className="card-label">{t.breakdownLabel}</div>
               <div className="breakdown">
                 <div className="bk-row">
-                  <span className="bk-label">Valor de mercado estimado agora</span>
+                  <span className="bk-label">{t.bk1}</span>
                   <span className="bk-val">€{Math.round(calc.valorMercado)}</span>
                 </div>
                 <div className="bk-row">
-                  <span className="bk-label">Preço sugerido por aluguer</span>
+                  <span className="bk-label">{t.bk2}</span>
                   <span className="bk-val">€{calc.precoAluguer}</span>
                 </div>
                 <div className="bk-row">
-                  <span className="bk-label">Receita bruta ({calc.alugueresTotal}× €{calc.precoAluguer})</span>
+                  <span className="bk-label">{t.bk3(calc.alugueresTotal, calc.precoAluguer)}</span>
                   <span className="bk-val pos">+€{Math.round(calc.receitaBruta)}</span>
                 </div>
                 <div className="bk-row">
-                  <span className="bk-label">Comissão Nora Grei (10%)</span>
+                  <span className="bk-label">{t.bk4}</span>
                   <span className="bk-val neg">−€{Math.round(calc.receitaBruta * COMISSAO_ALUGUER)}</span>
                 </div>
                 <div className="bk-div"/>
                 <div className="bk-row">
-                  <span className="bk-label">Líquido de alugueres</span>
+                  <span className="bk-label">{t.bk5}</span>
                   <span className="bk-val pos">€{Math.round(calc.liquidoAluguer)}</span>
                 </div>
                 <div className="bk-div"/>
                 <div className="bk-row">
-                  <span className="bk-label">Valor residual da peça após {meses} meses</span>
+                  <span className="bk-label">{t.bk6(meses)}</span>
                   <span className="bk-val">€{Math.round(calc.valorFinalPeca)}</span>
                 </div>
                 <div className="bk-row">
-                  <span className="bk-label">Venda usada líquida (comissão 20% + envio)</span>
+                  <span className="bk-label">{t.bk7}</span>
                   <span className="bk-val pos">+€{Math.round(calc.vendaFinalLiquido)}</span>
                 </div>
                 <div className="bk-div"/>
                 <div className="bk-total">
-                  <span>Total recebido</span>
+                  <span>{t.bkTotal}</span>
                   <span>€{Math.round(calc.totalNG)}</span>
                 </div>
               </div>
             </div>
 
-            <a href="/registar?lojista=1" className="btn">Publicar a minha peça agora</a>
-            <a href="/lojas" className="btn btn-outline">Ver como outras lojistas fazem →</a>
+            <a href="/registar?lojista=1" className="btn">{t.cta}</a>
+            <a href="/lojas" className="btn btn-outline">{t.ctaVer}</a>
 
             {/* Disclaimer */}
             <p style={{
@@ -528,14 +651,14 @@ export default function Calculadora() {
               borderTop:"1px solid var(--border)",
               marginTop:"0.5rem"
             }}>
-              ⓘ Os valores apresentados são <strong>estimativas indicativas</strong> baseadas em benchmarks do sector de moda em segunda mão e aluguer, ajustadas pela categoria e estado da peça. A rotação real depende da procura, sazonalidade, visibilidade da peça na plataforma e condições de mercado. <strong>Não constituem garantia de rendimento.</strong>
+              {t.disclaimer}
             </p>
           </>
         )}
 
         {(!calc || !p) && (
           <p style={{textAlign:"center",color:"var(--sub)",fontSize:"0.82rem",padding:"1.5rem 0"}}>
-            Introduz o preço original para ver a estimativa
+            {t.semPreco}
           </p>
         )}
 
