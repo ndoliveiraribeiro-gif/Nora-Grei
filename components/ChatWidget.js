@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 
-const WHATSAPP_NUMBER = "370XXXXXXXX"; // TODO: substituir pelo número lituano da Nora Grei
+const NORA_GREI_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
 
 const t = {
   pt: {
@@ -14,7 +15,7 @@ const t = {
     bemVindo: "Olá! Sou o assistente da Nora Grei. Como posso ajudar?",
     sugestoes: ["Como funciona o aluguer?", "Quanto custa o depósito?", "Como devolver uma peça?", "Ver os meus pontos"],
     humano: "Preferes falar com alguém da nossa equipa?",
-    abrirWhatsapp: "Abrir WhatsApp",
+    abrirWhatsapp: "Enviar mensagem",
   },
   fr: {
     titulo: "Aide Nora Grei",
@@ -26,7 +27,7 @@ const t = {
     bemVindo: "Bonjour ! Je suis l'assistant Nora Grei. Comment puis-je vous aider ?",
     sugestoes: ["Comment fonctionne la location ?", "Combien coûte le dépôt ?", "Comment retourner une pièce ?", "Voir mes points"],
     humano: "Préférez-vous parler à notre équipe ?",
-    abrirWhatsapp: "Ouvrir WhatsApp",
+    abrirWhatsapp: "Envoyer un message",
   },
   lt: {
     titulo: "Nora Grei pagalba",
@@ -38,7 +39,7 @@ const t = {
     bemVindo: "Sveiki! Aš esu Nora Grei asistentas. Kaip galiu padėti?",
     sugestoes: ["Kaip veikia nuoma?", "Kiek kainuoja užstatas?", "Kaip grąžinti drabužį?", "Žiūrėti mano taškus"],
     humano: "Pageidaujate kalbėti su mūsų komanda?",
-    abrirWhatsapp: "Atidaryti WhatsApp",
+    abrirWhatsapp: "Siųsti žinutę",
   },
 };
 
@@ -98,10 +99,60 @@ export default function ChatWidget({ lang = "pt" }) {
     setLoading(false);
   };
 
-  const abrirWhatsApp = () => {
-    const conversa = mensagens.map(m => `${m.role === "user" ? "Cliente" : "AI"}: ${m.content}`).join("\n");
-    const texto = encodeURIComponent(`Olá! Preciso de ajuda com a Nora Grei.\n\n[Conversa anterior]\n${conversa}`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${texto}`, "_blank");
+  const falarComPessoa = async () => {
+    // Verificar se o utilizador está autenticado
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      // Redirecionar para login com parâmetro para voltar
+      window.location.href = "/entrar?next=/mensagens";
+      return;
+    }
+
+    try {
+      // Verificar se já existe conversa com a Nora Grei
+      const { data: conversaExistente } = await supabase
+        .from("conversas")
+        .select("id")
+        .eq("cliente_id", user.id)
+        .eq("lojista_id", NORA_GREI_ID)
+        .single();
+
+      let conversaId;
+
+      if (conversaExistente) {
+        conversaId = conversaExistente.id;
+      } else {
+        // Criar nova conversa
+        const { data: novaConversa, error } = await supabase
+          .from("conversas")
+          .insert({ cliente_id: user.id, lojista_id: NORA_GREI_ID })
+          .select("id")
+          .single();
+
+        if (error) throw error;
+        conversaId = novaConversa.id;
+      }
+
+      // Enviar resumo do chat como primeira mensagem (se houver conversa)
+      if (mensagens.length > 1) {
+        const resumo = mensagens
+          .map(m => `${m.role === "user" ? "👤" : "🤖"} ${m.content}`)
+          .join("\n");
+
+        await supabase.from("mensagens_conversa").insert({
+          conversa_id: conversaId,
+          remetente_id: user.id,
+          conteudo: `[Resumo do chat de ajuda]\n${resumo}`,
+          lida: false,
+        });
+      }
+
+      // Redirecionar para mensagens
+      window.location.href = `/mensagens?conversa=${conversaId}`;
+    } catch (e) {
+      console.error("Erro ao criar conversa:", e);
+      window.location.href = "/mensagens";
+    }
   };
 
   return (
@@ -248,7 +299,7 @@ export default function ChatWidget({ lang = "pt" }) {
         }
 
         .chat-humano-text { font-size: 0.78rem; color: #4a4845; font-family: 'Jost', sans-serif; font-weight: 400; }
-        .chat-humano-btn { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; background: #25D366; color: #fff; border: none; padding: 0.5rem 0.85rem; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 500; white-space: nowrap; border-radius: 4px; }
+        .chat-humano-btn { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; background: #080808; color: #f8f7f5; border: none; padding: 0.5rem 0.85rem; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 500; white-space: nowrap; border-radius: 4px; }
 
         .chat-input-area {
           padding: 0.75rem 1rem;
@@ -344,7 +395,7 @@ export default function ChatWidget({ lang = "pt" }) {
           {mostrarHumano && (
             <div className="chat-humano">
               <span className="chat-humano-text">{i.humano}</span>
-              <button className="chat-humano-btn" onClick={abrirWhatsApp}>
+              <button className="chat-humano-btn" onClick={falarComPessoa}>
                 {i.abrirWhatsapp}
               </button>
             </div>
