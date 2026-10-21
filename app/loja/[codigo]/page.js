@@ -31,7 +31,8 @@ async function getPecas(clienteId) {
 }
 
 export async function generateMetadata({ params }) {
-  const loja = await getLoja(params.codigo);
+  const { codigo } = await params;
+  const loja = await getLoja(codigo);
 
   if (!loja) {
     return {
@@ -69,7 +70,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function LojaPage({ params }) {
-  const loja = await getLoja(params.codigo);
+  const { codigo } = await params;
+  const loja = await getLoja(codigo);
   const pecas = loja ? await getPecas(loja.id) : [];
 
   return <LojaCliente lojaInicial={loja} pecasIniciais={pecas} />;
