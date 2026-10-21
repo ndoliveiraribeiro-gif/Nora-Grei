@@ -4185,7 +4185,7 @@ export default function Perfil() {
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer/dia</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
-                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{est.precoVendaUsada}€</div>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#5b8a6b"}}>{est.precoVendaUsada}€</div>
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda sugerida</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
@@ -4201,9 +4201,9 @@ export default function Perfil() {
                     </div>
                     <input type="range" min={0} max={100} step={5} value={contextoVendaEditar}
                       onChange={e=>setContextoVendaEditar(Number(e.target.value))}
-                      style={{width:"100%",accentColor:"#c4748a",height:"3px",cursor:"pointer"}} />
+                      style={{width:"100%",accentColor:"#5b8a6b",height:"3px",cursor:"pointer"}} />
                     {contextoVendaEditar > 20 && (
-                      <div style={{fontSize:"0.62rem",color:"#c4748a",textAlign:"center",marginTop:"0.25rem"}}>
+                      <div style={{fontSize:"0.62rem",color:"#5b8a6b",textAlign:"center",marginTop:"0.25rem"}}>
                         Ajuste de liquidez: −{Math.round(contextoVendaEditar*0.30)}% sobre o valor de venda
                       </div>
                     )}
@@ -4525,7 +4525,7 @@ export default function Perfil() {
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer/dia</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
-                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{estN2.precoVendaUsada}€</div>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#5b8a6b"}}>{estN2.precoVendaUsada}€</div>
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda sugerida</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
@@ -4540,9 +4540,9 @@ export default function Perfil() {
                     </div>
                     <input type="range" min={0} max={100} step={5} value={contextoVendaNova}
                       onChange={e=>setContextoVendaNova(Number(e.target.value))}
-                      style={{width:"100%",accentColor:"#c4748a",height:"3px",cursor:"pointer"}} />
+                      style={{width:"100%",accentColor:"#5b8a6b",height:"3px",cursor:"pointer"}} />
                     {contextoVendaNova > 20 && (
-                      <div style={{fontSize:"0.62rem",color:"#c4748a",textAlign:"center",marginTop:"0.25rem"}}>
+                      <div style={{fontSize:"0.62rem",color:"#5b8a6b",textAlign:"center",marginTop:"0.25rem"}}>
                         Ajuste de liquidez: −{Math.round(contextoVendaNova*0.30)}% sobre o valor de venda
                       </div>
                     )}
