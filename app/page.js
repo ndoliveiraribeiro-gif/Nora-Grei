@@ -645,10 +645,17 @@ export default function Home() {
         @keyframes scrollDrop{0%{top:-100%}100%{top:200%}}
         /* mobile */
         @media(max-width:768px){
-          .hero{grid-template-columns:1fr;grid-template-rows:52svh 1fr;height:auto}
-          .hero-content{padding:2.5rem 1.75rem 3rem}
+          .hero{grid-template-columns:1fr;grid-template-rows:52svh auto;height:auto;min-height:auto}
+          .hero-media{height:52svh;min-height:52svh}
+          .hero-media video,.hero-media img{object-position:center center}
+          .hero-content{padding:2rem 1.5rem 2.5rem;height:auto;min-height:auto;justify-content:flex-start}
           .hero-content::before{display:none}
-          .hero-titulo{font-size:clamp(2.2rem,8vw,3rem)}
+          .hero-eyebrow{margin-bottom:0.75rem}
+          .hero-titulo{font-size:clamp(2rem,7vw,2.8rem);margin-bottom:0.75rem}
+          .hero-sub{margin-bottom:1.25rem;font-size:0.78rem}
+          .hero-sim{padding:1rem 1.25rem;margin-bottom:1.25rem}
+          .hero-btns{gap:0.5rem}
+          .hero-cta1,.hero-cta2{font-size:0.58rem;padding:0.75rem 1.25rem}
           .hero-scroll-cue{display:none}
         }
 
