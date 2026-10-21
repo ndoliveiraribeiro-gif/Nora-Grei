@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const T = {
   pt: {
     nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Novas peças, novos lojistas todos os dias. Já tens a tua?", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "Simulador de rendimento", preco: "Preço de compra (€)", anual: "Estimativa anual de aluguer", mes: "/mês estimado", cta: "Calcular com precisão" } },
+    hero: { eyebrow: "Aluguer · Venda · Luxo", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Calcular o meu potencial", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "O teu guarda-roupa tem valor", preco: "Peça de", anual: "pode gerar", ano: "/ ano em aluguer", cta: "Calcular em detalhe" } },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -70,7 +70,7 @@ const T = {
   },
   fr: {
     nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelles pièces, nouveaux lojistas chaque jour. Vous avez déjà la vôtre ?", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Simulateur de revenus", preco: "Prix d'achat (€)", anual: "Estimation annuelle de location", mes: "/mois estimé", cta: "Calculer avec précision" } },
+    hero: { eyebrow: "Location · Vente · Luxe", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Calculer mon potentiel", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Votre garde-robe a de la valeur", preco: "Pièce à", anual: "peut générer", ano: "/ an en location", cta: "Calculer en détail" } },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -135,7 +135,7 @@ const T = {
   },
   lt: {
     nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauji daiktai, nauji lojistai kiekvieną dieną. Ar jau turi savą?", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Pajamų simuliatorius", preco: "Pirkimo kaina (€)", anual: "Metinė nuomos sąmata", mes: "/mėn. sąmata", cta: "Skaičiuoti tiksliau" } },
+    hero: { eyebrow: "Nuoma · Pardavimas · Prabanga", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Skaičiuoti savo potencialą", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Tavo spinta turi vertę", preco: "Drabužis po", anual: "gali generuoti", ano: "/ metus nuomos", cta: "Skaičiuoti išsamiau" } },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
@@ -1058,11 +1058,11 @@ export default function Home() {
 
         {/* painel direito — conteúdo + simulador */}
         <div className="hero-content">
-          <p className="hero-eyebrow">Nora Grei</p>
+          <p className="hero-eyebrow">{t.hero.eyebrow}</p>
           <h1 className="hero-titulo">
-            {lang === "fr" ? <>Habillez <em>l&apos;extraordinaire.</em></> :
-             lang === "lt" ? <>Apsirenkite <em>išskirtinai.</em></> :
-             <>Veste o <em>extraordinário.</em></>}
+            {lang === "fr" ? <>Habillez<br/><em>l&apos;extraordinaire.</em></> :
+             lang === "lt" ? <>Apsirenkite<br/><em>išskirtinai.</em></> :
+             <>Veste o<br/><em>extraordinário.</em></>}
           </h1>
           <p className="hero-sub">{t.hero.sub}</p>
 
@@ -1083,14 +1083,14 @@ export default function Home() {
             <div className="hero-sim-resultado">
               <span className="hero-sim-resultado-label">{t.hero.sim.anual}</span>
               <span className="hero-sim-val">€{Math.round(simVal * 0.45)}</span>
-              <span className="hero-sim-sub">{t.hero.sim.mes}</span>
+              <span className="hero-sim-sub">{t.hero.sim.ano}</span>
             </div>
             <a href="/calculadora" className="hero-sim-link">{t.hero.sim.cta} →</a>
           </div>
 
           <div className="hero-btns">
             <a href="/catalogo" className="hero-cta1">{t.hero.cta1}</a>
-            <a href="#como" className="hero-cta2">{t.hero.cta2} →</a>
+            <a href="/calculadora" className="hero-cta2">{t.hero.cta2} →</a>
           </div>
 
           <div className="hero-scroll-cue">
