@@ -5,6 +5,24 @@ import PecaCard from "@/components/PecaCard";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"];
 
+const CATEGORIAS_T = {
+  "Vestidos":    { fr: "Robes",       lt: "Suknelės" },
+  "Casacos":     { fr: "Manteaux",    lt: "Paltai" },
+  "Conjuntos":   { fr: "Ensembles",   lt: "Komplektai" },
+  "Acessórios":  { fr: "Accessoires", lt: "Aksesuarai" },
+  "Corsets":     { fr: "Corsets",     lt: "Korsetai" },
+  "Tops":        { fr: "Tops",        lt: "Topai" },
+  "Calças":      { fr: "Pantalons",   lt: "Kelnės" },
+  "Saias":       { fr: "Jupes",       lt: "Sijonai" },
+  "Relógios":    { fr: "Montres",     lt: "Laikrodžiai" },
+  "Malas":       { fr: "Sacs",        lt: "Rankinės" },
+  "Bijutaria":   { fr: "Bijoux",      lt: "Papuošalai" },
+};
+function traduzCat(cat, lang) {
+  if (!cat || lang === "pt") return cat;
+  return CATEGORIAS_T[cat]?.[lang] || cat;
+}
+
 // Modal de detalhe de preço (estilo Vinted)
 function ModalPreco({ peca, lang, onClose }) {
   const base = peca.preco_aluguer_dia || 0;
@@ -93,7 +111,7 @@ function PecaCardLojista({ peca, lang }) {
         </div>
         <div style={{padding:"0.7rem 0.75rem 0.4rem"}}>
           {peca.categoria && (
-            <p style={{fontSize:"0.72rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a8783",fontFamily:"'Jost',sans-serif",marginBottom:"0.18rem",fontWeight:400}}>{peca.categoria}</p>
+            <p style={{fontSize:"0.72rem",letterSpacing:"0.14em",textTransform:"uppercase",color:"#8a8783",fontFamily:"'Jost',sans-serif",marginBottom:"0.18rem",fontWeight:400}}>{traduzCat(peca.categoria, lang)}</p>
           )}
           <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:"0.92rem",fontWeight:500,lineHeight:1.25,marginBottom:"0.2rem",color:"#111",letterSpacing:"0.01em"}}>{peca.nome}</h3>
           {peca.lojistaNome && (
