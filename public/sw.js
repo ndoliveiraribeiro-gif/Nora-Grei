@@ -1,6 +1,6 @@
 // Service Worker — Nora Grei
 // Muda este número em cada deploy para forçar actualização imediata
-const CACHE_VERSION = 'v20261020-3';
+const CACHE_VERSION = 'v20261021-1';
 const CACHE_NAME = `nora-grei-${CACHE_VERSION}`;
 
 // Instala e activa imediatamente, sem esperar por tabs antigas
@@ -56,8 +56,11 @@ self.addEventListener('fetch', e => {
 
 // Network-first: sempre vai buscar a versão mais recente
 self.addEventListener('fetch', e => {
+  const url = e.request.url;
   // Só intercept requests da mesma origem
-  if (!e.request.url.startsWith(self.location.origin)) return;
+  if (!url.startsWith(self.location.origin)) return;
+  // Ignorar requests RSC do Next.js (não são Response normais)
+  if (url.includes('_rsc') || url.includes('_next/') || e.request.headers.get('rsc') === '1') return;
   // HTML sempre da rede — nunca de cache
   if (e.request.headers.get('accept')?.includes('text/html')) {
     e.respondWith(
@@ -65,7 +68,10 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-  // Resto: network-first com fallback para cache
+  // Só cachear assets estáticos (js, css, imagens, fonts)
+  const isAsset = /\.(js|css|png|jpg|jpeg|webp|svg|ico|woff2?|ttf)(\?|$)/.test(url);
+  if (!isAsset) return;
+  // Network-first com fallback para cache
   e.respondWith(
     fetch(e.request)
       .then(res => {
