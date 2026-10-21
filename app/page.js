@@ -57,6 +57,16 @@ const T = {
     ]},
     instagram: { label: "Inspira-te", titulo: "Segue-nos no Instagram", sub: "Vê como as nossas clientes usam as peças.", btn: "Ver @noragrei" },
     lojasSec: { label: "Marketplace", titulo: "Lojas em destaque.", sub: "Lojistas curadoras que partilham as suas peças na plataforma Nora Grei.", verTodas: "Ver todas as lojas", verLoja: "Ver loja" },
+    calcStrip: "Descobriste já quanto valem as tuas peças? → Calculadora",
+    calcSec: {
+      eyebrow: "O teu guarda-roupa trabalha por ti",
+      titulo: "Peças Nora Grei — novas para alugar, usadas para vender ou alugar.",
+      sub: "A Nora Grei não é só uma plataforma de aluguer. É um ecossistema onde as tuas peças geram valor — enquanto promovemos a marca e a sua visão de moda consciente.",
+      pill1: "Nova → disponível para aluguer",
+      pill2: "Usada → vende ou aluga",
+      cta: "Calcular o potencial das minhas peças",
+      ctaSub: "Gratuito · Resultado em segundos",
+    },
   },
   fr: {
     nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
@@ -112,6 +122,16 @@ const T = {
     ]},
     instagram: { label: "Inspirez-vous", titulo: "Suivez-nous sur Instagram", sub: "Voyez comment nos clientes portent les pièces.", btn: "Voir @noragrei" },
     lojasSec: { label: "Marketplace", titulo: "Boutiques en vedette.", sub: "Des curatrices qui partagent leurs pièces sur la plateforme Nora Grei.", verTodas: "Voir toutes les boutiques", verLoja: "Voir la boutique" },
+    calcStrip: "Avez-vous découvert la valeur de vos pièces ? → Calculateur",
+    calcSec: {
+      eyebrow: "Votre garde-robe travaille pour vous",
+      titulo: "Pièces Nora Grei — neuves à louer, d'occasion à vendre ou à louer.",
+      sub: "Nora Grei n'est pas qu'une plateforme de location. C'est un écosystème où vos pièces génèrent de la valeur — tout en promouvant la marque et sa vision de mode responsable.",
+      pill1: "Neuve → disponible à la location",
+      pill2: "D'occasion → vendez ou louez",
+      cta: "Calculer le potentiel de mes pièces",
+      ctaSub: "Gratuit · Résultat en secondes",
+    },
   },
   lt: {
     nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
@@ -167,6 +187,16 @@ const T = {
     ]},
     instagram: { label: "Įkvėpkitės", titulo: "Sekite mus Instagram", sub: "Žiūrėkite, kaip mūsų klientės dėvi drabužius.", btn: "Žiūrėti @noragrei" },
     lojasSec: { label: "Marketplace", titulo: "Išskirtinės parduotuvės.", sub: "Kuratorės, dalinančios savo drabužius Nora Grei platformoje.", verTodas: "Žiūrėti visas parduotuves", verLoja: "Žiūrėti parduotuvę" },
+    calcStrip: "Ar jau sužinojai, kiek vertos tavo pirkinio? → Skaičiuotuvas",
+    calcSec: {
+      eyebrow: "Tavo spinta dirba už tave",
+      titulo: "Nora Grei drabužiai — nauji nuomai, naudoti parduoti ar nuomoti.",
+      sub: "Nora Grei nėra tik nuomos platforma. Tai ekosistema, kurioje tavo drabužiai generuoja vertę — kartu skatindami prekės ženklą ir jo sąmoningos mados viziją.",
+      pill1: "Naujas → prieinamas nuomai",
+      pill2: "Naudotas → parduok arba nuomok",
+      cta: "Apskaičiuoti savo drabužių potencialą",
+      ctaSub: "Nemokama · Rezultatas per sekundes",
+    },
   },
 };
 
@@ -867,6 +897,27 @@ export default function Home() {
           .nav-right{gap:0.5rem}
           .hero-sound{bottom:4rem}
         }
+
+        /* CALC STRIP */
+        .calc-strip{display:flex;align-items:center;justify-content:center;gap:0.5rem;background:#111;padding:0.6rem 1.5rem;text-align:center;position:relative;z-index:101}
+        .calc-strip a{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;transition:color 0.2s}
+        .calc-strip a:hover{color:#fff}
+        .calc-strip-dot{width:5px;height:5px;border-radius:50%;background:var(--rosa);flex-shrink:0}
+
+        /* CALC SEC */
+        .calc-sec{background:#0d0d0d;padding:3.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+        .calc-sec::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,rgba(196,116,138,0.12) 0%,transparent 70%);pointer-events:none}
+        .calc-sec-inner{position:relative;z-index:1;max-width:680px;margin:0 auto}
+        .calc-eyebrow{font-family:var(--sans);font-size:0.68rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rosa);margin-bottom:1rem}
+        .calc-titulo{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.6rem);font-weight:300;color:#f8f7f5;line-height:1.25;margin-bottom:1.25rem}
+        .calc-sub{font-family:var(--sans);font-size:0.88rem;color:rgba(248,247,245,0.55);line-height:1.7;max-width:560px;margin:0 auto 1.75rem;font-weight:300}
+        .calc-pills{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+        .calc-pill{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.45rem 1rem;border:1px solid rgba(196,116,138,0.4);color:rgba(248,247,245,0.65);white-space:nowrap}
+        .calc-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:0.6rem}
+        .calc-cta{display:inline-flex;align-items:center;justify-content:center;padding:0.9rem 2.25rem;background:var(--rosa);color:#fff;font-family:var(--sans);font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;transition:background 0.2s,transform 0.15s;min-height:48px}
+        .calc-cta:hover{background:#b5647a;transform:translateY(-1px)}
+        .calc-cta-sub{font-family:var(--sans);font-size:0.7rem;color:rgba(248,247,245,0.35);letter-spacing:0.1em}
+        @media(min-width:769px){.calc-sec{padding:4.5rem 4rem}}
       `}</style>
 
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -914,6 +965,12 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* CALC STRIP — nota de topo */}
+      <div className="calc-strip">
+        <div className="calc-strip-dot" />
+        <a href="/calculadora">{t.calcStrip}</a>
+      </div>
 
       {/* NAV */}
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
@@ -1090,6 +1147,23 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* CALCULADORA — SECÇÃO DE DESTAQUE */}
+      <section className="calc-sec">
+        <div className="calc-sec-inner">
+          <p className="calc-eyebrow">{t.calcSec.eyebrow}</p>
+          <h2 className="calc-titulo">{t.calcSec.titulo}</h2>
+          <p className="calc-sub">{t.calcSec.sub}</p>
+          <div className="calc-pills">
+            <span className="calc-pill">{t.calcSec.pill1}</span>
+            <span className="calc-pill">{t.calcSec.pill2}</span>
+          </div>
+          <div className="calc-cta-wrap">
+            <a href="/calculadora" className="calc-cta">{t.calcSec.cta}</a>
+            <span className="calc-cta-sub">{t.calcSec.ctaSub}</span>
+          </div>
+        </div>
+      </section>
 
       {/* COMO FUNCIONA — TOUR ANIMADO */}
       <section id="como" style={{background:"var(--rosa)",padding:"3rem 0 3.5rem"}}>
