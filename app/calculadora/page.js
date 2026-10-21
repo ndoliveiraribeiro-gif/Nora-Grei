@@ -1,5 +1,6 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 
 const T = {
   pt: {
@@ -39,6 +40,15 @@ const T = {
     ctaVer: "Ver como outras lojistas fazem →",
     disclaimer: <>ⓘ Os valores apresentados são <strong>estimativas indicativas</strong> baseadas em benchmarks do sector de moda em segunda mão e aluguer, ajustadas pela categoria e estado da peça. A rotação real depende da procura, sazonalidade, visibilidade da peça na plataforma e condições de mercado. <strong>Não constituem garantia de rendimento.</strong></>,
     semPreco: "Introduz o preço original para ver a estimativa",
+    gateTitle: "Guarda a tua avaliação",
+    gateSub: "Introduz o teu email para veres o resultado e receberes o resumo.",
+    gateEmailPlaceholder: "O teu email",
+    gateBtn: "Ver resultado →",
+    gateOuLogin: "Já tens conta?",
+    gateEntrar: "Entrar",
+    gateSkip: "Ver só desta vez (sem guardar)",
+    gateLegal: "Ao continuares aceitas receber comunicações da Nora Grei. Podes cancelar a qualquer momento.",
+    gateEmailEnviado: "✓ Email registado! A ver resultado...",
   },
   fr: {
     eyebrow: "Nora Grei · Calculatrice",
@@ -77,6 +87,15 @@ const T = {
     ctaVer: "Voir comment d'autres boutiques font →",
     disclaimer: <>ⓘ Les valeurs présentées sont des <strong>estimations indicatives</strong> basées sur des benchmarks du secteur mode de seconde main et location. La rotation réelle dépend de la demande, de la saisonnalité et de la visibilité. <strong>Elles ne constituent pas une garantie de revenus.</strong></>,
     semPreco: "Saisis le prix original pour voir l'estimation",
+    gateTitle: "Sauvegarde ton évaluation",
+    gateSub: "Entre ton email pour voir le résultat et recevoir le résumé.",
+    gateEmailPlaceholder: "Ton email",
+    gateBtn: "Voir le résultat →",
+    gateOuLogin: "Tu as déjà un compte ?",
+    gateEntrar: "Se connecter",
+    gateSkip: "Voir juste cette fois (sans sauvegarder)",
+    gateLegal: "En continuant, tu acceptes de recevoir des communications de Nora Grei.",
+    gateEmailEnviado: "✓ Email enregistré ! Affichage du résultat...",
   },
   lt: {
     eyebrow: "Nora Grei · Skaičiuoklė",
@@ -115,6 +134,15 @@ const T = {
     ctaVer: "Peržiūrėti kitas parduotuves →",
     disclaimer: <>ⓘ Pateiktos vertės yra <strong>orientacinės</strong>, pagrįstos antros rankos mados ir nuomos sektoriaus duomenimis. Reali apyvarta priklauso nuo paklausos, sezoniškumo ir drabužio matomumo. <strong>Tai nėra pajamų garantija.</strong></>,
     semPreco: "Įvesk originalią kainą, kad pamatytum skaičiavimą",
+    gateTitle: "Išsaugok savo įvertinimą",
+    gateSub: "Įvesk el. paštą, kad pamatytum rezultatą ir gautum santrauką.",
+    gateEmailPlaceholder: "Tavo el. paštas",
+    gateBtn: "Žiūrėti rezultatą →",
+    gateOuLogin: "Jau turi paskyrą?",
+    gateEntrar: "Prisijungti",
+    gateSkip: "Žiūrėti tik šį kartą (neišsaugoti)",
+    gateLegal: "Tęsdamas sutinki gauti Nora Grei komunikacijas.",
+    gateEmailEnviado: "✓ El. paštas užregistruotas! Rodomas rezultatas...",
   },
 };
 
@@ -166,10 +194,51 @@ export default function Calculadora() {
   const [uso, setUso] = useState("pouco");
   const [meses, setMeses] = useState(12);
 
+  // Gate de email
+  const [gateAberto, setGateAberto] = useState(false);
+  const [gateEmail, setGateEmail] = useState("");
+  const [gateOk, setGateOk] = useState(false); // passou o gate nesta sessão
+  const [gateSaving, setGateSaving] = useState(false);
+  const [userLogado, setUserLogado] = useState(null);
+  const [avalCount, setAvalCount] = useState(0);
+  const gateDisparado = useRef(false);
+
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
     if (saved && T[saved]) setLang(saved);
+    // Verificar sessão activa
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) setUserLogado(data.user);
+    });
+    // Se já passou o gate antes nesta sessão
+    try {
+      if (sessionStorage.getItem("ng_calc_gate_ok") === "1") setGateOk(true);
+      const cnt = parseInt(localStorage.getItem("ng_calc_count") || "0");
+      setAvalCount(cnt);
+    } catch {}
   }, []);
+
+  const submitGateEmail = async () => {
+    if (!gateEmail || !gateEmail.includes("@")) return;
+    setGateSaving(true);
+    try {
+      // Guardar lead na tabela leads_calculadora (criar se não existir) ou clientes
+      await supabase.from("leads_calculadora").upsert({ email: gateEmail.toLowerCase().trim(), origem: "calculadora", criado_em: new Date().toISOString() }, { onConflict: "email" });
+    } catch {}
+    setGateOk(true);
+    setGateAberto(false);
+    setGateSaving(false);
+    try {
+      sessionStorage.setItem("ng_calc_gate_ok", "1");
+      localStorage.setItem("ng_calc_count", "2");
+    } catch {}
+  };
+
+  const skipGate = () => {
+    setGateOk(true);
+    setGateAberto(false);
+    try { sessionStorage.setItem("ng_calc_gate_ok", "1"); } catch {}
+  };
 
   const t = T[lang] || T.pt;
   const CATEGORIAS = CATEGORIAS_DATA.map(c => ({ ...c, label: c.label[lang] || c.label.pt }));
@@ -224,6 +293,25 @@ export default function Calculadora() {
       vendaFinalLiquido, totalNG, vendaVinted, ganhoExtra, multiplicador,
     };
   }, [p, categoria, estado, idade, uso, meses]);
+
+  // Lógica do gate: quando o resultado aparece, verificar se precisa gate
+  useEffect(() => {
+    if (!calc || !p) return;
+    if (userLogado || gateOk) return; // autenticado ou já passou
+    if (gateDisparado.current) return; // só uma vez por sessão
+    try {
+      const cnt = parseInt(localStorage.getItem("ng_calc_count") || "0");
+      if (cnt === 0) {
+        // 1ª avaliação — grátis, apenas incrementar o contador
+        localStorage.setItem("ng_calc_count", "1");
+        setAvalCount(1);
+      } else {
+        // 2ª+ avaliação — mostrar gate
+        gateDisparado.current = true;
+        setGateAberto(true);
+      }
+    } catch {}
+  }, [calc, p]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const catObj = CATEGORIAS_DATA.find(c => c.id === categoria);
 
@@ -486,6 +574,67 @@ export default function Calculadora() {
         @media (max-width: 768px) {
           .wrap { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
         }
+
+        /* Gate de email */
+        .gate-overlay {
+          position: fixed; inset: 0; z-index: 200;
+          background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+          display: flex; align-items: flex-end; justify-content: center;
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .gate-sheet {
+          background: var(--bg);
+          border-radius: 20px 20px 0 0;
+          padding: 2rem 1.5rem 2.5rem;
+          width: 100%; max-width: 480px;
+          animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+          from { transform: translateY(60px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .gate-titulo {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.6rem; font-weight: 400;
+          color: var(--fg); margin-bottom: 0.4rem;
+        }
+        .gate-sub {
+          font-size: 0.8rem; color: var(--sub); line-height: 1.5;
+          margin-bottom: 1.25rem;
+        }
+        .gate-input {
+          width: 100%; padding: 0.85rem 1rem;
+          border: 1.5px solid var(--border);
+          border-radius: 10px;
+          background: var(--card);
+          color: var(--fg);
+          font-family: 'Jost', sans-serif;
+          font-size: 0.9rem;
+          margin-bottom: 0.75rem;
+          box-sizing: border-box;
+          outline: none;
+          transition: border-color 0.15s;
+        }
+        .gate-input:focus { border-color: var(--accent); }
+        .gate-legal {
+          font-size: 0.65rem; color: var(--sub);
+          line-height: 1.45; margin-bottom: 1rem;
+        }
+        .gate-skip {
+          display: block; width: 100%; text-align: center;
+          font-size: 0.72rem; color: var(--sub);
+          background: none; border: none; cursor: pointer;
+          padding: 0.5rem; margin-top: 0.25rem;
+          font-family: 'Jost', sans-serif;
+          text-decoration: underline;
+        }
+        .gate-login-row {
+          text-align: center; font-size: 0.75rem;
+          color: var(--sub); margin-top: 0.75rem;
+        }
+        .gate-login-row a { color: var(--accent); text-decoration: none; }
+        /* Blur nos resultados quando gate activo */
+        .results-blur { filter: blur(6px); pointer-events: none; user-select: none; }
       `}</style>
 
       <div className="wrap">
@@ -556,9 +705,41 @@ export default function Calculadora() {
           <p style={{fontSize:"0.7rem",color:"var(--sub)",marginTop:"0.5rem"}}>{t.mesesHint}</p>
         </div>
 
+        {/* GATE DE EMAIL — mostrado quando já avaliou 1x e não está logado */}
+        {gateAberto && (
+          <div className="gate-overlay" onClick={e => e.target === e.currentTarget && skipGate()}>
+            <div className="gate-sheet">
+              <div className="gate-titulo">{t.gateTitle}</div>
+              <p className="gate-sub">{t.gateSub}</p>
+              <input
+                className="gate-input"
+                type="email"
+                placeholder={t.gateEmailPlaceholder}
+                value={gateEmail}
+                onChange={e => setGateEmail(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && submitGateEmail()}
+                autoFocus
+              />
+              <p className="gate-legal">{t.gateLegal}</p>
+              <button
+                className="btn"
+                onClick={submitGateEmail}
+                disabled={gateSaving}
+                style={{opacity: gateSaving ? 0.6 : 1}}
+              >
+                {gateSaving ? "…" : t.gateBtn}
+              </button>
+              <button className="gate-skip" onClick={skipGate}>{t.gateSkip}</button>
+              <div className="gate-login-row">
+                {t.gateOuLogin} <a href="/entrar">{t.gateEntrar}</a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* RESULTADOS */}
         {calc && p > 0 && (
-          <>
+          <div className={gateAberto ? "results-blur" : ""}>
             {/* Hero total */}
             <div className="hero-res">
               <div className="hero-label">{t.heroLabel}</div>
@@ -653,7 +834,7 @@ export default function Calculadora() {
             }}>
               {t.disclaimer}
             </p>
-          </>
+          </div>
         )}
 
         {(!calc || !p) && (
