@@ -9,6 +9,31 @@ const TAMANHOS = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46"
 const OCASIOES = ["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"];
 const CORES = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
 
+// ── i18n tipos de listagem ───────────────────────────────────────────────────
+const TIPOS_I18N = {
+  pt: {
+    titulo: "Disponível para",
+    alugar:  { titulo:"Alugar",          icone:"↻", desc:"Peça fica no teu armário a gerar rendimento recorrente",            detalhe:"Rendimento recorrente",  nota:"A peça volta sempre para ti após cada aluguer. Tu defines o preço por dia e a disponibilidade. Podes pausar ou cancelar a qualquer momento. Ideal para peças de qualidade que usas pouco mas não queres vender." },
+    comprar: { titulo:"Vender",          icone:"→", desc:"Venda a preço fixo — novo, usado ou em segunda mão",                detalhe:"Liquidez imediata",      nota:"Define o preço de venda e a peça fica listada até ser vendida. Quando vendida, recebes o valor (menos comissão Nora Grei) e a peça é enviada para a compradora. Podes editar o preço ou retirar a peça a qualquer momento." },
+    ambos:   { titulo:"Alugar e Vender", icone:"◈", desc:"Alugas enquanto encontras compradora — duas fontes de receita",    detalhe:"Máxima flexibilidade",   nota:"A peça está disponível para aluguer e para venda em simultâneo. Se for vendida, os alugueres em curso são respeitados até ao fim. Boa opção para quem quer monetizar ao máximo antes de vender definitivamente." },
+    social:  { titulo:"Venda Social",    icone:"♡", desc:"A compradora decide o que paga — mínimo 5€",                       detalhe:"Preço livre",            nota:"Ideal para libertar stock de peças que já não usas. A Nora Grei define o mínimo em 5€ — a compradora pode pagar mais se quiser. Recebes o valor pago (menos comissão). Ótimo para dar nova vida a peças paradas no armário." },
+  },
+  fr: {
+    titulo: "Disponible pour",
+    alugar:  { titulo:"Louer",                 icone:"↻", desc:"La pièce reste dans ton armoire et génère des revenus récurrents",     detalhe:"Revenus récurrents",     nota:"La pièce te revient toujours après chaque location. Tu fixes le prix par jour et la disponibilité. Tu peux mettre en pause ou annuler à tout moment. Idéal pour des pièces de qualité que tu utilises peu mais ne veux pas vendre." },
+    comprar: { titulo:"Vendre",                icone:"→", desc:"Vente à prix fixe — neuf, occasion ou seconde main",                   detalhe:"Liquidité immédiate",    nota:"Fixe le prix de vente et la pièce reste listée jusqu'à sa vente. Une fois vendue, tu reçois le montant (moins commission Nora Grei) et la pièce est envoyée à l'acheteuse. Tu peux modifier le prix ou retirer la pièce à tout moment." },
+    ambos:   { titulo:"Louer et Vendre",       icone:"◈", desc:"Tu loues pendant que tu trouves une acheteuse — deux sources de revenus", detalhe:"Flexibilité maximale",  nota:"La pièce est disponible pour la location et la vente en même temps. Si elle est vendue, les locations en cours sont respectées jusqu'à leur terme. Bonne option pour maximiser les revenus avant de vendre définitivement." },
+    social:  { titulo:"Vente Sociale",         icone:"♡", desc:"L'acheteuse décide du prix — minimum 5€",                              detalhe:"Prix libre",             nota:"Idéal pour libérer du stock de pièces que tu n'utilises plus. Nora Grei fixe le minimum à 5€ — l'acheteuse peut payer plus si elle le souhaite. Tu reçois le montant payé (moins commission). Parfait pour donner une nouvelle vie aux pièces dormantes." },
+  },
+  lt: {
+    titulo: "Prieinama",
+    alugar:  { titulo:"Nuomoti",              icone:"↻", desc:"Drabužis lieka tavo spintoje ir generuoja pasikartojančias pajamas",   detalhe:"Pasikartojančios pajamos", nota:"Drabužis visada grįžta pas tave po kiekvienos nuomos. Tu nustatai dienos kainą ir prieinamumą. Gali pristabdyti ar atšaukti bet kuriuo metu. Idealiai tinka kokybiškiems drabužiams, kuriuos retai dėvi, bet nenori parduoti." },
+    comprar: { titulo:"Parduoti",             icone:"→", desc:"Pardavimas fiksuota kaina — naujas, naudotas ar iš antrų rankų",      detalhe:"Greita likvidacija",       nota:"Nustatyk pardavimo kainą ir drabužis bus sąraše tol, kol bus parduotas. Parduodant gausi sumą (minus Nora Grei komisiniai), o drabužis bus išsiųstas pirkėjai. Kainą ar įrašą gali redaguoti bet kuriuo metu." },
+    ambos:   { titulo:"Nuomoti ir Parduoti", icone:"◈", desc:"Nuomoji kol randi pirkėją — dvi pajamų šaltiniai",                   detalhe:"Maksimalus lankstumas",    nota:"Drabužis vienu metu prieinamas nuomai ir pardavimui. Jei parduodamas, esamos nuomos gerbiamos iki pabaigos. Geras pasirinkimas tiems, kurie nori maksimaliai užsidirbti prieš galutinai parduodant." },
+    social:  { titulo:"Socialinis pardavimas",icone:"♡", desc:"Pirkėja pati nusprendžia kainą — mažiausiai 5€",                    detalhe:"Laisva kaina",             nota:"Idealiai tinka atlaisvinti drabužių atsargą, kurios nebenaudoji. Nora Grei nustato minimumą 5€ — pirkėja gali mokėti daugiau. Gauni sumokėtą sumą (minus komisiniai). Puiku suteikti naują gyvenimą lentynoje dulkėjantiems drabužiams." },
+  },
+};
+
 const PECA_VAZIA = {
   nome: "", categoria: "", marca: "", cor: "", condicao: "como_novo",
   tipo: "alugar", descricao: "", material: "",
@@ -94,6 +119,7 @@ function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria }) 
 }
 
 export default function PublicarPage() {
+  const [lang, setLang] = useState("pt");
   const [user, setUser] = useState(null);
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +131,10 @@ export default function PublicarPage() {
   const [erro, setErro] = useState("");
   const [pecaCriada, setPecaCriada] = useState(null);
   const inputFotoRef = useRef();
+
+  useEffect(() => {
+    try { const l = localStorage.getItem("ng_lang"); if (l) setLang(l); } catch (_) {}
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -922,47 +952,23 @@ export default function PublicarPage() {
               const ganhoAluguer = est ? `€${est.ganho12m}/ano` : null;
               const ganhoVenda = est ? `€${est.precoVendaUsada} imediato` : null;
               const ganhoAmbos = est ? `€${est.precoVendaUsada} + rendas` : null;
-              const opcoes = [
-                {
-                  val: "alugar",
-                  titulo: "Alugar",
-                  icone: "↻",
-                  desc: "Peça fica no teu armário a gerar rendimento recorrente",
-                  detalhe: ganhoAluguer ? `Potencial ${ganhoAluguer}` : "Rendimento recorrente",
-                  cor: "#c4748a",
-                  nota: "A peça volta sempre para ti após cada aluguer. Tu defines o preço por dia e a disponibilidade. Podes pausar ou cancelar a qualquer momento. Ideal para peças de qualidade que usas pouco mas não queres vender.",
-                },
-                {
-                  val: "comprar",
-                  titulo: "Vender",
-                  icone: "→",
-                  desc: "Venda a preço fixo — novo, usado ou em segunda mão",
-                  detalhe: ganhoVenda ? `Receber ${ganhoVenda}` : "Liquidez imediata",
-                  cor: "#5b8a6b",
-                  nota: "Define o preço de venda e a peça fica listada até ser vendida. Quando vendida, recebes o valor (menos comissão Nora Grei) e a peça é enviada para a compradora. Podes editar o preço ou retirar a peça a qualquer momento.",
-                },
-                {
-                  val: "ambos",
-                  titulo: "Alugar e Vender",
-                  icone: "◈",
-                  desc: "Alugas enquanto encontras compradora — duas fontes de receita",
-                  detalhe: ganhoAmbos ? `${ganhoAmbos}` : "Máxima flexibilidade",
-                  cor: "#7a6a9e",
-                  nota: "A peça está disponível para aluguer e para venda em simultâneo. Se for vendida, os alugueres em curso são respeitados até ao fim. Boa opção para quem quer monetizar ao máximo antes de vender definitivamente.",
-                },
-                {
-                  val: "social",
-                  titulo: "Venda Social",
-                  icone: "♡",
-                  desc: "A compradora decide o que paga — mínimo 5€",
-                  detalhe: "Preço livre · comunidade decide o valor",
-                  cor: "#c4a882",
-                  nota: "Ideal para libertar stock de peças que já não usas. A Nora Grei define o mínimo em 5€ — a compradora pode pagar mais se quiser. Recebes o valor pago (menos comissão). Ótimo para dar nova vida a peças paradas no armário.",
-                },
-              ];
+              const tl = TIPOS_I18N[lang] || TIPOS_I18N.pt;
+              const CORES_TIPO = { alugar:"#c4748a", comprar:"#5b8a6b", ambos:"#7a6a9e", social:"#c4a882" };
+              const DETALHES_CALC = {
+                alugar:  ganhoAluguer ? `Potencial ${ganhoAluguer}` : tl.alugar.detalhe,
+                comprar: ganhoVenda   ? `Receber ${ganhoVenda}`     : tl.comprar.detalhe,
+                ambos:   ganhoAmbos   ? ganhoAmbos                  : tl.ambos.detalhe,
+                social:  tl.social.detalhe,
+              };
+              const opcoes = ["alugar","comprar","ambos","social"].map(val => ({
+                val,
+                ...tl[val],
+                detalhe: DETALHES_CALC[val],
+                cor: CORES_TIPO[val],
+              }));
               return (
                 <div className="pub-card">
-                  <p className="pub-card-t">Disponível para</p>
+                  <p className="pub-card-t">{tl.titulo}</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     {opcoes.map(({ val, titulo, icone, desc, detalhe, cor, nota }) => {
                       const ativo = peca.tipo === val;
