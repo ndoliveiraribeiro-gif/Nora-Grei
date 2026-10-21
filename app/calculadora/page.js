@@ -227,10 +227,10 @@ const ESTADOS_DATA = [
 ];
 
 const USOS_DATA = [
-  { id: "nunca",    fator: 1.00, label: { pt: "1–2 vezes",      fr: "1–2 fois",         lt: "1–2 kartai" } },
-  { id: "pouco",    fator: 0.88, label: { pt: "Menos de 10×",   fr: "Moins de 10 fois", lt: "Mažiau 10×" } },
-  { id: "moderado", fator: 0.72, label: { pt: "10 a 30 vezes",  fr: "10 à 30 fois",     lt: "10–30 kartų" } },
-  { id: "frequente",fator: 0.52, label: { pt: "Mais de 30×",    fr: "Plus de 30 fois",  lt: "Daugiau 30×" } },
+  { id: "nunca",    fator: 1.00, label: { pt: "Raramente usada",     fr: "Rarement portée",      lt: "Retai nešiota" } },
+  { id: "pouco",    fator: 0.88, label: { pt: "Pouco frequente",     fr: "Peu fréquent",         lt: "Retai" } },
+  { id: "moderado", fator: 0.72, label: { pt: "Frequência moderada", fr: "Fréquence modérée",    lt: "Vidutiniškai" } },
+  { id: "frequente",fator: 0.52, label: { pt: "Muito frequente",     fr: "Très fréquent",        lt: "Labai dažnai" } },
 ];
 
 const IDADES_DATA = [
