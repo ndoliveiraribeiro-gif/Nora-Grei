@@ -6,8 +6,410 @@ const CATEGORIAS_VESTUARIO = ["Vestidos","Saias","Calças","Blusas","Casacos","F
 const CATEGORIAS_ACESSORIOS = ["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"];
 const CATEGORIAS_SEM_TAMANHO = ["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
 const TAMANHOS = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","48","Único"];
-const OCASIOES = ["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"];
+const OCASIOES_PT = ["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"];
+const OCASIOES_FR = ["Mariage","Gala","Cocktail","Fête","Dîner","Travail","Quotidien","Plage","Vacances","Plage/Vacances"];
+const OCASIOES_LT = ["Vestuvės","Gala","Kokteiliai","Vakarėlis","Vakarienė","Darbas","Kasdienybė","Paplūdimys","Atostogos","Paplūd./Atost."];
 const CORES = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
+
+// ── Dicionário i18n global da página ────────────────────────────────────────
+const T = {
+  pt: {
+    // Auth / acesso
+    carregando: "...",
+    precisaAuth: "Precisas de estar autenticado para publicar uma peça.",
+    entrar: "Entrar",
+    perfilErro: "Não foi possível carregar o teu perfil. Tenta novamente.",
+    lojistaNaoPodePublicar: "Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.",
+    lojistaSuspensa: "A tua conta de lojista está inativa. Contacta a Nora Grei para reativar.",
+    irPerfil: "Ir para o perfil",
+    // Nav
+    voltar: "← Voltar",
+    // Passo 1 — Fotos
+    p1titulo: "Adicionar peça",
+    p1sub: "Começa pelas fotos — até 5 imagens da peça.",
+    fotosCard: "Fotos da peça",
+    tocaFotos: "Toca para adicionar fotos",
+    fotosFormatos: "JPG, PNG, WEBP — até 5 fotos",
+    adicionarFoto: "Adicionar",
+    removerFoto: "Remover",
+    aAnalisar: "A analisar...",
+    fotoRejeitada: "✕ Foto rejeitada",
+    fotosSelecionadasSingular: "foto selecionada. A primeira será a imagem principal.",
+    fotosSelecionadasPlural: "fotos selecionadas. A primeira será a imagem principal.",
+    erroSemFotos: "Adiciona pelo menos uma foto.",
+    erroAguardarAnalise: "Aguarda a análise das fotos.",
+    erroFotosRejeitadas: "Remove as fotos rejeitadas antes de continuar.",
+    aAnalisarFotos: "A analisar fotos...",
+    continuar: "Continuar →",
+    // Passo 2 — Detalhes
+    p2titulo: "Detalhes da peça",
+    p2sub: "Informação sobre a peça — quanto mais detalhes, melhor para a cliente.",
+    categoriaCard: "Categoria",
+    categoriaLabel: "Categoria *",
+    categoriaPlaceholder: "Selecionar categoria...",
+    grupoVestuario: "Vestuário",
+    grupoAcessorios: "Acessórios",
+    grupoRelogios: "Relógios",
+    grupoCalcado: "Calçado",
+    calcadoItens: ["Saltos","Sandálias","Botas","Sapatilhas","Calçado"],
+    identificacaoCard: "Identificação",
+    nomeLabel: "Nome da peça *",
+    nomePlaceholder: "Ex: Vestido midi azul marinho",
+    marcaLabel: "Marca / Designer",
+    marcaPlaceholder: "Zara, Mango, Gucci...",
+    valorNovaBotaoNaoSei: "Não sei o preço original",
+    valorNovaBotaoCancelar: "✕ cancelar",
+    valorNovaLabel: "Valor peça nova (€)",
+    valorNovaObrigatorio: "*",
+    valorNovaEstimativaPlaceholder: "Estimativa de valor (ex: 120)",
+    valorNovaEstimativaHint: "⚠ Inserir uma estimativa do valor de mercado actual — os cálculos ficarão menos precisos.",
+    valorNovaPlaceholder: "Ex: 200",
+    valorNovaHint: "Preço original quando era nova — base do aluguer e da venda usada.",
+    corLabel: "Cor principal",
+    corPlaceholder: "Azul marinho",
+    materialLabel: "Material",
+    materialPlaceholder: "100% seda natural",
+    condicaoLabel: "Condição",
+    condicaoNovo: "Novo (com etiqueta)",
+    condicaoComoNovo: "Como novo (nunca usado)",
+    condicaoMuitoBom: "Muito bom estado",
+    condicaoBom: "Bom estado",
+    condicaoUsado: "Usado",
+    descricaoLabel: "Descrição",
+    descricaoPlaceholder: "Conta a história desta peça — ocasião ideal, como usar, porquê é especial...",
+    defeitoCard: "Estado de conservação",
+    defeitoLabel: "A peça tem defeito",
+    defeitoPerfeito: "A peça está em perfeitas condições.",
+    defeitoPlaceholder: "Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha...",
+    higienizacaoCard: "Higienização",
+    higienizacaoLabel: "Esta peça requer higienização profissional",
+    higienizacaoSem: "Sem taxa de higienização — a limpeza é tratada internamente.",
+    higienizacaoCustoLabel: "Custo de higienização (€)",
+    higienizacaoCustoPlaceholder: "ex: 6.00",
+    higienizacaoCustoHint: "Valor cobrado ao cliente no checkout. Define de acordo com a tua lavandaria parceira.",
+    tamanhosCard: "Tamanhos disponíveis",
+    adicionarTamanho: "+ Tamanho",
+    ocasioesCard: "Ocasiões",
+    estimativaLabel: "Estimativa automática",
+    aluguerDia: "Aluguer / dia",
+    vendaUsada: "Venda usada",
+    valorMercado: "Valor mercado",
+    caucao: "Caução",
+    erroNome: "O nome da peça é obrigatório.",
+    erroValorEstimativa: "Insere uma estimativa do valor de mercado — mesmo aproximada ajuda a calcular os preços.",
+    erroValorOriginal: "Indica o valor original da peça nova — precisamos dele para calcular os preços. Se não sabes, clica em «Não sei o preço original».",
+    erroCategoria: "Seleciona uma categoria.",
+    // Passo 3 — Preços
+    p3titulo: "Preços e disponibilidade",
+    p3sub: "Define como a peça estará disponível — para alugar, vender, ou ambos.",
+    estimativaNG: "Estimativa Nora Grei",
+    tierPremium: "✦ Marca premium",
+    tierAlta: "Marca alta",
+    tierMassmarket: "Marca standard",
+    rotacoesMes: "rotações/mês",
+    diasAluguer: "dias/aluguer",
+    potencial: "potencial",
+    em12Meses: "em 12 meses",
+    usarSugestao: "Usar sugestão",
+    ajustarManualmente: "Ou ajusta manualmente abaixo",
+    idadePecaCard: "Idade da peça",
+    idadeMenos1: "Menos de 1 ano",
+    idade1a2: "1 a 2 anos",
+    idade2a4: "2 a 4 anos",
+    idade4mais: "Mais de 4 anos",
+    precosCard: "Preços",
+    valorNovaObrigLabel: "Valor peça nova (€) *",
+    valorNovaObrigHint: "Obrigatório — é a âncora para calcular o preço de aluguer, caução e valor de venda usada.",
+    aluguerDiaLabel: "Aluguer / dia (€) *",
+    aluguerSugestao: "sugerido:",
+    clientePoupanca: "A cliente poupa",
+    vsComprarNova: "% vs comprar nova",
+    vendaUsadaLabel: "Preço de venda usada (€) *",
+    vendaUsadaEstimativa: "Estimativa:",
+    vendaUsadaComBase: "com base no estado e marca.",
+    vendaUsadaHint: "Preço de venda da peça em segunda mão.",
+    linkExternoCard: "Link para comprar nova",
+    linkExternoOpcional: "(opcional)",
+    linkExternoLabel: "Link para comprar nova ↗",
+    linkExterno15: "15€/mês",
+    linkExternoPlaceholder: "https://www.zara.com/produto/...",
+    linkExternoHint: "Direciona as clientes para comprarem a peça nova noutro site. A Nora Grei ativa este link após pagamento de 15€/mês.",
+    erroValorEstimativa2: "Insere uma estimativa do valor de mercado para continuar.",
+    erroValorOriginal2: "O valor da peça é obrigatório — é a base para calcular o aluguer e o preço usado. Se não sabes, clica em «Não sei o preço original» no passo anterior.",
+    erroAluguerDia: "Indica o preço de aluguer por dia.",
+    erroPrecoVenda: "Indica o preço de venda.",
+    aPublicar: "A publicar...",
+    publicarPeca: "Publicar peça",
+    erroPublicar: "Erro ao publicar: ",
+    erroPorFavor: "tenta de novo.",
+    // Passo 4 — Sucesso
+    p4titulo: "Peça publicada!",
+    p4sub: "A tua peça foi adicionada ao teu catálogo e ficará visível na tua loja após aprovação.",
+    verLoja: "Ver a minha loja ↗",
+    adicionarOutra: "Adicionar outra peça",
+    irParaPerfil: "Ir para o perfil",
+  },
+  fr: {
+    carregando: "...",
+    precisaAuth: "Tu dois être authentifiée pour publier un article.",
+    entrar: "Se connecter",
+    perfilErro: "Impossible de charger ton profil. Réessaie.",
+    lojistaNaoPodePublicar: "Cette section est réservée aux boutiques approuvées. Candidater depuis ton profil.",
+    lojistaSuspensa: "Ton compte boutique est inactif. Contacte Nora Grei pour le réactiver.",
+    irPerfil: "Aller au profil",
+    voltar: "← Retour",
+    p1titulo: "Ajouter un article",
+    p1sub: "Commence par les photos — jusqu'à 5 images de l'article.",
+    fotosCard: "Photos de l'article",
+    tocaFotos: "Touche pour ajouter des photos",
+    fotosFormatos: "JPG, PNG, WEBP — jusqu'à 5 photos",
+    adicionarFoto: "Ajouter",
+    removerFoto: "Supprimer",
+    aAnalisar: "Analyse...",
+    fotoRejeitada: "✕ Photo rejetée",
+    fotosSelecionadasSingular: "photo sélectionnée. La première sera l'image principale.",
+    fotosSelecionadasPlural: "photos sélectionnées. La première sera l'image principale.",
+    erroSemFotos: "Ajoute au moins une photo.",
+    erroAguardarAnalise: "Attends la fin de l'analyse des photos.",
+    erroFotosRejeitadas: "Supprime les photos rejetées avant de continuer.",
+    aAnalisarFotos: "Analyse des photos...",
+    continuar: "Continuer →",
+    p2titulo: "Détails de l'article",
+    p2sub: "Informations sur l'article — plus il y a de détails, mieux c'est pour la cliente.",
+    categoriaCard: "Catégorie",
+    categoriaLabel: "Catégorie *",
+    categoriaPlaceholder: "Choisir une catégorie...",
+    grupoVestuario: "Vêtements",
+    grupoAcessorios: "Accessoires",
+    grupoRelogios: "Montres",
+    grupoCalcado: "Chaussures",
+    calcadoItens: ["Talons","Sandales","Bottes","Baskets","Chaussures"],
+    identificacaoCard: "Identification",
+    nomeLabel: "Nom de l'article *",
+    nomePlaceholder: "Ex : Robe midi bleu marine",
+    marcaLabel: "Marque / Créateur",
+    marcaPlaceholder: "Zara, Mango, Gucci...",
+    valorNovaBotaoNaoSei: "Je ne connais pas le prix d'origine",
+    valorNovaBotaoCancelar: "✕ annuler",
+    valorNovaLabel: "Valeur article neuf (€)",
+    valorNovaObrigatorio: "*",
+    valorNovaEstimativaPlaceholder: "Estimation de valeur (ex : 120)",
+    valorNovaEstimativaHint: "⚠ Entre une estimation de la valeur de marché actuelle — les calculs seront moins précis.",
+    valorNovaPlaceholder: "Ex : 200",
+    valorNovaHint: "Prix d'origine neuf — base pour le tarif location et la vente d'occasion.",
+    corLabel: "Couleur principale",
+    corPlaceholder: "Bleu marine",
+    materialLabel: "Matière",
+    materialPlaceholder: "100% soie naturelle",
+    condicaoLabel: "État",
+    condicaoNovo: "Neuf (avec étiquette)",
+    condicaoComoNovo: "Comme neuf (jamais porté)",
+    condicaoMuitoBom: "Très bon état",
+    condicaoBom: "Bon état",
+    condicaoUsado: "Porté",
+    descricaoLabel: "Description",
+    descricaoPlaceholder: "Raconte l'histoire de cet article — occasion idéale, comment le porter, pourquoi il est spécial...",
+    defeitoCard: "État de conservation",
+    defeitoLabel: "L'article a un défaut",
+    defeitoPerfeito: "L'article est en parfait état.",
+    defeitoPlaceholder: "Décris le défaut — ex : légère tache sur la manche, fil lâche sur l'ourlet...",
+    higienizacaoCard: "Nettoyage",
+    higienizacaoLabel: "Cet article nécessite un nettoyage professionnel",
+    higienizacaoSem: "Pas de frais de nettoyage — le nettoyage est géré en interne.",
+    higienizacaoCustoLabel: "Coût de nettoyage (€)",
+    higienizacaoCustoPlaceholder: "ex : 6.00",
+    higienizacaoCustoHint: "Montant facturé à la cliente au checkout. Définis-le selon ton pressing partenaire.",
+    tamanhosCard: "Tailles disponibles",
+    adicionarTamanho: "+ Taille",
+    ocasioesCard: "Occasions",
+    estimativaLabel: "Estimation automatique",
+    aluguerDia: "Location / jour",
+    vendaUsada: "Vente occasion",
+    valorMercado: "Valeur marché",
+    caucao: "Dépôt",
+    erroNome: "Le nom de l'article est obligatoire.",
+    erroValorEstimativa: "Entre une estimation de la valeur de marché — même approximative, elle aide à calculer les prix.",
+    erroValorOriginal: "Indique la valeur d'origine de l'article neuf — on en a besoin pour calculer les prix. Si tu ne sais pas, clique sur «Je ne connais pas le prix d'origine».",
+    erroCategoria: "Sélectionne une catégorie.",
+    p3titulo: "Prix et disponibilité",
+    p3sub: "Définis comment l'article sera disponible — à louer, à vendre, ou les deux.",
+    estimativaNG: "Estimation Nora Grei",
+    tierPremium: "✦ Marque premium",
+    tierAlta: "Marque haut de gamme",
+    tierMassmarket: "Marque standard",
+    rotacoesMes: "rotations/mois",
+    diasAluguer: "jours/location",
+    potencial: "potentiel",
+    em12Meses: "en 12 mois",
+    usarSugestao: "Utiliser la suggestion",
+    ajustarManualmente: "Ou ajuste manuellement ci-dessous",
+    idadePecaCard: "Âge de l'article",
+    idadeMenos1: "Moins d'1 an",
+    idade1a2: "1 à 2 ans",
+    idade2a4: "2 à 4 ans",
+    idade4mais: "Plus de 4 ans",
+    precosCard: "Prix",
+    valorNovaObrigLabel: "Valeur article neuf (€) *",
+    valorNovaObrigHint: "Obligatoire — c'est la base pour calculer le tarif location, le dépôt et la valeur de revente.",
+    aluguerDiaLabel: "Location / jour (€) *",
+    aluguerSugestao: "suggéré :",
+    clientePoupanca: "La cliente économise",
+    vsComprarNova: "% vs acheter neuf",
+    vendaUsadaLabel: "Prix de vente occasion (€) *",
+    vendaUsadaEstimativa: "Estimation :",
+    vendaUsadaComBase: "selon l'état et la marque.",
+    vendaUsadaHint: "Prix de vente de l'article en seconde main.",
+    linkExternoCard: "Lien pour acheter neuf",
+    linkExternoOpcional: "(optionnel)",
+    linkExternoLabel: "Lien pour acheter neuf ↗",
+    linkExterno15: "15€/mois",
+    linkExternoPlaceholder: "https://www.zara.com/produit/...",
+    linkExternoHint: "Dirige les clientes vers l'achat neuf sur un autre site. Nora Grei active ce lien après paiement de 15€/mois.",
+    erroValorEstimativa2: "Entre une estimation de la valeur de marché pour continuer.",
+    erroValorOriginal2: "La valeur de l'article est obligatoire — c'est la base pour calculer la location et le prix d'occasion. Si tu ne sais pas, clique sur «Je ne connais pas le prix d'origine» à l'étape précédente.",
+    erroAluguerDia: "Indique le tarif de location par jour.",
+    erroPrecoVenda: "Indique le prix de vente.",
+    aPublicar: "Publication...",
+    publicarPeca: "Publier l'article",
+    erroPublicar: "Erreur lors de la publication : ",
+    erroPorFavor: "réessaie.",
+    p4titulo: "Article publié !",
+    p4sub: "Ton article a été ajouté à ton catalogue et sera visible dans ta boutique après validation.",
+    verLoja: "Voir ma boutique ↗",
+    adicionarOutra: "Ajouter un autre article",
+    irParaPerfil: "Aller au profil",
+  },
+  lt: {
+    carregando: "...",
+    precisaAuth: "Norėdama paskelbti straipsnį, turi būti prisijungusi.",
+    entrar: "Prisijungti",
+    perfilErro: "Nepavyko įkelti tavo profilio. Bandyk dar kartą.",
+    lojistaNaoPodePublicar: "Ši sritis skirta tik patvirtintoms parduotuvėms. Pateik paraišką savo profilyje.",
+    lojistaSuspensa: "Tavo parduotuvės paskyra neaktyvi. Susisiek su Nora Grei, kad ją reaktyvuotum.",
+    irPerfil: "Eiti į profilį",
+    voltar: "← Grįžti",
+    p1titulo: "Pridėti drabužį",
+    p1sub: "Pradėk nuo nuotraukų — iki 5 drabužio vaizdų.",
+    fotosCard: "Drabužio nuotraukos",
+    tocaFotos: "Palieski, kad pridėtum nuotraukas",
+    fotosFormatos: "JPG, PNG, WEBP — iki 5 nuotraukų",
+    adicionarFoto: "Pridėti",
+    removerFoto: "Pašalinti",
+    aAnalisar: "Analizuojama...",
+    fotoRejeitada: "✕ Nuotrauka atmesta",
+    fotosSelecionadasSingular: "nuotrauka pasirinkta. Pirmoji bus pagrindinė.",
+    fotosSelecionadasPlural: "nuotraukos pasirinktos. Pirmoji bus pagrindinė.",
+    erroSemFotos: "Pridėk bent vieną nuotrauką.",
+    erroAguardarAnalise: "Palaukite nuotraukų analizės pabaigos.",
+    erroFotosRejeitadas: "Prieš tęsiant pašalink atmestas nuotraukas.",
+    aAnalisarFotos: "Analizuojamos nuotraukos...",
+    continuar: "Tęsti →",
+    p2titulo: "Drabužio informacija",
+    p2sub: "Informacija apie drabužį — kuo daugiau detalių, tuo geriau klientei.",
+    categoriaCard: "Kategorija",
+    categoriaLabel: "Kategorija *",
+    categoriaPlaceholder: "Pasirinkti kategoriją...",
+    grupoVestuario: "Drabužiai",
+    grupoAcessorios: "Aksesuarai",
+    grupoRelogios: "Laikrodžiai",
+    grupoCalcado: "Avalynė",
+    calcadoItens: ["Kulniukai","Sandalai","Batai","Sportiniai bateliai","Avalynė"],
+    identificacaoCard: "Identifikavimas",
+    nomeLabel: "Drabužio pavadinimas *",
+    nomePlaceholder: "Pvz.: Vidutinio ilgio suknelė tamsiai mėlyna",
+    marcaLabel: "Prekės ženklas / Dizaineris",
+    marcaPlaceholder: "Zara, Mango, Gucci...",
+    valorNovaBotaoNaoSei: "Nežinau pradinės kainos",
+    valorNovaBotaoCancelar: "✕ atšaukti",
+    valorNovaLabel: "Naudo drabužio vertė (€)",
+    valorNovaObrigatorio: "*",
+    valorNovaEstimativaPlaceholder: "Vertės įvertinimas (pvz.: 120)",
+    valorNovaEstimativaHint: "⚠ Įvesk dabartinės rinkos vertės įvertinimą — skaičiavimai bus mažiau tikslūs.",
+    valorNovaPlaceholder: "Pvz.: 200",
+    valorNovaHint: "Pradinė kaina naujam — nuomos ir naudoto pardavimo pagrindas.",
+    corLabel: "Pagrindinė spalva",
+    corPlaceholder: "Tamsiai mėlyna",
+    materialLabel: "Medžiaga",
+    materialPlaceholder: "100% natūralus šilkas",
+    condicaoLabel: "Būklė",
+    condicaoNovo: "Naujas (su etikete)",
+    condicaoComoNovo: "Kaip naujas (nenešiotas)",
+    condicaoMuitoBom: "Labai gera būklė",
+    condicaoBom: "Gera būklė",
+    condicaoUsado: "Nešiotas",
+    descricaoLabel: "Aprašymas",
+    descricaoPlaceholder: "Papasakok šio drabužio istoriją — ideali proga, kaip dėvėti, kodėl jis ypatingas...",
+    defeitoCard: "Išsaugojimo būklė",
+    defeitoLabel: "Drabužis turi defektą",
+    defeitoPerfeito: "Drabužis yra puikios būklės.",
+    defeitoPlaceholder: "Aprašyk defektą — pvz.: nedidelė dėmė ant rankovės, laisvas siūlas apačioje...",
+    higienizacaoCard: "Valymas",
+    higienizacaoLabel: "Šiam drabužiui reikalingas profesionalus valymas",
+    higienizacaoSem: "Nėra valymo mokesčio — valymas atliekamas viduje.",
+    higienizacaoCustoLabel: "Valymo kaina (€)",
+    higienizacaoCustoPlaceholder: "pvz.: 6.00",
+    higienizacaoCustoHint: "Suma, skaičiuojama klientei checkout metu. Nustatyk pagal savo partnerio skalavyklą.",
+    tamanhosCard: "Prieinami dydžiai",
+    adicionarTamanho: "+ Dydis",
+    ocasioesCard: "Proga",
+    estimativaLabel: "Automatinis įvertinimas",
+    aluguerDia: "Nuoma / diena",
+    vendaUsada: "Pardavimas naudotas",
+    valorMercado: "Rinkos vertė",
+    caucao: "Užstatas",
+    erroNome: "Drabužio pavadinimas yra privalomas.",
+    erroValorEstimativa: "Įvesk rinkos vertės įvertinimą — net apytikslis padės apskaičiuoti kainas.",
+    erroValorOriginal: "Nurodyk pradinę naujojo drabužio vertę — jos reikia kainoms apskaičiuoti. Jei nežinai, spausk «Nežinau pradinės kainos».",
+    erroCategoria: "Pasirink kategoriją.",
+    p3titulo: "Kainos ir prieinamumas",
+    p3sub: "Nustatyk, kaip bus prieinamas drabužis — nuomai, pardavimui ar abiem.",
+    estimativaNG: "Nora Grei įvertinimas",
+    tierPremium: "✦ Premium prekės ženklas",
+    tierAlta: "Aukštos klasės prekės ženklas",
+    tierMassmarket: "Standartinis prekės ženklas",
+    rotacoesMes: "rotacijos/mėn.",
+    diasAluguer: "dienos/nuoma",
+    potencial: "potencialas",
+    em12Meses: "per 12 mėn.",
+    usarSugestao: "Naudoti pasiūlymą",
+    ajustarManualmente: "Arba nustatyk rankiniu būdu žemiau",
+    idadePecaCard: "Drabužio amžius",
+    idadeMenos1: "Mažiau nei 1 metai",
+    idade1a2: "1–2 metai",
+    idade2a4: "2–4 metai",
+    idade4mais: "Daugiau nei 4 metai",
+    precosCard: "Kainos",
+    valorNovaObrigLabel: "Naujojo drabužio vertė (€) *",
+    valorNovaObrigHint: "Privaloma — tai pagrindas nuomos kainai, užstatui ir naudoto pardavimo vertei apskaičiuoti.",
+    aluguerDiaLabel: "Nuoma / diena (€) *",
+    aluguerSugestao: "siūloma:",
+    clientePoupanca: "Klientė sutaupo",
+    vsComprarNova: "% lyginant su nauju",
+    vendaUsadaLabel: "Naudoto pardavimo kaina (€) *",
+    vendaUsadaEstimativa: "Įvertinimas:",
+    vendaUsadaComBase: "pagal būklę ir prekės ženklą.",
+    vendaUsadaHint: "Antros rankos drabužio pardavimo kaina.",
+    linkExternoCard: "Nuoroda pirkti naują",
+    linkExternoOpcional: "(neprivaloma)",
+    linkExternoLabel: "Nuoroda pirkti naują ↗",
+    linkExterno15: "15€/mėn.",
+    linkExternoPlaceholder: "https://www.zara.com/produktas/...",
+    linkExternoHint: "Nukreipia klienteles pirkti naują drabužį kitoje svetainėje. Nora Grei aktyvuoja šią nuorodą sumokėjus 15€/mėn.",
+    erroValorEstimativa2: "Įvesk rinkos vertės įvertinimą, kad galėtum tęsti.",
+    erroValorOriginal2: "Drabužio vertė yra privaloma — tai pagrindas nuomos ir naudoto kainos skaičiavimui. Jei nežinai, spausk «Nežinau pradinės kainos» ankstesniame žingsnyje.",
+    erroAluguerDia: "Nurodyk nuomos kainą per dieną.",
+    erroPrecoVenda: "Nurodyk pardavimo kainą.",
+    aPublicar: "Skelbiama...",
+    publicarPeca: "Paskelbti drabužį",
+    erroPublicar: "Klaida skelbiant: ",
+    erroPorFavor: "bandyk dar kartą.",
+    p4titulo: "Drabužis paskelbtas!",
+    p4sub: "Tavo drabužis pridėtas į katalogą ir bus matomas parduotuvėje po patvirtinimo.",
+    verLoja: "Žiūrėti mano parduotuvę ↗",
+    adicionarOutra: "Pridėti kitą drabužį",
+    irParaPerfil: "Eiti į profilį",
+  },
+};
 
 // ── i18n tipos de listagem ───────────────────────────────────────────────────
 const TIPOS_I18N = {
@@ -69,10 +471,7 @@ function fatorMarca(marca = "") {
 const FATOR_ESTADO = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
 const FATOR_IDADE  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
 
-// Mapa categoria → { rotação mensal, dias médios por aluguer, fator preço base }
-// fatorPreco: percentagem do valorMercado a cobrar por dia — varia com procura da categoria
 const ROTACAO_CAT = {
-  //                          rot/mês  diasAlug  fatorPreco
   Vestidos:   { rot: 1.8, dias: 3.5, fp: 0.10 },
   Fatos:      { rot: 1.5, dias: 4.0, fp: 0.09 },
   Macacões:   { rot: 1.4, dias: 3.5, fp: 0.09 },
@@ -88,15 +487,12 @@ const ROTACAO_CAT = {
   _default:   { rot: 1.2, dias: 3.5, fp: 0.08 },
 };
 
-// Fator de interação não-linear entre estado e idade
-// Peças muito usadas E velhas degradam-se mais depressa que a multiplicação simples sugere
 function fatorEstadoIdade(condicao, idade_peca) {
   const fe = FATOR_ESTADO[condicao] ?? 0.68;
   const fi = FATOR_IDADE[idade_peca] ?? 0.85;
-  // Se ambos são baixos, aplicar penalização extra
   const combinado = fe * fi;
-  if (combinado < 0.30) return combinado * 0.85; // penalização extra peças muito degradadas
-  if (combinado > 0.85) return combinado * 1.05; // ligeiro bónus peças quase novas
+  if (combinado < 0.30) return combinado * 0.85;
+  if (combinado > 0.85) return combinado * 1.05;
   return combinado;
 }
 
@@ -107,13 +503,10 @@ function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria }) 
   const fei = fatorEstadoIdade(condicao, idade_peca);
   const valorMercado = Math.round(p * fm * fei);
   const cat = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
-  // Preço aluguer/dia: baseado na procura da categoria (fatorPreco) + ajuste de tier
   const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
   const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
   const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
-  // Caução: 30% do valor de mercado (cobre risco de dano)
   const caucao = Math.round(valorMercado * 0.30 / 10) * 10;
-  // Ganho em 12 meses: dias médios por aluguer × rotação × 12 meses × 90% ocupação × (1-10% comissão)
   const ganho12m = Math.round(precoAluguerDia * cat.dias * cat.rot * 12 * 0.90 * 0.90);
   return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier };
 }
@@ -124,7 +517,7 @@ export default function PublicarPage() {
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [passo, setPasso] = useState(1); // 1=fotos, 2=detalhes, 3=preços, 4=sucesso
-  const [fotos, setFotos] = useState([]); // { file, url, valida, validando, motivo }
+  const [fotos, setFotos] = useState([]);
   const [peca, setPeca] = useState(PECA_VAZIA);
   const [enviando, setEnviando] = useState(false);
   const [progresso, setProgresso] = useState("");
@@ -141,7 +534,6 @@ export default function PublicarPage() {
       if (!session) { setLoading(false); return; }
       setUser(session.user);
       let { data: cli } = await supabase.from("clientes").select("*").eq("id", session.user.id).maybeSingle();
-      // fallback: alguns registos usam user_id em vez de id como FK do auth
       if (!cli) {
         const { data: cli2 } = await supabase.from("clientes").select("*").eq("user_id", session.user.id).maybeSingle();
         cli = cli2;
@@ -151,10 +543,9 @@ export default function PublicarPage() {
     });
   }, []);
 
-  // Share Target: receber fotos partilhadas de outras apps (câmara, galeria, etc.)
+  // Share Target: receber fotos partilhadas de outras apps
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     const processarFotosPartilhadas = (arquivos) => {
       try {
         const novasFotos = arquivos.map(a => {
@@ -168,16 +559,12 @@ export default function PublicarPage() {
         setFotos(novasFotos);
       } catch (e) { /* ignorar */ }
     };
-
-    // Ouvir postMessage do service worker
     const onMessage = (e) => {
       if (e.data?.type === "NG_SHARE_FOTOS" && e.data.fotos?.length) {
         processarFotosPartilhadas(e.data.fotos);
       }
     };
     navigator.serviceWorker?.addEventListener("message", onMessage);
-
-    // Fallback: verificar cache do SW (para quando a página abre nova)
     const checkShareCache = async () => {
       try {
         const cache = await caches.open("ng-share-target");
@@ -190,34 +577,29 @@ export default function PublicarPage() {
       } catch (e) { /* ignorar */ }
     };
     checkShareCache();
-
     return () => navigator.serviceWorker?.removeEventListener("message", onMessage);
   }, []);
 
   const validarFotoComIA = async (foto, index) => {
     try {
-      // Converter File para base64
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result.split(",")[1]);
         reader.onerror = reject;
         reader.readAsDataURL(foto.file);
       });
-
       const res = await fetch("/api/validar-foto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imagem: base64, tipo: foto.file.type }),
       });
       const resultado = await res.json();
-
       setFotos(prev => prev.map((f, i) =>
         i === index
           ? { ...f, validando: false, valida: resultado.valida, motivo: resultado.motivo, categoria_ia: resultado.categoria }
           : f
       ));
     } catch {
-      // Em caso de erro de rede, aceitar a foto
       setFotos(prev => prev.map((f, i) =>
         i === index ? { ...f, validando: false, valida: true, motivo: "Validação indisponível" } : f
       ));
@@ -230,50 +612,46 @@ export default function PublicarPage() {
       const base = prev.length;
       const novas = arr.map(f => ({ file: f, url: URL.createObjectURL(f), validando: true, valida: null, motivo: "" }));
       const todas = [...prev, ...novas].slice(0, 5);
-      // Lançar validação para cada nova foto
-      novas.forEach((f, i) => {
-        validarFotoComIA(f, base + i);
-      });
+      novas.forEach((f, i) => { validarFotoComIA(f, base + i); });
       return todas;
     });
   };
 
   const removerFoto = (i) => setFotos(prev => prev.filter((_, j) => j !== i));
-
   const setP = (k, v) => setPeca(prev => ({ ...prev, [k]: v }));
 
+  // Obter dicionário da língua activa
+  const tl = T[lang] || T.pt;
+  const tLoc = TIPOS_I18N[lang] || TIPOS_I18N.pt;
+  const OCASIOES = lang === "fr" ? OCASIOES_FR : lang === "lt" ? OCASIOES_LT : OCASIOES_PT;
+
   const validarPasso2 = () => {
-    if (!peca.nome.trim()) { setErro("O nome da peça é obrigatório."); return false; }
+    if (!peca.nome.trim()) { setErro(tl.erroNome); return false; }
     if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
-      const msg = peca.valor_peca_desconhecido
-        ? "Insere uma estimativa do valor de mercado — mesmo aproximada ajuda a calcular os preços."
-        : "Indica o valor original da peça nova — precisamos dele para calcular os preços. Se não sabes, clica em «Não sei o preço original».";
-      setErro(msg); return false;
+      setErro(peca.valor_peca_desconhecido ? tl.erroValorEstimativa : tl.erroValorOriginal);
+      return false;
     }
-    if (!peca.categoria) { setErro("Seleciona uma categoria."); return false; }
+    if (!peca.categoria) { setErro(tl.erroCategoria); return false; }
     setErro(""); return true;
   };
 
   const validarPasso3 = () => {
-    // Venda social: preço livre (mín. 5€ definido pelo sistema), não precisa de valores manuais
     if (peca.tipo === "social") { setErro(""); return true; }
     const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
     const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
     if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
-      const msg = peca.valor_peca_desconhecido
-        ? "Insere uma estimativa do valor de mercado para continuar."
-        : "O valor da peça é obrigatório — é a base para calcular o aluguer e o preço usado. Se não sabes, clica em «Não sei o preço original» no passo anterior.";
-      setErro(msg); return false;
+      setErro(peca.valor_peca_desconhecido ? tl.erroValorEstimativa2 : tl.erroValorOriginal2);
+      return false;
     }
-    if (precisaAluguer && !peca.preco_aluguer_dia) { setErro("Indica o preço de aluguer por dia."); return false; }
-    if (precisaVenda && !peca.preco_venda) { setErro("Indica o preço de venda."); return false; }
+    if (precisaAluguer && !peca.preco_aluguer_dia) { setErro(tl.erroAluguerDia); return false; }
+    if (precisaVenda && !peca.preco_venda) { setErro(tl.erroPrecoVenda); return false; }
     setErro(""); return true;
   };
 
   const publicar = async () => {
     if (!validarPasso3()) return;
     setEnviando(true);
-    setProgresso("A criar peça...");
+    setProgresso(tl.aPublicar);
     try {
       const pecasExistentes = await supabase.from("pecas_lojista").select("id", { count: "exact" }).eq("cliente_id", user.id);
       const count = pecasExistentes.count || 0;
@@ -306,7 +684,6 @@ export default function PublicarPage() {
 
       if (pecaErr) throw pecaErr;
 
-      // Tamanhos
       for (const t of peca.tamanhos) {
         await supabase.from("stock_lojista").insert({
           peca_id: novaPeca.id,
@@ -316,13 +693,12 @@ export default function PublicarPage() {
         });
       }
 
-      // Upload fotos
       if (fotos.length > 0) {
         const urls = [];
         for (const foto of fotos) {
           const ext = foto.file.name.split(".").pop();
           const path = `${novaPeca.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-          setProgresso(`A fazer upload: ${foto.file.name}...`);
+          setProgresso(`${tl.aPublicar} ${foto.file.name}...`);
           const { error: upErr } = await supabase.storage
             .from("pecas_lojista")
             .upload(path, foto.file, { upsert: true });
@@ -339,7 +715,7 @@ export default function PublicarPage() {
       setPecaCriada(novaPeca);
       setPasso(4);
     } catch (e) {
-      setErro("Erro ao publicar: " + (e.message || "tenta de novo."));
+      setErro(tl.erroPublicar + (e.message || tl.erroPorFavor));
     }
     setEnviando(false);
     setProgresso("");
@@ -355,31 +731,30 @@ export default function PublicarPage() {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif", fontSize: "0.8rem", letterSpacing: "0.2em", color: "#888" }}>
-      ...
+      {tl.carregando}
     </div>
   );
 
   if (!user) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2" }}>
       <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
-      <p style={{ fontSize: "0.82rem", color: "#5a5855" }}>Precisas de estar autenticado para publicar uma peça.</p>
-      <a href="/entrar" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>Entrar</a>
+      <p style={{ fontSize: "0.82rem", color: "#5a5855" }}>{tl.precisaAuth}</p>
+      <a href="/entrar" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>{tl.entrar}</a>
     </div>
   );
 
-  // lojista activo = modo_lojista true E lojista_estado não é "inativo"
   const isModoLojista = cliente?.modo_lojista === true && cliente?.lojista_estado !== "inativo";
   if (!isModoLojista) return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem", fontFamily: "'Jost',sans-serif", background: "#f7f5f2", padding: "2rem", textAlign: "center" }}>
       <div style={{ fontFamily: "'Cormorant',serif", fontSize: "1.2rem", letterSpacing: "0.2em", color: "#1a1a1a" }}>NORA GREI</div>
       {!cliente ? (
-        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Não foi possível carregar o teu perfil. Tenta novamente.</p>
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>{tl.perfilErro}</p>
       ) : cliente.lojista_estado === "inativo" ? (
-        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>A tua conta de lojista está <strong>inativa</strong>. Contacta a Nora Grei para reativar.</p>
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>{tl.lojistaSuspensa}</p>
       ) : (
-        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>Esta área é exclusiva para lojistas aprovados. Candidata-te no teu perfil.</p>
+        <p style={{ fontSize: "0.9rem", color: "#5a5855", maxWidth: "360px", lineHeight: 1.6 }}>{tl.lojistaNaoPodePublicar}</p>
       )}
-      <a href="/perfil" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>Ir para o perfil</a>
+      <a href="/perfil" style={{ background: "#1a1a1a", color: "#fff", padding: "0.75rem 2rem", textDecoration: "none", fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "'Jost',sans-serif" }}>{tl.irPerfil}</a>
     </div>
   );
 
@@ -420,7 +795,6 @@ export default function PublicarPage() {
         .pub-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
         .pub-full { grid-column: 1 / -1; }
 
-        /* Fotos */
         .fotos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
         .foto-thumb { aspect-ratio: 3/4; border-radius: 4px; overflow: hidden; position: relative; background: var(--g1); }
         .foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -429,25 +803,20 @@ export default function PublicarPage() {
         .foto-add:hover { border-color: var(--black); color: var(--black); }
         .foto-add svg { opacity: 0.5; }
 
-        /* Tipo btns */
         .tipo-btn { padding: 0.6rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; text-align: center; }
         .tipo-btn.active { background: #c4748a; color: #fff; border-color: #c4748a; }
 
-        /* Tamanhos */
         .tamanho-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
         .tamanho-sel { flex: 1; padding: 0.6rem 0.75rem; border: 1.5px solid var(--g2); font-family: var(--sans); font-size: 0.88rem; background: #fff; outline: none; }
         .tamanho-qty { width: 70px; padding: 0.6rem 0.75rem; border: 1.5px solid var(--g2); font-family: var(--sans); font-size: 0.88rem; text-align: center; }
         .tamanho-rm { background: none; border: none; color: var(--rosa); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0.2rem; }
 
-        /* Ocasiões */
         .ocasiao-btn { padding: 0.35rem 0.6rem; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--sans); border: 1.5px solid var(--g2); background: #fff; color: var(--g4); cursor: pointer; transition: all 0.15s; }
         .ocasiao-btn.active { background: #c4748a; color: #fff; border-color: #c4748a; }
 
-        /* Upload area */
         .upload-area { border: 2px dashed var(--g2); padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; background: var(--g1); }
         .upload-area:hover { border-color: var(--rosa); }
 
-        /* Botões */
         .pub-btn { width: 100%; padding: 0.9rem; border: none; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-family: var(--sans); font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .pub-btn-black { background: #c4748a; color: #fff; }
         .pub-btn-black:hover { background: #b5637a; }
@@ -470,7 +839,6 @@ export default function PublicarPage() {
         .link-externo-box { padding: 1rem; background: #faf8f5; border: 1.5px solid #e8d5a3; margin-bottom: 1rem; }
         .link-externo-badge { font-size: 0.72rem; background: var(--ouro); color: #fff; padding: 0.1rem 0.4rem; font-weight: 600; letter-spacing: 0.08em; margin-left: 0.4rem; }
 
-        /* Sucesso */
         .sucesso-wrap { text-align: center; padding: 3rem 2rem; }
         .sucesso-icon { font-size: 2.5rem; margin-bottom: 1rem; }
         .sucesso-titulo { font-family: var(--sans); font-size: 1.5rem; font-weight: 600; color: var(--black); margin-bottom: 0.5rem; }
@@ -494,7 +862,7 @@ export default function PublicarPage() {
             <div key={s} className={`pub-step${passo > s ? " done" : passo === s ? " active" : ""}`} />
           ))}
         </div>
-        <a href="/perfil" className="pub-voltar">← Voltar</a>
+        <a href="/perfil" className="pub-voltar">{tl.voltar}</a>
       </nav>
 
       <div className="pub-body">
@@ -502,33 +870,30 @@ export default function PublicarPage() {
         {/* ── PASSO 1 — FOTOS ── */}
         {passo === 1 && (
           <>
-            <h1 className="pub-titulo">Adicionar peça</h1>
-            <p className="pub-subtitulo">Começa pelas fotos — até 5 imagens da peça.</p>
+            <h1 className="pub-titulo">{tl.p1titulo}</h1>
+            <p className="pub-subtitulo">{tl.p1sub}</p>
 
             <div className="pub-card">
-              <p className="pub-card-t">Fotos da peça</p>
+              <p className="pub-card-t">{tl.fotosCard}</p>
 
-              {/* Área drag-and-drop */}
               {fotos.length === 0 && (
                 <div className="upload-area" onClick={() => inputFotoRef.current?.click()}>
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8c4bc" strokeWidth="1.2" style={{marginBottom:"0.75rem"}}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  <p style={{fontSize:"0.9rem",color:"#5a5855",fontWeight:500,marginBottom:"0.25rem"}}>Toca para adicionar fotos</p>
-                  <p style={{fontSize:"0.72rem",color:"#9c9894"}}>JPG, PNG, WEBP — até 5 fotos</p>
+                  <p style={{fontSize:"0.9rem",color:"#5a5855",fontWeight:500,marginBottom:"0.25rem"}}>{tl.tocaFotos}</p>
+                  <p style={{fontSize:"0.72rem",color:"#9c9894"}}>{tl.fotosFormatos}</p>
                 </div>
               )}
 
-              {/* Grid de miniaturas */}
               {fotos.length > 0 && (
                 <div className="fotos-grid">
                   {fotos.map((f, i) => (
                     <div key={i} className="foto-thumb">
                       <img src={f.url} alt="" />
-                      <button className="foto-remove" onClick={() => removerFoto(i)} title="Remover">✕</button>
-                      {/* Badge de validação IA */}
+                      <button className="foto-remove" onClick={() => removerFoto(i)} title={tl.removerFoto}>✕</button>
                       {f.validando && (
                         <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(8,8,8,0.7)",display:"flex",alignItems:"center",justifyContent:"center",padding:"0.3rem",gap:"0.3rem"}}>
                           <div style={{width:6,height:6,borderRadius:"50%",background:"#f39c12",animation:"pcpulse 1s infinite"}}/>
-                          <span style={{fontSize:"0.68rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em"}}>A analisar...</span>
+                          <span style={{fontSize:"0.68rem",color:"#fff",fontFamily:"'Jost',sans-serif",letterSpacing:"0.08em"}}>{tl.aAnalisar}</span>
                         </div>
                       )}
                       {!f.validando && f.valida === true && (
@@ -538,9 +903,9 @@ export default function PublicarPage() {
                       )}
                       {!f.validando && f.valida === false && (
                         <div style={{position:"absolute",inset:0,background:"rgba(200,50,50,0.82)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0.4rem",gap:"0.3rem"}}>
-                          <span style={{fontSize:"0.72rem",color:"#fff",fontFamily:"'Jost',sans-serif",fontWeight:600,letterSpacing:"0.06em",textAlign:"center"}}>✕ Foto rejeitada</span>
+                          <span style={{fontSize:"0.72rem",color:"#fff",fontFamily:"'Jost',sans-serif",fontWeight:600,letterSpacing:"0.06em",textAlign:"center"}}>{tl.fotoRejeitada}</span>
                           <span style={{fontSize:"0.68rem",color:"rgba(255,255,255,0.85)",fontFamily:"'Jost',sans-serif",textAlign:"center",lineHeight:1.3}}>{f.motivo}</span>
-                          <button onClick={() => removerFoto(i)} style={{marginTop:"0.25rem",fontSize:"0.68rem",background:"rgba(255,255,255,0.2)",color:"#fff",border:"1px solid rgba(255,255,255,0.4)",padding:"0.2rem 0.5rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>Remover</button>
+                          <button onClick={() => removerFoto(i)} style={{marginTop:"0.25rem",fontSize:"0.68rem",background:"rgba(255,255,255,0.2)",color:"#fff",border:"1px solid rgba(255,255,255,0.4)",padding:"0.2rem 0.5rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",letterSpacing:"0.06em"}}>{tl.removerFoto}</button>
                         </div>
                       )}
                     </div>
@@ -548,7 +913,7 @@ export default function PublicarPage() {
                   {fotos.length < 5 && (
                     <div className="foto-add" onClick={() => inputFotoRef.current?.click()}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                      <span>Adicionar</span>
+                      <span>{tl.adicionarFoto}</span>
                     </div>
                   )}
                 </div>
@@ -565,7 +930,7 @@ export default function PublicarPage() {
 
               {fotos.length > 0 && (
                 <p style={{fontSize:"0.72rem",color:"#9c9894",marginTop:"0.5rem"}}>
-                  {fotos.length} foto{fotos.length > 1 ? "s" : ""} selecionada{fotos.length > 1 ? "s" : ""}. A primeira será a imagem principal.
+                  {fotos.length} {fotos.length > 1 ? tl.fotosSelecionadasPlural : tl.fotosSelecionadasSingular}
                 </p>
               )}
             </div>
@@ -576,15 +941,15 @@ export default function PublicarPage() {
               <button
                 className="pub-btn pub-btn-black"
                 onClick={() => {
-                  if (!fotos.length) { setErro("Adiciona pelo menos uma foto."); return; }
-                  if (fotos.some(f => f.validando)) { setErro("Aguarda a análise das fotos."); return; }
+                  if (!fotos.length) { setErro(tl.erroSemFotos); return; }
+                  if (fotos.some(f => f.validando)) { setErro(tl.erroAguardarAnalise); return; }
                   const invalidas = fotos.filter(f => f.valida === false);
-                  if (invalidas.length > 0) { setErro("Remove as fotos rejeitadas antes de continuar."); return; }
+                  if (invalidas.length > 0) { setErro(tl.erroFotosRejeitadas); return; }
                   setErro(""); setPasso(2);
                 }}
                 disabled={fotos.length === 0 || fotos.some(f => f.validando)}
               >
-                {fotos.some(f => f.validando) ? "A analisar fotos..." : "Continuar →"}
+                {fotos.some(f => f.validando) ? tl.aAnalisarFotos : tl.continuar}
               </button>
             </div>
           </>
@@ -593,14 +958,14 @@ export default function PublicarPage() {
         {/* ── PASSO 2 — DETALHES ── */}
         {passo === 2 && (
           <>
-            <h1 className="pub-titulo">Detalhes da peça</h1>
-            <p className="pub-subtitulo">Informação sobre a peça — quanto mais detalhes, melhor para a cliente.</p>
+            <h1 className="pub-titulo">{tl.p2titulo}</h1>
+            <p className="pub-subtitulo">{tl.p2sub}</p>
 
             {/* Categoria */}
             <div className="pub-card">
-              <p className="pub-card-t">Categoria</p>
+              <p className="pub-card-t">{tl.categoriaCard}</p>
               <div className="pub-fg">
-                <label className="pub-label">Categoria *</label>
+                <label className="pub-label">{tl.categoriaLabel}</label>
                 <select
                   className="pub-select"
                   value={peca.categoria}
@@ -610,18 +975,18 @@ export default function PublicarPage() {
                     setPeca(prev => ({ ...prev, categoria: cat, tamanhos: semTam ? [{ tamanho: "Único", quantidade: 1 }] : prev.tamanhos }));
                   }}
                 >
-                  <option value="">Selecionar categoria...</option>
-                  <optgroup label="Vestuário">
+                  <option value="">{tl.categoriaPlaceholder}</option>
+                  <optgroup label={tl.grupoVestuario}>
                     {CATEGORIAS_VESTUARIO.map(c => <option key={c}>{c}</option>)}
                   </optgroup>
-                  <optgroup label="Acessórios">
+                  <optgroup label={tl.grupoAcessorios}>
                     {CATEGORIAS_ACESSORIOS.map(c => <option key={c}>{c}</option>)}
                   </optgroup>
-                  <optgroup label="Relógios">
+                  <optgroup label={tl.grupoRelogios}>
                     <option>Relógios</option>
                   </optgroup>
-                  <optgroup label="Calçado">
-                    {["Saltos","Sandálias","Botas","Sapatilhas","Calçado"].map(c => <option key={c}>{c}</option>)}
+                  <optgroup label={tl.grupoCalcado}>
+                    {tl.calcadoItens.map(c => <option key={c}>{c}</option>)}
                   </optgroup>
                 </select>
               </div>
@@ -629,23 +994,23 @@ export default function PublicarPage() {
 
             {/* Nome + Marca */}
             <div className="pub-card">
-              <p className="pub-card-t">Identificação</p>
+              <p className="pub-card-t">{tl.identificacaoCard}</p>
               <div className="pub-grid2">
                 <div className="pub-fg">
-                  <label className="pub-label">Nome da peça *</label>
-                  <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder="Ex: Vestido midi azul marinho" />
+                  <label className="pub-label">{tl.nomeLabel}</label>
+                  <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder={tl.nomePlaceholder} />
                 </div>
                 <div className="pub-fg">
-                  <label className="pub-label">Marca / Designer</label>
-                  <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder="Zara, Mango, Gucci..." />
+                  <label className="pub-label">{tl.marcaLabel}</label>
+                  <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder={tl.marcaPlaceholder} />
                 </div>
                 <div className="pub-fg">
                   <label className="pub-label" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <span>Valor peça nova (€) {!peca.valor_peca_desconhecido && <span style={{color:"#c4748a"}}>*</span>}</span>
+                    <span>{tl.valorNovaLabel} {!peca.valor_peca_desconhecido && <span style={{color:"#c4748a"}}>{tl.valorNovaObrigatorio}</span>}</span>
                     <button type="button"
                       onClick={()=>setP("valor_peca_desconhecido", !peca.valor_peca_desconhecido)}
                       style={{fontSize:"0.6rem",color:peca.valor_peca_desconhecido?"#c4748a":"#888580",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",padding:0}}>
-                      {peca.valor_peca_desconhecido ? "✕ cancelar" : "Não sei o preço original"}
+                      {peca.valor_peca_desconhecido ? tl.valorNovaBotaoCancelar : tl.valorNovaBotaoNaoSei}
                     </button>
                   </label>
                   {peca.valor_peca_desconhecido ? (
@@ -655,9 +1020,9 @@ export default function PublicarPage() {
                         type="number" min="0"
                         value={peca.valor_peca}
                         onChange={e => setP("valor_peca", e.target.value)}
-                        placeholder="Estimativa de valor (ex: 120)"
+                        placeholder={tl.valorNovaEstimativaPlaceholder}
                       />
-                      <span className="pub-hint" style={{color:"#b35900"}}>⚠ Inserir uma estimativa do valor de mercado actual — os cálculos ficarão menos precisos.</span>
+                      <span className="pub-hint" style={{color:"#b35900"}}>{tl.valorNovaEstimativaHint}</span>
                     </>
                   ) : (
                     <>
@@ -666,44 +1031,44 @@ export default function PublicarPage() {
                         type="number" min="0"
                         value={peca.valor_peca}
                         onChange={e => setP("valor_peca", e.target.value)}
-                        placeholder="Ex: 200"
+                        placeholder={tl.valorNovaPlaceholder}
                         style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
                       />
-                      <span className="pub-hint">Preço original quando era nova — base do aluguer e da venda usada.</span>
+                      <span className="pub-hint">{tl.valorNovaHint}</span>
                     </>
                   )}
                 </div>
                 <div className="pub-fg">
-                  <label className="pub-label">Cor principal</label>
-                  <input className="pub-input" value={peca.cor} onChange={e => setP("cor", e.target.value)} placeholder="Azul marinho" list="cores-lista" />
+                  <label className="pub-label">{tl.corLabel}</label>
+                  <input className="pub-input" value={peca.cor} onChange={e => setP("cor", e.target.value)} placeholder={tl.corPlaceholder} list="cores-lista" />
                   <datalist id="cores-lista">
                     {CORES.map(c => <option key={c} value={c} />)}
                   </datalist>
                 </div>
                 <div className="pub-fg">
-                  <label className="pub-label">Material</label>
-                  <input className="pub-input" value={peca.material} onChange={e => setP("material", e.target.value)} placeholder="100% seda natural" />
+                  <label className="pub-label">{tl.materialLabel}</label>
+                  <input className="pub-input" value={peca.material} onChange={e => setP("material", e.target.value)} placeholder={tl.materialPlaceholder} />
                 </div>
                 <div className="pub-fg pub-full">
-                  <label className="pub-label">Condição</label>
+                  <label className="pub-label">{tl.condicaoLabel}</label>
                   <select className="pub-select" value={peca.condicao} onChange={e => setP("condicao", e.target.value)}>
-                    <option value="novo">Novo (com etiqueta)</option>
-                    <option value="como_novo">Como novo (nunca usado)</option>
-                    <option value="muito_bom">Muito bom estado</option>
-                    <option value="bom">Bom estado</option>
-                    <option value="usado">Usado</option>
+                    <option value="novo">{tl.condicaoNovo}</option>
+                    <option value="como_novo">{tl.condicaoComoNovo}</option>
+                    <option value="muito_bom">{tl.condicaoMuitoBom}</option>
+                    <option value="bom">{tl.condicaoBom}</option>
+                    <option value="usado">{tl.condicaoUsado}</option>
                   </select>
                 </div>
                 <div className="pub-fg pub-full">
-                  <label className="pub-label">Descrição</label>
-                  <textarea className="pub-textarea" value={peca.descricao} onChange={e => setP("descricao", e.target.value)} placeholder="Conta a história desta peça — ocasião ideal, como usar, porquê é especial..." />
+                  <label className="pub-label">{tl.descricaoLabel}</label>
+                  <textarea className="pub-textarea" value={peca.descricao} onChange={e => setP("descricao", e.target.value)} placeholder={tl.descricaoPlaceholder} />
                 </div>
               </div>
             </div>
 
             {/* Defeito */}
             <div className="pub-card">
-              <p className="pub-card-t">Estado de conservação</p>
+              <p className="pub-card-t">{tl.defeitoCard}</p>
               <div className={`defeito-box${peca.tem_defeito ? " ativo" : ""}`}>
                 <label className="defeito-label">
                   <input
@@ -712,7 +1077,7 @@ export default function PublicarPage() {
                     onChange={e => setP("tem_defeito", e.target.checked)}
                     style={{ width: "1rem", height: "1rem", cursor: "pointer", accentColor: "#e74c3c" }}
                   />
-                  A peça tem defeito
+                  {tl.defeitoLabel}
                 </label>
                 {peca.tem_defeito ? (
                   <textarea
@@ -720,11 +1085,11 @@ export default function PublicarPage() {
                     value={peca.descricao_defeito}
                     onChange={e => setP("descricao_defeito", e.target.value)}
                     style={{ marginTop: "0.75rem", border: "1.5px solid #e74c3c" }}
-                    placeholder="Descreve o defeito — ex: ligeira mancha na manga, fio solto na bainha..."
+                    placeholder={tl.defeitoPlaceholder}
                   />
                 ) : (
                   <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
-                    A peça está em perfeitas condições.
+                    {tl.defeitoPerfeito}
                   </p>
                 )}
               </div>
@@ -732,7 +1097,7 @@ export default function PublicarPage() {
 
             {/* Higienização */}
             <div className="pub-card">
-              <p className="pub-card-t">Higienização</p>
+              <p className="pub-card-t">{tl.higienizacaoCard}</p>
               <div className={`defeito-box${peca.higienizacao_ativa ? " ativo" : ""}`}>
                 <label className="defeito-label">
                   <input
@@ -741,26 +1106,26 @@ export default function PublicarPage() {
                     onChange={e => setP("higienizacao_ativa", e.target.checked)}
                     style={{ width: "1rem", height: "1rem", cursor: "pointer", accentColor: "#c4748a" }}
                   />
-                  Esta peça requer higienização profissional
+                  {tl.higienizacaoLabel}
                 </label>
                 {peca.higienizacao_ativa ? (
                   <div style={{ marginTop: "0.75rem" }}>
-                    <label className="pub-label" style={{ fontSize: "0.72rem" }}>Custo de higienização (€)</label>
+                    <label className="pub-label" style={{ fontSize: "0.72rem" }}>{tl.higienizacaoCustoLabel}</label>
                     <input
                       className="pub-input"
                       type="number" min="0" step="0.5"
                       value={peca.higienizacao_valor}
                       onChange={e => setP("higienizacao_valor", e.target.value)}
-                      placeholder="ex: 6.00"
+                      placeholder={tl.higienizacaoCustoPlaceholder}
                       style={{ marginTop: "0.4rem", maxWidth: 140 }}
                     />
                     <p style={{ fontSize: "0.65rem", color: "#9c9894", marginTop: "0.4rem", lineHeight: 1.5 }}>
-                      Valor cobrado ao cliente no checkout. Define de acordo com a tua lavandaria parceira.
+                      {tl.higienizacaoCustoHint}
                     </p>
                   </div>
                 ) : (
                   <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
-                    Sem taxa de higienização — a limpeza é tratada internamente.
+                    {tl.higienizacaoSem}
                   </p>
                 )}
               </div>
@@ -768,7 +1133,7 @@ export default function PublicarPage() {
 
             {/* Tamanhos */}
             <div className="pub-card">
-              <p className="pub-card-t">Tamanhos disponíveis</p>
+              <p className="pub-card-t">{tl.tamanhosCard}</p>
               {peca.tamanhos.map((t, idx) => (
                 <div key={idx} className="tamanho-row">
                   <select
@@ -784,7 +1149,6 @@ export default function PublicarPage() {
                     value={t.quantidade}
                     min={1}
                     onChange={e => setPeca(prev => ({ ...prev, tamanhos: prev.tamanhos.map((x, i) => i === idx ? { ...x, quantidade: parseInt(e.target.value) || 1 } : x) }))}
-                    title="Quantidade"
                   />
                   {peca.tamanhos.length > 1 && (
                     <button
@@ -798,13 +1162,13 @@ export default function PublicarPage() {
                 onClick={() => setPeca(prev => ({ ...prev, tamanhos: [...prev.tamanhos, { tamanho: "M", quantidade: 1 }] }))}
                 style={{ fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "none", border: "1.5px solid var(--g2)", padding: "0.4rem 0.75rem", cursor: "pointer", fontFamily: "var(--sans)", color: "var(--g4)" }}
               >
-                + Tamanho
+                {tl.adicionarTamanho}
               </button>
             </div>
 
             {/* Ocasiões */}
             <div className="pub-card">
-              <p className="pub-card-t">Ocasiões</p>
+              <p className="pub-card-t">{tl.ocasioesCard}</p>
               <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
                 {OCASIOES.map(oc => (
                   <button
@@ -824,7 +1188,7 @@ export default function PublicarPage() {
               </div>
             </div>
 
-            {/* Preview de preços — aparece assim que valor_peca está preenchido */}
+            {/* Preview de preços */}
             {(() => {
               const est = calcEstimativa(peca);
               if (!est) return null;
@@ -835,14 +1199,14 @@ export default function PublicarPage() {
                   marginBottom: "0.75rem",
                 }}>
                   <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#888580", marginBottom: "0.6rem" }}>
-                    Estimativa automática
+                    {tl.estimativaLabel}
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.5rem" }}>
                     {[
-                      ["Aluguer / dia", `€${est.precoAluguerDia}`, "#c4748a"],
-                      ["Venda usada", `€${est.precoVendaUsada}`, "#1a1816"],
-                      ["Valor mercado", `€${est.valorMercado}`, "#1a1816"],
-                      ["Caução", `€${est.caucao}`, "#27ae60"],
+                      [tl.aluguerDia, `€${est.precoAluguerDia}`, "#c4748a"],
+                      [tl.vendaUsada, `€${est.precoVendaUsada}`, "#1a1816"],
+                      [tl.valorMercado, `€${est.valorMercado}`, "#1a1816"],
+                      [tl.caucao, `€${est.caucao}`, "#27ae60"],
                     ].map(([l, v, cor]) => (
                       <div key={l} style={{ textAlign: "center" }}>
                         <div style={{ fontSize: "1rem", fontFamily: "serif", fontWeight: 400, color: cor }}>{v}</div>
@@ -851,7 +1215,7 @@ export default function PublicarPage() {
                     ))}
                   </div>
                   <div style={{ fontSize: "0.68rem", color: "#888580", marginTop: "0.6rem", borderTop: "1px solid #e2dfda", paddingTop: "0.5rem" }}>
-                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial €{est.ganho12m} em 12 meses
+                    ~{est.rotMes}× {tl.rotacoesMes} · ~{est.diasAlug} {tl.diasAluguer} · {tl.potencial} €{est.ganho12m} {tl.em12Meses}
                   </div>
                 </div>
               );
@@ -865,7 +1229,7 @@ export default function PublicarPage() {
                 className="pub-btn pub-btn-black"
                 onClick={() => { if (validarPasso2()) setPasso(3); }}
               >
-                Continuar →
+                {tl.continuar}
               </button>
             </div>
           </>
@@ -874,14 +1238,14 @@ export default function PublicarPage() {
         {/* ── PASSO 3 — PREÇOS ── */}
         {passo === 3 && (
           <>
-            <h1 className="pub-titulo">Preços e disponibilidade</h1>
-            <p className="pub-subtitulo">Define como a peça estará disponível — para alugar, vender, ou ambos.</p>
+            <h1 className="pub-titulo">{tl.p3titulo}</h1>
+            <p className="pub-subtitulo">{tl.p3sub}</p>
 
-            {/* ── Estimativa inteligente ── */}
+            {/* Estimativa inteligente */}
             {(() => {
               const est = calcEstimativa(peca);
               if (!est) return null;
-              const tierLabel = { premium: "✦ Marca premium", alta: "Marca alta", massmarket: "Marca standard" }[est.tier];
+              const tierLabel = { premium: tl.tierPremium, alta: tl.tierAlta, massmarket: tl.tierMassmarket }[est.tier];
               return (
                 <div style={{
                   background: "linear-gradient(135deg,#1a1816 0%,#2d2926 100%)",
@@ -889,28 +1253,28 @@ export default function PublicarPage() {
                   marginBottom: "0.75rem", color: "#fff",
                 }}>
                   <div style={{ fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem" }}>
-                    Estimativa Nora Grei · {tierLabel}
+                    {tl.estimativaNG} · {tierLabel}
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.6rem", marginBottom: "0.85rem" }}>
                     <div>
                       <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.valorMercado}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>valor mercado</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>{tl.valorMercado}</div>
                     </div>
                     <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
                       <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1, color: "#e8a0b0" }}>€{est.precoAluguerDia}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>aluguer/dia</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>{tl.aluguerDia}</div>
                     </div>
                     <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
                       <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1 }}>€{est.precoVendaUsada}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>venda usada</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>{tl.vendaUsada}</div>
                     </div>
                     <div style={{ borderLeft: "1px solid rgba(255,255,255,0.1)", paddingLeft: "0.5rem" }}>
                       <div style={{ fontSize: "1.25rem", fontFamily: "serif", fontWeight: 400, lineHeight: 1, color: "#a8d8a8" }}>€{est.caucao}</div>
-                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>caução</div>
+                      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>{tl.caucao}</div>
                     </div>
                   </div>
                   <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: "0.75rem", lineHeight: 1.4 }}>
-                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> em 12 meses
+                    ~{est.rotMes}× {tl.rotacoesMes} · ~{est.diasAlug} {tl.diasAluguer} · {tl.potencial} <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> {tl.em12Meses}
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <button
@@ -921,10 +1285,10 @@ export default function PublicarPage() {
                         preco_venda: est.precoVendaUsada.toString(),
                       }))}
                     >
-                      Usar sugestão
+                      {tl.usarSugestao}
                     </button>
                     <div style={{ flex: 1, padding: "0.55rem", background: "rgba(255,255,255,0.07)", borderRadius: 8, fontSize: "0.64rem", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", lineHeight: 1.3 }}>
-                      Ou ajusta manualmente abaixo
+                      {tl.ajustarManualmente}
                     </div>
                   </div>
                 </div>
@@ -933,9 +1297,9 @@ export default function PublicarPage() {
 
             {/* Idade da peça */}
             <div className="pub-card" style={{ marginBottom: "0.75rem" }}>
-              <p className="pub-card-t">Idade da peça</p>
+              <p className="pub-card-t">{tl.idadePecaCard}</p>
               <div className="pub-grid2">
-                {[["novo","Menos de 1 ano"],["1a2","1 a 2 anos"],["2a4","2 a 4 anos"],["4mais","Mais de 4 anos"]].map(([v, l]) => (
+                {[["novo", tl.idadeMenos1],["1a2", tl.idade1a2],["2a4", tl.idade2a4],["4mais", tl.idade4mais]].map(([v, l]) => (
                   <button
                     key={v}
                     className={`tipo-btn${peca.idade_peca === v ? " active" : ""}`}
@@ -949,26 +1313,25 @@ export default function PublicarPage() {
             {/* Tipo — cards com contexto financeiro */}
             {(() => {
               const est = calcEstimativa(peca);
-              const ganhoAluguer = est ? `€${est.ganho12m}/ano` : null;
-              const ganhoVenda = est ? `€${est.precoVendaUsada} imediato` : null;
-              const ganhoAmbos = est ? `€${est.precoVendaUsada} + rendas` : null;
-              const tl = TIPOS_I18N[lang] || TIPOS_I18N.pt;
+              const ganhoAluguer = est ? `€${est.ganho12m}/${lang === "fr" ? "an" : lang === "lt" ? "metus" : "ano"}` : null;
+              const ganhoVenda = est ? `€${est.precoVendaUsada} ${lang === "fr" ? "immédiat" : lang === "lt" ? "iš karto" : "imediato"}` : null;
+              const ganhoAmbos = est ? `€${est.precoVendaUsada} + ${lang === "fr" ? "rentes" : lang === "lt" ? "nuoma" : "rendas"}` : null;
               const CORES_TIPO = { alugar:"#c4748a", comprar:"#5b8a6b", ambos:"#7a6a9e", social:"#c4a882" };
               const DETALHES_CALC = {
-                alugar:  ganhoAluguer ? `Potencial ${ganhoAluguer}` : tl.alugar.detalhe,
-                comprar: ganhoVenda   ? `Receber ${ganhoVenda}`     : tl.comprar.detalhe,
-                ambos:   ganhoAmbos   ? ganhoAmbos                  : tl.ambos.detalhe,
-                social:  tl.social.detalhe,
+                alugar:  ganhoAluguer ? `${lang === "fr" ? "Potentiel" : lang === "lt" ? "Potencialas" : "Potencial"} ${ganhoAluguer}` : tLoc.alugar.detalhe,
+                comprar: ganhoVenda   ? `${lang === "fr" ? "Recevoir" : lang === "lt" ? "Gauti" : "Receber"} ${ganhoVenda}` : tLoc.comprar.detalhe,
+                ambos:   ganhoAmbos   ? ganhoAmbos                  : tLoc.ambos.detalhe,
+                social:  tLoc.social.detalhe,
               };
               const opcoes = ["alugar","comprar","ambos","social"].map(val => ({
                 val,
-                ...tl[val],
+                ...tLoc[val],
                 detalhe: DETALHES_CALC[val],
                 cor: CORES_TIPO[val],
               }));
               return (
                 <div className="pub-card">
-                  <p className="pub-card-t">{tl.titulo}</p>
+                  <p className="pub-card-t">{tLoc.titulo}</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     {opcoes.map(({ val, titulo, icone, desc, detalhe, cor, nota }) => {
                       const ativo = peca.tipo === val;
@@ -987,28 +1350,13 @@ export default function PublicarPage() {
                               width: "100%",
                             }}
                           >
-                            <span style={{
-                              fontSize: "1.3rem", lineHeight: 1,
-                              color: ativo ? cor : "#aaa",
-                              minWidth: 28, textAlign: "center",
-                            }}>{icone}</span>
+                            <span style={{ fontSize: "1.3rem", lineHeight: 1, color: ativo ? cor : "#aaa", minWidth: 28, textAlign: "center" }}>{icone}</span>
                             <div style={{ flex: 1 }}>
-                              <div style={{
-                                fontSize: "0.78rem", fontWeight: 600,
-                                letterSpacing: "0.06em", textTransform: "uppercase",
-                                color: ativo ? cor : "#1a1816", marginBottom: "0.2rem",
-                                fontFamily: "inherit",
-                              }}>{titulo}</div>
+                              <div style={{ fontSize: "0.78rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: ativo ? cor : "#1a1816", marginBottom: "0.2rem", fontFamily: "inherit" }}>{titulo}</div>
                               <div style={{ fontSize: "0.7rem", color: "#888", lineHeight: 1.4 }}>{desc}</div>
                             </div>
-                            <div style={{
-                              fontSize: "0.68rem", fontWeight: 600,
-                              color: ativo ? cor : "#bbb",
-                              textAlign: "right", whiteSpace: "nowrap",
-                              lineHeight: 1.3,
-                            }}>{detalhe}</div>
+                            <div style={{ fontSize: "0.68rem", fontWeight: 600, color: ativo ? cor : "#bbb", textAlign: "right", whiteSpace: "nowrap", lineHeight: 1.3 }}>{detalhe}</div>
                           </button>
-                          {/* Nota explicativa — só visível quando selecionado */}
                           {ativo && (
                             <div style={{
                               padding: "0.65rem 1rem 0.75rem",
@@ -1034,68 +1382,60 @@ export default function PublicarPage() {
 
             {/* Preços */}
             <div className="pub-card">
-              <p className="pub-card-t">Preços</p>
+              <p className="pub-card-t">{tl.precosCard}</p>
               <div className="pub-grid2">
 
-                {/* Valor nova */}
                 <div className="pub-fg">
-                  <label className="pub-label">
-                    Valor peça nova (€) <span style={{color:"#c4748a"}}>*</span>
-                  </label>
+                  <label className="pub-label">{tl.valorNovaObrigLabel}</label>
                   <input
                     className="pub-input"
-                    type="number"
-                    min="0"
+                    type="number" min="0"
                     value={peca.valor_peca}
                     onChange={e => setP("valor_peca", e.target.value)}
                     placeholder="200"
                     style={!peca.valor_peca ? { borderColor: "rgba(196,116,138,0.4)" } : {}}
                   />
-                  <span className="pub-hint">Obrigatório — é a âncora para calcular o preço de aluguer, caução e valor de venda usada.</span>
+                  <span className="pub-hint">{tl.valorNovaObrigHint}</span>
                 </div>
 
-                {/* Preço aluguer */}
                 {precisaAluguer && (
                   <div className="pub-fg">
                     <label className="pub-label" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                      Aluguer / dia (€) *
+                      {tl.aluguerDiaLabel}
                       {(() => { const est = calcEstimativa(peca); return est ? (
                         <span style={{ fontSize: "0.55rem", background: "#e8f5e9", color: "#27ae60", padding: "0.1rem 0.35rem", fontWeight: 600 }}>
-                          sugerido: €{est.precoAluguerDia}
+                          {tl.aluguerSugestao} €{est.precoAluguerDia}
                         </span>
                       ) : null; })()}
                     </label>
                     <input
                       className="pub-input"
-                      type="number"
-                      min="0"
+                      type="number" min="0"
                       value={peca.preco_aluguer_dia}
                       onChange={e => setP("preco_aluguer_dia", e.target.value)}
                       placeholder="16"
                     />
                     {peca.valor_peca && peca.preco_aluguer_dia && parseFloat(peca.valor_peca) > 0 && parseFloat(peca.preco_aluguer_dia) > 0 && (
                       <span className="pub-sugestao">
-                        A cliente poupa {Math.round((1 - parseFloat(peca.preco_aluguer_dia) / parseFloat(peca.valor_peca)) * 100)}% vs comprar nova
+                        {tl.clientePoupanca} {Math.round((1 - parseFloat(peca.preco_aluguer_dia) / parseFloat(peca.valor_peca)) * 100)}{tl.vsComprarNova}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Preço venda usada */}
                 {precisaVenda && (
                   <div className="pub-fg">
-                    <label className="pub-label">Preço de venda usada (€) *</label>
+                    <label className="pub-label">{tl.vendaUsadaLabel}</label>
                     <input
                       className="pub-input"
-                      type="number"
-                      min="0"
+                      type="number" min="0"
                       value={peca.preco_venda}
                       onChange={e => setP("preco_venda", e.target.value)}
                       placeholder="150"
                     />
                     {(() => { const est = calcEstimativa(peca); return est ? (
-                      <span className="pub-hint">Estimativa: €{est.precoVendaUsada} com base no estado e marca.</span>
-                    ) : <span className="pub-hint">Preço de venda da peça em segunda mão.</span>; })()}
+                      <span className="pub-hint">{tl.vendaUsadaEstimativa} €{est.precoVendaUsada} {tl.vendaUsadaComBase}</span>
+                    ) : <span className="pub-hint">{tl.vendaUsadaHint}</span>; })()}
                   </div>
                 )}
 
@@ -1104,22 +1444,22 @@ export default function PublicarPage() {
 
             {/* Link externo */}
             <div className="pub-card">
-              <p className="pub-card-t">Link para comprar nova <span style={{opacity:0.5}}>(opcional)</span></p>
+              <p className="pub-card-t">{tl.linkExternoCard} <span style={{opacity:0.5}}>{tl.linkExternoOpcional}</span></p>
               <div className="link-externo-box">
                 <label className="pub-label" style={{ color: "#8a6a2a" }}>
-                  Link para comprar nova ↗
-                  <span className="link-externo-badge">15€/mês</span>
+                  {tl.linkExternoLabel}
+                  <span className="link-externo-badge">{tl.linkExterno15}</span>
                 </label>
                 <input
                   className="pub-input"
                   type="url"
                   value={peca.link_compra_externa}
                   onChange={e => setP("link_compra_externa", e.target.value)}
-                  placeholder="https://www.zara.com/produto/..."
+                  placeholder={tl.linkExternoPlaceholder}
                   style={{ marginTop: "0.5rem" }}
                 />
                 <p style={{ fontSize: "0.65rem", color: "#8a6a2a", marginTop: "0.5rem", lineHeight: 1.5 }}>
-                  Direciona as clientes para comprarem a peça nova noutro site. A Nora Grei ativa este link após pagamento de 15€/mês.
+                  {tl.linkExternoHint}
                 </p>
               </div>
             </div>
@@ -1136,7 +1476,7 @@ export default function PublicarPage() {
                 onClick={publicar}
                 disabled={enviando}
               >
-                {enviando ? "A publicar..." : "Publicar peça"}
+                {enviando ? tl.aPublicar : tl.publicarPeca}
               </button>
             </div>
           </>
@@ -1146,10 +1486,8 @@ export default function PublicarPage() {
         {passo === 4 && (
           <div className="pub-card sucesso-wrap">
             <div className="sucesso-icon">🎉</div>
-            <h2 className="sucesso-titulo">Peça publicada!</h2>
-            <p className="sucesso-sub">
-              A tua peça foi adicionada ao teu catálogo e ficará visível na tua loja após aprovação.
-            </p>
+            <h2 className="sucesso-titulo">{tl.p4titulo}</h2>
+            <p className="sucesso-sub">{tl.p4sub}</p>
             <div className="sucesso-acoes">
               {cliente?.codigo_cliente && (
                 <a
@@ -1157,7 +1495,7 @@ export default function PublicarPage() {
                   className="sucesso-btn"
                   style={{ background: "#080808", color: "#fff" }}
                 >
-                  Ver a minha loja ↗
+                  {tl.verLoja}
                 </a>
               )}
               <button
@@ -1165,10 +1503,10 @@ export default function PublicarPage() {
                 onClick={reiniciar}
                 style={{ background: "#fff", border: "1.5px solid #e2dfda", color: "#080808" }}
               >
-                Adicionar outra peça
+                {tl.adicionarOutra}
               </button>
               <a href="/perfil" className="sucesso-btn" style={{ color: "#7a776f", textDecoration: "none", fontSize: "0.7rem" }}>
-                Ir para o perfil
+                {tl.irParaPerfil}
               </a>
             </div>
           </div>
