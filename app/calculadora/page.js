@@ -9,10 +9,11 @@ const T = {
     subtitulo: "Introduz os dados da peça e vê quanto podes ganhar — antes e depois de a vender.",
     precoLabel: "Preço original de compra",
     precoHint: "Quanto pagaste pela peça quando era nova",
-    categoriaLabel: "Categoria",
+    marcaLabel: "Marca",
+    marcaPlaceholder: "ex: Chanel, Zara, Gucci...",
+    tipoLabel: "Tipo de peça",
     estadoLabel: "Estado actual da peça",
-    idadeLabel: "Idade da peça",
-    usoLabel: "Quantas vezes a usaste",
+    usoLabel: "Frequência de uso",
     mesesLabel: "Durante quantos meses queres alugar?",
     mesesPeriodo: "Período de aluguer",
     mesesUnidade: (n) => `${n} meses`,
@@ -56,10 +57,11 @@ const T = {
     subtitulo: "Saisis les données de ta pièce et vois combien tu peux gagner — avant et après la vendre.",
     precoLabel: "Prix d'achat original",
     precoHint: "Combien tu as payé la pièce neuve",
-    categoriaLabel: "Catégorie",
+    marcaLabel: "Marque",
+    marcaPlaceholder: "ex : Chanel, Zara, Gucci...",
+    tipoLabel: "Type de pièce",
     estadoLabel: "État actuel de la pièce",
-    idadeLabel: "Âge de la pièce",
-    usoLabel: "Combien de fois tu l'as portée",
+    usoLabel: "Fréquence d'utilisation",
     mesesLabel: "Pendant combien de mois veux-tu louer ?",
     mesesPeriodo: "Période de location",
     mesesUnidade: (n) => `${n} mois`,
@@ -103,10 +105,11 @@ const T = {
     subtitulo: "Įvesk drabužio duomenis ir sužinok, kiek gali uždirbti — prieš ir po pardavimo.",
     precoLabel: "Originali pirkimo kaina",
     precoHint: "Kiek mokėjai už naują drabužį",
-    categoriaLabel: "Kategorija",
+    marcaLabel: "Prekės ženklas",
+    marcaPlaceholder: "pvz.: Chanel, Zara, Gucci...",
+    tipoLabel: "Drabužio tipas",
     estadoLabel: "Dabartinė drabužio būklė",
-    idadeLabel: "Drabužio amžius",
-    usoLabel: "Kiek kartų dėvėjai",
+    usoLabel: "Nešiojimo dažnis",
     mesesLabel: "Kiek mėnesių nori nuomoti?",
     mesesPeriodo: "Nuomos laikotarpis",
     mesesUnidade: (n) => `${n} mėn.`,
@@ -146,51 +149,70 @@ const T = {
   },
 };
 
+// ── Sistema de marcas (espelhado do perfil) ───────────────────────────────────
+const MARCAS_INVESTIMENTO = ["rolex","patek philippe","patek","audemars piguet","ap","richard mille","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly"];
+const MARCAS_PREMIUM = ["gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline",
+  "givenchy","valentino","versace","balenciaga","jacquemus","loewe","loro piana",
+  "brunello cucinelli","max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren"];
+const MARCAS_ALTA = ["zara","mango","&other stories","other stories","cos","arket",
+  "massimo dutti","pedro del hierro","hugo boss","boss","calvin klein","ck",
+  "tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda",
+  "weekday","monki","stradivarius","bershka","pull&bear","sfera",
+  "phase eight","whistles","reiss","allsaints","ba&sh","bash","sandro","maje"];
+
+// Sugestões visíveis por tier (para o datalist)
+const SUGESTOES_MARCA = [
+  "Chanel","Hermès","Louis Vuitton","Rolex","Patek Philippe",
+  "Gucci","Prada","Dior","Bottega Veneta","Saint Laurent","Balenciaga","Celine","Valentino","Versace","Loewe","Jacquemus","Burberry","Ralph Lauren","Max Mara","Mulberry",
+  "Zara","Mango","COS","Arket","Massimo Dutti","Hugo Boss","Calvin Klein","Tommy Hilfiger","Lacoste","Levi's","Sandro","Maje","Ba&sh",
+];
+
+function fatorMarca(marca = "") {
+  const m = marca.toLowerCase().trim();
+  if (!m) return { fator: 0.32, tier: "massmarket" };
+  if (MARCAS_INVESTIMENTO.some(b => m.includes(b))) return { fator: 1.15, tier: "investimento" };
+  if (MARCAS_PREMIUM.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
+  if (MARCAS_ALTA.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
+  return { fator: 0.32, tier: "massmarket" };
+}
+
 // Comissões reais da plataforma
 const COMISSAO_ALUGUER = 0.10;
 const COMISSAO_VENDA = 0.20;
-const CUSTO_HIGIENIZACAO = 8;
 const CUSTO_ENVIO = 6;
 
-// Fatores de depreciação por categoria
-const CATEGORIAS_DATA = [
-  { id: "luxo",      fator: 0.70, rotacao: 2.5, label: { pt: "Luxo / Designer",   fr: "Luxe / Créateur",    lt: "Prabanga / Dizaineris" } },
-  { id: "mid",       fator: 0.42, rotacao: 1.8, label: { pt: "Mid-market",         fr: "Milieu de gamme",    lt: "Vidutinė klasė" } },
-  { id: "festa",     fator: 0.55, rotacao: 1.2, label: { pt: "Festa / Ocasião",    fr: "Fête / Occasion",    lt: "Šventė / Proga" } },
-  { id: "casual",    fator: 0.28, rotacao: 2.2, label: { pt: "Casual / Dia-a-dia", fr: "Casual / Quotidien", lt: "Kasdieniai" } },
-  { id: "acessorio", fator: 0.65, rotacao: 2.0, label: { pt: "Acessório / Mala",   fr: "Accessoire / Sac",   lt: "Aksesuaras / Rankinė" } },
-];
-
 const ESTADOS_DATA = [
-  { id: "novo",      fator: 1.00, label: { pt: "Nunca usado / com etiqueta", fr: "Jamais porté / avec étiquette", lt: "Nenaudotas / su etiket." } },
-  { id: "excelente", fator: 0.85, label: { pt: "Excelente — como novo",      fr: "Excellent — comme neuf",        lt: "Puikus — kaip naujas" } },
-  { id: "bom",       fator: 0.65, label: { pt: "Bom — uso cuidadoso",        fr: "Bon — usage soigné",            lt: "Geras — atsargiai naudotas" } },
-  { id: "aceitavel", fator: 0.40, label: { pt: "Aceitável — uso visível",    fr: "Acceptable — usage visible",    lt: "Priimtinas — matomas naudojimas" } },
-];
-
-const IDADES_DATA = [
-  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano",  fr: "Moins d'un an",   lt: "Mažiau nei 1 metai" } },
-  { id: "1a2",   fator: 0.85, label: { pt: "1 a 2 anos",      fr: "1 à 2 ans",        lt: "1–2 metai" } },
-  { id: "2a4",   fator: 0.70, label: { pt: "2 a 4 anos",      fr: "2 à 4 ans",        lt: "2–4 metai" } },
-  { id: "4mais", fator: 0.50, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",    lt: "Daugiau nei 4 metai" } },
+  { id: "como_novo",  fator: 0.92, label: { pt: "Nunca usado / com etiqueta", fr: "Jamais porté / avec étiquette", lt: "Nenaudotas / su etikete" } },
+  { id: "bom",        fator: 0.68, label: { pt: "Bom — uso cuidadoso",        fr: "Bon — usage soigné",            lt: "Geras — atsargiai naudotas" } },
+  { id: "usado",      fator: 0.45, label: { pt: "Usado — uso visível",        fr: "Usé — usage visible",           lt: "Naudotas — matomas naudojimas" } },
+  { id: "com_defeito",fator: 0.25, label: { pt: "Com defeito / reparação",    fr: "Défectueux / à réparer",        lt: "Su defektu / taisytinas" } },
 ];
 
 const USOS_DATA = [
-  { id: "nunca", fator: 1.00, label: { pt: "Nunca / 1 vez",  fr: "Jamais / 1 fois",  lt: "Niekada / 1 kartą" } },
-  { id: "pouco", fator: 0.88, label: { pt: "2 a 5 vezes",    fr: "2 à 5 fois",        lt: "2–5 kartus" } },
-  { id: "medio", fator: 0.72, label: { pt: "6 a 15 vezes",   fr: "6 à 15 fois",       lt: "6–15 kartų" } },
-  { id: "muito", fator: 0.52, label: { pt: "Mais de 15×",    fr: "Plus de 15×",       lt: "Daugiau nei 15×" } },
+  { id: "nunca",    fator: 1.00, label: { pt: "Nunca usada",     fr: "Jamais portée",      lt: "Niekada nenešiota" } },
+  { id: "pouco",    fator: 0.88, label: { pt: "Pouco uso",       fr: "Peu portée",          lt: "Mažai nešiota" } },
+  { id: "moderado", fator: 0.72, label: { pt: "Uso moderado",    fr: "Usage modéré",        lt: "Vidutiniškai nešiota" } },
+  { id: "frequente",fator: 0.52, label: { pt: "Uso frequente",   fr: "Usage fréquent",      lt: "Dažnai nešiota" } },
 ];
 
-// Estimativa de preço Vinted por categoria (desconto agressivo)
-const VINTED_FATOR = { luxo: 0.35, mid: 0.20, festa: 0.25, casual: 0.15, acessorio: 0.30 };
+const TIPOS_DATA = [
+  { id: "Vestidos",   rot: 1.8, dias: 3.5, fp: 0.10, label: { pt: "Vestido",    fr: "Robe",      lt: "Suknelė" } },
+  { id: "Fatos",      rot: 1.5, dias: 4.0, fp: 0.09, label: { pt: "Fato",       fr: "Costume",   lt: "Kostiumas" } },
+  { id: "Casacos",    rot: 1.0, dias: 5.0, fp: 0.07, label: { pt: "Casaco",     fr: "Manteau",   lt: "Paltas" } },
+  { id: "Calças",     rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Calças",     fr: "Pantalon",  lt: "Kelnės" } },
+  { id: "Saias",      rot: 1.2, dias: 3.0, fp: 0.08, label: { pt: "Saia",       fr: "Jupe",      lt: "Sijonas" } },
+  { id: "Blusas",     rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Blusa / Top",fr: "Blouse",    lt: "Palaidinė" } },
+  { id: "Malas",      rot: 2.0, dias: 4.0, fp: 0.12, label: { pt: "Mala",       fr: "Sac",       lt: "Rankinė" } },
+  { id: "Acessórios", rot: 1.6, dias: 3.0, fp: 0.10, label: { pt: "Acessório",  fr: "Accessoire",lt: "Aksesuaras" } },
+  { id: "_default",   rot: 1.2, dias: 3.5, fp: 0.08, label: { pt: "Outra peça", fr: "Autre",     lt: "Kita" } },
+];
 
 export default function Calculadora() {
   const [lang, setLang] = useState("pt");
   const [preco, setPreco] = useState("");
-  const [categoria, setCategoria] = useState("mid");
+  const [marca, setMarca] = useState("");
+  const [tipo, setTipo] = useState("_default");
   const [estado, setEstado] = useState("bom");
-  const [idade, setIdade] = useState("1a2");
   const [uso, setUso] = useState("pouco");
   const [meses, setMeses] = useState(12);
 
@@ -241,58 +263,62 @@ export default function Calculadora() {
   };
 
   const t = T[lang] || T.pt;
-  const CATEGORIAS = CATEGORIAS_DATA.map(c => ({ ...c, label: c.label[lang] || c.label.pt }));
-  const ESTADOS    = ESTADOS_DATA.map(e => ({ ...e, label: e.label[lang] || e.label.pt }));
-  const IDADES     = IDADES_DATA.map(i => ({ ...i, label: i.label[lang] || i.label.pt }));
-  const USOS       = USOS_DATA.map(u => ({ ...u, label: u.label[lang] || u.label.pt }));
+  const ESTADOS = ESTADOS_DATA.map(e => ({ ...e, label: e.label[lang] || e.label.pt }));
+  const USOS    = USOS_DATA.map(u => ({ ...u, label: u.label[lang] || u.label.pt }));
+  const TIPOS   = TIPOS_DATA.map(tp => ({ ...tp, label: tp.label[lang] || tp.label.pt }));
 
   const p = parseFloat(preco) || 0;
+  const { fator: fm, tier } = fatorMarca(marca);
 
   const calc = useMemo(() => {
     if (!p) return null;
-    const cat = CATEGORIAS_DATA.find(c => c.id === categoria);
+    const { fator: fmemo, tier: tmemo } = fatorMarca(marca);
     const est = ESTADOS_DATA.find(e => e.id === estado);
-    const id  = IDADES_DATA.find(i => i.id === idade);
-    const us  = USOS_DATA.find(u => u.id === uso);
+    const usoObj = USOS_DATA.find(u => u.id === uso);
+    const cat = TIPOS_DATA.find(tp => tp.id === tipo) ?? TIPOS_DATA.find(tp => tp.id === "_default");
 
-    // Valor de mercado estimado agora
-    const valorMercado = p * cat.fator * est.fator * id.fator * us.fator;
+    // Fator estado×uso combinado
+    const fei = est.fator * usoObj.fator;
+    const feiClamp = fei < 0.30 ? fei * 0.85 : fei > 0.85 ? fei * 1.05 : fei;
 
-    // Preço de aluguer sugerido (12-18% do valor de mercado)
-    const precoAluguer = Math.round(valorMercado * 0.15 / 5) * 5 || 5;
+    // Valor de mercado (marcas investimento podem superar preço original)
+    const valorMercado = tmemo === "investimento"
+      ? Math.round(p * fmemo)
+      : Math.round(p * fmemo * feiClamp);
 
-    // Rotação estimada por mês (média da categoria, ajustada pelo estado)
-    const rotacaoMes = cat.rotacao * est.fator;
-    const alugueresTotal = Math.round(rotacaoMes * meses);
+    // Tier bonus para preço de aluguer
+    const tierBonus = tmemo === "investimento" ? 1.35 : tmemo === "premium" ? 1.20 : tmemo === "alta" ? 1.05 : 1.0;
+    const precoAluguer = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
 
-    // Receita bruta aluguer
-    // A higienização e logística são custos pagos pelo cliente — não saem do ganho do lojista
+    // Rotação e alugueres totais
+    const rotacaoMes = cat.rot * est.fator;
+    const alugueresTotal = Math.max(1, Math.round(rotacaoMes * meses));
+
+    // Receita aluguer
     const receitaBruta = precoAluguer * alugueresTotal;
-    const comissaoTotal = receitaBruta * COMISSAO_ALUGUER;
-    const liquidoAluguer = receitaBruta - comissaoTotal;
+    const liquidoAluguer = receitaBruta * (1 - COMISSAO_ALUGUER);
 
-    // Valor residual da peça após os alugueres (deprecia mais lentamente com cuidado NG)
-    // Assumimos que o aluguer controlado deprecia menos que uso privado (fator 0.85 vs 1.0)
-    const depreciacaoAluguerMes = 0.008; // 0.8% por mês de aluguer ativo
-    const valorFinalPeca = valorMercado * Math.pow(1 - depreciacaoAluguerMes, alugueresTotal);
-    const vendaFinalLiquido = Math.max(0, valorFinalPeca - valorFinalPeca * COMISSAO_VENDA - CUSTO_ENVIO);
+    // Valor residual após alugueres (deprecia suavemente)
+    const depreciacaoMes = 0.008;
+    const valorFinalPeca = valorMercado * Math.pow(1 - depreciacaoMes, alugueresTotal);
+    const vendaFinalLiquido = Math.max(0, valorFinalPeca * (1 - COMISSAO_VENDA) - CUSTO_ENVIO);
 
-    // Total Nora Grei
+    // Total NG
     const totalNG = liquidoAluguer + vendaFinalLiquido;
 
-    // Vinted — vende já agora ao preço de ocasião
-    const vendaVinted = p * VINTED_FATOR[categoria];
+    // Vinted — preço de ocasião imediato
+    const VINTED_FATOR_TIER = { investimento: 0.50, premium: 0.35, alta: 0.20, massmarket: 0.12 };
+    const vendaVinted = Math.round(p * (VINTED_FATOR_TIER[tmemo] ?? 0.18));
 
-    // Diferença
     const ganhoExtra = totalNG - vendaVinted;
     const multiplicador = vendaVinted > 0 ? (totalNG / vendaVinted) : 0;
 
     return {
       valorMercado, precoAluguer, rotacaoMes, alugueresTotal,
       receitaBruta, liquidoAluguer, valorFinalPeca,
-      vendaFinalLiquido, totalNG, vendaVinted, ganhoExtra, multiplicador,
+      vendaFinalLiquido, totalNG, vendaVinted, ganhoExtra, multiplicador, tier: tmemo,
     };
-  }, [p, categoria, estado, idade, uso, meses]);
+  }, [p, marca, tipo, estado, uso, meses]);
 
   // Lógica do gate: quando o resultado aparece, verificar se precisa gate
   useEffect(() => {
@@ -312,8 +338,6 @@ export default function Calculadora() {
       }
     } catch {}
   }, [calc, p]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const catObj = CATEGORIAS_DATA.find(c => c.id === categoria);
 
   return (
     <>
@@ -659,11 +683,44 @@ export default function Calculadora() {
           <p className="preco-hint">{t.precoHint}</p>
         </div>
 
+        {/* MARCA */}
         <div className="card">
-          <div className="card-label">{t.categoriaLabel}</div>
+          <div className="card-label">{t.marcaLabel}</div>
+          <datalist id="marcas-list">
+            {SUGESTOES_MARCA.map(s => <option key={s} value={s} />)}
+          </datalist>
+          <input
+            className="preco-input"
+            style={{paddingLeft:"0.85rem"}}
+            type="text"
+            list="marcas-list"
+            placeholder={t.marcaPlaceholder}
+            value={marca}
+            onChange={e => setMarca(e.target.value)}
+            autoComplete="off"
+          />
+          {tier && tier !== "massmarket" && (
+            <div style={{marginTop:"0.6rem",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+              <span style={{
+                fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",
+                padding:"0.2rem 0.55rem",borderRadius:"3px",fontWeight:500,
+                background: tier==="investimento"?"#1a3a2a": tier==="premium"?"#1a1a2e":"#2a2018",
+                color: tier==="investimento"?"#a8d8a8": tier==="premium"?"#c4b0e8":"#e8c97a",
+              }}>
+                {tier==="investimento" ? (lang==="fr"?"Pièce d'investissement ↑":lang==="lt"?"Investicinė ↑":"Peça de investimento ↑")
+                : tier==="premium" ? (lang==="fr"?"Marque premium":lang==="lt"?"Premium prekės ženklas":"Marca premium")
+                : (lang==="fr"?"Marque haute":lang==="lt"?"Aukšta klasė":"Marca alta")}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* TIPO DE PEÇA */}
+        <div className="card">
+          <div className="card-label">{t.tipoLabel}</div>
           <div className="pills">
-            {CATEGORIAS.map(c => (
-              <button key={c.id} className={`pill${categoria === c.id ? " sel" : ""}`} onClick={() => setCategoria(c.id)}>{c.label}</button>
+            {TIPOS.map(tp => (
+              <button key={tp.id} className={`pill${tipo === tp.id ? " sel" : ""}`} onClick={() => setTipo(tp.id)}>{tp.label}</button>
             ))}
           </div>
         </div>
@@ -673,15 +730,6 @@ export default function Calculadora() {
           <div className="pills">
             {ESTADOS.map(e => (
               <button key={e.id} className={`pill${estado === e.id ? " sel" : ""}`} onClick={() => setEstado(e.id)}>{e.label}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-label">{t.idadeLabel}</div>
-          <div className="pills">
-            {IDADES.map(i => (
-              <button key={i.id} className={`pill${idade === i.id ? " sel" : ""}`} onClick={() => setIdade(i.id)}>{i.label}</button>
             ))}
           </div>
         </div>
@@ -773,7 +821,7 @@ export default function Calculadora() {
               <div className="rotacao-label">{t.rotacaoLabel}</div>
               <div className="rotacao-num">{t.rotacaoNum(calc.alugueresTotal, meses)}</div>
               <div className="rotacao-sub">
-                {t.rotacaoSub(calc.rotacaoMes.toFixed(1), catObj?.label[lang] || catObj?.label.pt, ESTADOS_DATA.find(e=>e.id===estado)?.label[lang]?.split("—")[0]?.trim().toLowerCase() || "")}
+                {t.rotacaoSub(calc.rotacaoMes.toFixed(1), TIPOS_DATA.find(tp=>tp.id===tipo)?.label[lang] || TIPOS_DATA.find(tp=>tp.id==="_default")?.label[lang], ESTADOS_DATA.find(e=>e.id===estado)?.label[lang]?.split("—")[0]?.trim().toLowerCase() || "")}
               </div>
             </div>
 
