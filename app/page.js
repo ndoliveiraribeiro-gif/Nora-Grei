@@ -648,7 +648,7 @@ export default function Home() {
           .hero{grid-template-columns:1fr;grid-template-rows:52svh auto;height:auto;min-height:auto}
           .hero-media{height:52svh;min-height:52svh}
           .hero-media video,.hero-media img{object-position:center center}
-          .hero-content{padding:2rem 1.5rem calc(5rem + env(safe-area-inset-bottom, 0px));height:auto;min-height:auto;justify-content:flex-start}
+          .hero-content{padding:2rem 1.5rem calc(5rem + env(safe-area-inset-bottom, 0px));height:auto;min-height:auto;justify-content:flex-start;overflow:visible}
           .hero-content::before{display:none}
           .hero-eyebrow{margin-bottom:0.75rem}
           .hero-titulo{font-size:clamp(2rem,7vw,2.8rem);margin-bottom:0.75rem}
