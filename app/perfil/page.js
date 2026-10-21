@@ -1129,6 +1129,8 @@ export default function Perfil() {
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
   const [fotosEditar, setFotosEditar] = useState([]); // fotos a manter na edição
+  const [gerirLojaLoading, setGerirLojaLoading] = useState(""); // "suspender"|"reativar"|"eliminar"|""
+  const [confirmarEliminar, setConfirmarEliminar] = useState(false);
   const [modalEnvio, setModalEnvio] = useState(null); // aluguer a marcar como enviado
   const [trackingInfo, setTrackingInfo] = useState({ transportadora: "", numero: "" });
   const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
@@ -2562,6 +2564,16 @@ export default function Perfil() {
               </div>
             )}
 
+            {/* Estado: loja eliminada — pode reabrir candidatura */}
+            {candidaturaLojista === "eliminada" && (
+              <div style={{padding:"0.75rem 1rem",background:"#fff5f5",border:"1px solid #f5c6c6",display:"flex",alignItems:"center",gap:"0.6rem",justifyContent:"space-between"}}>
+                <span style={{fontSize:"0.78rem",color:"#c0392b"}}>✕ Loja eliminada.</span>
+                <button onClick={() => { setCandidaturaLojista(null); setShowFormLojista(true); }} style={{background:"none",border:"none",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"var(--black)",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap",textDecoration:"underline",padding:0}}>
+                  Abrir nova loja
+                </button>
+              </div>
+            )}
+
             {/* Estado: candidatura recusada — compacto */}
             {candidaturaLojista === "recusada" && (
               <div style={{padding:"0.75rem 1rem",background:"#fff5f5",border:"1px solid #f5c6c6",display:"flex",alignItems:"center",gap:"0.6rem",justifyContent:"space-between"}}>
@@ -2774,7 +2786,7 @@ export default function Perfil() {
             </div>
             {/* Tabs da loja — scroll horizontal no mobile */}
             <div className="tabs-scroll">
-              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["higienizacao","Higienização"],["estatisticas","Estatísticas"]].map(([key,label]) => (
+              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["higienizacao","Higienização"],["estatisticas","Estatísticas"],["gerir","Gerir loja"]].map(([key,label]) => (
                 <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
               ))}
             </div>
@@ -3737,6 +3749,98 @@ export default function Perfil() {
                 </div>
               );
             })()}
+            {tabLoja === "gerir" && (
+              <div style={{padding:"1.5rem 0"}}>
+                <h3 style={{fontFamily:"var(--serif)",fontSize:"1.3rem",fontWeight:300,marginBottom:"1.5rem"}}>Gerir loja</h3>
+
+                {/* Suspender loja */}
+                {lojaEstado !== "suspenso" && (
+                  <div style={{padding:"1.25rem",border:"1.5px solid var(--g2)",marginBottom:"1rem"}}>
+                    <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,marginBottom:"0.4rem"}}>⏸ Suspender loja temporariamente</div>
+                    <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"0.75rem",lineHeight:1.5}}>A tua loja deixa de aparecer publicamente. As tuas peças ficam guardadas e podes reactivar quando quiseres, sem nova candidatura.</p>
+                    <button
+                      disabled={gerirLojaLoading==="suspender"}
+                      onClick={async()=>{
+                        setGerirLojaLoading("suspender");
+                        await supabase.from("clientes").update({ modo_lojista: false, candidatura_lojista: "suspensa" }).eq("id", (await supabase.auth.getSession()).data.session.user.id);
+                        setModoLojista(false);
+                        setLojaEstado("suspenso");
+                        setCandidaturaLojista("suspensa");
+                        setGerirLojaLoading("");
+                      }}
+                      style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.55rem 1rem",background:"#f39c12",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}
+                    >{gerirLojaLoading==="suspender"?"...":"Suspender loja"}</button>
+                  </div>
+                )}
+
+                {/* Reactivar loja (só visível se suspensa) */}
+                {lojaEstado === "suspenso" && (
+                  <div style={{padding:"1.25rem",border:"1.5px solid #b8dbb8",background:"#f0f7f0",marginBottom:"1rem"}}>
+                    <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,color:"#2e7d32",marginBottom:"0.4rem"}}>▶ Loja suspensa — reactivar</div>
+                    <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"0.75rem",lineHeight:1.5}}>A tua loja está temporariamente suspensa. Clica para voltar a aparecer publicamente com todas as tuas peças.</p>
+                    <button
+                      disabled={gerirLojaLoading==="reativar"}
+                      onClick={async()=>{
+                        setGerirLojaLoading("reativar");
+                        await supabase.from("clientes").update({ modo_lojista: true, candidatura_lojista: "aprovada" }).eq("id", (await supabase.auth.getSession()).data.session.user.id);
+                        setModoLojista(true);
+                        setLojaEstado("teste");
+                        setCandidaturaLojista("aprovada");
+                        setGerirLojaLoading("");
+                      }}
+                      style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.55rem 1rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}
+                    >{gerirLojaLoading==="reativar"?"...":"Reactivar loja"}</button>
+                  </div>
+                )}
+
+                {/* Eliminar loja definitivamente */}
+                <div style={{padding:"1.25rem",border:"1.5px solid #f5c6c6",background:"#fff5f5",marginTop:"1rem"}}>
+                  <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontWeight:600,color:"#c0392b",marginBottom:"0.4rem"}}>✕ Eliminar loja definitivamente</div>
+                  <p style={{fontSize:"0.82rem",color:"var(--g4)",marginBottom:"0.5rem",lineHeight:1.5}}>Elimina todas as tuas peças e stock. <strong>Esta acção é irreversível.</strong></p>
+                  <p style={{fontSize:"0.78rem",color:"#888",marginBottom:"0.75rem",lineHeight:1.5}}>O histórico financeiro (vendas, alugueres, transferências) é mantido por razões legais e de controlo interno.</p>
+                  {!confirmarEliminar ? (
+                    <button onClick={()=>setConfirmarEliminar(true)} style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.55rem 1rem",background:"none",color:"#c0392b",border:"1.5px solid #e74c3c",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}>Eliminar loja</button>
+                  ) : (
+                    <div style={{background:"#fff",border:"1.5px solid #e74c3c",padding:"1rem",marginTop:"0.5rem"}}>
+                      <p style={{fontSize:"0.82rem",color:"#c0392b",fontWeight:600,marginBottom:"0.75rem"}}>⚠ Tens a certeza? Esta acção não pode ser desfeita.</p>
+                      <div style={{display:"flex",gap:"0.5rem"}}>
+                        <button
+                          disabled={gerirLojaLoading==="eliminar"}
+                          onClick={async()=>{
+                            setGerirLojaLoading("eliminar");
+                            const { data: { session } } = await supabase.auth.getSession();
+                            const uid = session.user.id;
+                            // 1. apagar stock
+                            const { data: ps } = await supabase.from("pecas_lojista").select("id").eq("cliente_id", uid);
+                            if (ps && ps.length > 0) {
+                              const ids = ps.map(p => p.id);
+                              await supabase.from("stock_lojista").delete().in("peca_id", ids);
+                              await supabase.from("pecas_lojista").delete().in("id", ids);
+                            }
+                            // 2. desactivar modo lojista (mantém histórico financeiro)
+                            await supabase.from("clientes").update({
+                              modo_lojista: false,
+                              candidatura_lojista: "eliminada",
+                              lojista_iban: null,
+                            }).eq("id", uid);
+                            setModoLojista(false);
+                            setPecasLoja([]);
+                            setAlugueresLoja([]);
+                            setCandidaturaLojista("eliminada");
+                            setGerirLojaLoading("");
+                            setConfirmarEliminar(false);
+                            setTabLoja("dashboard");
+                          }}
+                          style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.55rem 1rem",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}
+                        >{gerirLojaLoading==="eliminar"?"...":"Confirmar eliminação"}</button>
+                        <button onClick={()=>setConfirmarEliminar(false)} style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",padding:"0.55rem 0.85rem",background:"none",border:"1.5px solid var(--g2)",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {tabLoja === "estatisticas" && (
               <div>
                 {(() => {
