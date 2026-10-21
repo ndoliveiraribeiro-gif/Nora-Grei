@@ -41,6 +41,13 @@ const T = {
     cta: "Publicar a minha peça agora",
     ctaVer: "Ver como outras lojistas fazem →",
     disclaimer: <>ⓘ Os valores apresentados são <strong>estimativas indicativas</strong> baseadas em benchmarks do sector de moda em segunda mão e aluguer, ajustadas pela categoria e estado da peça. A rotação real depende da procura, sazonalidade, visibilidade da peça na plataforma e condições de mercado. <strong>Não constituem garantia de rendimento.</strong></>,
+    fotoLabel: "Analisa a peça com IA",
+    fotoSub: "Tira uma foto ou faz upload — preenchemos os campos automaticamente",
+    fotoBtn: "Tirar foto / Upload",
+    fotoAnalisando: "A analisar...",
+    fotoDetectado: "Detectado pela IA — confirma ou ajusta",
+    fotoErro: "Não foi possível analisar a foto. Preenche os campos manualmente.",
+    fotoDescartar: "Remover foto",
     semPreco: "Introduz o preço original para ver a estimativa",
     gateTitle: "Guarda a tua avaliação",
     gateSub: "Introduz o teu email para veres o resultado e receberes o resumo.",
@@ -90,6 +97,13 @@ const T = {
     cta: "Publier ma pièce maintenant",
     ctaVer: "Voir comment d'autres boutiques font →",
     disclaimer: <>ⓘ Les valeurs présentées sont des <strong>estimations indicatives</strong> basées sur des benchmarks du secteur mode de seconde main et location. La rotation réelle dépend de la demande, de la saisonnalité et de la visibilité. <strong>Elles ne constituent pas une garantie de revenus.</strong></>,
+    fotoLabel: "Analyse la pièce avec l'IA",
+    fotoSub: "Prends une photo ou uploade — on remplit les champs automatiquement",
+    fotoBtn: "Photo / Upload",
+    fotoAnalisando: "Analyse en cours...",
+    fotoDetectado: "Détecté par l'IA — confirme ou ajuste",
+    fotoErro: "Impossible d'analyser la photo. Remplis les champs manuellement.",
+    fotoDescartar: "Supprimer la photo",
     semPreco: "Saisis le prix original pour voir l'estimation",
     gateTitle: "Sauvegarde ton évaluation",
     gateSub: "Entre ton email pour voir le résultat et recevoir le résumé.",
@@ -139,6 +153,13 @@ const T = {
     cta: "Publikuoti savo drabužį dabar",
     ctaVer: "Peržiūrėti kitas parduotuves →",
     disclaimer: <>ⓘ Pateiktos vertės yra <strong>orientacinės</strong>, pagrįstos antros rankos mados ir nuomos sektoriaus duomenimis. Reali apyvarta priklauso nuo paklausos, sezoniškumo ir drabužio matomumo. <strong>Tai nėra pajamų garantija.</strong></>,
+    fotoLabel: "Analizuok drabužį su DI",
+    fotoSub: "Nufotografuok arba įkelk — automatiškai užpildysime laukus",
+    fotoBtn: "Nuotrauka / Įkelti",
+    fotoAnalisando: "Analizuojama...",
+    fotoDetectado: "Aptikta DI — patvirtink arba pataisyk",
+    fotoErro: "Nepavyko išanalizuoti nuotraukos. Užpildyk laukus rankiniu būdu.",
+    fotoDescartar: "Pašalinti nuotrauką",
     semPreco: "Įvesk originalią kainą, kad pamatytum skaičiavimą",
     gateTitle: "Išsaugok savo įvertinimą",
     gateSub: "Įvesk el. paštą, kad pamatytum rezultatą ir gautum santrauką.",
@@ -372,6 +393,72 @@ export default function Calculadora() {
     setGateOk(true);
     setGateAberto(false);
     try { sessionStorage.setItem("ng_calc_gate_ok", "1"); } catch {}
+  };
+
+  // ── Análise de foto por IA ────────────────────────────────────────────────
+  const [fotoPreview, setFotoPreview] = useState(null);
+  const [fotoAnalisando, setFotoAnalisando] = useState(false);
+  const [fotoErro, setFotoErro] = useState(null);
+  const [camposIA, setCamposIA] = useState({}); // campos detectados pela IA
+  const fotoInputRef = useRef(null);
+
+  const ESTADO_MAP_IA = { comEtiqueta: "comEtiqueta", bom: "bom", usado: "usado", defeito: "defeito" };
+  const COR_LABEL = { pt: "cor", fr: "couleur", lt: "spalva" };
+
+  const analisarFoto = async (file) => {
+    if (!file) return;
+    setFotoErro(null);
+    setFotoAnalisando(true);
+
+    // Preview local
+    const url = URL.createObjectURL(file);
+    setFotoPreview(url);
+
+    try {
+      const fd = new FormData();
+      fd.append("foto", file);
+      const res = await fetch("/api/analisar-peca", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Erro API");
+      const dados = await res.json();
+
+      const detectados = {};
+
+      if (dados.tipo) {
+        setTipo(dados.tipo);
+        detectados.tipo = true;
+      }
+      if (dados.estado && ESTADO_MAP_IA[dados.estado]) {
+        setEstado(dados.estado);
+        detectados.estado = true;
+      }
+      if (dados.marca) {
+        setMarca(dados.marca);
+        setMarcaInput(dados.marca);
+        detectados.marca = true;
+      }
+      if (dados.cor) {
+        detectados.cor = dados.cor;
+        setCamposIA(prev => ({ ...prev, cor: dados.cor, cor_confianca: dados.cor_confianca }));
+      }
+      if (dados.material) {
+        detectados.material = dados.material;
+        setCamposIA(prev => ({ ...prev, material: dados.material, material_confianca: dados.material_confianca }));
+      }
+
+      setCamposIA(detectados);
+
+    } catch {
+      setFotoErro(true);
+    } finally {
+      setFotoAnalisando(false);
+    }
+  };
+
+  const removerFoto = () => {
+    setFotoPreview(null);
+    setCamposIA({});
+    setFotoErro(null);
+    if (fotoInputRef.current) fotoInputRef.current.value = "";
   };
 
   const t = T[lang] || T.pt;
@@ -823,6 +910,80 @@ export default function Calculadora() {
         .gate-login-row a { color: var(--accent); text-decoration: none; }
         .results-blur { filter: blur(6px); pointer-events: none; user-select: none; }
 
+        /* ── Card de foto ────────────────────── */
+        .foto-card {
+          border: 1.5px dashed var(--border); border-radius: 14px;
+          padding: 1.1rem 1.15rem; margin-bottom: 0.65rem;
+          background: var(--card); transition: border-color 0.15s;
+        }
+        .foto-card:hover { border-color: var(--accent); }
+        .foto-upload-area {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 0.5rem; padding: 0.75rem 0; cursor: pointer;
+        }
+        .foto-icon {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: var(--bg); border: 1px solid var(--border);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.1rem;
+        }
+        .foto-upload-label {
+          font-size: 0.78rem; font-weight: 500; color: var(--fg);
+        }
+        .foto-upload-sub {
+          font-size: 0.68rem; color: var(--sub); text-align: center; line-height: 1.4;
+        }
+        .foto-preview-wrap {
+          position: relative; border-radius: 10px; overflow: hidden;
+          margin-bottom: 0.6rem;
+        }
+        .foto-preview {
+          width: 100%; max-height: 200px; object-fit: cover;
+          border-radius: 10px; display: block;
+        }
+        .foto-loading {
+          position: absolute; inset: 0; background: rgba(16,12,10,0.55);
+          display: flex; align-items: center; justify-content: center;
+          border-radius: 10px;
+        }
+        .foto-spinner {
+          width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.2);
+          border-top-color: #fff; border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .foto-descartada-btn {
+          position: absolute; top: 0.4rem; right: 0.4rem;
+          background: rgba(16,12,10,0.65); color: #fff;
+          border: none; border-radius: 4px; font-size: 0.62rem;
+          padding: 0.25rem 0.5rem; cursor: pointer;
+          font-family: 'Jost', sans-serif; letter-spacing: 0.05em;
+        }
+        .foto-detectado-banner {
+          font-size: 0.65rem; color: var(--accent);
+          letter-spacing: 0.1em; text-transform: uppercase;
+          font-weight: 500; margin-bottom: 0.5rem;
+        }
+        .foto-campos-list {
+          display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem;
+        }
+        .foto-campo-tag {
+          font-size: 0.65rem; padding: 0.2rem 0.55rem;
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 20px; color: var(--fg);
+        }
+        .foto-campo-tag.ia { border-color: var(--accent); color: var(--accent); }
+        .foto-erro {
+          font-size: 0.72rem; color: #c0392b; padding: 0.5rem 0;
+        }
+
+        /* Campo IA destacado */
+        .campo-ia-tag {
+          font-size: 0.58rem; color: var(--accent);
+          letter-spacing: 0.1em; text-transform: uppercase;
+          margin-bottom: 0.3rem; font-weight: 500;
+        }
+
         /* ── Lang switcher ───────────────────── */
         .lang-row {
           display: flex; justify-content: center; gap: 0.5rem;
@@ -867,6 +1028,73 @@ export default function Calculadora() {
               ? t.heroNota(Math.round(calc.liquidoAluguer), Math.round(calc.vendaFinalLiquido))
               : (lang==="fr"?"Remplis les champs pour voir le résultat":lang==="lt"?"Užpildyk laukus, kad pamatytum rezultatą":"Preenche os campos para ver o resultado")}
           </div>
+        </div>
+
+        {/* ── 0. UPLOAD DE FOTO — opcional, pré-preenche campos ── */}
+        <input
+          ref={fotoInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
+          style={{ display: "none" }}
+          onChange={e => { if (e.target.files?.[0]) analisarFoto(e.target.files[0]); }}
+        />
+
+        <div className="foto-card" onClick={() => !fotoPreview && fotoInputRef.current?.click()}>
+          <div className="card-label">{t.fotoLabel}</div>
+
+          {!fotoPreview && (
+            <div className="foto-upload-area">
+              <div className="foto-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <span className="foto-upload-label">{t.fotoBtn}</span>
+              <span className="foto-upload-sub">{t.fotoSub}</span>
+            </div>
+          )}
+
+          {fotoPreview && (
+            <>
+              <div className="foto-preview-wrap">
+                <img src={fotoPreview} alt="" className="foto-preview" />
+                {fotoAnalisando && (
+                  <div className="foto-loading">
+                    <div className="foto-spinner" />
+                  </div>
+                )}
+                {!fotoAnalisando && (
+                  <button className="foto-descartada-btn" onClick={e => { e.stopPropagation(); removerFoto(); }}>
+                    {t.fotoDescartar}
+                  </button>
+                )}
+              </div>
+
+              {!fotoAnalisando && !fotoErro && Object.keys(camposIA).length > 0 && (
+                <>
+                  <div className="foto-detectado-banner">{t.fotoDetectado}</div>
+                  <div className="foto-campos-list">
+                    {camposIA.tipo && <span className="foto-campo-tag ia">{TIPOS_DATA.find(tp => tp.id === tipo)?.label[lang] || tipo}</span>}
+                    {camposIA.estado && <span className="foto-campo-tag ia">{ESTADOS_DATA.find(e => e.id === estado)?.label[lang]?.split("—")[0]?.trim() || estado}</span>}
+                    {camposIA.marca && <span className="foto-campo-tag ia">{marca}</span>}
+                    {camposIA.cor && <span className="foto-campo-tag">{camposIA.cor}</span>}
+                    {camposIA.material && <span className="foto-campo-tag">{camposIA.material}</span>}
+                  </div>
+                </>
+              )}
+
+              {fotoErro && <div className="foto-erro">{t.fotoErro}</div>}
+
+              {!fotoAnalisando && (
+                <button className="btn btn-outline" style={{marginTop:"0.4rem",fontSize:"0.68rem",padding:"0.6rem"}}
+                  onClick={e => { e.stopPropagation(); fotoInputRef.current?.click(); }}>
+                  {t.fotoBtn}
+                </button>
+              )}
+            </>
+          )}
         </div>
 
         {/* ── 1. TIPO DE PEÇA — primeiro ── */}
@@ -939,6 +1167,7 @@ export default function Calculadora() {
 
         {/* ── 4. ESTADO — pills grid 4 cols ── */}
         <div className="card">
+          {camposIA.estado && <div className="campo-ia-tag">{t.fotoDetectado}</div>}
           <div className="card-label">{t.estadoLabel}</div>
           <div className="pills-grid">
             {ESTADOS.map(e => (
