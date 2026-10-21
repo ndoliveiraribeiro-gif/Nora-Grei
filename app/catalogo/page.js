@@ -5,8 +5,74 @@ import PecaCard from "@/components/PecaCard";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"];
 
+// Modal de detalhe de preço (estilo Vinted)
+function ModalPreco({ peca, lang, onClose }) {
+  const base = peca.preco_aluguer_dia || 0;
+  const baseVenda = peca.preco_venda || 0;
+  const taxaAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) - peca.preco_aluguer_dia : 0;
+  const taxaVenda   = peca.preco_venda > 0        ? Math.ceil(peca.preco_venda / 0.80) - peca.preco_venda               : 0;
+  const T = {
+    pt:{ titulo:"Detalhes do preço", peca:"Preço da peça", taxa:"Taxa de serviço e proteção", envio:"Envio", envioSub:"A calcular no pagamento", total:"Total", fechar:"OK, fechar", dia:"/dia", venda:"venda", livre:"preço livre", escudo:"Proteção Nora Grei — transações seguras e política de reembolso." },
+    fr:{ titulo:"Détails du prix", peca:"Prix de l'article", taxa:"Frais de service et protection", envio:"Livraison", envioSub:"Calculés au paiement", total:"Total", fechar:"OK, fermer", dia:"/jour", venda:"vente", livre:"prix libre", escudo:"Protection Nora Grei — transactions sécurisées et politique de remboursement." },
+    lt:{ titulo:"Kainos detalės", peca:"Prekės kaina", taxa:"Paslaugų ir apsaugos mokestis", envio:"Pristatymas", envioSub:"Skaičiuojama mokėjimo metu", total:"Iš viso", fechar:"Gerai, uždaryti", dia:"/d.", venda:"pardavimas", livre:"laisva kaina", escudo:"Nora Grei apsauga — saugios operacijos ir grąžinimo politika." },
+  };
+  const t = T[lang] || T.pt;
+  const isVenda = peca.tipo === "comprar";
+  const isAmbos = peca.tipo === "ambos";
+  const isSocial = peca.tipo === "social";
+  return (
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:"8px",width:"100%",maxWidth:"420px",padding:"1.5rem",position:"relative",fontFamily:"'Jost',sans-serif"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1.25rem"}}>
+          <span style={{fontSize:"1rem",fontWeight:600,color:"#111",letterSpacing:"0.01em"}}>{t.titulo}</span>
+          <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.25rem",color:"#8a8783",lineHeight:1,padding:"0.25rem"}}>✕</button>
+        </div>
+        {/* Linha peça */}
+        <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.9rem"}}>
+          <div style={{width:"40px",height:"40px",borderRadius:"4px",background:"#e8e5e0",overflow:"hidden",flexShrink:0}}>
+            {peca.fotos && peca.fotos[0] && <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{peca.nome}</div>
+            <div style={{fontSize:"0.85rem",color:"#555",marginTop:"0.15rem"}}>
+              {isSocial ? "5€+" : isVenda ? `${baseVenda}€` : `${base}€${t.dia}`}
+              {isAmbos && <> · {baseVenda}€ {t.venda}</>}
+            </div>
+          </div>
+        </div>
+        <hr style={{border:"none",borderTop:"1px solid #e8e5e0",marginBottom:"0.9rem"}}/>
+        {/* Taxa */}
+        {!isSocial && (
+          <div style={{display:"flex",alignItems:"flex-start",gap:"0.75rem",marginBottom:"0.9rem"}}>
+            <div style={{width:"32px",height:"32px",borderRadius:"50%",background:"#e8f4f0",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:"1rem"}}>🛡</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{t.taxa}</div>
+              <div style={{fontSize:"0.85rem",color:"#555",marginTop:"0.15rem"}}>
+                {isVenda ? `${taxaVenda}€` : `${taxaAluguer}€${t.dia}`}
+                {isAmbos && <> · {taxaVenda}€ {t.venda}</>}
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Envio */}
+        <div style={{display:"flex",alignItems:"flex-start",gap:"0.75rem",marginBottom:"1rem"}}>
+          <div style={{width:"32px",height:"32px",borderRadius:"50%",background:"#e8f0f8",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:"1rem"}}>📦</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{t.envio}</div>
+            <div style={{fontSize:"0.78rem",color:"#8a8783",marginTop:"0.1rem"}}>{t.envioSub}</div>
+          </div>
+        </div>
+        {/* Proteção */}
+        <p style={{fontSize:"0.75rem",color:"#8a8783",lineHeight:1.5,marginBottom:"1.25rem"}}>{t.escudo}</p>
+        <button onClick={onClose} style={{width:"100%",padding:"0.9rem",background:"#100c0a",color:"#f8f7f5",border:"none",borderRadius:"4px",fontSize:"0.85rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",fontWeight:500,cursor:"pointer"}}>{t.fechar}</button>
+      </div>
+    </div>
+  );
+}
+
 // Card inline para peças de lojistas (link diferente)
 function PecaCardLojista({ peca, lang }) {
+  const [modalAberto, setModalAberto] = useState(false);
   const disponivel = peca.estado !== "indisponivel";
   const l = { pt:{ alugar:"Alugar" }, fr:{ alugar:"Louer" }, lt:{ alugar:"Nuomoti" } };
   const lbl = (l[lang] || l.pt).alugar;
@@ -40,24 +106,30 @@ function PecaCardLojista({ peca, lang }) {
               ))}
             </div>
           )}
-          <div style={{display:"flex",alignItems:"center",gap:"0.35rem",paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0",flexWrap:"wrap"}}>
-            {(() => {
-              const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
-              const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
-              if (peca.tipo === "comprar") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span></>
-              );
-              if (peca.tipo === "social") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span></>
-              );
-              if (peca.tipo === "ambos") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span></>
-              );
-              return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span></>
-              );
-            })()}
-          </div>
+          {(() => {
+            const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
+            const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
+            const isSocial = peca.tipo === "social";
+            return (
+              <div style={{paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0"}}>
+                {/* linha principal do preço */}
+                <div style={{display:"flex",alignItems:"baseline",gap:"0.25rem",flexWrap:"wrap"}}>
+                  {peca.tipo === "comprar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span></>}
+                  {isSocial && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span></>}
+                  {peca.tipo === "ambos" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span></>}
+                  {peca.tipo === "alugar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span></>}
+                </div>
+                {/* segunda linha: preço incl. taxa + ícone clicável */}
+                {!isSocial && (
+                  <button onClick={e=>{e.preventDefault();e.stopPropagation();setModalAberto(true);}} style={{display:"inline-flex",alignItems:"center",gap:"0.2rem",background:"none",border:"none",padding:0,cursor:"pointer",marginTop:"0.18rem"}}>
+                    <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.75rem",color:"#5a5855",fontWeight:500}}>
+                      {peca.tipo==="comprar" ? `${comVenda}€` : `${comAluguer}€`} incl. 🛡
+                    </span>
+                  </button>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </a>
       {disponivel ? (
@@ -65,6 +137,7 @@ function PecaCardLojista({ peca, lang }) {
       ) : (
         <div style={{margin:"0 0.75rem 0.75rem",padding:"0.8rem",fontSize:"0.75rem",letterSpacing:"0.08em",textTransform:"uppercase",border:"1.5px solid #ccc9c4",color:"#4a4845",textAlign:"center",fontFamily:"'Jost',sans-serif",minHeight:"46px",display:"flex",alignItems:"center",justifyContent:"center"}}>Indisponível</div>
       )}
+      {modalAberto && <ModalPreco peca={peca} lang={lang} onClose={()=>setModalAberto(false)}/>}
     </div>
   );
 }
