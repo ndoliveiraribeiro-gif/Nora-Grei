@@ -11,13 +11,13 @@ export const viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
+  themeColor: "#a8a8ac",
 };
 
 export const metadata = {
   title: "Nora Grei",
   description: "Aluga ou compra peças exclusivas de moda.",
   manifest: "/manifest.json",
-  themeColor: "#a8a8ac",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
