@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 const T = {
   pt: {
     nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Novas peças, novos lojistas todos os dias. Já tens a tua?", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."] },
+    hero: { eyebrow: "Novas peças, novos lojistas todos os dias. Já tens a tua?", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Como funciona", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "Simulador de rendimento", preco: "Preço de compra (€)", anual: "Estimativa anual de aluguer", mes: "/mês estimado", cta: "Calcular com precisão" } },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -70,7 +70,7 @@ const T = {
   },
   fr: {
     nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Nouvelles pièces, nouveaux lojistas chaque jour. Vous avez déjà la vôtre ?", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."] },
+    hero: { eyebrow: "Nouvelles pièces, nouveaux lojistas chaque jour. Vous avez déjà la vôtre ?", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Comment ça marche", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Simulateur de revenus", preco: "Prix d'achat (€)", anual: "Estimation annuelle de location", mes: "/mois estimé", cta: "Calculer avec précision" } },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -135,7 +135,7 @@ const T = {
   },
   lt: {
     nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nauji daiktai, nauji lojistai kiekvieną dieną. Ar jau turi savą?", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."] },
+    hero: { eyebrow: "Nauji daiktai, nauji lojistai kiekvieną dieną. Ar jau turi savą?", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Kaip tai veikia", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Pajamų simuliatorius", preco: "Pirkimo kaina (€)", anual: "Metinė nuomos sąmata", mes: "/mėn. sąmata", cta: "Skaičiuoti tiksliau" } },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
@@ -399,6 +399,7 @@ export default function Home() {
   const [categoriaFotos, setCategoriaFotos] = useState({});
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoComSom, setVideoComSom] = useState(false);
+  const [simVal, setSimVal] = useState(400);
   const [pecasDestaque, setPecasDestaque] = useState([]);
   const [campanha, setCampanha] = useState(null);
   const [pwaBanner, setPwaBanner] = useState(false);
@@ -603,43 +604,53 @@ export default function Home() {
         .nav-right a:hover svg{color:#fff}
         .nav.scrolled .nav-right svg{color:var(--black)}
 
-        /* HERO */
-        .hero{min-height:100svh;position:relative;display:flex;flex-direction:column;overflow:hidden;background:var(--black)}
-        .hero-bg{position:absolute;inset:0;z-index:0}
-        .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center 20%);filter:brightness(0.52);transition:opacity 1s ease;opacity:0}
-        .hero-bg img.visivel{opacity:1}
-        .hero-bg video{width:100%;height:100%;object-fit:cover;object-position:center 30%}
-        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.88) 0%,rgba(8,8,8,0.65) 30%,rgba(8,8,8,0.2) 55%,rgba(8,8,8,0.28) 100%);z-index:1}
-        @media(min-width:601px){.hero-overlay{background:linear-gradient(to top,rgba(8,8,8,0.80) 0%,rgba(8,8,8,0.15) 55%,rgba(8,8,8,0.38) 100%)}}
-        .hero-sound{position:absolute;bottom:1.5rem;right:max(1.5rem,env(safe-area-inset-right,0px));z-index:3;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s;border-radius:2px}
-        .hero-sound:hover{background:rgba(255,255,255,0.22)}
-        .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;flex:1;padding:0 max(1.5rem,env(safe-area-inset-left,0px)) clamp(5rem,10vh,7rem);color:#fff}
-        .hero-eyebrow{font-size:0.65rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.82);margin-bottom:1rem}
-        /* texto rotativo */
-        .hero-rotary{font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(2.8rem,9vw,8rem);line-height:0.95;color:var(--white);overflow:hidden;height:1.05em;margin-bottom:0.6rem}
-        .hero-rotary-inner{display:flex;flex-direction:column;animation:rotaryScroll 15s cubic-bezier(0.77,0,0.18,1) infinite}
-        .hero-rotary-inner span{display:block;height:1.05em;line-height:1.05}
-        @keyframes rotaryScroll{0%,8%{transform:translateY(0)}10%,18%{transform:translateY(-1.05em)}20%,28%{transform:translateY(-2.1em)}30%,38%{transform:translateY(-3.15em)}40%,48%{transform:translateY(-4.2em)}50%,58%{transform:translateY(-5.25em)}60%,68%{transform:translateY(-6.3em)}70%,78%{transform:translateY(-7.35em)}80%,88%{transform:translateY(-8.4em)}90%,98%{transform:translateY(-9.45em)}100%{transform:translateY(-10.5em)}}
-        .hero-titulo{font-family:var(--serif);font-size:clamp(2.4rem,8vw,5.5rem);font-weight:300;line-height:1.02;color:#fff}
-        .hero-sub{font-family:var(--serif);font-size:clamp(0.95rem,1.8vw,1.3rem);font-weight:300;color:rgba(255,255,255,0.82);line-height:1.55;margin-bottom:clamp(1.75rem,4vh,3rem);max-width:50ch}
-        @media(max-width:600px){
-          .hero-eyebrow{margin-bottom:0.75rem}
-          .hero-sub{font-size:0.9rem;max-width:36ch;margin-bottom:1.75rem}
-          .hero-content{padding-bottom:max(5rem,calc(env(safe-area-inset-bottom,0px) + 4.5rem))}
-        }
+        /* HERO SPLIT */
+        .hero{display:grid;grid-template-columns:1fr 1fr;min-height:100svh;background:var(--black)}
+        .hero-media{position:relative;overflow:hidden;background:#1a1614}
+        .hero-media img{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center top);display:block;filter:brightness(0.82);transition:opacity 1s ease;opacity:0}
+        .hero-media img.visivel{opacity:1}
+        .hero-media video{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+        .hero-media-overlay{position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,rgba(16,12,10,0.5) 100%)}
+        .hero-sound{position:absolute;bottom:1.5rem;left:1.5rem;z-index:3;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.7);font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.4rem 0.8rem;cursor:pointer;font-family:var(--sans);transition:background 0.2s}
+        .hero-sound:hover{background:rgba(255,255,255,0.18)}
+        .hero-content{background:var(--black);display:flex;flex-direction:column;justify-content:center;padding:4rem 3.5rem;position:relative;color:#fff}
+        .hero-content::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:rgba(255,255,255,0.06)}
+        .hero-eyebrow{font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.5rem;font-family:var(--sans)}
+        .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,4vw,4.8rem);font-weight:300;line-height:1.05;color:var(--white);margin-bottom:0.75rem}
+        .hero-titulo em{font-style:italic;color:var(--gold)}
+        .hero-sub{font-size:0.82rem;color:rgba(255,255,255,0.4);line-height:1.75;margin-bottom:2.5rem;max-width:34ch;font-family:var(--sans)}
+        /* mini simulador */
+        .hero-sim{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:1.25rem 1.5rem;margin-bottom:2rem}
+        .hero-sim-label{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:0.85rem;font-family:var(--sans)}
+        .hero-sim-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem}
+        .hero-sim-row span{font-size:0.75rem;color:rgba(255,255,255,0.45);font-family:var(--sans)}
+        .hero-sim-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:var(--serif);font-size:1.25rem;font-weight:300;padding:0.35rem 0.65rem;width:100px;outline:none;text-align:right}
+        .hero-sim-input:focus{border-color:rgba(255,255,255,0.28)}
+        .hero-sim-resultado{display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap}
+        .hero-sim-resultado-label{font-size:0.68rem;color:rgba(255,255,255,0.3);font-family:var(--sans)}
+        .hero-sim-val{font-family:var(--serif);font-size:1.7rem;font-weight:300;color:var(--gold)}
+        .hero-sim-sub{font-size:0.62rem;color:rgba(255,255,255,0.28);font-family:var(--sans)}
+        .hero-sim-link{display:inline-block;margin-top:0.85rem;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--rosa);text-decoration:none;font-family:var(--sans)}
+        /* btns */
+        .hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
+        .hero-cta1{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;background:var(--white);color:var(--black);padding:0.9rem 2rem;text-decoration:none;font-family:var(--sans);font-weight:500;transition:opacity 0.2s;white-space:nowrap}
+        .hero-cta1:hover{opacity:0.85}
+        .hero-cta2{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.45);text-decoration:none;border:1px solid rgba(255,255,255,0.13);padding:0.9rem 1.5rem;transition:all 0.2s;white-space:nowrap;font-family:var(--sans)}
+        .hero-cta2:hover{border-color:rgba(255,255,255,0.35);color:rgba(255,255,255,0.8)}
         /* scroll cue */
-        .hero-scroll-cue{position:absolute;bottom:clamp(1.5rem,4vh,2.5rem);right:max(2rem,env(safe-area-inset-right,0px));z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px}
-        @media(max-width:600px){.hero-scroll-cue{display:none}}
-        .hero-scroll-cue span{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(248,247,245,0.3);writing-mode:vertical-rl}
-        .hero-scroll-line{width:1px;height:44px;background:rgba(248,247,245,0.1);position:relative;overflow:hidden}
+        .hero-scroll-cue{position:absolute;bottom:2rem;right:2rem;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .hero-scroll-cue span{font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.18);writing-mode:vertical-rl}
+        .hero-scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.07);position:relative;overflow:hidden}
         .hero-scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:1px;height:100%;background:var(--gold);animation:scrollDrop 2.4s ease-in-out infinite}
         @keyframes scrollDrop{0%{top:-100%}100%{top:200%}}
-        .hero-desc{font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:45ch;line-height:1.8;margin-bottom:2rem}
-        .hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
-        .hero-cta1{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;background:var(--white);color:var(--black);padding:0.85rem 1.75rem;text-decoration:none;font-family:var(--sans);font-weight:500;transition:background 0.2s;white-space:nowrap}
-        .hero-cta1:hover{background:var(--gold);color:var(--black)}
-        .hero-cta2{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;border:1px solid rgba(255,255,255,0.3);padding:0.85rem 1.75rem;transition:all 0.2s;white-space:nowrap}
-        .hero-cta2:hover{color:#fff;border-color:#fff}
+        /* mobile */
+        @media(max-width:768px){
+          .hero{grid-template-columns:1fr;grid-template-rows:52svh 1fr}
+          .hero-content{padding:2.5rem 1.75rem 3rem}
+          .hero-content::before{display:none}
+          .hero-titulo{font-size:clamp(2.2rem,8vw,3rem)}
+          .hero-scroll-cue{display:none}
+        }
 
         /* STRIP */
         .strip{background:var(--rosa);padding:0.75rem 0;overflow:hidden}
@@ -855,7 +866,6 @@ export default function Home() {
         /* RESPONSIVE DESKTOP */
         @media(min-width:769px){
           .hero{min-height:100svh}
-          .hero-content{padding:0 4rem clamp(4rem,9vh,7rem) !important}
           .valor-split{grid-template-columns:1fr 1fr}
           .valor-bloco{border-bottom:none;border-right:1px solid var(--g2);padding:3.5rem 4rem}
           .valor-bloco:last-child{border-right:none}
@@ -1018,13 +1028,14 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section className="hero" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
-        <div className="hero-bg">
+      {/* HERO SPLIT */}
+      <section className="hero">
+        {/* painel esquerdo — media */}
+        <div className="hero-media" style={{"--hero-pos": heroPeca?.hero_position || "center top"}}>
           {videoUrl
             ? <video src={videoUrl} autoPlay muted loop playsInline preload="auto" ref={el => {
                 if (!el) return;
-                el.muted = true;
+                el.muted = !videoComSom;
                 const tryPlay = () => el.play().catch(() => setTimeout(tryPlay, 500));
                 if (el.readyState >= 3) tryPlay();
                 else el.addEventListener("canplay", tryPlay, { once: true });
@@ -1033,37 +1044,59 @@ export default function Home() {
               ? <img src={heroPeca.fotos.filter(Boolean)[0]} alt="" className={heroCarregado ? "visivel" : ""} />
               : null
           }
-        </div>
-        <div className="hero-overlay" />
-        <div className="hero-content">
-          <p className="hero-eyebrow">{t.hero.eyebrow}</p>
-          {t.hero.rotary && (
-            <div className="hero-rotary">
-              <div className="hero-rotary-inner">
-                {[...t.hero.rotary, t.hero.rotary[0]].map((word, i) => (
-                  <span key={i}>{word}</span>
-                ))}
-              </div>
-            </div>
+          <div className="hero-media-overlay" />
+          {videoUrl && (
+            <button className="hero-sound" onClick={() => {
+              const videos = document.querySelectorAll(".hero-media video");
+              videos.forEach(v => { v.muted = videoComSom; });
+              setVideoComSom(!videoComSom);
+            }}>
+              {videoComSom ? "SOM ON" : "SOM OFF"}
+            </button>
           )}
+        </div>
+
+        {/* painel direito — conteúdo + simulador */}
+        <div className="hero-content">
+          <p className="hero-eyebrow">Nora Grei</p>
+          <h1 className="hero-titulo">
+            {lang === "fr" ? <>Habillez <em>l&apos;extraordinaire.</em></> :
+             lang === "lt" ? <>Apsirenkite <em>išskirtinai.</em></> :
+             <>Veste o <em>extraordinário.</em></>}
+          </h1>
           <p className="hero-sub">{t.hero.sub}</p>
+
+          {/* mini simulador */}
+          <div className="hero-sim">
+            <div className="hero-sim-label">{t.hero.sim.label}</div>
+            <div className="hero-sim-row">
+              <span>{t.hero.sim.preco}</span>
+              <input
+                type="number"
+                className="hero-sim-input"
+                value={simVal}
+                min={50}
+                max={10000}
+                onChange={e => setSimVal(Math.max(0, parseInt(e.target.value) || 0))}
+              />
+            </div>
+            <div className="hero-sim-resultado">
+              <span className="hero-sim-resultado-label">{t.hero.sim.anual}</span>
+              <span className="hero-sim-val">€{Math.round(simVal * 0.45)}</span>
+              <span className="hero-sim-sub">{t.hero.sim.mes}</span>
+            </div>
+            <a href="/calculadora" className="hero-sim-link">{t.hero.sim.cta} →</a>
+          </div>
+
           <div className="hero-btns">
             <a href="/catalogo" className="hero-cta1">{t.hero.cta1}</a>
             <a href="#como" className="hero-cta2">{t.hero.cta2} →</a>
           </div>
-        </div>
-        {videoUrl && (
-          <button className="hero-sound" onClick={() => {
-            const videos = document.querySelectorAll(".hero-bg video");
-            videos.forEach(v => { v.muted = videoComSom; });
-            setVideoComSom(!videoComSom);
-          }}>
-            {videoComSom ? "🔊" : "🔇"}
-          </button>
-        )}
-        <div className="hero-scroll-cue">
-          <span>scroll</span>
-          <div className="hero-scroll-line" />
+
+          <div className="hero-scroll-cue">
+            <span>scroll</span>
+            <div className="hero-scroll-line" />
+          </div>
         </div>
       </section>
 
