@@ -1,12 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import LojaCliente from "./LojaCliente";
 
-const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 async function getLoja(codigo) {
+  const supabaseServer = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
   const { data } = await supabaseServer
     .from("clientes")
     .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
@@ -17,6 +16,10 @@ async function getLoja(codigo) {
 }
 
 async function getPecas(clienteId) {
+  const supabaseServer = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
   const { data } = await supabaseServer
     .from("pecas")
     .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor, categorias(nome)")
