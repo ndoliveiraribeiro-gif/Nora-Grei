@@ -2,26 +2,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import PecaCard from "@/components/PecaCard";
+import { t as i18n, traduzCat } from "@/lib/i18n";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"];
 
-const CATEGORIAS_T = {
-  "Vestidos":    { fr: "Robes",       lt: "Suknelės" },
-  "Casacos":     { fr: "Manteaux",    lt: "Paltai" },
-  "Conjuntos":   { fr: "Ensembles",   lt: "Komplektai" },
-  "Acessórios":  { fr: "Accessoires", lt: "Aksesuarai" },
-  "Corsets":     { fr: "Corsets",     lt: "Korsetai" },
-  "Tops":        { fr: "Tops",        lt: "Topai" },
-  "Calças":      { fr: "Pantalons",   lt: "Kelnės" },
-  "Saias":       { fr: "Jupes",       lt: "Sijonai" },
-  "Relógios":    { fr: "Montres",     lt: "Laikrodžiai" },
-  "Malas":       { fr: "Sacs",        lt: "Rankinės" },
-  "Bijutaria":   { fr: "Bijoux",      lt: "Papuošalai" },
-};
-function traduzCat(cat, lang) {
-  if (!cat || lang === "pt") return cat;
-  return CATEGORIAS_T[cat]?.[lang] || cat;
-}
 
 // Modal de detalhe de preço (estilo Vinted)
 function ModalPreco({ peca, lang, onClose }) {

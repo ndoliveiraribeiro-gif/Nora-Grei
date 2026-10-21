@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { t, traduzCat } from "@/lib/i18n";
 
 function Timer({ dataFim, lang }) {
   const [tempo, setTempo] = useState("");
@@ -29,32 +30,8 @@ function Timer({ dataFim, lang }) {
   );
 }
 
-const CATEGORIAS_T = {
-  "Vestidos":    { fr: "Robes",      lt: "Suknelės" },
-  "Casacos":     { fr: "Manteaux",   lt: "Paltai" },
-  "Conjuntos":   { fr: "Ensembles",  lt: "Komplektai" },
-  "Acessórios":  { fr: "Accessoires",lt: "Aksesuarai" },
-  "Corsets":     { fr: "Corsets",    lt: "Korsetai" },
-  "Tops":        { fr: "Tops",       lt: "Topai" },
-  "Calças":      { fr: "Pantalons",  lt: "Kelnės" },
-  "Saias":       { fr: "Jupes",      lt: "Sijonai" },
-  "Relógios":    { fr: "Montres",    lt: "Laikrodžiai" },
-  "Malas":       { fr: "Sacs",       lt: "Rankinės" },
-  "Bijutaria":   { fr: "Bijoux",     lt: "Papuošalai" },
-};
-
-function traduzCategoria(cat, lang) {
-  if (!cat || lang === "pt") return cat;
-  return CATEGORIAS_T[cat]?.[lang] || cat;
-}
-
 export default function PecaCard({ peca, lang = "pt" }) {
-  const labels = {
-    pt: { alugar: "Alugar", comprar: "Comprar", reservar: "Indisponível — Reservar", disponivel: "Disponível", indisponivel: "Indisponível", guardar: "Guardar", removerGuardado: "Remover dos guardados" },
-    fr: { alugar: "Louer", comprar: "Acheter", reservar: "Indisponible — Réserver", disponivel: "Disponible", indisponivel: "Indisponible", guardar: "Sauvegarder", removerGuardado: "Retirer des favoris" },
-    lt: { alugar: "Nuomoti", comprar: "Pirkti", reservar: "Neprieinama — Rezervuoti", disponivel: "Prieinama", indisponivel: "Neprieinama", guardar: "Išsaugoti", removerGuardado: "Pašalinti iš išsaugotų" },
-  };
-  const l = labels[lang] || labels.pt;
+  const l = t(lang);
   const disponivel = peca.estado === "disponivel";
 
   const [naWishlist, setNaWishlist] = useState(false);
@@ -143,7 +120,7 @@ export default function PecaCard({ peca, lang = "pt" }) {
         {/* INFO */}
         <div style={{padding:'0.7rem 0.75rem 0.4rem'}}>
           {peca.categoria && (
-            <p style={{fontSize:'0.72rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'#8a8783',fontFamily:"'Jost',sans-serif",marginBottom:'0.18rem',fontWeight:400}}>{traduzCategoria(peca.categoria, lang)}</p>
+            <p style={{fontSize:'0.72rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'#8a8783',fontFamily:"'Jost',sans-serif",marginBottom:'0.18rem',fontWeight:400}}>{traduzCat(peca.categoria, lang)}</p>
           )}
           {/* Nome: peso 500 para ser bem legível */}
           <h3 style={{fontFamily:"'Jost',sans-serif",fontSize:'0.92rem',fontWeight:500,lineHeight:1.25,marginBottom:'0.35rem',color:'#111',letterSpacing:'0.01em'}}>{peca.nome}</h3>
