@@ -927,77 +927,98 @@ export default function PublicarPage() {
                   val: "alugar",
                   titulo: "Alugar",
                   icone: "↻",
-                  desc: "Peça fica no teu armário a gerar rendimento",
+                  desc: "Peça fica no teu armário a gerar rendimento recorrente",
                   detalhe: ganhoAluguer ? `Potencial ${ganhoAluguer}` : "Rendimento recorrente",
                   cor: "#c4748a",
+                  nota: "A peça volta sempre para ti após cada aluguer. Tu defines o preço por dia e a disponibilidade. Podes pausar ou cancelar a qualquer momento. Ideal para peças de qualidade que usas pouco mas não queres vender.",
                 },
                 {
                   val: "comprar",
                   titulo: "Vender",
                   icone: "→",
-                  desc: "Venda rápida, espaço liberto no armário",
+                  desc: "Venda a preço fixo — novo, usado ou em segunda mão",
                   detalhe: ganhoVenda ? `Receber ${ganhoVenda}` : "Liquidez imediata",
                   cor: "#5b8a6b",
+                  nota: "Define o preço de venda e a peça fica listada até ser vendida. Quando vendida, recebes o valor (menos comissão Nora Grei) e a peça é enviada para a compradora. Podes editar o preço ou retirar a peça a qualquer momento.",
                 },
                 {
                   val: "ambos",
                   titulo: "Alugar e Vender",
                   icone: "◈",
-                  desc: "Alugas enquanto encontras comprador",
+                  desc: "Alugas enquanto encontras compradora — duas fontes de receita",
                   detalhe: ganhoAmbos ? `${ganhoAmbos}` : "Máxima flexibilidade",
                   cor: "#7a6a9e",
+                  nota: "A peça está disponível para aluguer e para venda em simultâneo. Se for vendida, os alugueres em curso são respeitados até ao fim. Boa opção para quem quer monetizar ao máximo antes de vender definitivamente.",
                 },
                 {
                   val: "social",
                   titulo: "Venda Social",
                   icone: "♡",
-                  desc: "Liberta stock — comprador paga o que quiser (mín. 5€)",
+                  desc: "A compradora decide o que paga — mínimo 5€",
                   detalhe: "Preço livre · comunidade decide o valor",
                   cor: "#c4a882",
+                  nota: "Ideal para libertar stock de peças que já não usas. A Nora Grei define o mínimo em 5€ — a compradora pode pagar mais se quiser. Recebes o valor pago (menos comissão). Ótimo para dar nova vida a peças paradas no armário.",
                 },
               ];
               return (
                 <div className="pub-card">
                   <p className="pub-card-t">Disponível para</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    {opcoes.map(({ val, titulo, icone, desc, detalhe, cor }) => {
+                    {opcoes.map(({ val, titulo, icone, desc, detalhe, cor, nota }) => {
                       const ativo = peca.tipo === val;
                       return (
-                        <button
-                          key={val}
-                          onClick={() => setP("tipo", val)}
-                          style={{
-                            display: "flex", alignItems: "center", gap: "0.85rem",
-                            padding: "0.75rem 1rem",
-                            border: ativo ? `2px solid ${cor}` : "1.5px solid #e2dfda",
-                            borderRadius: 10,
-                            background: ativo ? `${cor}12` : "#fff",
-                            cursor: "pointer", textAlign: "left",
-                            transition: "all 0.15s", fontFamily: "inherit",
-                            width: "100%",
-                          }}
-                        >
-                          <span style={{
-                            fontSize: "1.3rem", lineHeight: 1,
-                            color: ativo ? cor : "#aaa",
-                            minWidth: 28, textAlign: "center",
-                          }}>{icone}</span>
-                          <div style={{ flex: 1 }}>
+                        <div key={val} style={{ display: "flex", flexDirection: "column" }}>
+                          <button
+                            onClick={() => setP("tipo", val)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: "0.85rem",
+                              padding: "0.75rem 1rem",
+                              border: ativo ? `2px solid ${cor}` : "1.5px solid #e2dfda",
+                              borderRadius: ativo ? "10px 10px 0 0" : 10,
+                              background: ativo ? `${cor}12` : "#fff",
+                              cursor: "pointer", textAlign: "left",
+                              transition: "all 0.15s", fontFamily: "inherit",
+                              width: "100%",
+                            }}
+                          >
+                            <span style={{
+                              fontSize: "1.3rem", lineHeight: 1,
+                              color: ativo ? cor : "#aaa",
+                              minWidth: 28, textAlign: "center",
+                            }}>{icone}</span>
+                            <div style={{ flex: 1 }}>
+                              <div style={{
+                                fontSize: "0.78rem", fontWeight: 600,
+                                letterSpacing: "0.06em", textTransform: "uppercase",
+                                color: ativo ? cor : "#1a1816", marginBottom: "0.2rem",
+                                fontFamily: "inherit",
+                              }}>{titulo}</div>
+                              <div style={{ fontSize: "0.7rem", color: "#888", lineHeight: 1.4 }}>{desc}</div>
+                            </div>
                             <div style={{
-                              fontSize: "0.78rem", fontWeight: 600,
-                              letterSpacing: "0.06em", textTransform: "uppercase",
-                              color: ativo ? cor : "#1a1816", marginBottom: "0.2rem",
+                              fontSize: "0.68rem", fontWeight: 600,
+                              color: ativo ? cor : "#bbb",
+                              textAlign: "right", whiteSpace: "nowrap",
+                              lineHeight: 1.3,
+                            }}>{detalhe}</div>
+                          </button>
+                          {/* Nota explicativa — só visível quando selecionado */}
+                          {ativo && (
+                            <div style={{
+                              padding: "0.65rem 1rem 0.75rem",
+                              background: `${cor}0a`,
+                              border: `2px solid ${cor}`,
+                              borderTop: "none",
+                              borderRadius: "0 0 10px 10px",
+                              fontSize: "0.72rem",
+                              color: "#5a5855",
+                              lineHeight: 1.55,
                               fontFamily: "inherit",
-                            }}>{titulo}</div>
-                            <div style={{ fontSize: "0.7rem", color: "#888", lineHeight: 1.4 }}>{desc}</div>
-                          </div>
-                          <div style={{
-                            fontSize: "0.68rem", fontWeight: 600,
-                            color: ativo ? cor : "#bbb",
-                            textAlign: "right", whiteSpace: "nowrap",
-                            lineHeight: 1.3,
-                          }}>{detalhe}</div>
-                        </button>
+                            }}>
+                              ℹ️ {nota}
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
