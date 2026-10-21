@@ -653,9 +653,10 @@ export default function Home() {
           .hero-eyebrow{margin-bottom:0.75rem}
           .hero-titulo{font-size:clamp(2rem,7vw,2.8rem);margin-bottom:0.75rem}
           .hero-sub{margin-bottom:1.25rem;font-size:0.78rem}
-          .hero-sim{padding:1rem 1.25rem;margin-bottom:1.25rem}
+          .hero-sim{display:none}
           .hero-btns{gap:0.5rem}
-          .hero-cta1,.hero-cta2{font-size:0.58rem;padding:0.75rem 1.25rem}
+          .hero-cta1{font-size:0.62rem;padding:1rem 0;width:100%;text-align:center}
+          .hero-cta2{font-size:0.62rem;padding:1rem 0;width:100%;text-align:center;border-left:none;border-right:none;border-top:none}
           .hero-scroll-cue{display:none}
         }
 
