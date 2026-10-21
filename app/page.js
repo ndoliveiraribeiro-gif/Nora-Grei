@@ -46,7 +46,7 @@ const T = {
     videoEmBreve: "Vídeo em breve",
     logoTag: "Alugar ou Comprar",
     catNomes: { Festa: "Festa", Trabalho: "Trabalho", "Férias": "Férias", Jantar: "Jantar" },
-    cupao: { texto: "Oferta de boas-vindas — 15% de desconto em noragrei.com", copiar: "Copiar código", copiado: "Copiado ✓" },
+    cupao: { copiar: "Copiar código", copiado: "Copiado" },
     destaque: { label: "Selecção da semana", verTodas: "Ver toda a colecção", alugar: "Alugar", reservar: "Indisponível — Reservar", dispEm: "Disponível em" },
     pwa: { titulo: "Instala a app Nora Grei", sub: "Acesso rápido à colecção, pedidos e notificações.", btn: "Instalar agora", iosP1: "1 · Toca em", iosP2: "⬆️ Partilhar", iosP3: "na barra do Safari", iosP4: "2 · Escolhe", iosP5: "\"Adicionar ao ecrã inicial\"", iosP6: "3 · Toca em", iosP7: "\"Adicionar\"", dispensar: "Agora não", secTitulo: "Tens a app?", secSub: "Instala no teu telemóvel e acede à colecção com um toque.", secBtn: "Instalar app" },
     trust: { label: "Porque nos escolhem", items: [
@@ -111,7 +111,7 @@ const T = {
     videoEmBreve: "Vidéo bientôt disponible",
     logoTag: "Louer ou Acheter",
     catNomes: { Festa: "Soirée", Trabalho: "Travail", "Férias": "Vacances", Jantar: "Dîner" },
-    cupao: { texto: "Offre de bienvenue — 15% de réduction sur noragrei.com", copiar: "Copier le code", copiado: "Copié ✓" },
+    cupao: { copiar: "Copier le code", copiado: "Copié" },
     destaque: { label: "Sélection de la semaine", verTodas: "Voir toute la collection", alugar: "Louer", reservar: "Indisponible — Réserver", dispEm: "Disponible dans" },
     pwa: { titulo: "Installer l'app Nora Grei", sub: "Accès rapide à la collection, commandes et notifications — sans encombrer.", btn: "Installer", ios: "Dans Safari, appuyez sur  puis \"Sur l'écran d'accueil\".", dispensar: "Plus tard", secTitulo: "Vous avez l'app?", secSub: "Installez sur votre téléphone pour accéder à la collection en un clic.", secBtn: "Installer l'app" },
     trust: { label: "Pourquoi nous choisir", items: [
@@ -176,7 +176,7 @@ const T = {
     videoEmBreve: "Vaizdo įrašas greitai",
     logoTag: "Nuomoti ar Pirkti",
     catNomes: { Festa: "Vakarėlis", Trabalho: "Darbas", "Férias": "Atostogos", Jantar: "Vakarienė" },
-    cupao: { texto: "Sveikiname — 15% nuolaida noragrei.com", copiar: "Kopijuoti kodą", copiado: "Nukopijuota ✓" },
+    cupao: { copiar: "Kopijuoti kodą", copiado: "Nukopijuota" },
     destaque: { label: "Savaitės atranka", verTodas: "Žiūrėti visą kolekciją", alugar: "Nuomoti", reservar: "Neprieinama — Rezervuoti", dispEm: "Prieinama po" },
     pwa: { titulo: "Įdiekite Nora Grei programėlę", sub: "Greita prieiga prie kolekcijos, užsakymų ir pranešimų — neužimant vietos.", btn: "Įdiegti", ios: "Safari, bakstelėkite  ir tada \"Pridėti prie pradžios ekrano\".", dispensar: "Vėliau", secTitulo: "Turite programėlę?", secSub: "Įdiekite telefone ir pasiekite kolekciją vienu prisilietimu.", secBtn: "Įdiegti programėlę" },
     trust: { label: "Kodėl mus renkasi", items: [
@@ -803,14 +803,20 @@ export default function Home() {
         .footer-social-link:hover{color:var(--rosa)}
 
         /* CUPÃO BANNER */
-        .cupao-banner{position:fixed;bottom:72px;left:0;right:0;z-index:150;background:var(--rosa);padding:1rem 1.5rem;animation:slideUp 0.4s ease}
+        .cupao-banner{position:fixed;bottom:72px;left:0;right:0;z-index:150;background:#100c0a;border-top:1px solid rgba(255,255,255,0.08);padding:1.1rem 1.5rem;animation:slideUp 0.4s ease}
         @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-        .cupao-inner{display:flex;flex-direction:column;gap:0.75rem}
-        .cupao-texto{font-size:0.82rem;color:#fff;font-weight:500}
-        .cupao-codigo{font-family:var(--serif);font-size:1.8rem;font-weight:300;color:#fff;letter-spacing:0.15em}
-        .cupao-actions{display:flex;gap:0.75rem;align-items:center}
-        .cupao-btn{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;background:#fff;color:var(--rosa);border:none;padding:0.6rem 1.25rem;cursor:pointer;font-family:var(--sans);font-weight:600;flex:1}
-        .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;flex-shrink:0}
+        .cupao-inner{display:flex;flex-direction:column;gap:0.6rem}
+        .cupao-eyebrow{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:var(--sans);font-weight:500}
+        .cupao-titulo{font-family:var(--serif);font-size:1.25rem;font-weight:300;font-style:italic;color:#f8f7f5;letter-spacing:0.02em;line-height:1.2}
+        .cupao-texto{font-size:0.78rem;color:rgba(255,255,255,0.55);font-family:var(--sans);line-height:1.45}
+        .cupao-codigo-wrap{display:flex;align-items:center;gap:0.65rem;margin-top:0.1rem}
+        .cupao-codigo{font-family:monospace;font-size:0.95rem;font-weight:600;color:#f8f7f5;letter-spacing:0.22em;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);padding:0.3rem 0.7rem}
+        .cupao-actions{display:flex;gap:0.75rem;align-items:center;margin-top:0.35rem}
+        .cupao-btn{font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;background:transparent;color:#f8f7f5;border:1px solid rgba(255,255,255,0.25);padding:0.55rem 1.1rem;cursor:pointer;font-family:var(--sans);font-weight:500;transition:border-color 0.2s,color 0.2s}
+        .cupao-btn:hover{border-color:rgba(255,255,255,0.6);color:#fff}
+        .cupao-btn.copiado{border-color:var(--rosa);color:var(--rosa)}
+        .cupao-fechar{background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;transition:color 0.2s;line-height:1}
+        .cupao-fechar:hover{color:rgba(255,255,255,0.7)}
 
         /* DESTAQUE */
         .destaque-sec{padding:0;background:var(--white)}
@@ -874,8 +880,8 @@ export default function Home() {
           .footer-bottom{flex-direction:row;justify-content:space-between;align-items:center}
           .nav{padding:1.25rem 3rem}
           .cupao-banner{bottom:0;padding:1rem 3rem}
-          .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between}
-          .cupao-actions{flex:0}
+          .cupao-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:2rem}
+          .cupao-actions{flex:0;margin-top:0}
           .trust-sec{padding:2.5rem 4rem}
           .trust-grid{grid-template-columns:repeat(4,1fr)}
           .depo-sec{padding:3.5rem 4rem}
@@ -952,14 +958,30 @@ export default function Home() {
       {banner && campanha && (
         <div className="cupao-banner">
           <div className="cupao-inner">
-            <div>
-              <div className="cupao-texto">{(lang === "fr" && campanha.mensagem_fr) || (lang === "lt" && campanha.mensagem_lt) || campanha.mensagem || ""}</div>
-              {campanha.codigo && <div className="cupao-codigo">{campanha.codigo}</div>}
-              {campanha.desconto && !campanha.codigo && <div className="cupao-codigo" style={{fontSize:"1.1rem"}}>{campanha.desconto}</div>}
+            <div style={{flex:1,minWidth:0}}>
+              <div className="cupao-eyebrow">Nora Grei</div>
+              <div className="cupao-titulo">{(lang === "fr" && campanha.titulo_fr) || (lang === "lt" && campanha.titulo_lt) || campanha.titulo || "Bem-vinda."}</div>
+              {campanha.mensagem && (
+                <div className="cupao-texto">{(lang === "fr" && campanha.mensagem_fr) || (lang === "lt" && campanha.mensagem_lt) || campanha.mensagem}</div>
+              )}
+              {campanha.codigo && (
+                <div className="cupao-codigo-wrap">
+                  <span className="cupao-codigo">{campanha.codigo}</span>
+                  {campanha.desconto && <span style={{fontSize:"0.7rem",color:"rgba(255,255,255,0.4)",fontFamily:"var(--sans)"}}>{campanha.desconto}</span>}
+                </div>
+              )}
             </div>
             <div className="cupao-actions">
-              {campanha.codigo && <button className="cupao-btn" onClick={copiarCupao}>{cupaoCopiado ? (t.cupao?.copiado || "Copiado ✓") : (t.cupao?.copiar || "Copiar código")}</button>}
-              {campanha.url_destino && !campanha.codigo && <a href={campanha.url_destino} className="cupao-btn" style={{textDecoration:"none",textAlign:"center"}}>Ver oferta →</a>}
+              {campanha.codigo && (
+                <button className={`cupao-btn${cupaoCopiado ? " copiado" : ""}`} onClick={copiarCupao}>
+                  {cupaoCopiado ? (t.cupao?.copiado || "Copiado") : (t.cupao?.copiar || "Copiar código")}
+                </button>
+              )}
+              {campanha.url_destino && !campanha.codigo && (
+                <a href={campanha.url_destino} className="cupao-btn" style={{textDecoration:"none",textAlign:"center"}}>
+                  {lang === "fr" ? "Voir l'offre" : lang === "lt" ? "Žiūrėti" : "Ver oferta"}
+                </a>
+              )}
               <button className="cupao-fechar" onClick={() => { setBanner(false); if (campanha?.id) localStorage.setItem(`ng_banner_${campanha.id}`, "1"); }}>✕</button>
             </div>
           </div>
