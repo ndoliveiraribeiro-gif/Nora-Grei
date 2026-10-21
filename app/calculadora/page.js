@@ -325,11 +325,17 @@ export default function Calculadora() {
   // Gate de email
   const [gateAberto, setGateAberto] = useState(false);
   const [gateEmail, setGateEmail] = useState("");
-  const [gateOk, setGateOk] = useState(false); // passou o gate nesta sessão
+  const [gateOk, setGateOk] = useState(false);
   const [gateSaving, setGateSaving] = useState(false);
   const [userLogado, setUserLogado] = useState(null);
   const [avalCount, setAvalCount] = useState(0);
   const gateDisparado = useRef(false);
+  // Autocomplete marca
+  const [marcaInput, setMarcaInput] = useState("");
+  const [marcaSugestoes, setMarcaSugestoes] = useState([]);
+  const [marcaFocused, setMarcaFocused] = useState(false);
+  const marcaRef = useRef(null);
+  const TODAS_MARCAS = GRUPOS_MARCA.flatMap(g => g.marcas.map(m => ({ nome: m, grupo: g.grupo })));
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -447,6 +453,35 @@ export default function Calculadora() {
     } catch {}
   }, [calc, p]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Filtrar sugestões de marca conforme o utilizador escreve
+  const handleMarcaInput = (val) => {
+    setMarcaInput(val);
+    if (val.length < 1) { setMarcaSugestoes([]); return; }
+    const q = val.toLowerCase();
+    setMarcaSugestoes(TODAS_MARCAS.filter(m => m.nome.toLowerCase().includes(q)).slice(0, 8));
+  };
+
+  const escolherMarca = (nome) => {
+    setMarca(nome);
+    setMarcaInput(nome);
+    setMarcaSugestoes([]);
+    setMarcaFocused(false);
+  };
+
+  // Grupos de tipo de peça para a UI por categoria
+  const TIPO_GRUPOS_UI = [
+    { icon: "👗", label: { pt: "Vestuário", fr: "Vêtements", lt: "Drabužiai" },
+      items: ["VestidoNoite","Vestido","Fato","Jumpsuit","Saia","Calças","Jeans","Blusa","Camisa","Camisola","Bodysuit","Casaco","Blazer","Pele"] },
+    { icon: "👜", label: { pt: "Malas", fr: "Sacs", lt: "Krepšiai" },
+      items: ["MalaLuxo","MalaOmbro","Clutch","Mochila"] },
+    { icon: "👠", label: { pt: "Calçado", fr: "Chaussures", lt: "Avalynė" },
+      items: ["Sapatos","Sapatilhas","Botas","Sandalias"] },
+    { icon: "✨", label: { pt: "Acessórios", fr: "Accessoires", lt: "Aksesuarai" },
+      items: ["Cinto","Lenco","OculosSol","Chapeu","Relogio","Joia"] },
+  ];
+
+  const catAtiva = TIPO_GRUPOS_UI.findIndex(g => g.items.includes(tipo));
+
   return (
     <>
       <style>{`
@@ -472,114 +507,268 @@ export default function Calculadora() {
           min-height: 100svh;
           max-width: 480px;
           margin: 0 auto;
-          padding: 0 1rem 5rem;
+          padding: 0 1rem calc(5rem + env(safe-area-inset-bottom, 0px));
         }
 
-        /* Header */
+        /* ── Header ─────────────────────────── */
         .pg-header {
-          padding: 2rem 0 1.75rem;
+          padding: 1.5rem 0 1.25rem;
           text-align: center;
         }
         .pg-eyebrow {
-          font-size: 0.65rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--accent);
-          margin-bottom: 0.6rem;
+          font-size: 0.62rem; letter-spacing: 0.2em;
+          text-transform: uppercase; color: var(--accent);
+          margin-bottom: 0.5rem;
         }
         .pg-titulo {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 2.1rem;
-          font-weight: 400;
-          line-height: 1.15;
-          color: var(--fg);
-          margin-bottom: 0.5rem;
+          font-size: 1.9rem; font-weight: 400; line-height: 1.15;
+          color: var(--fg); margin-bottom: 0.4rem;
         }
         .pg-sub {
-          font-size: 0.82rem;
-          color: var(--sub);
-          line-height: 1.55;
-          max-width: 32ch;
-          margin: 0 auto;
+          font-size: 0.78rem; color: var(--sub);
+          line-height: 1.5; max-width: 30ch; margin: 0 auto;
         }
 
-        /* Cards */
+        /* ── Resultado hero (sempre visível no topo) ── */
+        .hero-res {
+          background: var(--dark); border-radius: 18px;
+          padding: 1.5rem 1.35rem; margin-bottom: 0.75rem;
+          position: relative; overflow: hidden;
+        }
+        .hero-res::before {
+          content: 'NG'; position: absolute; right: 0.75rem; top: 50%;
+          transform: translateY(-50%);
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 5rem; font-weight: 300;
+          color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none;
+        }
+        .hero-label {
+          font-size: 0.58rem; letter-spacing: 0.2em;
+          text-transform: uppercase; color: rgba(255,255,255,0.38);
+          margin-bottom: 0.35rem;
+        }
+        .hero-valor {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 3.2rem; font-weight: 400; color: #fff;
+          line-height: 1; margin-bottom: 0.25rem;
+          transition: all 0.2s ease;
+        }
+        .hero-valor.vazio {
+          color: rgba(255,255,255,0.18);
+        }
+        .hero-nota {
+          font-size: 0.72rem; color: rgba(255,255,255,0.38); line-height: 1.4;
+        }
+
+        /* ── Cards ─────────────────────────── */
         .card {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 14px;
-          padding: 1.25rem;
-          margin-bottom: 0.75rem;
+          background: var(--card); border: 1px solid var(--border);
+          border-radius: 14px; padding: 1.1rem 1.15rem;
+          margin-bottom: 0.65rem;
         }
         .card-label {
-          font-size: 0.62rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--sub);
-          margin-bottom: 1rem;
-          font-weight: 500;
+          font-size: 0.58rem; letter-spacing: 0.18em;
+          text-transform: uppercase; color: var(--sub);
+          margin-bottom: 0.85rem; font-weight: 500;
         }
 
-        /* Input preço */
+        /* ── Input preço ─────────────────────── */
         .preco-row {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: var(--bg);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 0 0.9rem;
+          display: flex; align-items: center; gap: 0.45rem;
+          background: var(--bg); border: 1px solid var(--border);
+          border-radius: 8px; padding: 0 0.85rem;
+          transition: border-color 0.15s;
         }
-        .preco-prefix { font-size: 1.1rem; color: var(--sub); }
+        .preco-row:focus-within { border-color: var(--accent); }
+        .preco-prefix { font-size: 1.05rem; color: var(--sub); }
         .preco-input {
           flex: 1; border: none; background: transparent;
           font-family: 'Cormorant Garamond', serif;
-          font-size: 1.8rem; font-weight: 400;
-          color: var(--fg); padding: 0.5rem 0;
-          outline: none;
+          font-size: 1.75rem; font-weight: 400;
+          color: var(--fg); padding: 0.45rem 0; outline: none;
         }
-        .preco-hint { font-size: 0.72rem; color: var(--sub); margin-top: 0.4rem; }
+        .preco-hint { font-size: 0.7rem; color: var(--sub); margin-top: 0.35rem; }
 
-        /* Opções pill */
-        .pills {
-          display: flex; flex-wrap: wrap; gap: 0.4rem;
+        /* ── Categoria tabs (tipo) ───────────── */
+        .cat-tabs {
+          display: grid; grid-template-columns: repeat(4, 1fr);
+          gap: 0.35rem; margin-bottom: 0.85rem;
         }
-        .pill {
-          padding: 0.45rem 0.85rem;
-          border: 1px solid var(--border);
-          border-radius: 20px;
-          font-size: 0.74rem;
-          background: var(--bg);
-          color: var(--sub);
-          cursor: pointer;
-          transition: all 0.15s;
+        .cat-tab {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 0.2rem; padding: 0.55rem 0.25rem;
+          border: 1px solid var(--border); border-radius: 10px;
+          background: var(--bg); cursor: pointer; transition: all 0.15s;
           font-family: 'Jost', sans-serif;
         }
-        .pill.sel {
-          background: var(--fg);
-          color: #fff;
-          border-color: var(--fg);
+        .cat-tab.sel {
+          background: var(--fg); border-color: var(--fg);
+        }
+        .cat-tab-icon { font-size: 1.1rem; line-height: 1; }
+        .cat-tab-label {
+          font-size: 0.6rem; color: var(--sub); font-weight: 400;
+          white-space: nowrap;
+        }
+        .cat-tab.sel .cat-tab-label { color: rgba(255,255,255,0.7); }
+
+        /* Sub-tipo select */
+        .tipo-select {
+          width: 100%; padding: 0.6rem 2.2rem 0.6rem 0.85rem;
+          border: 1px solid var(--border); border-radius: 8px;
+          background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.85rem center;
+          color: var(--fg); font-family: 'Jost', sans-serif;
+          font-size: 0.85rem; outline: none; appearance: none; cursor: pointer;
         }
 
-        /* Slider meses */
+        /* ── Autocomplete marca ──────────────── */
+        .marca-wrap { position: relative; }
+        .marca-input {
+          width: 100%; padding: 0.65rem 0.85rem;
+          border: 1px solid var(--border); border-radius: 8px;
+          background: var(--bg); color: var(--fg);
+          font-family: 'Jost', sans-serif; font-size: 0.88rem;
+          outline: none; transition: border-color 0.15s;
+        }
+        .marca-input:focus { border-color: var(--accent); }
+        .marca-dropdown {
+          position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+          background: var(--card); border: 1px solid var(--border);
+          border-radius: 10px; z-index: 50; overflow: hidden;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        .marca-item {
+          padding: 0.65rem 0.85rem; font-size: 0.84rem; cursor: pointer;
+          display: flex; justify-content: space-between; align-items: center;
+          transition: background 0.1s; font-family: 'Jost', sans-serif;
+        }
+        .marca-item:hover { background: var(--bg); }
+        .marca-item-grupo {
+          font-size: 0.6rem; color: var(--sub);
+          letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .marca-badge {
+          display: inline-block; margin-top: 0.4rem;
+          font-size: 0.58rem; letter-spacing: 0.12em;
+          text-transform: uppercase; padding: 0.18rem 0.5rem;
+          border-radius: 3px; font-weight: 500;
+        }
+        .tier-investimento { background: #1a3a2a; color: #a8d8a8; }
+        .tier-premium      { background: #1a1a2e; color: #c4b0e8; }
+        .tier-alta         { background: #2a2018; color: #e8c97a; }
+
+        /* ── Pills em grid (4 colunas, nunca quebra) ── */
+        .pills-grid {
+          display: grid; grid-template-columns: repeat(4,1fr); gap: 0.35rem;
+        }
+        .pill {
+          padding: 0.5rem 0.2rem; border: 1px solid var(--border);
+          border-radius: 8px; font-size: 0.68rem; text-align: center;
+          background: var(--bg); color: var(--sub); cursor: pointer;
+          transition: all 0.12s; font-family: 'Jost', sans-serif;
+          line-height: 1.25; white-space: nowrap; overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .pill.sel {
+          background: var(--fg); color: #fff; border-color: var(--fg);
+        }
+        /* Quando são só 4 opções, grid de 4 — quando são 3 itens, grid de 3 */
+        .pills-3 { grid-template-columns: repeat(3,1fr); }
+
+        /* ── Slider meses ────────────────────── */
         .slider-header { display: flex; justify-content: space-between; margin-bottom: 0.6rem; }
-        .slider-val { font-size: 1rem; font-weight: 600; color: var(--fg); }
+        .slider-val { font-size: 0.95rem; font-weight: 600; color: var(--fg); }
         input[type=range] {
-          -webkit-appearance: none; width: 100%; height: 4px;
+          -webkit-appearance: none; width: 100%; height: 3px;
           border-radius: 2px; background: var(--border); outline: none;
         }
         input[type=range]::-webkit-slider-thumb {
-          -webkit-appearance: none; width: 20px; height: 20px;
+          -webkit-appearance: none; width: 18px; height: 18px;
           border-radius: 50%; background: var(--accent); cursor: pointer;
-          box-shadow: 0 1px 4px rgba(196,116,138,0.35);
+          box-shadow: 0 1px 4px rgba(196,116,138,0.4);
         }
 
-        /* Botão */
+        /* ── Comparação Vinted ───────────────── */
+        .comp-card {
+          display: grid; grid-template-columns: 1fr 1fr;
+          gap: 0.55rem; margin-bottom: 0.65rem;
+        }
+        .comp-col {
+          border-radius: 12px; padding: 0.9rem;
+          border: 1px solid var(--border);
+        }
+        .comp-col.ng { background: var(--dark); border-color: transparent; }
+        .comp-col.vinted { background: var(--card); }
+        .comp-marca {
+          font-size: 0.58rem; letter-spacing: 0.16em;
+          text-transform: uppercase; margin-bottom: 0.45rem;
+        }
+        .comp-col.ng .comp-marca { color: rgba(255,255,255,0.35); }
+        .comp-col.vinted .comp-marca { color: var(--sub); }
+        .comp-num {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.75rem; font-weight: 400; line-height: 1;
+          margin-bottom: 0.25rem;
+        }
+        .comp-col.ng .comp-num { color: #fff; }
+        .comp-col.vinted .comp-num { color: var(--fg); }
+        .comp-desc { font-size: 0.65rem; line-height: 1.3; }
+        .comp-col.ng .comp-desc { color: rgba(255,255,255,0.35); }
+        .comp-col.vinted .comp-desc { color: var(--sub); }
+        .comp-badge {
+          font-size: 0.6rem; letter-spacing: 0.06em;
+          text-transform: uppercase; color: var(--accent);
+          margin-top: 0.4rem; font-weight: 500;
+        }
+
+        /* ── Ganho banner ────────────────────── */
+        .ganho-banner {
+          background: linear-gradient(135deg, #c4748a 0%, #a85870 100%);
+          border-radius: 12px; padding: 0.9rem 1.1rem;
+          margin-bottom: 0.65rem;
+          display: flex; justify-content: space-between;
+          align-items: center; gap: 0.85rem;
+        }
+        .ganho-text { font-size: 0.76rem; color: rgba(255,255,255,0.85); line-height: 1.4; }
+        .ganho-num {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.85rem; font-weight: 400; color: #fff;
+          white-space: nowrap; flex-shrink: 0;
+        }
+
+        /* ── Rotação ─────────────────────────── */
+        .rotacao-card {
+          background: var(--green-bg); border: 1px solid #b8e0ca;
+          border-radius: 12px; padding: 0.9rem 1.1rem;
+          margin-bottom: 0.65rem;
+        }
+        .rotacao-label {
+          font-size: 0.58rem; letter-spacing: 0.15em;
+          text-transform: uppercase; color: var(--green);
+          margin-bottom: 0.4rem; font-weight: 500;
+        }
+        .rotacao-num {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.4rem; font-weight: 400; color: var(--green); line-height: 1;
+        }
+        .rotacao-sub { font-size: 0.72rem; color: #3a7a55; margin-top: 0.2rem; line-height: 1.4; }
+
+        /* ── Breakdown ───────────────────────── */
+        .breakdown { display: flex; flex-direction: column; gap: 0.5rem; }
+        .bk-row { display: flex; justify-content: space-between; font-size: 0.78rem; }
+        .bk-label { color: var(--sub); padding-right: 0.5rem; }
+        .bk-val { font-weight: 500; white-space: nowrap; }
+        .bk-val.pos { color: var(--green); }
+        .bk-val.neg { color: #c0392b; }
+        .bk-div { height: 1px; background: var(--border); }
+        .bk-total { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; }
+
+        /* ── Botões ──────────────────────────── */
         .btn {
-          display: block; width: 100%; padding: 1rem;
+          display: block; width: 100%; padding: 0.95rem;
           background: var(--fg); color: #fff; border: none;
           border-radius: 10px; font-family: 'Jost', sans-serif;
-          font-size: 0.74rem; letter-spacing: 0.14em;
+          font-size: 0.72rem; letter-spacing: 0.14em;
           text-transform: uppercase; cursor: pointer;
           text-align: center; text-decoration: none;
           transition: background 0.2s;
@@ -587,127 +776,11 @@ export default function Calculadora() {
         .btn:hover { background: #2d2926; }
         .btn-outline {
           background: transparent; color: var(--sub);
-          border: 1px solid var(--border);
-          margin-top: 0.5rem;
+          border: 1px solid var(--border); margin-top: 0.5rem;
         }
         .btn-outline:hover { background: var(--bg); }
 
-        /* Resultado hero */
-        .hero-res {
-          background: var(--dark);
-          border-radius: 16px;
-          padding: 1.75rem 1.5rem;
-          margin-bottom: 0.75rem;
-          position: relative;
-          overflow: hidden;
-        }
-        .hero-res::before {
-          content: 'NG';
-          position: absolute; right: 1rem; top: 50%;
-          transform: translateY(-50%);
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 6rem; font-weight: 300;
-          color: rgba(255,255,255,0.04);
-          line-height: 1;
-        }
-        .hero-label {
-          font-size: 0.62rem; letter-spacing: 0.2em;
-          text-transform: uppercase; color: rgba(255,255,255,0.4);
-          margin-bottom: 0.4rem;
-        }
-        .hero-valor {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 3.5rem; font-weight: 400;
-          color: #fff; line-height: 1;
-          margin-bottom: 0.3rem;
-        }
-        .hero-nota {
-          font-size: 0.75rem; color: rgba(255,255,255,0.45);
-          line-height: 1.4;
-        }
-
-        /* Comparação Vinted */
-        .comp-card {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 0.6rem; margin-bottom: 0.75rem;
-        }
-        .comp-col {
-          border-radius: 12px; padding: 1rem;
-          border: 1px solid var(--border);
-        }
-        .comp-col.ng { background: var(--dark); border-color: transparent; }
-        .comp-col.vinted { background: var(--card); }
-        .comp-marca {
-          font-size: 0.6rem; letter-spacing: 0.18em;
-          text-transform: uppercase; margin-bottom: 0.5rem;
-        }
-        .comp-col.ng .comp-marca { color: rgba(255,255,255,0.4); }
-        .comp-col.vinted .comp-marca { color: var(--sub); }
-        .comp-num {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.9rem; font-weight: 400; line-height: 1;
-          margin-bottom: 0.3rem;
-        }
-        .comp-col.ng .comp-num { color: #fff; }
-        .comp-col.vinted .comp-num { color: var(--fg); }
-        .comp-desc { font-size: 0.68rem; line-height: 1.35; }
-        .comp-col.ng .comp-desc { color: rgba(255,255,255,0.4); }
-        .comp-col.vinted .comp-desc { color: var(--sub); }
-        .comp-badge {
-          font-size: 0.62rem; letter-spacing: 0.08em;
-          text-transform: uppercase; color: var(--accent);
-          margin-top: 0.5rem; font-weight: 500;
-        }
-
-        /* Ganho extra */
-        .ganho-banner {
-          background: linear-gradient(135deg, #c4748a 0%, #a85870 100%);
-          border-radius: 12px; padding: 1rem 1.25rem;
-          margin-bottom: 0.75rem;
-          display: flex; justify-content: space-between;
-          align-items: center; gap: 1rem;
-        }
-        .ganho-text { font-size: 0.78rem; color: rgba(255,255,255,0.85); line-height: 1.4; }
-        .ganho-num {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 2rem; font-weight: 400; color: #fff;
-          white-space: nowrap;
-        }
-
-        /* Breakdown */
-        .breakdown { display: flex; flex-direction: column; gap: 0.55rem; }
-        .bk-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
-        .bk-label { color: var(--sub); }
-        .bk-val { font-weight: 500; }
-        .bk-val.pos { color: var(--green); }
-        .bk-val.neg { color: #c0392b; }
-        .bk-div { height: 1px; background: var(--border); }
-        .bk-total { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; }
-
-        /* Rotação */
-        .rotacao-card {
-          background: var(--green-bg);
-          border: 1px solid #b8e0ca;
-          border-radius: 12px; padding: 1rem 1.25rem;
-          margin-bottom: 0.75rem;
-        }
-        .rotacao-label {
-          font-size: 0.62rem; letter-spacing: 0.15em;
-          text-transform: uppercase; color: var(--green);
-          margin-bottom: 0.5rem; font-weight: 500;
-        }
-        .rotacao-num {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.5rem; font-weight: 400;
-          color: var(--green); line-height: 1;
-        }
-        .rotacao-sub { font-size: 0.75rem; color: #3a7a55; margin-top: 0.25rem; line-height: 1.4; }
-
-        @media (max-width: 768px) {
-          .wrap { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
-        }
-
-        /* Gate de email */
+        /* ── Gate de email ───────────────────── */
         .gate-overlay {
           position: fixed; inset: 0; z-index: 200;
           background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
@@ -715,8 +788,7 @@ export default function Calculadora() {
           padding-bottom: env(safe-area-inset-bottom, 0px);
         }
         .gate-sheet {
-          background: var(--bg);
-          border-radius: 20px 20px 0 0;
+          background: var(--bg); border-radius: 20px 20px 0 0;
           padding: 2rem 1.5rem 2.5rem;
           width: 100%; max-width: 480px;
           animation: slideUp 0.25s ease;
@@ -727,254 +799,209 @@ export default function Calculadora() {
         }
         .gate-titulo {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 1.6rem; font-weight: 400;
-          color: var(--fg); margin-bottom: 0.4rem;
+          font-size: 1.5rem; font-weight: 400;
+          color: var(--fg); margin-bottom: 0.35rem;
         }
-        .gate-sub {
-          font-size: 0.8rem; color: var(--sub); line-height: 1.5;
-          margin-bottom: 1.25rem;
-        }
+        .gate-sub { font-size: 0.78rem; color: var(--sub); line-height: 1.5; margin-bottom: 1.1rem; }
         .gate-input {
-          width: 100%; padding: 0.85rem 1rem;
-          border: 1.5px solid var(--border);
-          border-radius: 10px;
-          background: var(--card);
-          color: var(--fg);
-          font-family: 'Jost', sans-serif;
-          font-size: 0.9rem;
-          margin-bottom: 0.75rem;
-          box-sizing: border-box;
-          outline: none;
-          transition: border-color 0.15s;
+          width: 100%; padding: 0.8rem 1rem;
+          border: 1.5px solid var(--border); border-radius: 10px;
+          background: var(--card); color: var(--fg);
+          font-family: 'Jost', sans-serif; font-size: 0.88rem;
+          margin-bottom: 0.7rem; outline: none; transition: border-color 0.15s;
         }
         .gate-input:focus { border-color: var(--accent); }
-        .gate-legal {
-          font-size: 0.65rem; color: var(--sub);
-          line-height: 1.45; margin-bottom: 1rem;
-        }
+        .gate-legal { font-size: 0.63rem; color: var(--sub); line-height: 1.45; margin-bottom: 0.9rem; }
         .gate-skip {
           display: block; width: 100%; text-align: center;
-          font-size: 0.72rem; color: var(--sub);
+          font-size: 0.7rem; color: var(--sub);
           background: none; border: none; cursor: pointer;
-          padding: 0.5rem; margin-top: 0.25rem;
-          font-family: 'Jost', sans-serif;
-          text-decoration: underline;
+          padding: 0.5rem; margin-top: 0.2rem;
+          font-family: 'Jost', sans-serif; text-decoration: underline;
         }
-        .gate-login-row {
-          text-align: center; font-size: 0.75rem;
-          color: var(--sub); margin-top: 0.75rem;
-        }
+        .gate-login-row { text-align: center; font-size: 0.73rem; color: var(--sub); margin-top: 0.7rem; }
         .gate-login-row a { color: var(--accent); text-decoration: none; }
-        /* Blur nos resultados quando gate activo */
         .results-blur { filter: blur(6px); pointer-events: none; user-select: none; }
+
+        /* ── Lang switcher ───────────────────── */
+        .lang-row {
+          display: flex; justify-content: center; gap: 0.5rem;
+          padding: 0.75rem 0 0.25rem;
+        }
+        .lang-btn {
+          font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+          padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer;
+          border: 1px solid transparent; background: none;
+          color: var(--sub); font-family: 'Jost', sans-serif; transition: all 0.12s;
+        }
+        .lang-btn.sel { border-color: var(--border); color: var(--fg); background: var(--card); }
       `}</style>
 
       <div className="wrap">
 
+        {/* ── Lang switcher ── */}
+        <div className="lang-row">
+          {["pt","fr","lt"].map(l => (
+            <button key={l} className={`lang-btn${lang===l?" sel":""}`}
+              onClick={() => { setLang(l); try { localStorage.setItem("ng_lang",l); } catch {} }}>
+              {l.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Header ── */}
         <div className="pg-header">
           <div className="pg-eyebrow">{t.eyebrow}</div>
           <h1 className="pg-titulo serif">{t.titulo}</h1>
           <p className="pg-sub">{t.subtitulo}</p>
         </div>
 
-        {/* INPUTS */}
+        {/* ── RESULTADO HERO — sempre visível, actualiza em tempo real ── */}
+        <div className="hero-res">
+          <div className="hero-label">{t.heroLabel}</div>
+          <div className={`hero-valor${(!calc || !p) ? " vazio" : ""}`}>
+            {calc && p > 0 ? `€${Math.round(calc.totalNG)}` : "€ —"}
+          </div>
+          <div className="hero-nota">
+            {calc && p > 0
+              ? t.heroNota(Math.round(calc.liquidoAluguer), Math.round(calc.vendaFinalLiquido))
+              : (lang==="fr"?"Remplis les champs pour voir le résultat":lang==="lt"?"Užpildyk laukus, kad pamatytum rezultatą":"Preenche os campos para ver o resultado")}
+          </div>
+        </div>
+
+        {/* ── 1. TIPO DE PEÇA — primeiro ── */}
+        <div className="card">
+          <div className="card-label">{t.tipoLabel}</div>
+          {/* Tabs de categoria */}
+          <div className="cat-tabs">
+            {TIPO_GRUPOS_UI.map((g, idx) => (
+              <button key={idx}
+                className={`cat-tab${catAtiva === idx ? " sel" : ""}`}
+                onClick={() => setTipo(g.items[0])}>
+                <span className="cat-tab-icon">{g.icon}</span>
+                <span className="cat-tab-label">{g.label[lang] || g.label.pt}</span>
+              </button>
+            ))}
+          </div>
+          {/* Sub-tipo */}
+          <select className="tipo-select" value={tipo} onChange={e => setTipo(e.target.value)}>
+            {(TIPO_GRUPOS_UI[catAtiva >= 0 ? catAtiva : 0]?.items || TIPO_GRUPOS_UI[0].items).map(id => {
+              const td = TIPOS_DATA.find(t => t.id === id);
+              return td ? <option key={id} value={id}>{td.label[lang] || td.label.pt}</option> : null;
+            })}
+          </select>
+        </div>
+
+        {/* ── 2. PREÇO ── */}
         <div className="card">
           <div className="card-label">{t.precoLabel}</div>
           <div className="preco-row">
             <span className="preco-prefix">€</span>
-            <input
-              className="preco-input"
-              type="number" min="0" placeholder="0"
-              value={preco} onChange={e => setPreco(e.target.value)}
-            />
+            <input className="preco-input" type="number" min="0" placeholder="0"
+              value={preco} onChange={e => setPreco(e.target.value)} inputMode="numeric" />
           </div>
           <p className="preco-hint">{t.precoHint}</p>
         </div>
 
-        {/* MARCA — combobox por categoria + texto livre */}
+        {/* ── 3. MARCA — autocomplete ── */}
         <div className="card">
           <div className="card-label">{t.marcaLabel}</div>
-          <select
-            style={{
-              width:"100%",padding:"0.6rem 0.85rem",
-              border:"1px solid var(--border)",borderRadius:"8px",
-              background:"var(--bg)",color:"var(--fg)",
-              fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
-              outline:"none",appearance:"none",
-              backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
-              backgroundRepeat:"no-repeat",backgroundPosition:"right 0.85rem center",
-              paddingRight:"2.5rem",cursor:"pointer",marginBottom:"0.5rem",
-            }}
-            value={marca === "_outro" ? "_outro" : (GRUPOS_MARCA.flatMap(g=>g.marcas).find(m=>m.toLowerCase()===marca.toLowerCase()) ? marca : (marca ? "_outro" : ""))}
-            onChange={e => {
-              if (e.target.value === "_outro") { setMarca("_outro"); }
-              else if (e.target.value === "") { setMarca(""); }
-              else { setMarca(e.target.value); }
-            }}
-          >
-            <option value="">{lang==="fr"?"— Choisir une marque —":lang==="lt"?"— Pasirinkti prekės ženklą —":"— Escolher uma marca —"}</option>
-            {GRUPOS_MARCA.map(g => (
-              <optgroup key={g.grupo.pt} label={g.grupo[lang] || g.grupo.pt}>
-                {g.marcas.map(m => <option key={m} value={m}>{m}</option>)}
-              </optgroup>
-            ))}
-            <option value="_outro">{lang==="fr"?"Outra marca (escrever)":lang==="lt"?"Kitas prekės ženklas (įvesti)":"Outra marca (escrever)"}</option>
-          </select>
-          {/* Input de texto livre quando selecciona "Outra marca" ou digitou manualmente */}
-          {(marca === "_outro" || (marca && !GRUPOS_MARCA.flatMap(g=>g.marcas).some(m=>m.toLowerCase()===marca.toLowerCase()) && marca !== "")) && (
+          <div className="marca-wrap" ref={marcaRef}>
             <input
-              style={{
-                width:"100%",padding:"0.6rem 0.85rem",
-                border:"1px solid var(--border)",borderRadius:"8px",
-                background:"var(--bg)",color:"var(--fg)",
-                fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
-                outline:"none",marginBottom:"0.5rem",
-              }}
+              className="marca-input"
               type="text"
               placeholder={t.marcaPlaceholder}
-              value={marca === "_outro" ? "" : marca}
-              onChange={e => setMarca(e.target.value)}
-              autoFocus
+              value={marcaInput}
+              onChange={e => handleMarcaInput(e.target.value)}
+              onFocus={() => setMarcaFocused(true)}
+              onBlur={() => setTimeout(() => setMarcaFocused(false), 150)}
+              autoComplete="off"
             />
-          )}
-          {tier && tier !== "massmarket" && (
-            <div style={{marginTop:"0.4rem",display:"flex",alignItems:"center",gap:"0.4rem"}}>
-              <span style={{
-                fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",
-                padding:"0.2rem 0.55rem",borderRadius:"3px",fontWeight:500,
-                background: tier==="investimento"?"#1a3a2a": tier==="premium"?"#1a1a2e":"#2a2018",
-                color: tier==="investimento"?"#a8d8a8": tier==="premium"?"#c4b0e8":"#e8c97a",
-              }}>
-                {tier==="investimento" ? (lang==="fr"?"Pièce d'investissement ↑":lang==="lt"?"Investicinė ↑":"Peça de investimento ↑")
-                : tier==="premium" ? (lang==="fr"?"Marque premium":lang==="lt"?"Premium prekės ženklas":"Marca premium")
-                : (lang==="fr"?"Marque haute":lang==="lt"?"Aukšta klasė":"Marca alta")}
-              </span>
-            </div>
+            {marcaFocused && marcaSugestoes.length > 0 && (
+              <div className="marca-dropdown">
+                {marcaSugestoes.map(s => (
+                  <div key={s.nome} className="marca-item" onMouseDown={() => escolherMarca(s.nome)}>
+                    <span>{s.nome}</span>
+                    <span className="marca-item-grupo">{s.grupo[lang] || s.grupo.pt}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {tier && tier !== "massmarket" && marca && (
+            <span className={`marca-badge tier-${tier}`}>
+              {tier==="investimento" ? (lang==="fr"?"Investissement ↑":lang==="lt"?"Investicinė ↑":"Investimento ↑")
+              : tier==="premium" ? (lang==="fr"?"Marque premium":lang==="lt"?"Premium":"Premium")
+              : (lang==="fr"?"Haute marque":lang==="lt"?"Aukšta klasė":"Alta gama")}
+            </span>
           )}
         </div>
 
-        {/* TIPO DE PEÇA — select por categoria */}
-        <div className="card">
-          <div className="card-label">{t.tipoLabel}</div>
-          <select
-            style={{
-              width:"100%",padding:"0.6rem 0.85rem",
-              border:"1px solid var(--border)",borderRadius:"8px",
-              background:"var(--bg)",color:"var(--fg)",
-              fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
-              outline:"none",appearance:"none",
-              backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
-              backgroundRepeat:"no-repeat",backgroundPosition:"right 0.85rem center",
-              paddingRight:"2.5rem",cursor:"pointer",
-            }}
-            value={tipo}
-            onChange={e => setTipo(e.target.value)}
-          >
-            <optgroup label={lang==="fr"?"Vêtements — Occasion":lang==="lt"?"Drabužiai — Proga":"Vestuário — Ocasião"}>
-              <option value="VestidoNoite">{TIPOS_DATA.find(t=>t.id==="VestidoNoite")?.label[lang]}</option>
-              <option value="Vestido">{TIPOS_DATA.find(t=>t.id==="Vestido")?.label[lang]}</option>
-              <option value="Fato">{TIPOS_DATA.find(t=>t.id==="Fato")?.label[lang]}</option>
-              <option value="Jumpsuit">{TIPOS_DATA.find(t=>t.id==="Jumpsuit")?.label[lang]}</option>
-              <option value="Saia">{TIPOS_DATA.find(t=>t.id==="Saia")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Vêtements — Quotidien":lang==="lt"?"Drabužiai — Kasdien":"Vestuário — Dia a dia"}>
-              <option value="Calças">{TIPOS_DATA.find(t=>t.id==="Calças")?.label[lang]}</option>
-              <option value="Jeans">{TIPOS_DATA.find(t=>t.id==="Jeans")?.label[lang]}</option>
-              <option value="Blusa">{TIPOS_DATA.find(t=>t.id==="Blusa")?.label[lang]}</option>
-              <option value="Camisa">{TIPOS_DATA.find(t=>t.id==="Camisa")?.label[lang]}</option>
-              <option value="Camisola">{TIPOS_DATA.find(t=>t.id==="Camisola")?.label[lang]}</option>
-              <option value="Bodysuit">{TIPOS_DATA.find(t=>t.id==="Bodysuit")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Vêtements — Extérieur":lang==="lt"?"Drabužiai — Viršutiniai":"Vestuário — Exteriores"}>
-              <option value="Casaco">{TIPOS_DATA.find(t=>t.id==="Casaco")?.label[lang]}</option>
-              <option value="Blazer">{TIPOS_DATA.find(t=>t.id==="Blazer")?.label[lang]}</option>
-              <option value="Pele">{TIPOS_DATA.find(t=>t.id==="Pele")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Sacs":lang==="lt"?"Krepšiai":"Malas"}>
-              <option value="MalaLuxo">{TIPOS_DATA.find(t=>t.id==="MalaLuxo")?.label[lang]}</option>
-              <option value="MalaOmbro">{TIPOS_DATA.find(t=>t.id==="MalaOmbro")?.label[lang]}</option>
-              <option value="Clutch">{TIPOS_DATA.find(t=>t.id==="Clutch")?.label[lang]}</option>
-              <option value="Mochila">{TIPOS_DATA.find(t=>t.id==="Mochila")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Accessoires":lang==="lt"?"Aksesuarai":"Acessórios"}>
-              <option value="Cinto">{TIPOS_DATA.find(t=>t.id==="Cinto")?.label[lang]}</option>
-              <option value="Lenco">{TIPOS_DATA.find(t=>t.id==="Lenco")?.label[lang]}</option>
-              <option value="OculosSol">{TIPOS_DATA.find(t=>t.id==="OculosSol")?.label[lang]}</option>
-              <option value="Chapeu">{TIPOS_DATA.find(t=>t.id==="Chapeu")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Chaussures":lang==="lt"?"Avalynė":"Calçado"}>
-              <option value="Sapatos">{TIPOS_DATA.find(t=>t.id==="Sapatos")?.label[lang]}</option>
-              <option value="Sapatilhas">{TIPOS_DATA.find(t=>t.id==="Sapatilhas")?.label[lang]}</option>
-              <option value="Botas">{TIPOS_DATA.find(t=>t.id==="Botas")?.label[lang]}</option>
-              <option value="Sandalias">{TIPOS_DATA.find(t=>t.id==="Sandalias")?.label[lang]}</option>
-            </optgroup>
-            <optgroup label={lang==="fr"?"Montres & Bijoux":lang==="lt"?"Laikrodžiai ir papuošalai":"Relógios & Joalharia"}>
-              <option value="Relogio">{TIPOS_DATA.find(t=>t.id==="Relogio")?.label[lang]}</option>
-              <option value="Joia">{TIPOS_DATA.find(t=>t.id==="Joia")?.label[lang]}</option>
-            </optgroup>
-            <option value="_default">{TIPOS_DATA.find(t=>t.id==="_default")?.label[lang]}</option>
-          </select>
-        </div>
-
+        {/* ── 4. ESTADO — pills grid 4 cols ── */}
         <div className="card">
           <div className="card-label">{t.estadoLabel}</div>
-          <div className="pills">
+          <div className="pills-grid">
             {ESTADOS.map(e => (
-              <button key={e.id} className={`pill${estado === e.id ? " sel" : ""}`} onClick={() => setEstado(e.id)}>{e.label}</button>
+              <button key={e.id} className={`pill${estado === e.id ? " sel" : ""}`}
+                onClick={() => setEstado(e.id)}>
+                {e.label}
+              </button>
             ))}
           </div>
         </div>
 
+        {/* ── 5. USO — pills grid 4 cols ── */}
         <div className="card">
           <div className="card-label">{t.usoLabel}</div>
-          <div className="pills">
+          <div className="pills-grid">
             {USOS.map(u => (
-              <button key={u.id} className={`pill${uso === u.id ? " sel" : ""}`} onClick={() => setUso(u.id)}>{u.label}</button>
+              <button key={u.id} className={`pill${uso === u.id ? " sel" : ""}`}
+                onClick={() => setUso(u.id)}>
+                {u.label}
+              </button>
             ))}
           </div>
         </div>
 
+        {/* ── 6. IDADE — pills grid 4 cols ── */}
         <div className="card">
           <div className="card-label">{t.idadeLabel}</div>
-          <div className="pills">
+          <div className="pills-grid">
             {IDADES.map(i => (
-              <button key={i.id} className={`pill${idade === i.id ? " sel" : ""}`} onClick={() => setIdade(i.id)}>{i.label}</button>
+              <button key={i.id} className={`pill${idade === i.id ? " sel" : ""}`}
+                onClick={() => setIdade(i.id)}>
+                {i.label}
+              </button>
             ))}
           </div>
         </div>
 
+        {/* ── 7. MESES slider ── */}
         <div className="card">
-          <div className="card-label">{t.mesesLabel}</div>
           <div className="slider-header">
-            <span style={{fontSize:"0.78rem",color:"var(--sub)"}}>{t.mesesPeriodo}</span>
+            <span style={{fontSize:"0.76rem",color:"var(--sub)"}}>{t.mesesPeriodo}</span>
             <span className="slider-val">{t.mesesUnidade(meses)}</span>
           </div>
-          <input type="range" min="1" max="36" value={meses} onChange={e => setMeses(parseInt(e.target.value))} />
-          <p style={{fontSize:"0.7rem",color:"var(--sub)",marginTop:"0.5rem"}}>{t.mesesHint}</p>
+          <input type="range" min="1" max="36" value={meses}
+            onChange={e => setMeses(parseInt(e.target.value))} />
+          <p style={{fontSize:"0.68rem",color:"var(--sub)",marginTop:"0.45rem"}}>{t.mesesHint}</p>
         </div>
 
-        {/* GATE DE EMAIL — mostrado quando já avaliou 1x e não está logado */}
+        {/* ── Gate de email ── */}
         {gateAberto && (
           <div className="gate-overlay" onClick={e => e.target === e.currentTarget && skipGate()}>
             <div className="gate-sheet">
               <div className="gate-titulo">{t.gateTitle}</div>
               <p className="gate-sub">{t.gateSub}</p>
-              <input
-                className="gate-input"
-                type="email"
+              <input className="gate-input" type="email"
                 placeholder={t.gateEmailPlaceholder}
                 value={gateEmail}
                 onChange={e => setGateEmail(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && submitGateEmail()}
-                autoFocus
-              />
+                autoFocus />
               <p className="gate-legal">{t.gateLegal}</p>
-              <button
-                className="btn"
-                onClick={submitGateEmail}
-                disabled={gateSaving}
-                style={{opacity: gateSaving ? 0.6 : 1}}
-              >
+              <button className="btn" onClick={submitGateEmail}
+                disabled={gateSaving} style={{opacity: gateSaving ? 0.6 : 1}}>
                 {gateSaving ? "…" : t.gateBtn}
               </button>
               <button className="gate-skip" onClick={skipGate}>{t.gateSkip}</button>
@@ -985,17 +1012,11 @@ export default function Calculadora() {
           </div>
         )}
 
-        {/* RESULTADOS */}
+        {/* ── RESULTADOS DETALHADOS (após preço preenchido) ── */}
         {calc && p > 0 && (
           <div className={gateAberto ? "results-blur" : ""}>
-            {/* Hero total */}
-            <div className="hero-res">
-              <div className="hero-label">{t.heroLabel}</div>
-              <div className="hero-valor">€{Math.round(calc.totalNG)}</div>
-              <div className="hero-nota">{t.heroNota(Math.round(calc.liquidoAluguer), Math.round(calc.vendaFinalLiquido))}</div>
-            </div>
 
-            {/* Comparação Vinted */}
+            {/* Comparação */}
             <div className="comp-card">
               <div className="comp-col ng">
                 <div className="comp-marca">Nora Grei</div>
@@ -1016,12 +1037,16 @@ export default function Calculadora() {
               <div className="ganho-num">+€{Math.round(calc.ganhoExtra)}</div>
             </div>
 
-            {/* Rotação estimada */}
+            {/* Rotação */}
             <div className="rotacao-card">
               <div className="rotacao-label">{t.rotacaoLabel}</div>
               <div className="rotacao-num">{t.rotacaoNum(calc.alugueresTotal, meses)}</div>
               <div className="rotacao-sub">
-                {t.rotacaoSub(calc.rotacaoMes.toFixed(1), TIPOS_DATA.find(tp=>tp.id===tipo)?.label[lang] || TIPOS_DATA.find(tp=>tp.id==="_default")?.label[lang], ESTADOS_DATA.find(e=>e.id===estado)?.label[lang]?.split("—")[0]?.trim().toLowerCase() || "")}
+                {t.rotacaoSub(
+                  calc.rotacaoMes.toFixed(1),
+                  TIPOS_DATA.find(tp=>tp.id===tipo)?.label[lang] || TIPOS_DATA.find(tp=>tp.id==="_default")?.label[lang],
+                  ESTADOS_DATA.find(e=>e.id===estado)?.label[lang]?.split("—")[0]?.trim().toLowerCase() || ""
+                )}
               </div>
             </div>
 
@@ -1070,23 +1095,14 @@ export default function Calculadora() {
             <a href="/registar?lojista=1" className="btn">{t.cta}</a>
             <a href="/lojas" className="btn btn-outline">{t.ctaVer}</a>
 
-            {/* Disclaimer */}
-            <p style={{
-              fontSize:"0.7rem",
-              color:"var(--sub)",
-              lineHeight:1.55,
-              textAlign:"center",
-              padding:"1.25rem 0.5rem 0",
-              borderTop:"1px solid var(--border)",
-              marginTop:"0.5rem"
-            }}>
+            <p style={{fontSize:"0.68rem",color:"var(--sub)",lineHeight:1.5,textAlign:"center",padding:"1.25rem 0.5rem 0",borderTop:"1px solid var(--border)",marginTop:"0.5rem"}}>
               {t.disclaimer}
             </p>
           </div>
         )}
 
         {(!calc || !p) && (
-          <p style={{textAlign:"center",color:"var(--sub)",fontSize:"0.82rem",padding:"1.5rem 0"}}>
+          <p style={{textAlign:"center",color:"var(--sub)",fontSize:"0.8rem",padding:"1rem 0 0.5rem"}}>
             {t.semPreco}
           </p>
         )}
