@@ -6,8 +6,8 @@ Informações importantes:
 - Aluguer de roupa e acessórios de luxo por dia
 - Taxa de higienização: 9€ por peça
 - Depósito de caução = valor da peça (devolvido após inspeção)
-- Métodos de depósito: cartão, transferência, cheque visado, dinheiro (presencial)
-- Métodos de pagamento: cartão, MB Way, transferência, dinheiro, cheque visado
+- Métodos de depósito: cartão, MB Way, transferência bancária (IBAN disponível a pedido), dinheiro apenas em entrega presencial
+- Métodos de pagamento: cartão, MB Way, transferência bancária (IBAN disponível a pedido), dinheiro apenas em entrega presencial
 - Entrega: envio para casa ou levantamento presencial
 - Devolução: por correio ou presencial
 - Programa de fidelização: 10 alugueres = 1 grátis

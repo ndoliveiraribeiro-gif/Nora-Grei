@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 
-const WHATSAPP_NUMBER = "351912345678"; // número da Nora Grei
+const WHATSAPP_NUMBER = "370XXXXXXXX"; // TODO: substituir pelo número lituano da Nora Grei
 
 const t = {
   pt: {
