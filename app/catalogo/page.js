@@ -40,24 +40,31 @@ function PecaCardLojista({ peca, lang }) {
               ))}
             </div>
           )}
-          <div style={{display:"flex",alignItems:"baseline",gap:"0.25rem",paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0"}}>
-            {peca.tipo === "comprar" || peca.tipo === "social" ? (
-              <>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_venda || peca.preco_aluguer_dia}€</span>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>{peca.tipo === "social" ? "preço livre" : "venda"}</span>
-              </>
-            ) : peca.tipo === "ambos" ? (
-              <>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",fontWeight:400,marginLeft:"0.4rem"}}>· {peca.preco_venda}€ venda</span>
-              </>
-            ) : (
-              <>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
-                <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783",fontWeight:400}}>/dia</span>
-              </>
-            )}
+          <div style={{display:"flex",alignItems:"center",gap:"0.35rem",paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0",flexWrap:"wrap"}}>
+            {(() => {
+              const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
+              const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
+              const tip = lang === "fr"
+                ? "Prix incluant la commission Nora Grei (10% location / 20% vente)"
+                : lang === "lt"
+                ? "Kaina su Nora Grei komisiniais (10% nuoma / 20% pardavimas)"
+                : "Preço com comissão Nora Grei incluída (10% aluguer / 20% venda)";
+              const Info = ({ title }) => (
+                <span title={title} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"14px",height:"14px",borderRadius:"50%",border:"1px solid #b0ada8",color:"#8a8783",fontSize:"9px",fontFamily:"'Jost',sans-serif",cursor:"help",flexShrink:0,lineHeight:1}}>i</span>
+              );
+              if (peca.tipo === "comprar") return (
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span><Info title={tip}/></>
+              );
+              if (peca.tipo === "social") return (
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span><Info title={tip}/></>
+              );
+              if (peca.tipo === "ambos") return (
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span><Info title={tip}/></>
+              );
+              return (
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><Info title={tip}/></>
+              );
+            })()}
           </div>
         </div>
       </a>
