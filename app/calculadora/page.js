@@ -220,17 +220,17 @@ const COMISSAO_VENDA = 0.20;
 const CUSTO_ENVIO = 6;
 
 const ESTADOS_DATA = [
-  { id: "como_novo",  fator: 0.92, label: { pt: "Nunca usado / com etiqueta", fr: "Jamais porté / avec étiquette", lt: "Nenaudotas / su etikete" } },
-  { id: "bom",        fator: 0.68, label: { pt: "Bom — uso cuidadoso",        fr: "Bon — usage soigné",            lt: "Geras — atsargiai naudotas" } },
-  { id: "usado",      fator: 0.45, label: { pt: "Usado — uso visível",        fr: "Usé — usage visible",           lt: "Naudotas — matomas naudojimas" } },
-  { id: "com_defeito",fator: 0.25, label: { pt: "Com defeito / reparação",    fr: "Défectueux / à réparer",        lt: "Su defektu / taisytinas" } },
+  { id: "como_novo",  fator: 0.92, label: { pt: "Com etiqueta",   fr: "Avec étiquette",  lt: "Su etikete" } },
+  { id: "bom",        fator: 0.68, label: { pt: "Bom estado",     fr: "Bon état",        lt: "Gera būklė" } },
+  { id: "usado",      fator: 0.45, label: { pt: "Desgaste visível",fr: "Usure visible",   lt: "Matomas nusidėvėjimas" } },
+  { id: "com_defeito",fator: 0.25, label: { pt: "Com defeito",    fr: "Avec défaut",     lt: "Su defektu" } },
 ];
 
 const USOS_DATA = [
-  { id: "nunca",    fator: 1.00, label: { pt: "Nunca usada",     fr: "Jamais portée",      lt: "Niekada nenešiota" } },
-  { id: "pouco",    fator: 0.88, label: { pt: "Pouco uso",       fr: "Peu portée",          lt: "Mažai nešiota" } },
-  { id: "moderado", fator: 0.72, label: { pt: "Uso moderado",    fr: "Usage modéré",        lt: "Vidutiniškai nešiota" } },
-  { id: "frequente",fator: 0.52, label: { pt: "Uso frequente",   fr: "Usage fréquent",      lt: "Dažnai nešiota" } },
+  { id: "nunca",    fator: 1.00, label: { pt: "1–2 vezes",      fr: "1–2 fois",         lt: "1–2 kartai" } },
+  { id: "pouco",    fator: 0.88, label: { pt: "Menos de 10×",   fr: "Moins de 10 fois", lt: "Mažiau 10×" } },
+  { id: "moderado", fator: 0.72, label: { pt: "10 a 30 vezes",  fr: "10 à 30 fois",     lt: "10–30 kartų" } },
+  { id: "frequente",fator: 0.52, label: { pt: "Mais de 30×",    fr: "Plus de 30 fois",  lt: "Daugiau 30×" } },
 ];
 
 const IDADES_DATA = [
