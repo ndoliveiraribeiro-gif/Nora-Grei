@@ -571,7 +571,8 @@ export default function Home() {
         @media(max-width:768px){body{padding-bottom:72px}}
 
         /* NAV */
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem max(1.5rem,env(safe-area-inset-left,0px));padding-top:max(1.25rem,env(safe-area-inset-top));transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,padding 0.3s;background:linear-gradient(to bottom,rgba(8,8,8,0.6) 0%,transparent 100%);border-bottom:1px solid transparent}
+        .nav-safe-area{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:rgba(8,8,8,0.75);z-index:101;pointer-events:none}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem max(1.5rem,env(safe-area-inset-left,0px));padding-top:calc(env(safe-area-inset-top,0px) + 1.25rem);transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,padding 0.3s;background:linear-gradient(to bottom,rgba(8,8,8,0.75) 0%,transparent 100%);border-bottom:1px solid transparent}
         .nav.scrolled{background:rgba(248,247,245,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--g2);box-shadow:0 2px 20px rgba(0,0,0,0.06);padding:0.85rem max(1.5rem,env(safe-area-inset-left,0px))}
         .logo{display:flex;flex-direction:column;text-decoration:none;color:#fff;transition:color 0.4s}
         .nav.scrolled .logo{color:var(--black)}
@@ -1004,6 +1005,7 @@ export default function Home() {
       )}
 
       {/* NAV */}
+      <div className="nav-safe-area"></div>
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
         <a href="/" className="logo">
           <span className="logo-name">Nora Grei</span>
