@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 function getStripe() {
   if (!process.env.STRIPE_SECRET_KEY) return null;
@@ -30,6 +32,7 @@ export async function POST(request) {
     }
 
     // Buscar todos os alugueres activos com data_fim ultrapassada
+    const supabaseAdmin = getSupabaseAdmin();
     const hoje = new Date().toISOString().split("T")[0];
     const { data: atrasados, error } = await supabaseAdmin
       .from("alugueres")
