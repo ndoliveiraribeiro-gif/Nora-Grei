@@ -44,25 +44,17 @@ function PecaCardLojista({ peca, lang }) {
             {(() => {
               const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
               const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
-              const tip = lang === "fr"
-                ? "Le prix affiché inclut les frais de service et de garantie de la plateforme."
-                : lang === "lt"
-                ? "Rodoma kaina apima platformos paslaugų ir garantijos mokesčius."
-                : "O preço apresentado inclui taxas de serviço e garantia da plataforma.";
-              const Info = ({ title }) => (
-                <span title={title} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"14px",height:"14px",borderRadius:"50%",border:"1px solid #b0ada8",color:"#8a8783",fontSize:"9px",fontFamily:"'Jost',sans-serif",cursor:"help",flexShrink:0,lineHeight:1}}>i</span>
-              );
               if (peca.tipo === "comprar") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span><Info title={tip}/></>
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span></>
               );
               if (peca.tipo === "social") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span><Info title={tip}/></>
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span></>
               );
               if (peca.tipo === "ambos") return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span><Info title={tip}/></>
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span></>
               );
               return (
-                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><Info title={tip}/></>
+                <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span></>
               );
             })()}
           </div>
