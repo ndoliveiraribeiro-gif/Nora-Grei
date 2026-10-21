@@ -598,8 +598,15 @@ export default function Calculadora() {
         }
 
         /* ── Header ─────────────────────────── */
+        .pg-back {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+          color: var(--sub); text-decoration: none; font-family: 'Jost', sans-serif;
+          padding: 1.25rem 0 0; transition: color 0.2s;
+        }
+        .pg-back:hover { color: var(--fg); }
         .pg-header {
-          padding: 1.5rem 0 1.25rem;
+          padding: 1rem 0 1.25rem;
           text-align: center;
         }
         .pg-eyebrow {
@@ -1011,6 +1018,7 @@ export default function Calculadora() {
         </div>
 
         {/* ── Header ── */}
+        <a href="/" className="pg-back">← Início</a>
         <div className="pg-header">
           <div className="pg-eyebrow">{t.eyebrow}</div>
           <h1 className="pg-titulo serif">{t.titulo}</h1>
