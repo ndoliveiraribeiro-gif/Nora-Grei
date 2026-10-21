@@ -4,8 +4,9 @@ import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
 
 // ── Estimativa de valor ─────────────────────────────────────────────────────
-const MARCAS_PREMIUM_P = ["hermès","hermes","chanel","louis vuitton","lv","gucci","prada",
-  "bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline",
+// Marcas que podem APRECIAR acima do preço de compra (investimento)
+const MARCAS_INVESTIMENTO_P = ["rolex","patek philippe","patek","audemars piguet","ap","richard mille","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly"];
+const MARCAS_PREMIUM_P = ["gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline",
   "givenchy","valentino","versace","balenciaga","jacquemus","loewe","loro piana",
   "brunello cucinelli","max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren"];
 const MARCAS_ALTA_P = ["zara","mango","&other stories","other stories","cos","arket",
@@ -15,10 +16,12 @@ const MARCAS_ALTA_P = ["zara","mango","&other stories","other stories","cos","ar
   "phase eight","whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje"];
 function fatorMarcaP(marca = "") {
   const m = marca.toLowerCase().trim();
+  if (MARCAS_INVESTIMENTO_P.some(b => m.includes(b))) return { fator: 1.15, tier: "investimento" };
   if (MARCAS_PREMIUM_P.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
   if (MARCAS_ALTA_P.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
   return { fator: 0.32, tier: "massmarket" };
 }
+// condicao: como_novo | bom | usado | com_defeito  (substituiu "número de usos")
 const FATOR_ESTADO_P = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
 const FATOR_IDADE_P  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
 const ROTACAO_CAT_P = {
@@ -44,19 +47,27 @@ function fatorEstadoIdadeP(condicao, idade_peca) {
   if (combinado > 0.85) return combinado * 1.05;
   return combinado;
 }
-function calcEstimativaP({ valor_peca, marca, condicao, idade_peca, categoria }) {
+// contexto_venda: 0 = sem pressa (preço máximo), 100 = liquidez urgente (desconto)
+function calcEstimativaP({ valor_peca, marca, condicao, idade_peca, categoria, contexto_venda = 0 }) {
   const p = parseFloat(valor_peca) || 0;
   if (!p) return null;
   const { fator: fm, tier } = fatorMarcaP(marca);
   const fei = fatorEstadoIdadeP(condicao, idade_peca);
-  const valorMercado = Math.round(p * fm * fei);
+  // marcas de investimento: valor pode superar preço original; aplicar fator antes do ajuste estado/idade
+  const valorBase = tier === "investimento" ? Math.round(p * fm) : Math.round(p * fm * fei);
+  const valorMercado = tier === "investimento" ? valorBase : valorBase; // mantemos para flexibilidade futura
   const cat = ROTACAO_CAT_P[categoria] ?? ROTACAO_CAT_P._default;
-  const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
+  const tierBonus = tier === "investimento" ? 1.35 : tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
   const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
-  const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
+  // contexto_venda: slider 0-100; 0=sem pressa→preço pleno, 100=liquidez urgente→-30%
+  const fatorContexto = 1 - (contexto_venda / 100) * 0.30;
+  const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75 * fatorContexto));
+  const precoVendaMax = Math.max(5, Math.round(valorMercado * 0.75)); // sem urgência
   const caucao = Math.round(valorMercado * 0.30 / 10) * 10;
   const ganho12m = Math.round(precoAluguerDia * cat.dias * cat.rot * 12 * 0.90 * 0.90);
-  return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier };
+  // quantas rendas para recuperar o valor de venda
+  const rendasParaRecuperar = precoAluguerDia > 0 ? Math.ceil(precoVendaMax / precoAluguerDia) : null;
+  return { valorMercado, precoAluguerDia, precoVendaUsada, precoVendaMax, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier, rendasParaRecuperar };
 }
 
 const NIVEL_NOMES_PERFIL = {
@@ -1131,6 +1142,8 @@ export default function Perfil() {
   const [fotosEditar, setFotosEditar] = useState([]); // fotos a manter na edição
   const [gerirLojaLoading, setGerirLojaLoading] = useState(""); // "suspender"|"reativar"|"eliminar"|""
   const [confirmarEliminar, setConfirmarEliminar] = useState(false);
+  const [contextoVendaEditar, setContextoVendaEditar] = useState(0); // 0=sem pressa, 100=liquidez urgente
+  const [contextoVendaNova, setContextoVendaNova] = useState(0);
   const [modalEnvio, setModalEnvio] = useState(null); // aluguer a marcar como enviado
   const [trackingInfo, setTrackingInfo] = useState({ transportadora: "", numero: "" });
   const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
@@ -4143,23 +4156,28 @@ export default function Perfil() {
 
             {/* Bloco de estimativa */}
             {(()=>{
-              const est = calcEstimativaP(editarPeca);
+              const est = calcEstimativaP({...editarPeca, contexto_venda: contextoVendaEditar});
               if (!est) return (
                 <p style={{fontSize:"0.75rem",color:"var(--g4)",marginBottom:"1rem",padding:"0.75rem",background:"#f7f6f4",borderRadius:"8px",border:"1px dashed #d5d0c8"}}>
-                  Preenche o valor da peça nova para ver a estimativa de preços ↑
+                  Preenche o valor da peça nova para ver a nossa avaliação ↑
                 </p>
               );
+              const tierLabel = est.tier === "investimento" ? "peça de investimento ↑" : est.tier === "premium" ? "marca premium" : est.tier === "alta" ? "marca alta" : "mass market";
+              const tierCor = est.tier === "investimento" ? "#a8d8a8" : "#c4748a";
               return (
                 <div style={{background:"#1a1816",color:"#f5f3ef",borderRadius:"10px",padding:"1rem",marginBottom:"1rem"}}>
-                  <div style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#a09890",marginBottom:"0.6rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
-                    <span>✦</span> Estimativa Nora Grei
-                    <span style={{marginLeft:"auto",fontSize:"0.6rem",background:"#2a2826",padding:"0.1rem 0.35rem",borderRadius:"3px",color:"#c4748a"}}>
-                      {est.tier === "premium" ? "marca premium" : est.tier === "alta" ? "marca alta" : "mass market"}
+                  <div style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#a09890",marginBottom:"0.4rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                    <span>✦</span> Com base na nossa avaliação
+                    <span style={{marginLeft:"auto",fontSize:"0.6rem",background:"#2a2826",padding:"0.1rem 0.35rem",borderRadius:"3px",color:tierCor}}>
+                      {tierLabel}
                     </span>
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"0.4rem",marginBottom:"0.6rem"}}>
+                  <div style={{fontSize:"0.68rem",color:"#a09890",marginBottom:"0.8rem",fontStyle:"italic"}}>
+                    Valor estimado para a sua peça neste momento
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"0.4rem",marginBottom:"0.8rem"}}>
                     <div style={{textAlign:"center"}}>
-                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{est.valorMercado}€</div>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:est.tier==="investimento"?"#a8d8a8":"#f5f3ef"}}>{est.valorMercado}€</div>
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>mercado</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
@@ -4168,15 +4186,31 @@ export default function Perfil() {
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
                       <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{est.precoVendaUsada}€</div>
-                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda usada</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda sugerida</div>
                     </div>
                     <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
                       <div style={{fontSize:"1rem",fontWeight:700,color:"#a8d8a8"}}>{est.caucao}€</div>
                       <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>caução</div>
                     </div>
                   </div>
-                  <div style={{fontSize:"0.68rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
-                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial {est.ganho12m}€ em 12 meses
+                  {/* Slider contexto de venda */}
+                  <div style={{marginBottom:"0.8rem"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.6rem",color:"#a09890",marginBottom:"0.3rem",letterSpacing:"0.06em"}}>
+                      <span>Sem pressa · preço máximo</span>
+                      <span>Preciso de liquidez</span>
+                    </div>
+                    <input type="range" min={0} max={100} step={5} value={contextoVendaEditar}
+                      onChange={e=>setContextoVendaEditar(Number(e.target.value))}
+                      style={{width:"100%",accentColor:"#c4748a",height:"3px",cursor:"pointer"}} />
+                    {contextoVendaEditar > 20 && (
+                      <div style={{fontSize:"0.62rem",color:"#c4748a",textAlign:"center",marginTop:"0.25rem"}}>
+                        Ajuste de liquidez: −{Math.round(contextoVendaEditar*0.30)}% sobre o valor de venda
+                      </div>
+                    )}
+                  </div>
+                  <div style={{fontSize:"0.65rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
+                    ~{est.rotMes}× rotações/mês · ~{est.diasAlug} dias/aluguer · potencial {est.ganho12m}€/ano
+                    {est.rendasParaRecuperar && <span> · recupera em {est.rendasParaRecuperar} rendas</span>}
                   </div>
                   <button type="button"
                     onClick={()=>setEditarPeca(p=>({...p,preco_aluguer_dia:est.precoAluguerDia,preco_venda:est.precoVendaUsada}))}
@@ -4411,7 +4445,7 @@ export default function Perfil() {
 
             {/* Tipo — alugar / vender / ambos */}
             {(()=>{
-              const estN = calcEstimativaP(novaPeca);
+              const estN = calcEstimativaP({...novaPeca, contexto_venda: contextoVendaNova});
               const opcoesN = [
                 { val:"alugar",  titulo:"Alugar",          icone:"↻", desc:"Rendimento recorrente", detalhe: estN ? `€${estN.ganho12m}/ano` : "rendimento recorrente", cor:"#c4748a" },
                 { val:"comprar", titulo:"Vender",           icone:"→", desc:"Liquidez imediata",     detalhe: estN ? `€${estN.precoVendaUsada} imediato` : "liquidez imediata", cor:"#5b8a6b" },
@@ -4463,10 +4497,68 @@ export default function Perfil() {
               )}
             </div>
             {novaPeca.valor_peca&&novaPeca.preco_aluguer_dia&&parseFloat(novaPeca.valor_peca)>0&&parseFloat(novaPeca.preco_aluguer_dia)>0&&(
-              <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"1rem",paddingLeft:"0.25rem"}}>
+              <p style={{fontSize:"0.68rem",color:"#27ae60",marginBottom:"0.5rem",paddingLeft:"0.25rem"}}>
                 A cliente poupa {Math.round((1-parseFloat(novaPeca.preco_aluguer_dia)/parseFloat(novaPeca.valor_peca))*100)}% vs comprar nova
               </p>
             )}
+
+            {/* Estimativa Nora Grei — nova peça */}
+            {(()=>{
+              const estN2 = calcEstimativaP({...novaPeca, contexto_venda: contextoVendaNova});
+              if (!estN2) return null;
+              const tierLabelN = estN2.tier === "investimento" ? "peça de investimento ↑" : estN2.tier === "premium" ? "marca premium" : estN2.tier === "alta" ? "marca alta" : "mass market";
+              const tierCorN = estN2.tier === "investimento" ? "#a8d8a8" : "#c4748a";
+              return (
+                <div style={{background:"#1a1816",color:"#f5f3ef",borderRadius:"10px",padding:"1rem",marginBottom:"1rem"}}>
+                  <div style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#a09890",marginBottom:"0.4rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                    <span>✦</span> Com base na nossa avaliação
+                    <span style={{marginLeft:"auto",fontSize:"0.6rem",background:"#2a2826",padding:"0.1rem 0.35rem",borderRadius:"3px",color:tierCorN}}>{tierLabelN}</span>
+                  </div>
+                  <div style={{fontSize:"0.68rem",color:"#a09890",marginBottom:"0.8rem",fontStyle:"italic"}}>Valor estimado para a sua peça neste momento</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"0.4rem",marginBottom:"0.8rem"}}>
+                    <div style={{textAlign:"center"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:estN2.tier==="investimento"?"#a8d8a8":"#f5f3ef"}}>{estN2.valorMercado}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>mercado</div>
+                    </div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#c4748a"}}>{estN2.precoAluguerDia}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>aluguer/dia</div>
+                    </div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#f5f3ef"}}>{estN2.precoVendaUsada}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>venda sugerida</div>
+                    </div>
+                    <div style={{textAlign:"center",borderLeft:"1px solid #2a2826"}}>
+                      <div style={{fontSize:"1rem",fontWeight:700,color:"#a8d8a8"}}>{estN2.caucao}€</div>
+                      <div style={{fontSize:"0.58rem",color:"#a09890",letterSpacing:"0.08em",textTransform:"uppercase"}}>caução</div>
+                    </div>
+                  </div>
+                  <div style={{marginBottom:"0.8rem"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.6rem",color:"#a09890",marginBottom:"0.3rem",letterSpacing:"0.06em"}}>
+                      <span>Sem pressa · preço máximo</span>
+                      <span>Preciso de liquidez</span>
+                    </div>
+                    <input type="range" min={0} max={100} step={5} value={contextoVendaNova}
+                      onChange={e=>setContextoVendaNova(Number(e.target.value))}
+                      style={{width:"100%",accentColor:"#c4748a",height:"3px",cursor:"pointer"}} />
+                    {contextoVendaNova > 20 && (
+                      <div style={{fontSize:"0.62rem",color:"#c4748a",textAlign:"center",marginTop:"0.25rem"}}>
+                        Ajuste de liquidez: −{Math.round(contextoVendaNova*0.30)}% sobre o valor de venda
+                      </div>
+                    )}
+                  </div>
+                  <div style={{fontSize:"0.65rem",color:"#a09890",marginBottom:"0.6rem",textAlign:"center"}}>
+                    ~{estN2.rotMes}× rotações/mês · ~{estN2.diasAlug} dias/aluguer · potencial {estN2.ganho12m}€/ano
+                    {estN2.rendasParaRecuperar && <span> · recupera em {estN2.rendasParaRecuperar} rendas</span>}
+                  </div>
+                  <button type="button"
+                    onClick={()=>setNovaPeca(p=>({...p,preco_aluguer_dia:estN2.precoAluguerDia,preco_venda:estN2.precoVendaUsada}))}
+                    style={{width:"100%",background:"#c4748a",color:"#fff",border:"none",borderRadius:"6px",padding:"0.5rem",fontSize:"0.75rem",fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",cursor:"pointer"}}>
+                    Usar sugestão →
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Preço venda + Material */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem"}}>
