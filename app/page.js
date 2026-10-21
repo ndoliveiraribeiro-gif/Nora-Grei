@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import ChatWidget from "@/components/ChatWidget";
 
 const T = {
   pt: {
@@ -1381,7 +1382,7 @@ export default function Home() {
         </div>
       </footer>
 
-
+      <ChatWidget lang={lang} />
     </>
   );
 }

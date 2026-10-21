@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import PecaCard from "@/components/PecaCard";
+import ChatWidget from "@/components/ChatWidget";
 import { t as i18n, traduzCat } from "@/lib/i18n";
 
 const CATEGORIAS_BD = ["Vestidos", "Casacos", "Conjuntos", "Acessórios", "Corsets", "Tops", "Calças", "Saias", "Relógios"];
@@ -698,6 +699,7 @@ export default function Catalogo() {
         </div>
       )}
 
+      <ChatWidget lang={lang} />
     </>
   );
 }
