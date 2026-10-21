@@ -245,6 +245,7 @@ export default function PecaLojaPage() {
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [valorSocial, setValorSocial] = useState("5");
   const hoje = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
@@ -330,7 +331,13 @@ export default function PecaLojaPage() {
 
   const irParaCheckout = () => {
     if (!tamanhoSelecionado) return;
-    window.location.href = `/loja/${codigo}/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`;
+    if (peca?.tipo === "social") {
+      const v = parseFloat(valorSocial) || 5;
+      const valor = Math.max(5, v);
+      window.location.href = `/loja/${codigo}/checkout?peca=${id}&tamanho=${tamanhoSelecionado}&modo=social&valor=${valor}`;
+    } else {
+      window.location.href = `/loja/${codigo}/checkout?peca=${id}&tamanho=${tamanhoSelecionado}`;
+    }
   };
 
   const diasAluguer = dataInicio && dataFim ? Math.max(1, Math.ceil((new Date(dataFim) - new Date(dataInicio)) / 86400000)) : 0;
@@ -685,13 +692,57 @@ export default function PecaLojaPage() {
           {/* CTAs */}
           {disponivel ? (
             <div style={{display:"flex",flexDirection:"column",gap:"0.6rem",marginBottom:"0.75rem"}}>
-              <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
-                {tamanhoSelecionado ? i.alugar : i.semTamanho}
-              </button>
-              {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && (
-                <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
-                  🛍 {tamanhoSelecionado ? i.adicionarCesto : i.semTamanho}
-                </button>
+              {peca.tipo === "social" ? (
+                /* Venda Social — preço livre */
+                <div style={{border:"1.5px solid #c4a882",borderRadius:"10px",padding:"1rem",background:"#faf8f4"}}>
+                  <p style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4a882",fontWeight:700,margin:"0 0 0.5rem",fontFamily:"var(--sans)"}}>
+                    ♡ {({pt:"Venda Social",fr:"Vente Sociale",lt:"Socialinis pardavimas"})[lang]||"Venda Social"}
+                  </p>
+                  <p style={{fontSize:"0.75rem",color:"#6b6762",margin:"0 0 0.75rem",lineHeight:1.4,fontFamily:"var(--sans)"}}>
+                    {({
+                      pt:"Paga o que quiseres — mínimo 5€. A lojista liberta o armário, tu decides o valor justo.",
+                      fr:"Paie ce que tu veux — minimum 5€. La vendeuse libère son dressing, tu décides la valeur.",
+                      lt:"Mokėk kiek nori — mažiausiai 5€. Pardavėja atlaisvina spintą, tu nusprendžia vertę."
+                    })[lang]||"Paga o que quiseres — mínimo 5€."}
+                  </p>
+                  <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.75rem"}}>
+                    <span style={{fontSize:"0.85rem",color:"#1a1a1a",fontFamily:"var(--sans)",fontWeight:600}}>€</span>
+                    <input
+                      type="number"
+                      min="5"
+                      step="1"
+                      value={valorSocial}
+                      onChange={e => setValorSocial(e.target.value)}
+                      style={{flex:1,border:"1.5px solid #c4a882",borderRadius:"6px",padding:"0.55rem 0.75rem",fontSize:"1.1rem",fontWeight:700,fontFamily:"var(--sans)",color:"#1a1a1a",outline:"none",background:"#fff",textAlign:"center"}}
+                    />
+                  </div>
+                  {parseFloat(valorSocial) < 5 && (
+                    <p style={{fontSize:"0.72rem",color:"#c0392b",margin:"-0.25rem 0 0.5rem",fontFamily:"var(--sans)"}}>
+                      {({pt:"Valor mínimo: 5€",fr:"Montant minimum: 5€",lt:"Minimali suma: 5€"})[lang]||"Valor mínimo: 5€"}
+                    </p>
+                  )}
+                  <button
+                    className="btn-alugar"
+                    onClick={irParaCheckout}
+                    disabled={!tamanhoSelecionado || parseFloat(valorSocial) < 5}
+                    style={{width:"100%",background:"#c4a882",borderColor:"#c4a882"}}
+                  >
+                    {tamanhoSelecionado
+                      ? `${({pt:"Comprar por",fr:"Acheter pour",lt:"Pirkti už"})[lang]||"Comprar por"} ${parseFloat(valorSocial) >= 5 ? parseFloat(valorSocial).toFixed(0) : 5}€`
+                      : i.semTamanho}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button className="btn-alugar" onClick={irParaCheckout} disabled={!tamanhoSelecionado}>
+                    {tamanhoSelecionado ? i.alugar : i.semTamanho}
+                  </button>
+                  {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && (
+                    <button className="btn-cesto" onClick={adicionarAoCesto} disabled={!tamanhoSelecionado}>
+                      🛍 {tamanhoSelecionado ? i.adicionarCesto : i.semTamanho}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           ) : (

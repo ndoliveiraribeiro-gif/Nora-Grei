@@ -225,6 +225,8 @@ export default function PublicarPage() {
   };
 
   const validarPasso3 = () => {
+    // Venda social: preço livre (mín. 5€ definido pelo sistema), não precisa de valores manuais
+    if (peca.tipo === "social") { setErro(""); return true; }
     const precisaAluguer = peca.tipo === "alugar" || peca.tipo === "ambos";
     const precisaVenda = peca.tipo === "comprar" || peca.tipo === "ambos";
     if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
@@ -250,6 +252,7 @@ export default function PublicarPage() {
         nome: peca.nome.trim(),
         descricao: peca.descricao.trim() || null,
         tipo: peca.tipo,
+        preco_social_minimo: peca.tipo === "social" ? 5 : null,
         preco_aluguer_dia: peca.preco_aluguer_dia ? parseFloat(peca.preco_aluguer_dia) : null,
         preco_venda: peca.preco_venda ? parseFloat(peca.preco_venda) : null,
         valor_peca: peca.valor_peca ? parseFloat(peca.valor_peca) : null,
@@ -943,6 +946,14 @@ export default function PublicarPage() {
                   desc: "Alugas enquanto encontras comprador",
                   detalhe: ganhoAmbos ? `${ganhoAmbos}` : "Máxima flexibilidade",
                   cor: "#7a6a9e",
+                },
+                {
+                  val: "social",
+                  titulo: "Venda Social",
+                  icone: "♡",
+                  desc: "Liberta stock — comprador paga o que quiser (mín. 5€)",
+                  detalhe: "Preço livre · comunidade decide o valor",
+                  cor: "#c4a882",
                 },
               ];
               return (
