@@ -615,10 +615,10 @@ export default function Home() {
         .hero-sound:hover{background:rgba(255,255,255,0.18)}
         .hero-content{background:#100c0a;display:flex;flex-direction:column;justify-content:center;padding:5rem 3.5rem 4rem;position:relative;color:#fff;overflow:hidden;height:100%}
         .hero-content::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:rgba(255,255,255,0.06)}
-        .hero-eyebrow{font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.5rem;font-family:var(--sans)}
+        .hero-eyebrow{font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:1.5rem;font-family:var(--sans)}
         .hero-titulo{font-family:var(--serif);font-size:clamp(2.8rem,4vw,4.8rem);font-weight:300;line-height:1.05;color:var(--bg);margin-bottom:0.75rem}
         .hero-titulo em{font-style:italic;color:var(--gold)}
-        .hero-sub{font-size:0.82rem;color:rgba(255,255,255,0.4);line-height:1.75;margin-bottom:2.5rem;max-width:34ch;font-family:var(--sans)}
+        .hero-sub{font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:2.5rem;max-width:34ch;font-family:var(--sans)}
         /* mini simulador */
         .hero-sim{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:1.25rem 1.5rem;margin-bottom:2rem}
         .hero-sim-label{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:0.85rem;font-family:var(--sans)}
