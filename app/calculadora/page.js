@@ -14,6 +14,7 @@ const T = {
     tipoLabel: "Tipo de peça",
     estadoLabel: "Estado actual da peça",
     usoLabel: "Frequência de uso",
+    idadeLabel: "Idade da peça",
     mesesLabel: "Durante quantos meses queres alugar?",
     mesesPeriodo: "Período de aluguer",
     mesesUnidade: (n) => `${n} meses`,
@@ -62,6 +63,7 @@ const T = {
     tipoLabel: "Type de pièce",
     estadoLabel: "État actuel de la pièce",
     usoLabel: "Fréquence d'utilisation",
+    idadeLabel: "Âge de la pièce",
     mesesLabel: "Pendant combien de mois veux-tu louer ?",
     mesesPeriodo: "Période de location",
     mesesUnidade: (n) => `${n} mois`,
@@ -110,6 +112,7 @@ const T = {
     tipoLabel: "Drabužio tipas",
     estadoLabel: "Dabartinė drabužio būklė",
     usoLabel: "Nešiojimo dažnis",
+    idadeLabel: "Drabužio amžius",
     mesesLabel: "Kiek mėnesių nori nuomoti?",
     mesesPeriodo: "Nuomos laikotarpis",
     mesesUnidade: (n) => `${n} mėn.`,
@@ -195,6 +198,13 @@ const USOS_DATA = [
   { id: "frequente",fator: 0.52, label: { pt: "Uso frequente",   fr: "Usage fréquent",      lt: "Dažnai nešiota" } },
 ];
 
+const IDADES_DATA = [
+  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano",  fr: "Moins d'un an",  lt: "Mažiau nei 1 metai" } },
+  { id: "1a2",   fator: 0.85, label: { pt: "1 a 2 anos",      fr: "1 à 2 ans",       lt: "1–2 metai" } },
+  { id: "2a4",   fator: 0.70, label: { pt: "2 a 4 anos",      fr: "2 à 4 ans",       lt: "2–4 metai" } },
+  { id: "4mais", fator: 0.52, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",   lt: "Daugiau nei 4 metai" } },
+];
+
 const TIPOS_DATA = [
   { id: "Vestidos",   rot: 1.8, dias: 3.5, fp: 0.10, label: { pt: "Vestido",    fr: "Robe",      lt: "Suknelė" } },
   { id: "Fatos",      rot: 1.5, dias: 4.0, fp: 0.09, label: { pt: "Fato",       fr: "Costume",   lt: "Kostiumas" } },
@@ -214,6 +224,7 @@ export default function Calculadora() {
   const [tipo, setTipo] = useState("_default");
   const [estado, setEstado] = useState("bom");
   const [uso, setUso] = useState("pouco");
+  const [idade, setIdade] = useState("1a2");
   const [meses, setMeses] = useState(12);
 
   // Gate de email
@@ -265,6 +276,7 @@ export default function Calculadora() {
   const t = T[lang] || T.pt;
   const ESTADOS = ESTADOS_DATA.map(e => ({ ...e, label: e.label[lang] || e.label.pt }));
   const USOS    = USOS_DATA.map(u => ({ ...u, label: u.label[lang] || u.label.pt }));
+  const IDADES  = IDADES_DATA.map(i => ({ ...i, label: i.label[lang] || i.label.pt }));
   const TIPOS   = TIPOS_DATA.map(tp => ({ ...tp, label: tp.label[lang] || tp.label.pt }));
 
   const p = parseFloat(preco) || 0;
@@ -275,10 +287,11 @@ export default function Calculadora() {
     const { fator: fmemo, tier: tmemo } = fatorMarca(marca);
     const est = ESTADOS_DATA.find(e => e.id === estado);
     const usoObj = USOS_DATA.find(u => u.id === uso);
+    const idObj  = IDADES_DATA.find(i => i.id === idade);
     const cat = TIPOS_DATA.find(tp => tp.id === tipo) ?? TIPOS_DATA.find(tp => tp.id === "_default");
 
-    // Fator estado×uso combinado
-    const fei = est.fator * usoObj.fator;
+    // Fator estado × uso × idade combinado
+    const fei = est.fator * usoObj.fator * idObj.fator;
     const feiClamp = fei < 0.30 ? fei * 0.85 : fei > 0.85 ? fei * 1.05 : fei;
 
     // Valor de mercado (marcas investimento podem superar preço original)
@@ -318,7 +331,7 @@ export default function Calculadora() {
       receitaBruta, liquidoAluguer, valorFinalPeca,
       vendaFinalLiquido, totalNG, vendaVinted, ganhoExtra, multiplicador, tier: tmemo,
     };
-  }, [p, marca, tipo, estado, uso, meses]);
+  }, [p, marca, tipo, estado, uso, idade, meses]);
 
   // Lógica do gate: quando o resultado aparece, verificar se precisa gate
   useEffect(() => {
@@ -739,6 +752,15 @@ export default function Calculadora() {
           <div className="pills">
             {USOS.map(u => (
               <button key={u.id} className={`pill${uso === u.id ? " sel" : ""}`} onClick={() => setUso(u.id)}>{u.label}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-label">{t.idadeLabel}</div>
+          <div className="pills">
+            {IDADES.map(i => (
+              <button key={i.id} className={`pill${idade === i.id ? " sel" : ""}`} onClick={() => setIdade(i.id)}>{i.label}</button>
             ))}
           </div>
         </div>
