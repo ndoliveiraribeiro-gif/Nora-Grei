@@ -4,13 +4,12 @@ import LojaCliente from "./LojaCliente";
 async function getLoja(codigo) {
   const supabaseServer = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
   const { data } = await supabaseServer
     .from("clientes")
     .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
     .eq("codigo_cliente", codigo)
-    .eq("modo_lojista", true)
     .maybeSingle();
   return data || null;
 }
@@ -18,7 +17,7 @@ async function getLoja(codigo) {
 async function getPecas(clienteId) {
   const supabaseServer = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
   const { data } = await supabaseServer
     .from("pecas")
