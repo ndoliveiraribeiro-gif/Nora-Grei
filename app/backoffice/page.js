@@ -1102,6 +1102,8 @@ export default function Backoffice() {
   const [alugueresLojista, setAlugueresLojista] = useState([]);
   const [candidaturasLojista, setCandidaturasLojista] = useState([]);
   const [pecasPendentes, setPecasPendentes] = useState([]);
+  const [pecasLojistaTodas, setPecasLojistaTodas] = useState([]);
+  const [editFotosLojista, setEditFotosLojista] = useState(null); // {id, nome, fotos}
   const [subTabCandidaturas, setSubTabCandidaturas] = useState(false); // toggle detalhe
   const [subTabLojistas, setSubTabLojistas] = useState("depositos");
   const [lojistasAprovados, setLojistasAprovados] = useState([]);
@@ -1300,6 +1302,12 @@ export default function Backoffice() {
         .eq("estado", "pendente")
         .order("created_at", { ascending: false });
       if (pendentes) setPecasPendentes(pendentes);
+      const { data: todasPL } = await supabase
+        .from("pecas_lojista")
+        .select("id, nome, categoria, fotos, estado, clientes(nome, codigo_cliente)")
+        .in("estado", ["disponivel", "indisponivel", "rejeitado"])
+        .order("created_at", { ascending: false });
+      if (todasPL) setPecasLojistaTodas(todasPL);
       // lojistas aprovados para painel de avaliações
       const { data: lojs } = await supabase
         .from("clientes")
@@ -3188,6 +3196,55 @@ export default function Backoffice() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* GESTÃO DE FOTOS DE PEÇAS LOJISTA */}
+              {pecasLojistaTodas.length > 0 && (
+                <div style={CARD}>
+                  <p style={CARD_T}>📷 Fotos das peças de lojistas</p>
+                  {editFotosLojista && (
+                    <div style={{ background:"#fff8f8",border:"1px solid #f0eeeb",padding:"1rem",marginBottom:"1rem",borderRadius:4 }}>
+                      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.75rem" }}>
+                        <span style={{ fontFamily:"'Jost',sans-serif",fontWeight:500,fontSize:"0.88rem" }}>A editar fotos: {editFotosLojista.nome}</span>
+                        <button onClick={()=>setEditFotosLojista(null)} style={{ background:"none",border:"none",cursor:"pointer",color:"#888",fontSize:"1.1rem" }}>✕</button>
+                      </div>
+                      {editFotosLojista.fotos?.length > 0 ? (
+                        <div style={{ display:"flex",gap:"0.5rem",flexWrap:"wrap" }}>
+                          {editFotosLojista.fotos.map((url, i) => (
+                            <div key={i} style={{ position:"relative" }}>
+                              <img src={url} alt="" style={{ width:80,height:100,objectFit:"cover",border:"1px solid #e2dfda" }} />
+                              <button onClick={async () => {
+                                const novas = editFotosLojista.fotos.filter((_,fi)=>fi!==i);
+                                await supabase.from("pecas_lojista").update({ fotos: novas }).eq("id", editFotosLojista.id);
+                                setEditFotosLojista(prev=>({...prev, fotos: novas}));
+                                setPecasLojistaTodas(prev=>prev.map(p=>p.id===editFotosLojista.id?{...p,fotos:novas}:p));
+                              }} style={{ position:"absolute",top:-8,right:-8,width:22,height:22,borderRadius:"50%",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontSize:"0.7rem",fontWeight:700 }}>✕</button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p style={{ fontSize:"0.82rem",color:"#aaa" }}>Sem fotos — array vazio na BD.</p>
+                      )}
+                    </div>
+                  )}
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:"0.75rem" }}>
+                    {pecasLojistaTodas.map(p => (
+                      <div key={p.id} style={{ background:"#f8f7f5",border:"1px solid #e8e5e0",overflow:"hidden",cursor:"pointer" }} onClick={()=>setEditFotosLojista(p)}>
+                        <div style={{ aspectRatio:"2/3",background:"#e8e5e0",position:"relative",overflow:"hidden" }}>
+                          {p.fotos?.[0]
+                            ? <img src={p.fotos[0]} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }} />
+                            : <div style={{ width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",color:"#ccc",fontSize:"1.5rem" }}>📷</div>
+                          }
+                          {p.fotos?.length > 0 && <div style={{ position:"absolute",top:4,right:4,background:"rgba(0,0,0,0.55)",color:"#fff",fontSize:"0.62rem",padding:"1px 5px",borderRadius:8 }}>{p.fotos.length}</div>}
+                        </div>
+                        <div style={{ padding:"0.4rem 0.5rem" }}>
+                          <div style={{ fontSize:"0.72rem",fontWeight:500,fontFamily:"'Jost',sans-serif",lineHeight:1.3,color:"#111" }}>{p.nome}</div>
+                          <div style={{ fontSize:"0.62rem",color:"#b8964e",fontFamily:"'Jost',sans-serif" }}>{p.clientes?.nome||"—"}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
