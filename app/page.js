@@ -904,11 +904,7 @@ export default function Home() {
           .hero-sound{bottom:4rem}
         }
 
-        /* CALC STRIP */
-        .calc-strip{display:flex;align-items:center;justify-content:center;gap:0.5rem;background:#111;padding:0.6rem 1.5rem;text-align:center;position:relative;z-index:101}
-        .calc-strip a{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;transition:color 0.2s}
-        .calc-strip a:hover{color:#fff}
-        .calc-strip-dot{width:5px;height:5px;border-radius:50%;background:var(--rosa);flex-shrink:0}
+        /* CALC STRIP — removida */
 
         /* CALC SEC */
         .calc-sec{background:#0d0d0d;padding:3.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
@@ -987,12 +983,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* CALC STRIP — nota de topo */}
-      <div className="calc-strip">
-        <div className="calc-strip-dot" />
-        <a href="/calculadora">{t.calcStrip}</a>
-      </div>
 
       {/* NAV */}
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
