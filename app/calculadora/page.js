@@ -205,13 +205,44 @@ const GRUPOS_MARCA = [
   },
 ];
 
-function fatorMarca(marca = "") {
+// Categorias de tipo que pertencem a cada grupo de produto
+const TIPOS_MALAS    = ["MalaLuxo","MalaOmbro","Clutch","Mochila"];
+const TIPOS_RELOGIOS = ["Relogio"];
+const TIPOS_CALCADO  = ["Sapatos","Sapatilhas","Botas","Sandalias"];
+const TIPOS_JOIAS    = ["Joia"];
+const TIPOS_ROUPA    = ["VestidoNoite","Vestido","Fato","Jumpsuit","Saia",
+                        "Calças","Jeans","Blusa","Camisa","Camisola","Bodysuit",
+                        "Casaco","Blazer","Pele"];
+const TIPOS_ACESS    = ["Cinto","Lenco","OculosSol","Chapeu"];
+
+// Factores de retenção por tier × categoria
+// Fonte: Vestiaire Collective SS25, ThredUp 2025, plottdata.com/blogs/luxury-resale-market-analysis
+// Roupa deprecia muito mais rápido que malas/relógios da mesma marca
+const FATORES_MARCA = {
+  // tier         roupa  malas  relógio calçado joias  acess
+  investimento: { roupa: 0.72, malas: 1.10, relogio: 1.20, calcado: 0.65, joias: 0.90, acess: 0.75 },
+  premium:      { roupa: 0.48, malas: 0.72, relogio: 0.65, calcado: 0.52, joias: 0.60, acess: 0.55 },
+  alta:         { roupa: 0.28, malas: 0.45, relogio: 0.40, calcado: 0.35, joias: 0.38, acess: 0.32 },
+  massmarket:   { roupa: 0.12, malas: 0.22, relogio: 0.18, calcado: 0.15, joias: 0.15, acess: 0.14 },
+};
+
+function categoriaTipo(tipo) {
+  if (TIPOS_MALAS.includes(tipo))    return "malas";
+  if (TIPOS_RELOGIOS.includes(tipo)) return "relogio";
+  if (TIPOS_CALCADO.includes(tipo))  return "calcado";
+  if (TIPOS_JOIAS.includes(tipo))    return "joias";
+  if (TIPOS_ACESS.includes(tipo))    return "acess";
+  return "roupa"; // default (inclui _default)
+}
+
+function fatorMarca(marca = "", tipo = "_default") {
   const m = marca.toLowerCase().trim();
-  if (!m) return { fator: 0.32, tier: "massmarket" };
-  if (MARCAS_INVESTIMENTO.some(b => m.includes(b))) return { fator: 1.15, tier: "investimento" };
-  if (MARCAS_PREMIUM.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
-  if (MARCAS_ALTA.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
-  return { fator: 0.32, tier: "massmarket" };
+  const cat = categoriaTipo(tipo);
+  if (!m) return { fator: FATORES_MARCA.massmarket[cat], tier: "massmarket" };
+  if (MARCAS_INVESTIMENTO.some(b => m.includes(b))) return { fator: FATORES_MARCA.investimento[cat], tier: "investimento" };
+  if (MARCAS_PREMIUM.some(b => m.includes(b)))      return { fator: FATORES_MARCA.premium[cat],      tier: "premium" };
+  if (MARCAS_ALTA.some(b => m.includes(b)))         return { fator: FATORES_MARCA.alta[cat],         tier: "alta" };
+  return { fator: FATORES_MARCA.massmarket[cat], tier: "massmarket" };
 }
 
 // Comissões reais da plataforma
@@ -344,11 +375,11 @@ export default function Calculadora() {
   const TIPOS   = TIPOS_DATA.map(tp => ({ ...tp, label: tp.label[lang] || tp.label.pt }));
 
   const p = parseFloat(preco) || 0;
-  const { fator: fm, tier } = fatorMarca(marca);
+  const { fator: fm, tier } = fatorMarca(marca, tipo);
 
   const calc = useMemo(() => {
     if (!p) return null;
-    const { fator: fmemo, tier: tmemo } = fatorMarca(marca);
+    const { fator: fmemo, tier: tmemo } = fatorMarca(marca, tipo);
     const est = ESTADOS_DATA.find(e => e.id === estado);
     const usoObj = USOS_DATA.find(u => u.id === uso);
     const idObj  = IDADES_DATA.find(i => i.id === idade);
