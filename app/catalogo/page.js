@@ -45,10 +45,10 @@ function PecaCardLojista({ peca, lang }) {
               const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
               const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
               const tip = lang === "fr"
-                ? "Prix incluant la commission Nora Grei (10% location / 20% vente)"
+                ? "Le prix affiché inclut les frais de service et de garantie de la plateforme."
                 : lang === "lt"
-                ? "Kaina su Nora Grei komisiniais (10% nuoma / 20% pardavimas)"
-                : "Preço com comissão Nora Grei incluída (10% aluguer / 20% venda)";
+                ? "Rodoma kaina apima platformos paslaugų ir garantijos mokesčius."
+                : "O preço apresentado inclui taxas de serviço e garantia da plataforma.";
               const Info = ({ title }) => (
                 <span title={title} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"14px",height:"14px",borderRadius:"50%",border:"1px solid #b0ada8",color:"#8a8783",fontSize:"9px",fontFamily:"'Jost',sans-serif",cursor:"help",flexShrink:0,lineHeight:1}}>i</span>
               );
