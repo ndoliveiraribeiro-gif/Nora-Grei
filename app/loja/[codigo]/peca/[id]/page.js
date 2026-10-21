@@ -40,6 +40,49 @@ const calcularCaucaoRoi = (valorPeca, precoDia, totalAlugueres, nv) => {
   return Math.max(Math.round(valorPeca * 0.05), caucao);
 };
 
+// ── Avaliação de marca (igual ao backoffice) ──────────────────────────────
+const MARCAS_INVESTIMENTO_P = ["rolex","patek philippe","patek","audemars piguet","ap","richard mille","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly"];
+const MARCAS_PREMIUM_P = ["gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline","givenchy","valentino","versace","balenciaga","jacquemus","loewe","loro piana","brunello cucinelli","max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren"];
+const MARCAS_ALTA_P = ["zara","mango","&other stories","other stories","cos","arket","massimo dutti","pedro del hierro","escorpion","escorpión","hugo boss","boss","calvin klein","ck","tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda","weekday","monki","stradivarius","bershka","pull&bear","sfera","phase eight","whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje"];
+function fatorMarcaP(marca = "") {
+  const m = marca.toLowerCase().trim();
+  if (MARCAS_INVESTIMENTO_P.some(b => m.includes(b))) return { fator: 1.15, tier: "investimento" };
+  if (MARCAS_PREMIUM_P.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
+  if (MARCAS_ALTA_P.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
+  return { fator: 0.32, tier: "massmarket" };
+}
+const FATOR_ESTADO_P = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
+const FATOR_IDADE_P  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
+const ROTACAO_CAT_P = {
+  "Vestidos":   { fp:0.0060, dias:3, rot:5.5 },
+  "Casacos":    { fp:0.0050, dias:4, rot:4.0 },
+  "Saias":      { fp:0.0055, dias:3, rot:5.0 },
+  "Tops":       { fp:0.0065, dias:2, rot:6.5 },
+  "Calças":     { fp:0.0050, dias:3, rot:5.0 },
+  "Fatos":      { fp:0.0045, dias:4, rot:4.0 },
+  "Acessórios": { fp:0.0080, dias:2, rot:7.0 },
+  "Malas":      { fp:0.0070, dias:3, rot:6.0 },
+  "Sapatos":    { fp:0.0055, dias:2, rot:5.5 },
+  "Lingerie":   { fp:0.0090, dias:2, rot:7.0 },
+  _default:     { fp:0.0055, dias:3, rot:5.0 },
+};
+function calcEstimativaPPublica({ valor_peca, marca, condicao, idade_peca, categoria }) {
+  const p = parseFloat(valor_peca) || 0;
+  if (!p) return null;
+  const { fator: fm, tier } = fatorMarcaP(marca);
+  const fei = (() => {
+    const fe = FATOR_ESTADO_P[condicao] ?? 0.65;
+    const fi = FATOR_IDADE_P[idade_peca] ?? 0.70;
+    return (fe + fi) / 2;
+  })();
+  const valorBase = tier === "investimento" ? Math.round(p * fm) : Math.round(p * fm * fei);
+  const cat = ROTACAO_CAT_P[categoria] ?? ROTACAO_CAT_P._default;
+  const tierBonus = tier === "investimento" ? 1.35 : tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
+  const precoAluguerSugerido = Math.max(5, Math.round(valorBase * cat.fp * tierBonus / 5) * 5);
+  return { valorMercado: valorBase, precoAluguerSugerido, tier };
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 const t = {
   pt: {
     pecaNaoEncontrada: "Peça não encontrada.",
@@ -91,6 +134,12 @@ const t = {
     carregando: "A carregar...",
     voltar: "← Loja",
     porOcasiao: "Por ocasião",
+    tierInvestimento: "Peça de investimento ↑",
+    tierPremium: "Marca premium",
+    tierInvestimentoDesc: "Esta marca tende a valorizar ou manter o valor ao longo do tempo.",
+    tierPremiumDesc: "Marca de luxo com elevado valor de revenda.",
+    avNossaAvaliacao: "A nossa avaliação",
+    avValorMercado: "Valor estimado de mercado",
   },
   fr: {
     pecaNaoEncontrada: "Pièce introuvable.",
@@ -142,6 +191,12 @@ const t = {
     carregando: "Chargement...",
     voltar: "← Boutique",
     porOcasiao: "À l'occasion",
+    tierInvestimento: "Pièce d'investissement ↑",
+    tierPremium: "Marque premium",
+    tierInvestimentoDesc: "Cette marque tend à prendre ou maintenir sa valeur avec le temps.",
+    tierPremiumDesc: "Marque de luxe à haute valeur de revente.",
+    avNossaAvaliacao: "Notre évaluation",
+    avValorMercado: "Valeur marchande estimée",
   },
   lt: {
     pecaNaoEncontrada: "Drabužis nerastas.",
@@ -193,6 +248,12 @@ const t = {
     carregando: "Kraunama...",
     voltar: "← Parduotuvė",
     porOcasiao: "Atskirai",
+    tierInvestimento: "Investicinė prekė ↑",
+    tierPremium: "Premium prekės ženklas",
+    tierInvestimentoDesc: "Šis prekės ženklas linkęs išlaikyti arba didinti vertę laikui bėgant.",
+    tierPremiumDesc: "Prabangos prekės ženklas su aukšta perparduodamąja verte.",
+    avNossaAvaliacao: "Mūsų įvertinimas",
+    avValorMercado: "Įvertinta rinkos vertė",
   },
 };
 
@@ -492,6 +553,43 @@ export default function PecaLojaPage() {
         <div className="info">
           {lojista?.nome && <p className="badge-cat">{lojista.nome}</p>}
           <h1 className="nome">{peca.nome}</h1>
+
+          {/* Badge de tier de marca — investimento e premium */}
+          {(() => {
+            if (!peca.marca) return null;
+            const { tier } = fatorMarcaP(peca.marca);
+            if (tier === "investimento") return (
+              <div style={{display:"flex",alignItems:"flex-start",gap:"0.6rem",background:"linear-gradient(135deg,#1a2e22 0%,#243d2c 100%)",padding:"0.65rem 0.9rem",marginBottom:"1rem",borderRadius:"2px"}}>
+                <span style={{fontSize:"1rem",flexShrink:0,marginTop:"0.05rem"}}>📈</span>
+                <div>
+                  <span style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4a882",fontWeight:700,fontFamily:"var(--sans)"}}>{i.tierInvestimento}</span>
+                  <p style={{fontSize:"0.75rem",color:"rgba(255,255,255,0.72)",margin:"0.2rem 0 0",lineHeight:1.45,fontFamily:"var(--sans)"}}>{i.tierInvestimentoDesc}</p>
+                </div>
+              </div>
+            );
+            if (tier === "premium") return (
+              <div style={{display:"flex",alignItems:"center",gap:"0.5rem",background:"#f9f6f1",border:"1px solid #e8d8c0",padding:"0.5rem 0.8rem",marginBottom:"1rem",borderRadius:"2px"}}>
+                <span style={{fontSize:"0.85rem"}}>✦</span>
+                <span style={{fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#8a6a2a",fontWeight:600,fontFamily:"var(--sans)"}}>{i.tierPremium}</span>
+              </div>
+            );
+            return null;
+          })()}
+
+          {/* Estimativa de valor de mercado (só se tiver valor_peca e marca) */}
+          {(() => {
+            const est = peca.valor_peca && peca.marca
+              ? calcEstimativaPPublica({ valor_peca: peca.valor_peca, marca: peca.marca, condicao: peca.condicao, idade_peca: peca.idade_peca, categoria: peca.categoria })
+              : null;
+            if (!est || est.tier === "massmarket") return null;
+            return (
+              <div style={{background:"#f5f4f1",padding:"0.6rem 0.9rem",marginBottom:"0.85rem",borderRadius:"2px",display:"flex",alignItems:"center",gap:"0.6rem",fontFamily:"var(--sans)"}}>
+                <span style={{fontSize:"0.72rem",color:"#5a5855",letterSpacing:"0.1em"}}>{i.avNossaAvaliacao}:</span>
+                <span style={{fontSize:"0.9rem",fontWeight:600,color:"#1a2e22"}}>{est.valorMercado}€</span>
+                <span style={{fontSize:"0.68rem",color:"#9c9894",letterSpacing:"0.08em",textTransform:"uppercase"}}>{i.avValorMercado}</span>
+              </div>
+            );
+          })()}
 
           {/* Preço + taxa de proteção inline com ⓘ modal */}
           {(peca.tipo === "ambos" || peca.tipo === "alugar" || !peca.tipo) && peca.preco_aluguer_dia && (() => {
