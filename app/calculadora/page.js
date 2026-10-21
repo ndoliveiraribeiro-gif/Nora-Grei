@@ -152,22 +152,57 @@ const T = {
   },
 };
 
-// ── Sistema de marcas (espelhado do perfil) ───────────────────────────────────
-const MARCAS_INVESTIMENTO = ["rolex","patek philippe","patek","audemars piguet","ap","richard mille","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly"];
-const MARCAS_PREMIUM = ["gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl","celine","céline",
-  "givenchy","valentino","versace","balenciaga","jacquemus","loewe","loro piana",
-  "brunello cucinelli","max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren"];
-const MARCAS_ALTA = ["zara","mango","&other stories","other stories","cos","arket",
-  "massimo dutti","pedro del hierro","hugo boss","boss","calvin klein","ck",
-  "tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda",
-  "weekday","monki","stradivarius","bershka","pull&bear","sfera",
-  "phase eight","whistles","reiss","allsaints","ba&sh","bash","sandro","maje"];
+// ── Sistema de marcas com grupos ─────────────────────────────────────────────
+// Listas de detecção de tier (lowercase, para fatorMarca)
+const MARCAS_INVESTIMENTO = [
+  "rolex","patek philippe","patek","audemars piguet","ap","richard mille",
+  "vacheron constantin","jaeger-lecoultre","jaeger lecoultre","a. lange","lange",
+  "cartier","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly",
+  "delvaux","goyard",
+];
+const MARCAS_PREMIUM = [
+  "gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl",
+  "celine","céline","givenchy","valentino","versace","balenciaga","jacquemus",
+  "loewe","loro piana","brunello cucinelli","max mara","tod's","tods","ferragamo",
+  "burberry","mulberry","ralph lauren","michael kors","coach","kate spade",
+  "longchamp","furla","tory burch","liu jo","pinko","self-portrait",
+  "omega","tag heuer","breitling","iwc","tudor","longines","tissot",
+];
+const MARCAS_ALTA = [
+  "zara","mango","&other stories","other stories","cos","arket","massimo dutti",
+  "pedro del hierro","hugo boss","boss","calvin klein","ck","tommy hilfiger","tommy",
+  "lacoste","levis","levi's","gant","scotch soda","weekday","monki","stradivarius",
+  "bershka","pull&bear","sfera","phase eight","whistles","reiss","allsaints",
+  "ba&sh","bash","sandro","maje","claudie pierlot","rouje","apc","a.p.c.",
+  "isabel marant etoile","ba&sh","iro","american vintage","sessun","soeur",
+];
 
-// Sugestões visíveis por tier (para o datalist)
-const SUGESTOES_MARCA = [
-  "Chanel","Hermès","Louis Vuitton","Rolex","Patek Philippe",
-  "Gucci","Prada","Dior","Bottega Veneta","Saint Laurent","Balenciaga","Celine","Valentino","Versace","Loewe","Jacquemus","Burberry","Ralph Lauren","Max Mara","Mulberry",
-  "Zara","Mango","COS","Arket","Massimo Dutti","Hugo Boss","Calvin Klein","Tommy Hilfiger","Lacoste","Levi's","Sandro","Maje","Ba&sh",
+// Grupos para o combobox — separados por tipo de produto
+const GRUPOS_MARCA = [
+  {
+    grupo: { pt: "Relógios de Luxo", fr: "Montres de Luxe", lt: "Prabangūs laikrodžiai" },
+    marcas: ["Rolex","Patek Philippe","Audemars Piguet","Richard Mille","Vacheron Constantin","Jaeger-LeCoultre","A. Lange & Söhne","Cartier","Omega","TAG Heuer","Breitling","IWC","Tudor","Longines","Tissot"],
+  },
+  {
+    grupo: { pt: "Haute Couture & Joalharia", fr: "Haute Couture & Joaillerie", lt: "Haute couture ir papuošalai" },
+    marcas: ["Chanel","Hermès","Louis Vuitton","Delvaux","Goyard"],
+  },
+  {
+    grupo: { pt: "Luxo — Roupa & Acessórios", fr: "Luxe — Vêtements & Accessoires", lt: "Prabanga — drabužiai ir aksesuarai" },
+    marcas: ["Gucci","Prada","Bottega Veneta","Dior","Saint Laurent","Celine","Givenchy","Valentino","Versace","Balenciaga","Jacquemus","Loewe","Loro Piana","Brunello Cucinelli","Max Mara","Tod's","Ferragamo","Burberry","Mulberry","Ralph Lauren"],
+  },
+  {
+    grupo: { pt: "Premium — Malas & Acessórios", fr: "Premium — Sacs & Accessoires", lt: "Premium — rankinės ir aksesuarai" },
+    marcas: ["Michael Kors","Coach","Kate Spade","Longchamp","Furla","Tory Burch","Liu Jo","Pinko","Self-Portrait"],
+  },
+  {
+    grupo: { pt: "Contemporary / High Street", fr: "Contemporary / High Street", lt: "Contemporary / High Street" },
+    marcas: ["Sandro","Maje","Ba&sh","Claudie Pierlot","Isabel Marant Étoile","IRO","A.P.C.","American Vintage","Rouje","Sessun","Soeur"],
+  },
+  {
+    grupo: { pt: "High Street", fr: "High Street", lt: "High Street" },
+    marcas: ["Zara","Mango","COS","Arket","Massimo Dutti","Hugo Boss","Calvin Klein","Tommy Hilfiger","Lacoste","Levi's","Gant","& Other Stories","Phase Eight","Reiss","Whistles","AllSaints","Pull&Bear","Bershka","Stradivarius"],
+  },
 ];
 
 function fatorMarca(marca = "") {
@@ -205,23 +240,52 @@ const IDADES_DATA = [
   { id: "4mais", fator: 0.52, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",   lt: "Daugiau nei 4 metai" } },
 ];
 
+// ── Tipos de peça por categoria ──────────────────────────────────────────────
 const TIPOS_DATA = [
-  { id: "Vestidos",   rot: 1.8, dias: 3.5, fp: 0.10, label: { pt: "Vestido",    fr: "Robe",      lt: "Suknelė" } },
-  { id: "Fatos",      rot: 1.5, dias: 4.0, fp: 0.09, label: { pt: "Fato",       fr: "Costume",   lt: "Kostiumas" } },
-  { id: "Casacos",    rot: 1.0, dias: 5.0, fp: 0.07, label: { pt: "Casaco",     fr: "Manteau",   lt: "Paltas" } },
-  { id: "Calças",     rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Calças",     fr: "Pantalon",  lt: "Kelnės" } },
-  { id: "Saias",      rot: 1.2, dias: 3.0, fp: 0.08, label: { pt: "Saia",       fr: "Jupe",      lt: "Sijonas" } },
-  { id: "Blusas",     rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Blusa / Top",fr: "Blouse",    lt: "Palaidinė" } },
-  { id: "Malas",      rot: 2.0, dias: 4.0, fp: 0.12, label: { pt: "Mala",       fr: "Sac",       lt: "Rankinė" } },
-  { id: "Acessórios", rot: 1.6, dias: 3.0, fp: 0.10, label: { pt: "Acessório",  fr: "Accessoire",lt: "Aksesuaras" } },
-  { id: "_default",   rot: 1.2, dias: 3.5, fp: 0.08, label: { pt: "Outra peça", fr: "Autre",     lt: "Kita" } },
+  // Vestuário — ocasião
+  { id: "VestidoNoite",  rot: 2.2, dias: 2.0, fp: 0.13, label: { pt: "Vestido de gala / noite", fr: "Robe de soirée",     lt: "Vakarinė suknelė" } },
+  { id: "Vestido",       rot: 1.8, dias: 3.5, fp: 0.10, label: { pt: "Vestido",                  fr: "Robe",               lt: "Suknelė" } },
+  { id: "Fato",          rot: 1.5, dias: 4.0, fp: 0.09, label: { pt: "Fato / conjunto",          fr: "Costume / ensemble", lt: "Kostiumas / komplektas" } },
+  { id: "Jumpsuit",      rot: 1.4, dias: 3.0, fp: 0.09, label: { pt: "Jumpsuit / macacão",       fr: "Combinaison",        lt: "Kombinezonas" } },
+  { id: "Saia",          rot: 1.2, dias: 3.0, fp: 0.08, label: { pt: "Saia",                     fr: "Jupe",               lt: "Sijonas" } },
+  // Vestuário — dia a dia
+  { id: "Calças",        rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Calças",                   fr: "Pantalon",           lt: "Kelnės" } },
+  { id: "Jeans",         rot: 1.0, dias: 3.0, fp: 0.06, label: { pt: "Jeans",                    fr: "Jean",               lt: "Džinsai" } },
+  { id: "Blusa",         rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Blusa / top",              fr: "Blouse / top",       lt: "Palaidinė / topas" } },
+  { id: "Camisa",        rot: 1.0, dias: 3.0, fp: 0.06, label: { pt: "Camisa",                   fr: "Chemise",            lt: "Marškiniai" } },
+  { id: "Camisola",      rot: 1.0, dias: 3.0, fp: 0.06, label: { pt: "Camisola / cardigan",      fr: "Pull / cardigan",    lt: "Megztinis / kardiganas" } },
+  { id: "Bodysuit",      rot: 1.1, dias: 2.5, fp: 0.07, label: { pt: "Bodysuit",                 fr: "Body",               lt: "Bodysuit" } },
+  // Vestuário — exteriores
+  { id: "Casaco",        rot: 1.0, dias: 5.0, fp: 0.07, label: { pt: "Casaco / sobretudo",       fr: "Manteau",            lt: "Paltas" } },
+  { id: "Blazer",        rot: 1.2, dias: 3.5, fp: 0.08, label: { pt: "Blazer",                   fr: "Blazer",             lt: "Bleizeris" } },
+  { id: "Pele",          rot: 0.9, dias: 5.0, fp: 0.10, label: { pt: "Pele / couro",             fr: "Cuir / fourrure",    lt: "Oda / kailis" } },
+  // Acessórios — malas
+  { id: "MalaLuxo",      rot: 2.5, dias: 4.0, fp: 0.15, label: { pt: "Mala de luxo",             fr: "Sac de luxe",        lt: "Prabangus krepšys" } },
+  { id: "MalaOmbro",     rot: 2.0, dias: 4.0, fp: 0.12, label: { pt: "Mala de ombro",            fr: "Sac à main",         lt: "Rankinė" } },
+  { id: "Clutch",        rot: 1.8, dias: 2.0, fp: 0.11, label: { pt: "Clutch / carteira",        fr: "Pochette",           lt: "Vokelė" } },
+  { id: "Mochila",       rot: 1.3, dias: 3.5, fp: 0.09, label: { pt: "Mochila",                  fr: "Sac à dos",          lt: "Kuprinė" } },
+  // Acessórios — outros
+  { id: "Cinto",         rot: 1.5, dias: 3.0, fp: 0.09, label: { pt: "Cinto",                    fr: "Ceinture",           lt: "Diržas" } },
+  { id: "Lenco",         rot: 1.6, dias: 2.5, fp: 0.10, label: { pt: "Lenço / foulard",          fr: "Foulard",            lt: "Skara / šalikas" } },
+  { id: "OculosSol",     rot: 1.4, dias: 3.0, fp: 0.09, label: { pt: "Óculos de sol",            fr: "Lunettes de soleil", lt: "Saulės akiniai" } },
+  { id: "Chapeu",        rot: 1.2, dias: 3.0, fp: 0.08, label: { pt: "Chapéu",                   fr: "Chapeau",            lt: "Skrybėlė" } },
+  // Calçado
+  { id: "Sapatos",       rot: 1.3, dias: 3.0, fp: 0.08, label: { pt: "Sapatos",                  fr: "Chaussures",         lt: "Batai" } },
+  { id: "Sapatilhas",    rot: 1.1, dias: 3.0, fp: 0.07, label: { pt: "Sapatilhas / sneakers",    fr: "Baskets",            lt: "Sportiniai batai" } },
+  { id: "Botas",         rot: 1.2, dias: 4.0, fp: 0.08, label: { pt: "Botas",                    fr: "Bottes",             lt: "Auliniai batai" } },
+  { id: "Sandalias",     rot: 1.3, dias: 2.5, fp: 0.08, label: { pt: "Sandálias",                fr: "Sandales",           lt: "Sandalai" } },
+  // Relógios & joalharia
+  { id: "Relogio",       rot: 1.8, dias: 5.0, fp: 0.12, label: { pt: "Relógio",                  fr: "Montre",             lt: "Laikrodis" } },
+  { id: "Joia",          rot: 1.5, dias: 3.0, fp: 0.10, label: { pt: "Joia / bijutaria",         fr: "Bijou",              lt: "Papuošalas" } },
+  // Fallback
+  { id: "_default",      rot: 1.2, dias: 3.5, fp: 0.08, label: { pt: "Outra peça",               fr: "Autre",              lt: "Kita" } },
 ];
 
 export default function Calculadora() {
   const [lang, setLang] = useState("pt");
   const [preco, setPreco] = useState("");
   const [marca, setMarca] = useState("");
-  const [tipo, setTipo] = useState("_default");
+  const [tipo, setTipo] = useState("Vestido");
   const [estado, setEstado] = useState("bom");
   const [uso, setUso] = useState("pouco");
   const [idade, setIdade] = useState("1a2");
@@ -696,24 +760,54 @@ export default function Calculadora() {
           <p className="preco-hint">{t.precoHint}</p>
         </div>
 
-        {/* MARCA */}
+        {/* MARCA — combobox por categoria + texto livre */}
         <div className="card">
           <div className="card-label">{t.marcaLabel}</div>
-          <datalist id="marcas-list">
-            {SUGESTOES_MARCA.map(s => <option key={s} value={s} />)}
-          </datalist>
-          <input
-            className="preco-input"
-            style={{paddingLeft:"0.85rem"}}
-            type="text"
-            list="marcas-list"
-            placeholder={t.marcaPlaceholder}
-            value={marca}
-            onChange={e => setMarca(e.target.value)}
-            autoComplete="off"
-          />
+          <select
+            style={{
+              width:"100%",padding:"0.6rem 0.85rem",
+              border:"1px solid var(--border)",borderRadius:"8px",
+              background:"var(--bg)",color:"var(--fg)",
+              fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
+              outline:"none",appearance:"none",
+              backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
+              backgroundRepeat:"no-repeat",backgroundPosition:"right 0.85rem center",
+              paddingRight:"2.5rem",cursor:"pointer",marginBottom:"0.5rem",
+            }}
+            value={marca === "_outro" ? "_outro" : (GRUPOS_MARCA.flatMap(g=>g.marcas).find(m=>m.toLowerCase()===marca.toLowerCase()) ? marca : (marca ? "_outro" : ""))}
+            onChange={e => {
+              if (e.target.value === "_outro") { setMarca("_outro"); }
+              else if (e.target.value === "") { setMarca(""); }
+              else { setMarca(e.target.value); }
+            }}
+          >
+            <option value="">{lang==="fr"?"— Choisir une marque —":lang==="lt"?"— Pasirinkti prekės ženklą —":"— Escolher uma marca —"}</option>
+            {GRUPOS_MARCA.map(g => (
+              <optgroup key={g.grupo.pt} label={g.grupo[lang] || g.grupo.pt}>
+                {g.marcas.map(m => <option key={m} value={m}>{m}</option>)}
+              </optgroup>
+            ))}
+            <option value="_outro">{lang==="fr"?"Outra marca (escrever)":lang==="lt"?"Kitas prekės ženklas (įvesti)":"Outra marca (escrever)"}</option>
+          </select>
+          {/* Input de texto livre quando selecciona "Outra marca" ou digitou manualmente */}
+          {(marca === "_outro" || (marca && !GRUPOS_MARCA.flatMap(g=>g.marcas).some(m=>m.toLowerCase()===marca.toLowerCase()) && marca !== "")) && (
+            <input
+              style={{
+                width:"100%",padding:"0.6rem 0.85rem",
+                border:"1px solid var(--border)",borderRadius:"8px",
+                background:"var(--bg)",color:"var(--fg)",
+                fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
+                outline:"none",marginBottom:"0.5rem",
+              }}
+              type="text"
+              placeholder={t.marcaPlaceholder}
+              value={marca === "_outro" ? "" : marca}
+              onChange={e => setMarca(e.target.value)}
+              autoFocus
+            />
+          )}
           {tier && tier !== "massmarket" && (
-            <div style={{marginTop:"0.6rem",display:"flex",alignItems:"center",gap:"0.4rem"}}>
+            <div style={{marginTop:"0.4rem",display:"flex",alignItems:"center",gap:"0.4rem"}}>
               <span style={{
                 fontSize:"0.62rem",letterSpacing:"0.14em",textTransform:"uppercase",
                 padding:"0.2rem 0.55rem",borderRadius:"3px",fontWeight:500,
@@ -728,14 +822,67 @@ export default function Calculadora() {
           )}
         </div>
 
-        {/* TIPO DE PEÇA */}
+        {/* TIPO DE PEÇA — select por categoria */}
         <div className="card">
           <div className="card-label">{t.tipoLabel}</div>
-          <div className="pills">
-            {TIPOS.map(tp => (
-              <button key={tp.id} className={`pill${tipo === tp.id ? " sel" : ""}`} onClick={() => setTipo(tp.id)}>{tp.label}</button>
-            ))}
-          </div>
+          <select
+            style={{
+              width:"100%",padding:"0.6rem 0.85rem",
+              border:"1px solid var(--border)",borderRadius:"8px",
+              background:"var(--bg)",color:"var(--fg)",
+              fontFamily:"'Jost',sans-serif",fontSize:"0.88rem",
+              outline:"none",appearance:"none",
+              backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
+              backgroundRepeat:"no-repeat",backgroundPosition:"right 0.85rem center",
+              paddingRight:"2.5rem",cursor:"pointer",
+            }}
+            value={tipo}
+            onChange={e => setTipo(e.target.value)}
+          >
+            <optgroup label={lang==="fr"?"Vêtements — Occasion":lang==="lt"?"Drabužiai — Proga":"Vestuário — Ocasião"}>
+              <option value="VestidoNoite">{TIPOS_DATA.find(t=>t.id==="VestidoNoite")?.label[lang]}</option>
+              <option value="Vestido">{TIPOS_DATA.find(t=>t.id==="Vestido")?.label[lang]}</option>
+              <option value="Fato">{TIPOS_DATA.find(t=>t.id==="Fato")?.label[lang]}</option>
+              <option value="Jumpsuit">{TIPOS_DATA.find(t=>t.id==="Jumpsuit")?.label[lang]}</option>
+              <option value="Saia">{TIPOS_DATA.find(t=>t.id==="Saia")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Vêtements — Quotidien":lang==="lt"?"Drabužiai — Kasdien":"Vestuário — Dia a dia"}>
+              <option value="Calças">{TIPOS_DATA.find(t=>t.id==="Calças")?.label[lang]}</option>
+              <option value="Jeans">{TIPOS_DATA.find(t=>t.id==="Jeans")?.label[lang]}</option>
+              <option value="Blusa">{TIPOS_DATA.find(t=>t.id==="Blusa")?.label[lang]}</option>
+              <option value="Camisa">{TIPOS_DATA.find(t=>t.id==="Camisa")?.label[lang]}</option>
+              <option value="Camisola">{TIPOS_DATA.find(t=>t.id==="Camisola")?.label[lang]}</option>
+              <option value="Bodysuit">{TIPOS_DATA.find(t=>t.id==="Bodysuit")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Vêtements — Extérieur":lang==="lt"?"Drabužiai — Viršutiniai":"Vestuário — Exteriores"}>
+              <option value="Casaco">{TIPOS_DATA.find(t=>t.id==="Casaco")?.label[lang]}</option>
+              <option value="Blazer">{TIPOS_DATA.find(t=>t.id==="Blazer")?.label[lang]}</option>
+              <option value="Pele">{TIPOS_DATA.find(t=>t.id==="Pele")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Sacs":lang==="lt"?"Krepšiai":"Malas"}>
+              <option value="MalaLuxo">{TIPOS_DATA.find(t=>t.id==="MalaLuxo")?.label[lang]}</option>
+              <option value="MalaOmbro">{TIPOS_DATA.find(t=>t.id==="MalaOmbro")?.label[lang]}</option>
+              <option value="Clutch">{TIPOS_DATA.find(t=>t.id==="Clutch")?.label[lang]}</option>
+              <option value="Mochila">{TIPOS_DATA.find(t=>t.id==="Mochila")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Accessoires":lang==="lt"?"Aksesuarai":"Acessórios"}>
+              <option value="Cinto">{TIPOS_DATA.find(t=>t.id==="Cinto")?.label[lang]}</option>
+              <option value="Lenco">{TIPOS_DATA.find(t=>t.id==="Lenco")?.label[lang]}</option>
+              <option value="OculosSol">{TIPOS_DATA.find(t=>t.id==="OculosSol")?.label[lang]}</option>
+              <option value="Chapeu">{TIPOS_DATA.find(t=>t.id==="Chapeu")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Chaussures":lang==="lt"?"Avalynė":"Calçado"}>
+              <option value="Sapatos">{TIPOS_DATA.find(t=>t.id==="Sapatos")?.label[lang]}</option>
+              <option value="Sapatilhas">{TIPOS_DATA.find(t=>t.id==="Sapatilhas")?.label[lang]}</option>
+              <option value="Botas">{TIPOS_DATA.find(t=>t.id==="Botas")?.label[lang]}</option>
+              <option value="Sandalias">{TIPOS_DATA.find(t=>t.id==="Sandalias")?.label[lang]}</option>
+            </optgroup>
+            <optgroup label={lang==="fr"?"Montres & Bijoux":lang==="lt"?"Laikrodžiai ir papuošalai":"Relógios & Joalharia"}>
+              <option value="Relogio">{TIPOS_DATA.find(t=>t.id==="Relogio")?.label[lang]}</option>
+              <option value="Joia">{TIPOS_DATA.find(t=>t.id==="Joia")?.label[lang]}</option>
+            </optgroup>
+            <option value="_default">{TIPOS_DATA.find(t=>t.id==="_default")?.label[lang]}</option>
+          </select>
         </div>
 
         <div className="card">
