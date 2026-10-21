@@ -1128,6 +1128,7 @@ export default function Perfil() {
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
   const [editarPeca, setEditarPeca] = useState(null);
   const [editarLoading, setEditarLoading] = useState(false);
+  const [fotosEditar, setFotosEditar] = useState([]); // fotos a manter na edição
   const [modalEnvio, setModalEnvio] = useState(null); // aluguer a marcar como enviado
   const [trackingInfo, setTrackingInfo] = useState({ transportadora: "", numero: "" });
   const [modalVerificar, setModalVerificar] = useState(null); // aluguer a verificar devolução
@@ -1727,6 +1728,7 @@ export default function Perfil() {
       higienizacao_valor: editarPeca.higienizacao_ativa ? (parseFloat(editarPeca.higienizacao_valor) || null) : null,
       ocasioes: editarPeca.ocasioes || [],
       link_compra_externa: editarPeca.link_compra_externa || null,
+      fotos: fotosEditar.length > 0 ? fotosEditar : null,
     }).eq("id", editarPeca.id);
     // reload peças
     const { data: { session } } = await supabase.auth.getSession();
@@ -1735,6 +1737,7 @@ export default function Perfil() {
       if (ps) setPecasLoja(ps);
     }
     setEditarPeca(null);
+    setFotosEditar([]);
     setEditarLoading(false);
   };
 
@@ -3099,7 +3102,7 @@ export default function Perfil() {
                                   )}
                                 </div>
                                 <div style={{display:"flex",flexDirection:"column",gap:"0.3rem",flexShrink:0}}>
-                                  <button onClick={()=>{setEditarPeca({...p});}}
+                                  <button onClick={()=>{setEditarPeca({...p});setFotosEditar(p.fotos||[]);}}
                                     style={{fontSize:"0.6rem",letterSpacing:"0.1em",textTransform:"uppercase",padding:"0.3rem 0.55rem",background:"#f39c12",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600,whiteSpace:"nowrap"}}>
                                     {({pt:"Editar preço",fr:"Modifier prix",lt:"Keisti kainą"})[lang]||"Editar preço"}
                                   </button>
@@ -3159,7 +3162,7 @@ export default function Perfil() {
                           style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid #89c4e1",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"#4a9ec4",whiteSpace:"nowrap",fontWeight:600}}>
                           📊 {({pt:"Simular",fr:"Simuler",lt:"Simuliuoti"})[lang]||"Simular"}
                         </button>
-                        <button onClick={()=>setEditarPeca({...p})} style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
+                        <button onClick={()=>{setEditarPeca({...p});setFotosEditar(p.fotos||[]);}} style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.35rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g4)",whiteSpace:"nowrap"}}>Editar</button>
                       </div>
                     </div>
                     {/* Painel de links da peça */}
@@ -3257,7 +3260,7 @@ export default function Perfil() {
                               <div style={{fontSize:"0.62rem",color:"#7ab5ce",marginTop:"0.5rem",lineHeight:1.45}}>
                                 {({pt:"Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas.",fr:"Valeurs nettes après commission Nora Grei (10%). Estimations basées sur la rotation moyenne de la catégorie — non garanties.",lt:"Grynosios vertės po Nora Grei komisinio mokesčio (10%). Įvertinimai pagrįsti vidutine kategorijos rotacija — negarantuojama."})[lang]||"Valores líquidos após comissão Nora Grei (10%). Estimativas baseadas em rotação média da categoria — não garantidas."}
                               </div>
-                              <button onClick={()=>setEditarPeca({...p})}
+                              <button onClick={()=>{setEditarPeca({...p});setFotosEditar(p.fotos||[]);}}
                                 style={{marginTop:"0.75rem",fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.4rem 0.85rem",background:"#4a9ec4",color:"#fff",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontWeight:600}}>
                                 {({pt:"Editar preço desta peça →",fr:"Modifier le prix de cette pièce →",lt:"Keisti šio daikto kainą →"})[lang]||"Editar preço desta peça →"}
                               </button>
@@ -4124,9 +4127,57 @@ export default function Perfil() {
               }
             </div>
 
+            {/* Fotos — remover existentes / adicionar novas */}
+            <div style={{marginBottom:"1.25rem"}}>
+              <label className="lbl" style={{display:"block",marginBottom:"0.5rem"}}>Fotos</label>
+              {fotosEditar.length > 0 && (
+                <div style={{display:"flex",flexWrap:"wrap",gap:"0.5rem",marginBottom:"0.6rem"}}>
+                  {fotosEditar.map((url, i) => (
+                    <div key={i} style={{position:"relative",width:72,height:72,flexShrink:0}}>
+                      <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:3}} />
+                      <button
+                        type="button"
+                        onClick={()=>setFotosEditar(f=>f.filter((_,j)=>j!==i))}
+                        style={{position:"absolute",top:-5,right:-5,width:18,height:18,borderRadius:"50%",background:"#e74c3c",color:"#fff",border:"none",cursor:"pointer",fontSize:"0.6rem",lineHeight:"18px",textAlign:"center",fontFamily:"var(--sans)",fontWeight:700,padding:0}}
+                        title="Remover foto"
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label style={{display:"inline-flex",alignItems:"center",gap:"0.4rem",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",color:"var(--g4)",border:"1.5px dashed var(--g2)",padding:"0.4rem 0.75rem",borderRadius:3}}>
+                <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{
+                  const files = Array.from(e.target.files);
+                  if (!files.length) return;
+                  const urls = await Promise.all(files.map(f => new Promise(res=>{
+                    const reader = new FileReader();
+                    reader.onload = ev => res(ev.target.result);
+                    reader.readAsDataURL(f);
+                  })));
+                  // upload imediato para Supabase
+                  const { data: { session } } = await supabase.auth.getSession();
+                  if (!session) return;
+                  const uploadedUrls = await Promise.all(files.map(async (f, i) => {
+                    const ext = f.name.split(".").pop() || "jpg";
+                    const path = `${session.user.id}/${editarPeca.id}/${Date.now()}-${i}.${ext}`;
+                    let bucket = "pecas_lojista";
+                    let res = await supabase.storage.from(bucket).upload(path, f, { upsert: true });
+                    if (res.error) { bucket = "pecas"; res = await supabase.storage.from(bucket).upload(path, f, { upsert: true }); }
+                    if (res.error) return null;
+                    const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path);
+                    return pub?.publicUrl || null;
+                  }));
+                  setFotosEditar(f => [...f, ...uploadedUrls.filter(Boolean)]);
+                  e.target.value = "";
+                }} />
+                📷 Adicionar fotos
+              </label>
+              {fotosEditar.length === 0 && <span style={{fontSize:"0.72rem",color:"#e74c3c",marginLeft:"0.5rem"}}>Sem fotos — a peça não aparece na loja</span>}
+            </div>
+
             <div style={{display:"flex",gap:"0.75rem",marginTop:"1.25rem"}}>
               <button onClick={guardarEdicaoPeca} disabled={!editarPeca.nome||editarLoading} style={{flex:1,padding:"0.85rem",background:"var(--black)",color:"#fff",border:"none",fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)",opacity:!editarPeca.nome?0.5:1}}>{editarLoading?"...":"Guardar"}</button>
-              <button onClick={()=>setEditarPeca(null)} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
+              <button onClick={()=>{setEditarPeca(null);setFotosEditar([]);}} style={{padding:"0.85rem 1.25rem",background:"none",border:"1.5px solid var(--g2)",fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--sans)"}}>Cancelar</button>
             </div>
           </div>
         </div>
