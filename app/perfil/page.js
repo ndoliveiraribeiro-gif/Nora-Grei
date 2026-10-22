@@ -1728,7 +1728,7 @@ export default function Perfil() {
     if (!formLojista.tipo_entidade) { setFormLojistaMsg("Indica se és pessoa singular ou empresa."); return; }
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
     if (formLojista.tipo_entidade === "empresa" && !formLojista.nome_empresa.trim()) { setFormLojistaMsg("Indica o nome da empresa."); return; }
-    if (!formLojista.nif.trim()) { setFormLojistaMsg("Indica o teu NIF (obrigatório por lei)."); return; }
+    if (!formLojista.nif.trim()) { setFormLojistaMsg(formLojista.tipo_entidade === "empresa" ? "Indica o NIF da empresa para faturação." : "Indica o teu NIF (obrigatório por lei)."); return; }
     if (!formLojista.telefone_loja.trim()) { setFormLojistaMsg("Indica um número de telefone de contacto."); return; }
     if (!formLojista.morada.trim()) { setFormLojistaMsg("Indica a tua morada para levantamento das peças."); return; }
     if (!formLojista.iban.trim()) { setFormLojistaMsg("Indica o teu IBAN ou NIB para receberes pagamentos."); return; }
@@ -3186,8 +3186,8 @@ export default function Perfil() {
                   <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>2 · Identificação e contacto</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.75rem",marginBottom:"0.75rem"}}>
                     <div>
-                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>NIF *</label>
-                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nif} onChange={e => setFormLojista(f => ({...f, nif: e.target.value}))} placeholder="123 456 789" inputMode="numeric" maxLength={11} />
+                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>{formLojista.tipo_entidade === "empresa" ? "NIF Empresa *" : "NIF *"}</label>
+                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nif} onChange={e => setFormLojista(f => ({...f, nif: e.target.value}))} placeholder={formLojista.tipo_entidade === "empresa" ? "500 123 456" : "123 456 789"} inputMode="numeric" maxLength={11} />
                     </div>
                     <div>
                       <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Telefone *</label>
