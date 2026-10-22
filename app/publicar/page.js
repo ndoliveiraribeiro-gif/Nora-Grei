@@ -464,13 +464,21 @@ const MARCAS_PREMIUM = [
   "dior","christian dior","saint laurent","ysl","celine","céline","givenchy",
   "valentino","versace","balenciaga","jacquemus","loewe","loro piana","brunello cucinelli",
   "max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren",
+  // relógios & jóias
+  "rolex","patek philippe","audemars piguet","richard mille","ap","cartier","bulgari","bvlgari",
+  "tiffany","tiffany & co","van cleef","van cleef & arpels","chopard","piaget","iwc",
+  "jaeger-lecoultre","jaeger lecoultre","jlc","omega","tag heuer","breitling","longines",
+  "swarovski","pandora","dior joaillerie","chanel joaillerie",
 ];
 const MARCAS_ALTA = [
   "zara","mango","&other stories","other stories","cos","arket","massimo dutti",
   "pedro del hierro","escorpion","escorpión","hugo boss","boss","calvin klein","ck",
   "tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda",
   "weekday","monki","stradivarius","bershka","pull&bear","sfera","phase eight",
-  "whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje","ba&sh",
+  "whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje",
+  // relógios & jóias acessíveis
+  "fossil","michael kors","marc jacobs","kate spade","coach","dkny","tommy hilfiger watches",
+  "cluse","daniel wellington","mvmt","aldo","mango accessories",
 ];
 
 function fatorMarca(marca = "") {
@@ -496,6 +504,11 @@ const ROTACAO_CAT = {
   Kaftans:    { rot: 0.9, dias: 5.0, fp: 0.08 },
   Malas:      { rot: 2.0, dias: 4.0, fp: 0.12 },
   Acessórios: { rot: 1.6, dias: 3.0, fp: 0.10 },
+  Relógios:   { rot: 1.4, dias: 4.0, fp: 0.14 },
+  Anéis:      { rot: 1.3, dias: 3.0, fp: 0.09 },
+  Colares:    { rot: 1.3, dias: 3.0, fp: 0.09 },
+  Pulseiras:  { rot: 1.2, dias: 3.0, fp: 0.09 },
+  Óculos:     { rot: 1.5, dias: 3.0, fp: 0.11 },
   _default:   { rot: 1.2, dias: 3.5, fp: 0.08 },
 };
 
@@ -711,7 +724,7 @@ export default function PublicarPage() {
         preco_venda: peca.preco_venda ? parseFloat(peca.preco_venda) : null,
         valor_peca: peca.valor_peca ? parseFloat(peca.valor_peca) : null,
         idade_peca: peca.idade_peca || "1a2",
-        caucao: (() => { const e = calcEstimativa(peca); return e ? e.caucao : null; })(),
+        // caucao: campo não existe na tabela — calculado no frontend apenas
         material: peca.material.trim() || null,
         marca: peca.marca.trim() || null,
         cor: peca.cor.trim() || null,
