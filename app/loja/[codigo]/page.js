@@ -22,11 +22,12 @@ async function withRetry(fn, tentativas = 3, espera = 600) {
 
 async function getLoja(codigo) {
   return withRetry(async () => {
-    const { data } = await sbServer()
+    const { data, error } = await sbServer()
       .from("clientes")
       .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
       .eq("codigo_cliente", codigo)
       .maybeSingle();
+    console.log("[getLoja] codigo:", codigo, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
     return data || null;
   });
 }
