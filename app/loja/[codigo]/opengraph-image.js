@@ -15,7 +15,7 @@ export default async function OgLoja({ params }) {
 
   const { data: lojista } = await supabase
     .from("clientes")
-    .select("nome, foto_perfil")
+    .select("nome, avatar_url")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
 

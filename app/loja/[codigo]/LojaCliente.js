@@ -211,8 +211,8 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         <div className="loja-header-deco">NG</div>
         <div className="loja-header-inner">
           <div className="loja-avatar-lg">
-            {loja.foto_perfil
-              ? <img src={loja.foto_perfil} alt={loja.nome} />
+            {loja.avatar_url
+              ? <img src={loja.avatar_url} alt={loja.nome} />
               : <div className="loja-avatar-lg-initials">{initials}</div>
             }
           </div>

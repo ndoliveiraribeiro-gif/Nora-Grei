@@ -1595,9 +1595,11 @@ export default function Perfil() {
         alert((t[lang] || t.pt).erroFoto);
       } else {
         const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-        const url = data.publicUrl + "?t=" + Date.now(); // cache-bust
-        setPerfil(prev => ({ ...prev, avatar_url: url }));
-        await supabase.from("clientes").update({ avatar_url: url }).eq("id", user.id);
+        const urlBase = data.publicUrl;
+        const urlLocal = urlBase + "?t=" + Date.now(); // cache-bust só para o estado local
+        setPerfil(prev => ({ ...prev, avatar_url: urlLocal }));
+        // Guardar na BD sem o timestamp — assim persiste entre sessões
+        await supabase.from("clientes").update({ avatar_url: urlBase }).eq("id", user.id);
       }
     } catch(err) {
       console.error("Erro inesperado avatar:", err);

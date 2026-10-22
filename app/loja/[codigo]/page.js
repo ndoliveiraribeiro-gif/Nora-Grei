@@ -8,7 +8,7 @@ async function getLoja(codigo) {
   );
   const { data, error } = await supabaseServer
     .from("clientes")
-    .select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
+    .select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
   return data || null;
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }) {
     ? loja.descricao.slice(0, 155)
     : `Descobre as peças de ${loja.nome} na plataforma Nora Grei — alugar ou comprar moda exclusiva.`;
   const url = `https://noragrei.com/loja/${loja.codigo_cliente}`;
-  const imagem = loja.foto_perfil || "https://noragrei.com/og-default.jpg";
+  const imagem = loja.avatar_url || "https://noragrei.com/og-default.jpg";
 
   return {
     title: titulo,

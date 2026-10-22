@@ -509,7 +509,7 @@ export default function Home() {
 
     const { data: todasPecas } = await supabase.from("pecas").select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)").not("fotos", "is", null).neq("fotos", "{}");
 
-    const { data: lojasData } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais, foto_perfil, descricao").eq("modo_lojista", true).limit(6);
+    const { data: lojasData } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao").eq("modo_lojista", true).limit(6);
     if (lojasData) setLojas(lojasData);
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
@@ -1275,8 +1275,8 @@ export default function Home() {
               return (
                 <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
                   <div className="loja-avatar">
-                    {loja.foto_perfil
-                      ? <img src={loja.foto_perfil} alt={loja.nome} />
+                    {loja.avatar_url
+                      ? <img src={loja.avatar_url} alt={loja.nome} />
                       : <div className="loja-avatar-initials">{initials}</div>
                     }
                   </div>
