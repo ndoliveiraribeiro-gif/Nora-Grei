@@ -3370,11 +3370,7 @@ export default function Perfil() {
         )}
 
         {/* TAB CALCULADORA — disponível para todos os utilizadores */}
-        {tabAtiva === "calculadora" && (
-          <div style={{padding:"1rem 0 3rem"}}>
-            <MiniCalculadora lang={lang} i={i} />
-          </div>
-        )}
+        {tabAtiva === "calculadora" && (() => { window.location.href = "/calculadora"; return null; })()}
 
         {modoLojista && tabAtiva === "loja" && (
           <div style={{padding:"0.5rem 0 2rem"}}>
