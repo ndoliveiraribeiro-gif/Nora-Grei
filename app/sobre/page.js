@@ -11,7 +11,7 @@ const TXT = {
   pt: {
     hero_eyebrow: "O que é a Nora Grei?",
     hero_title: "Moda de luxo que circula,\nem vez de ficar parada.",
-    hero_desc: "A Nora Grei é uma plataforma de aluguer e venda de peças de moda de luxo usadas — francesa, lituana e portuguesa. Podes alugar peças únicas para qualquer ocasião, vender as tuas, ou abrir a tua própria loja dentro da plataforma.",
+    hero_desc: "A Nora Grei é moda para todos — do luxo ao acessível, da marca premium à peça que já tens no armário. Aluga, vende, dá ou abre a tua loja. A plataforma adapta-se ao teu estilo e ao que estás disposto a investir.",
     cta_conta: "Criar conta gratuita",
     cta_loja: "Quero abrir uma loja",
     cta_catalogo: "Ver catálogo",
@@ -70,7 +70,7 @@ const TXT = {
   fr: {
     hero_eyebrow: "Qu'est-ce que Nora Grei ?",
     hero_title: "La mode de luxe qui circule,\nau lieu de rester au placard.",
-    hero_desc: "Nora Grei est une plateforme de location et vente de pièces de mode de luxe d'occasion — française, lituanienne et portugaise. Louez des pièces uniques, vendez les vôtres ou ouvrez votre propre boutique.",
+    hero_desc: "Nora Grei, c'est la mode pour tous — du luxe à l'accessible, de la marque premium à la pièce déjà dans votre garde-robe. Louez, vendez, donnez ou ouvrez votre boutique. La plateforme s'adapte à votre style et à ce que vous souhaitez investir.",
     cta_conta: "Créer un compte gratuit",
     cta_loja: "Je veux ouvrir une boutique",
     cta_catalogo: "Voir le catalogue",
@@ -118,7 +118,7 @@ const TXT = {
   lt: {
     hero_eyebrow: "Kas yra Nora Grei?",
     hero_title: "Prabangos mada, kuri cirkuliuoja,\no ne stovi spintoje.",
-    hero_desc: "Nora Grei — tai nuomos ir pardavimo platforma, skirta naudotiems prabangos drabužiams. Nuomokite unikalius daiktus, parduokite savus arba atidarykite savo parduotuvę.",
+    hero_desc: "Nora Grei — mada visiems: nuo prabangos iki prieinamos, nuo premium prekės ženklo iki drabužio, kuris jau kabo jūsų spintoje. Nuomokite, parduokite, dovanokite arba atidarykite savo parduotuvę. Platforma prisitaiko prie jūsų stiliaus ir to, ką esate pasiryžę investuoti.",
     cta_conta: "Sukurti nemokamą paskyrą",
     cta_loja: "Noriu atidaryti parduotuvę",
     cta_catalogo: "Žiūrėti katalogą",
