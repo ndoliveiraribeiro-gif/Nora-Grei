@@ -48,7 +48,7 @@ export default function FeedPage() {
     try {
       let query = supabase
         .from("feed_posts")
-        .select("*, clientes(nome, avatar_url, id), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
+        .select("*, clientes(nome, foto_perfil, id), pecas(id, nome, preco_aluguer_dia, fotos, categorias(nome))")
         .eq("estado", "publicado")
         .order("boosted", { ascending: false })
         .order("publicado_em", { ascending: false })
@@ -228,8 +228,8 @@ function PostCard({ post, t, lang, liked, onLike }) {
   return (
     <div className={`post-card${post.boosted ? " boosted" : ""}`}>
       <div className="post-header">
-        {post.clientes?.avatar_url
-          ? <img src={post.clientes.avatar_url} className="post-avatar" alt="" />
+        {post.clientes?.foto_perfil
+          ? <img src={post.clientes.foto_perfil} className="post-avatar" alt="" />
           : <div className="post-avatar">{iniciais}</div>
         }
         <div className="post-meta">

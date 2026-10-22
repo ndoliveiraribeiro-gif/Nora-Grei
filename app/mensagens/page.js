@@ -201,7 +201,7 @@ function MensagensInner() {
       .from("avaliacoes_lojista")
       .select(`
         id, nota_cliente_lojista, nota_plataforma, comentario_cliente, created_at, tipo_transacao,
-        cliente:cliente_id(nome, avatar_url),
+        cliente:cliente_id(nome, foto_perfil),
         peca:peca_id(nome, fotos)
       `)
       .eq("lojista_id", cliAtivo.id)

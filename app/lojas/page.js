@@ -50,7 +50,7 @@ export default function Lojas() {
   const carregar = async () => {
     const { data } = await supabase
       .from("clientes")
-      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao")
       .eq("modo_lojista", true)
       .order("nome");
     setLojas(data || []);
@@ -133,8 +133,8 @@ export default function Lojas() {
             return (
               <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
                 <div className="loja-avatar">
-                  {loja.avatar_url
-                    ? <img src={loja.avatar_url} alt={nomeVis} />
+                  {loja.foto_perfil
+                    ? <img src={loja.foto_perfil} alt={nomeVis} />
                     : <div className="loja-initials">{initials}</div>
                   }
                 </div>

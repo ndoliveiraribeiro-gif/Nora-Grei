@@ -1206,7 +1206,7 @@ function MiniCalculadora({ lang, i }) {
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
-  const [perfil, setPerfil] = useState({ nome: "", nome_publico: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
+  const [perfil, setPerfil] = useState({ nome: "", nome_publico: "", telefone: "", morada: "", numero_porta: "", andar: "", foto_perfil: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
   const [reembolsosPendentes, setReembolsosPendentes] = useState([]);
@@ -1324,7 +1324,7 @@ export default function Perfil() {
 
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
-      setPerfil({ nome: c.nome||"", nome_publico: c.nome_publico||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: c.avatar_url||user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
+      setPerfil({ nome: c.nome||"", nome_publico: c.nome_publico||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", foto_perfil: c.foto_perfil||user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
       if (c.modo_lojista) {
         setModoLojista(true);
         setLojaEstado(c.lojista_estado||"teste");
@@ -1342,7 +1342,7 @@ export default function Perfil() {
           if (als) {
             setAlugueresLoja(als);
             // carregar avaliações para cálculo da nota média no dashboard
-            const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma, comentario_cliente, created_at, clientes(nome, avatar_url)").eq("lojista_id", user.id).order("created_at", { ascending: false });
+            const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma, comentario_cliente, created_at, clientes(nome, foto_perfil)").eq("lojista_id", user.id).order("created_at", { ascending: false });
             if (avs) setAvaliacoesLoja(avs);
             // Carregar tabela de higienização do lojista
             const { data: hig } = await supabase.from("higienizacao_lojista").select("categoria, valor").eq("lojista_id", user.id);
@@ -1576,9 +1576,9 @@ export default function Perfil() {
   const guardarPerfil = async () => {
     if (!user) return;
     const perfilCompleto = CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
-    // avatar_url: remover o ?t= antes de gravar para não ficar URL suja na BD
-    const avatarParaGuardar = perfil.avatar_url ? perfil.avatar_url.split("?t=")[0] : null;
-    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, nome_publico: perfil.nome_publico||null, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, avatar_url: avatarParaGuardar });
+    // foto_perfil: remover o ?t= antes de gravar para não ficar URL suja na BD
+    const avatarParaGuardar = perfil.foto_perfil ? perfil.foto_perfil.split("?t=")[0] : null;
+    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, nome_publico: perfil.nome_publico||null, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, foto_perfil: avatarParaGuardar });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 3000);
   };
@@ -1599,9 +1599,9 @@ export default function Perfil() {
         const { data } = supabase.storage.from("avatars").getPublicUrl(path);
         const urlBase = data.publicUrl;
         const urlLocal = urlBase + "?t=" + Date.now(); // cache-bust só para o estado local
-        setPerfil(prev => ({ ...prev, avatar_url: urlLocal }));
+        setPerfil(prev => ({ ...prev, foto_perfil: urlLocal }));
         // Guardar na BD sem o timestamp — assim persiste entre sessões
-        await supabase.from("clientes").update({ avatar_url: urlBase }).eq("id", user.id);
+        await supabase.from("clientes").update({ foto_perfil: urlBase }).eq("id", user.id);
       }
     } catch(err) {
       console.error("Erro inesperado avatar:", err);
@@ -2408,7 +2408,7 @@ export default function Perfil() {
 
         <div className="hero">
           <div className="avatar-wrap">
-            {perfil.avatar_url ? <img src={perfil.avatar_url} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
+            {perfil.foto_perfil ? <img src={perfil.foto_perfil} alt="Avatar" className="avatar" /> : <div className="avatar-ph">{perfil.nome?.[0]?.toUpperCase()||"?"}</div>}
             <button className="avatar-btn" onClick={() => fileRef.current?.click()}>{uploadingFoto?"...":"+"}</button>
             <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={uploadFoto} />
           </div>
@@ -2940,7 +2940,7 @@ export default function Perfil() {
               const pendentesAcao = alugueresLoja.filter(a=>["pendente","em_devolucao"].includes(a.estado));
 
               // ── CHECKLIST DE ONBOARDING ──────────────────────────────
-              const temFoto = !!(perfil?.avatar_url);
+              const temFoto = !!(perfil?.foto_perfil);
               const temPecas = pecasLoja.length > 0;
               const temPecaLink = pecasLoja.some(p => p.link_compra_externa);
               const temAluguerConcluido = alugueresLoja.some(a => ["devolvido","devolvido_danificado"].includes(a.estado));
