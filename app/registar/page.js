@@ -196,17 +196,6 @@ function RegistarInner() {
   const [loading, setLoading] = useState(false);
   const [verPass, setVerPass] = useState(false);
   const [verConfirmar, setVerConfirmar] = useState(false);
-  // Passo 2 — dados de lojista
-  const [userId, setUserId] = useState(null);
-  const [nomeLoja, setNomeLoja] = useState("");
-  const [morada, setMorada] = useState("");
-  const [numeroPorta, setNumeroPorta] = useState("");
-  const [codigoPostal, setCodigoPostal] = useState("");
-  const [cidadeLoja, setCidadeLoja] = useState(cidade);
-  const [nif, setNif] = useState("");
-  const [iban, setIban] = useState("");
-  const [loadingOnboarding, setLoadingOnboarding] = useState(false);
-  const [erroOnboarding, setErroOnboarding] = useState("");
   const lang = typeof window !== "undefined" ? (localStorage.getItem("ng_lang") || "pt") : "pt";
   const i = t[lang] || t.pt;
 
@@ -328,33 +317,8 @@ function RegistarInner() {
     } else {
       console.error("signUp não devolveu user — registo em clientes não foi criado");
     }
-    setUserId(novoUser?.id || null);
     setSucesso(true);
     setLoading(false);
-  };
-
-  const handleOnboarding = async (e) => {
-    e.preventDefault();
-    setErroOnboarding("");
-    if (!morada.trim() || !codigoPostal.trim() || !cidadeLoja.trim() || !nif.trim()) {
-      setErroOnboarding(i.onboarding?.erroObrig || "Preenche os campos obrigatórios.");
-      return;
-    }
-    setLoadingOnboarding(true);
-    const idToUse = userId || (await supabase.auth.getUser()).data?.user?.id;
-    if (!idToUse) { setErroOnboarding(i.onboarding?.erroSessao || "Sessão expirada. Faz login."); setLoadingOnboarding(false); return; }
-    const { error } = await supabase.from("clientes").update({
-      nome_publico: nomeLoja || nome,
-      morada: morada.trim(),
-      numero_porta: numeroPorta.trim() || null,
-      codigo_postal: codigoPostal.trim(),
-      cidade: cidadeLoja.trim(),
-      nif: nif.trim(),
-      iban: iban.trim() || null,
-    }).eq("id", idToUse);
-    setLoadingOnboarding(false);
-    if (error) { setErroOnboarding(i.onboarding?.erroGuardar || "Erro ao guardar. Tenta novamente."); return; }
-    window.location.href = "/perfil";
   };
 
   return (
@@ -440,54 +404,7 @@ function RegistarInner() {
           <div className="form-wrap">
             <h1 className="form-title">{i.titulo}</h1>
             {sucesso ? (
-              <form onSubmit={handleOnboarding}>
-                <p style={{fontSize:"0.78rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#888",marginBottom:"0.5rem"}}>Passo 2 / 2</p>
-                <h2 style={{fontFamily:"var(--serif)",fontSize:"2rem",fontWeight:300,marginBottom:"0.4rem",color:"var(--black)"}}>{i.onboarding?.titulo}</h2>
-                <p style={{fontSize:"0.9rem",color:"var(--grey-500)",marginBottom:"1.75rem",lineHeight:1.6}}>{i.onboarding?.sub}</p>
-
-                {erroOnboarding && <div className="form-erro">{erroOnboarding}</div>}
-
-                <div className="form-group">
-                  <label className="form-label">{i.onboarding?.nomeLoja}</label>
-                  <input className="form-input" type="text" value={nomeLoja} onChange={e => setNomeLoja(e.target.value)} placeholder={i.onboarding?.nomeLojaPh} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">{i.onboarding?.morada}</label>
-                  <input className="form-input" type="text" value={morada} onChange={e => setMorada(e.target.value)} required placeholder={i.onboarding?.moradaPh} />
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:"0.75rem"}}>
-                  <div className="form-group">
-                    <label className="form-label">{i.onboarding?.cp}</label>
-                    <input className="form-input" type="text" value={codigoPostal} onChange={e => setCodigoPostal(e.target.value)} required placeholder={i.onboarding?.cpPh} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">{i.onboarding?.numero}</label>
-                    <input className="form-input" type="text" value={numeroPorta} onChange={e => setNumeroPorta(e.target.value)} placeholder={i.onboarding?.numeroPh} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">{i.onboarding?.cidade}</label>
-                  <input className="form-input" type="text" value={cidadeLoja} onChange={e => setCidadeLoja(e.target.value)} required placeholder={i.onboarding?.cidadePh} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">{i.onboarding?.nif}</label>
-                  <input className="form-input" type="text" value={nif} onChange={e => setNif(e.target.value)} required placeholder={i.onboarding?.nifPh} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">{i.onboarding?.iban}</label>
-                  <input className="form-input" type="text" value={iban} onChange={e => setIban(e.target.value)} placeholder={i.onboarding?.ibanPh} />
-                  <p style={{fontSize:"0.78rem",color:"var(--grey-500)",marginTop:"0.4rem"}}>{i.onboarding?.ibanDica}</p>
-                </div>
-
-                <button type="submit" className="form-btn" disabled={loadingOnboarding}>
-                  {loadingOnboarding ? "..." : i.onboarding?.btn}
-                </button>
-                <div style={{textAlign:"center",marginTop:"1rem"}}>
-                  <a href="/perfil" style={{fontSize:"0.78rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--grey-500)",textDecoration:"none",borderBottom:"1px solid var(--grey-200)",paddingBottom:"1px"}}>
-                    {i.onboarding?.pular}
-                  </a>
-                </div>
-              </form>
+              <div className="form-sucesso">{i.sucesso}</div>
             ) : (
               <form onSubmit={handleRegistar}>
                 <div className="form-group">
