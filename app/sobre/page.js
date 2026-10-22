@@ -36,14 +36,14 @@ const TXT = {
       { n: "4", t: "Enviamos e liquidamos", d: "Tratas do envio. Nós tratamos dos pagamentos e passamos-te a liquidação automaticamente." },
     ],
 
-    // Ganhar dinheiro
-    sec_ganhar_tag: "Ganhar dinheiro",
-    sec_ganhar_title: "Sim, ganhas dinheiro\nna Nora Grei.",
+    // Rentabilizar
+    sec_ganhar_tag: "Para lojistas",
+    sec_ganhar_title: "Rentabiliza o teu\nguarda-roupa.",
     ganhar_items: [
-      { ico: "🛍", t: "Aluguer das tuas peças", d: "Cada vez que alguém aluga uma peça tua, recebes o valor do aluguer menos 10% de comissão da plataforma." },
-      { ico: "🏷", t: "Venda das tuas peças", d: "Vendes as peças que já não usas. A plataforma fica com 20% e tu recebes os restantes 80% no teu IBAN." },
-      { ico: "🔗", t: "Referidos e afiliados", d: "Cada pessoa que se regista pelo teu link dá-te €5 de crédito. Quando faz o primeiro aluguer, ganhas comissão extra." },
-      { ico: "📸", t: "Venda social", d: "Publicas uma peça só para venda na tua rede social pessoal, sem que apareça no catálogo geral. Perfeito para peças com audiência específica." },
+      { ico: "🛍", t: "Aluga as tuas peças", d: "As peças que tens no armário podem gerar retorno. Publica, define disponibilidade e recebe pedidos." },
+      { ico: "🏷", t: "Vende o que já não usas", d: "Dá uma segunda vida às peças que já não usas — e encontra quem as valoriza." },
+      { ico: "🔗", t: "Referidos e afiliados", d: "Cada pessoa que se regista pelo teu link dá-te €5 de crédito. Quando faz o primeiro aluguer, ganhas crédito extra." },
+      { ico: "📸", t: "Venda social", d: "Publica uma peça só para a tua rede, sem aparecer no catálogo geral. Ideal para peças com audiência específica." },
     ],
 
     // Calculadora
@@ -56,11 +56,10 @@ const TXT = {
     faq_tag: "Dúvidas frequentes",
     faq_title: "Perguntas rápidas",
     faqs: [
-      { q: "É gratuito criar conta?", a: "Sim, completamente. Não há mensalidades nem subscrições. Só pagas quando alguém aluga ou compra uma peça tua." },
-      { q: "Quanto tempo demora a aprovação de lojista?", a: "Normalmente 24 a 48 horas. Receberas uma notificação quando a conta de loja for activada." },
-      { q: "Como recebo o dinheiro?", a: "Por transferência bancária para o IBAN que indicares no teu perfil. As liquidações são processadas automaticamente após cada aluguer concluído." },
-      { q: "E se a peça se danificar durante um aluguer?", a: "A plataforma tem um processo de verificação na devolução. O cliente é responsável por danos que não existiam antes. Podes registar o estado inicial da peça com fotos na publicação." },
-      { q: "Posso ter uma loja mesmo sendo particular?", a: "Sim. Não precisas de ser empresa. Qualquer pessoa pode candidatar-se a lojista — basta ter NIF e conta bancária." },
+      { q: "É gratuito criar conta?", a: "Sim, completamente. Não há mensalidades nem subscrições." },
+      { q: "Quanto tempo demora a aprovação de lojista?", a: "Normalmente 24 a 48 horas. Recebes uma notificação quando a tua loja for activada." },
+      { q: "E se a peça se danificar durante um aluguer?", a: "A plataforma tem um processo de verificação na devolução. O cliente é responsável por danos que não existiam antes. Podes registar o estado inicial com fotos na publicação." },
+      { q: "Posso ter uma loja mesmo sendo particular?", a: "Sim. Não precisas de ser empresa. Qualquer pessoa pode candidatar-se a lojista." },
     ],
 
     ajuda: "Ver centro de ajuda completo →",
@@ -91,11 +90,11 @@ const TXT = {
       { n: "3", t: "Recevez les commandes", d: "Notification WhatsApp à chaque réservation. Confirmez en un clic." },
       { n: "4", t: "Expédiez, on règle", d: "Vous gérez l'envoi. Nous gérons les paiements et vous virons automatiquement." },
     ],
-    sec_ganhar_tag: "Gagner de l'argent",
-    sec_ganhar_title: "Oui, vous gagnez de l'argent\nsur Nora Grei.",
+    sec_ganhar_tag: "Pour les lojistas",
+    sec_ganhar_title: "Rentabilisez\nvotre garde-robe.",
     ganhar_items: [
-      { ico: "🛍", t: "Location de vos pièces", d: "À chaque location, vous recevez le montant moins 10 % de commission." },
-      { ico: "🏷", t: "Vente de vos pièces", d: "Vendez ce que vous n'utilisez plus. 80 % du prix vous revient." },
+      { ico: "🛍", t: "Louez vos pièces", d: "Les pièces dans votre armoire peuvent générer un retour. Publiez, définissez vos disponibilités et recevez des demandes." },
+      { ico: "🏷", t: "Vendez ce que vous n'utilisez plus", d: "Donnez une seconde vie à vos pièces — et trouvez qui les valorise." },
       { ico: "🔗", t: "Parrainages", d: "Chaque personne inscrite via votre lien vous rapporte 5 € de crédit." },
       { ico: "📸", t: "Vente sociale", d: "Publiez une pièce uniquement pour votre réseau, sans qu'elle apparaisse dans le catalogue général." },
     ],
@@ -106,11 +105,10 @@ const TXT = {
     faq_tag: "Questions fréquentes",
     faq_title: "Questions rapides",
     faqs: [
-      { q: "La création de compte est-elle gratuite ?", a: "Oui, complètement. Aucun abonnement. Vous payez uniquement quand une pièce est louée ou vendue." },
+      { q: "La création de compte est-elle gratuite ?", a: "Oui, complètement. Aucun abonnement." },
       { q: "Combien de temps prend l'approbation ?", a: "Généralement 24 à 48 heures. Vous recevrez une notification dès que votre boutique sera activée." },
-      { q: "Comment je reçois l'argent ?", a: "Par virement vers l'IBAN que vous indiquez dans votre profil. Les règlements sont automatiques." },
       { q: "Et si la pièce est endommagée ?", a: "La plateforme vérifie à la réception. Le client est responsable des dommages. Vous pouvez enregistrer l'état initial avec des photos." },
-      { q: "Faut-il être une entreprise ?", a: "Non. Tout particulier avec un NIF et un compte bancaire peut ouvrir une boutique." },
+      { q: "Faut-il être une entreprise ?", a: "Non. Tout particulier peut ouvrir une boutique." },
     ],
     ajuda: "Voir le centre d'aide complet →",
     footer_marca: "NORA GREI",
@@ -140,13 +138,13 @@ const TXT = {
       { n: "3", t: "Gaukite užsakymus", d: "WhatsApp pranešimas kiekvieną kartą. Patvirtinkite vienu paspaudimu." },
       { n: "4", t: "Siųskite, mes atsiskaitome", d: "Jūs tvarkote siuntimą. Mes tvarkome mokėjimus ir automatiškai pervedame." },
     ],
-    sec_ganhar_tag: "Uždirbti pinigus",
-    sec_ganhar_title: "Taip, Nora Grei\nuždirba pinigų.",
+    sec_ganhar_tag: "Lojistams",
+    sec_ganhar_title: "Rentabilizuokite\nsavo spintą.",
     ganhar_items: [
-      { ico: "🛍", t: "Daiktų nuoma", d: "Kiekvieną kartą, kai nuomojamas jūsų daiktas, gaunate sumą atėmus 10 % komisinių." },
-      { ico: "🏷", t: "Daiktų pardavimas", d: "Parduokite tai, ko nebevartojate. 80 % kainos tenka jums." },
+      { ico: "🛍", t: "Nuomokite savo drabužius", d: "Daiktai spintoje gali duoti naudos. Skelbkite, nustatykite prieinamumą ir gaukite užsakymus." },
+      { ico: "🏷", t: "Parduokite tai, ko nebevartojate", d: "Suteikite antrą gyvenimą savo drabužiams — ir raskite, kas juos įvertins." },
       { ico: "🔗", t: "Rekomendacijos", d: "Kiekvienas per jūsų nuorodą užsiregistravęs asmuo duoda jums 5 € kreditą." },
-      { ico: "📸", t: "Socialinis pardavimas", d: "Skelbkite daiktą tik savo tinklui, be katalogas." },
+      { ico: "📸", t: "Socialinis pardavimas", d: "Skelbkite daiktą tik savo tinklui, nepasirodo bendrame kataloge." },
     ],
     sec_calc_tag: "Kainų skaičiuoklė",
     sec_calc_title: "Nežinote, kiek prašyti?",
@@ -155,11 +153,10 @@ const TXT = {
     faq_tag: "D.U.K.",
     faq_title: "Greiti klausimai",
     faqs: [
-      { q: "Ar paskyros kūrimas nemokamas?", a: "Taip, visiškai. Jokio abonamento. Mokate tik kai nuomojamas ar parduodamas daiktas." },
+      { q: "Ar paskyros kūrimas nemokamas?", a: "Taip, visiškai. Jokio abonamento." },
       { q: "Kiek laiko užtrunka patvirtinimas?", a: "Paprastai 24–48 valandos. Gausite pranešimą, kai parduotuvė bus aktyvuota." },
-      { q: "Kaip gaunu pinigus?", a: "Pavedimu į IBAN, kurį nurodysite profilyje. Atsiskaitymai automatiniai." },
       { q: "O jei daiktas sugadinamas?", a: "Platforma tikrina grąžinant. Klientas atsakingas už žalą. Galite įrašyti pradinę būklę su nuotraukomis." },
-      { q: "Ar reikia būti įmone?", a: "Ne. Bet kuris asmuo su mokesčių kodu ir banko sąskaita gali atidaryti parduotuvę." },
+      { q: "Ar reikia būti įmone?", a: "Ne. Bet kuris asmuo gali atidaryti parduotuvę." },
     ],
     ajuda: "Žiūrėti pilną pagalbos centrą →",
     footer_marca: "NORA GREI",
@@ -267,10 +264,6 @@ export default function SobrePage() {
                 <div style={{ fontSize: "0.82rem", color: "rgba(248,247,245,0.65)", lineHeight: 1.65 }}>{g.d}</div>
               </div>
             ))}
-          </div>
-          <div style={{ marginTop: "2.5rem", padding: "1.25rem 1.5rem", background: "rgba(196,116,138,0.15)", border: "1px solid rgba(196,116,138,0.3)", borderRadius: "3px", fontSize: "0.85rem", color: "rgba(248,247,245,0.8)" }}>
-            <strong style={{ color: "#c4748a" }}>Comissões:</strong>&nbsp;
-            {lang === "pt" ? "Aluguer 10% · Venda 20% · Envio €6 (tratado pela plataforma)" : lang === "fr" ? "Location 10 % · Vente 20 % · Expédition 6 € (gérée par la plateforme)" : "Nuoma 10 % · Pardavimas 20 % · Siuntimas 6 € (tvarko platforma)"}
           </div>
         </div>
       </section>
