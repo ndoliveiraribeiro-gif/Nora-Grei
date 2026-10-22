@@ -1576,7 +1576,9 @@ export default function Perfil() {
   const guardarPerfil = async () => {
     if (!user) return;
     const perfilCompleto = CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
-    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, nome_publico: perfil.nome_publico||null, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, avatar_url: perfil.avatar_url||null });
+    // avatar_url: remover o ?t= antes de gravar para não ficar URL suja na BD
+    const avatarParaGuardar = perfil.avatar_url ? perfil.avatar_url.split("?t=")[0] : null;
+    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, nome_publico: perfil.nome_publico||null, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, avatar_url: avatarParaGuardar });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 3000);
   };
