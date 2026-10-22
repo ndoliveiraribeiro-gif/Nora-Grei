@@ -1186,7 +1186,7 @@ export default function Perfil() {
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
-  const [formLojista, setFormLojista] = useState({ nome_loja: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false, cartao_numero: "", cartao_validade: "", cartao_cvv: "" });
+  const [formLojista, setFormLojista] = useState({ tipo_entidade: "", nome_loja: "", nome_empresa: "", nif_empresa: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false, cartao_numero: "", cartao_validade: "", cartao_cvv: "" });
   const [formLojistaMsg, setFormLojistaMsg] = useState("");
   const [formLojistaLoading, setFormLojistaLoading] = useState(false);
   const [stripeDisponivel, setStripeDisponivel] = useState(false);
@@ -1725,7 +1725,9 @@ export default function Perfil() {
   }, [secaoAberta, modoLojista]);
 
   const submeterCandidaturaLojista = async () => {
+    if (!formLojista.tipo_entidade) { setFormLojistaMsg("Indica se és pessoa singular ou empresa."); return; }
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
+    if (formLojista.tipo_entidade === "empresa" && !formLojista.nome_empresa.trim()) { setFormLojistaMsg("Indica o nome da empresa."); return; }
     if (!formLojista.nif.trim()) { setFormLojistaMsg("Indica o teu NIF (obrigatório por lei)."); return; }
     if (!formLojista.telefone_loja.trim()) { setFormLojistaMsg("Indica um número de telefone de contacto."); return; }
     if (!formLojista.morada.trim()) { setFormLojistaMsg("Indica a tua morada para levantamento das peças."); return; }
@@ -1753,7 +1755,9 @@ export default function Perfil() {
     }
 
     const candidatura = {
+      tipo_entidade: formLojista.tipo_entidade,
       nome_loja: formLojista.nome_loja.trim(),
+      ...(formLojista.tipo_entidade === "empresa" && { nome_empresa: formLojista.nome_empresa.trim(), nif_empresa: formLojista.nif_empresa.trim() }),
       descricao: formLojista.descricao.trim(),
       iban: formLojista.iban.trim().toUpperCase(),
       tipo_pagamento: formLojista.tipo_pagamento,
@@ -1767,6 +1771,7 @@ export default function Perfil() {
     const updateData = {
       candidatura_lojista: "pendente",
       lojista_candidatura_dados: candidatura,
+      ...(formLojista.tipo_entidade === "empresa" && { is_marca_propria: true }),
     };
     if (stripePaymentMethodId) {
       updateData.stripe_payment_method_id = stripePaymentMethodId;
@@ -3132,6 +3137,23 @@ export default function Perfil() {
                   <button onClick={() => setShowFormLojista(false)} style={{background:"none",border:"none",fontSize:"1.2rem",cursor:"pointer",color:"var(--g4)",lineHeight:1}}>✕</button>
                 </div>
 
+                {/* 0. Tipo de entidade */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>Quem és?</div>
+                  <div style={{display:"flex",gap:"0.75rem"}}>
+                    {[{v:"singular",l:"Pessoa singular"},{v:"empresa",l:"Marca / Empresa"}].map(({v,l}) => (
+                      <button key={v} onClick={() => setFormLojista(f => ({...f, tipo_entidade: v}))} style={{flex:1,padding:"0.75rem",border:`1.5px solid ${formLojista.tipo_entidade===v?"#1a1816":"#e2dfda"}`,background:formLojista.tipo_entidade===v?"#1a1816":"#fff",color:formLojista.tipo_entidade===v?"#fff":"#1a1816",fontSize:"0.78rem",fontFamily:"var(--sans)",cursor:"pointer",transition:"all 0.15s",letterSpacing:"0.04em"}}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                  {formLojista.tipo_entidade === "empresa" && (
+                    <div style={{marginTop:"0.75rem",padding:"0.75rem",background:"rgba(196,116,138,0.06)",border:"1px solid rgba(196,116,138,0.2)",fontSize:"0.72rem",color:"#c4748a",letterSpacing:"0.04em"}}>
+                      A tua loja ficará identificada como <strong>Marca</strong> na plataforma.
+                    </div>
+                  )}
+                </div>
+
                 {/* 1. Sobre a loja */}
                 <div style={{marginBottom:"1.5rem"}}>
                   <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>1 · Sobre a tua loja</div>
@@ -3139,6 +3161,16 @@ export default function Perfil() {
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da loja *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => setFormLojista(f => ({...f, nome_loja: e.target.value}))} placeholder="ex: Atelier da Maria" />
                   </div>
+                  {formLojista.tipo_entidade === "empresa" && (<>
+                    <div style={{marginBottom:"0.75rem"}}>
+                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da empresa *</label>
+                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_empresa} onChange={e => setFormLojista(f => ({...f, nome_empresa: e.target.value}))} placeholder="ex: Atelier Maria Lda." />
+                    </div>
+                    <div style={{marginBottom:"0.75rem"}}>
+                      <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>NIF da empresa</label>
+                      <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nif_empresa} onChange={e => setFormLojista(f => ({...f, nif_empresa: e.target.value}))} placeholder="ex: 500 123 456" />
+                    </div>
+                  </>)}
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Que tipo de peças tens para alugar? *</label>
                     <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.tipo_pecas} onChange={e => setFormLojista(f => ({...f, tipo_pecas: e.target.value}))} placeholder="ex: Vestidos de noite, casacos de inverno, acessórios..." />
