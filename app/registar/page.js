@@ -10,7 +10,8 @@ const t = {
     email: "Email",
     password: "Password",
     confirmar: "Confirmar password",
-    telefone: "Telemóvel (WhatsApp)",
+    telefone: "Telemóvel (WhatsApp) *",
+    erroTelefone: "Indica o teu número de telemóvel para receberes notificações.",
     btn: "Criar conta",
     jatem: "Já tem conta?",
     link: "Entrar",
@@ -42,7 +43,8 @@ const t = {
     email: "Email",
     password: "Mot de passe",
     confirmar: "Confirmer le mot de passe",
-    telefone: "Téléphone (WhatsApp)",
+    telefone: "Téléphone (WhatsApp) *",
+    erroTelefone: "Indiquez votre numéro de téléphone pour recevoir des notifications.",
     btn: "Créer un compte",
     jatem: "Vous avez déjà un compte ?",
     link: "Se connecter",
@@ -74,7 +76,8 @@ const t = {
     email: "El. paštas",
     password: "Slaptažodis",
     confirmar: "Patvirtinti slaptažodį",
-    telefone: "Telefonas (WhatsApp)",
+    telefone: "Telefonas (WhatsApp) *",
+    erroTelefone: "Nurodykite savo telefono numerį pranešimams gauti.",
     btn: "Sukurti paskyrą",
     jatem: "Jau turite paskyrą?",
     link: "Prisijungti",
@@ -162,6 +165,7 @@ function RegistarInner() {
     e.preventDefault();
     setErro("");
     setErroTipo("");
+    if (!telefone.trim()) { setErro(i.erroTelefone); return; }
     if (password.length < 6) { setErro(i.erroMin); return; }
     if (password !== confirmar) { setErro(i.erroPass); return; }
     setLoading(true);
@@ -341,7 +345,7 @@ function RegistarInner() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.telefone}</label>
-                  <input className="form-input" type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} autoComplete="tel" placeholder="+351 912 345 678" />
+                  <input className="form-input" type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} autoComplete="tel" placeholder="+351 912 345 678" required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.dataNasc}</label>
