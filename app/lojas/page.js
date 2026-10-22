@@ -50,7 +50,7 @@ export default function Lojas() {
   const carregar = async () => {
     const { data } = await supabase
       .from("clientes")
-      .select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao")
       .eq("modo_lojista", true)
       .order("nome");
     setLojas(data || []);
@@ -128,16 +128,17 @@ export default function Lojas() {
       ) : (
         <div className="pg-grid">
           {lojasFiltradas.map(loja => {
-            const initials = loja.nome ? loja.nome.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
+            const nomeVis = loja.nome_publico || loja.nome;
+            const initials = nomeVis ? nomeVis.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
             return (
               <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
                 <div className="loja-avatar">
                   {loja.avatar_url
-                    ? <img src={loja.avatar_url} alt={loja.nome} />
+                    ? <img src={loja.avatar_url} alt={nomeVis} />
                     : <div className="loja-initials">{initials}</div>
                   }
                 </div>
-                <div className="loja-nome">{loja.nome}</div>
+                <div className="loja-nome">{nomeVis}</div>
                 {(loja.cidade || loja.pais) && (
                   <div className="loja-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</div>
                 )}

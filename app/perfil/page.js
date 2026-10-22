@@ -625,7 +625,7 @@ function ReservaDisponivelCard({ reserva, i }) {
 const t = {
   pt: {
     titulo: "O meu perfil", dadosPessoais: "Dados pessoais",
-    nome: "Nome completo", email: "Email", telefone: "Telefone",
+    nome: "Nome completo", nomePub: "Nome público / Pseudónimo", nomePubDica: "Como apareces na plataforma. Se não definires, usa o nome real.", email: "Email", telefone: "Telefone",
     dataNascimento: "Data de nascimento", genero: "Género",
     generosOpcoes: ["Mulher", "Homem", "Prefiro não especificar"],
     comoTeVes: "Como te vês hoje?", comoTeVesOpcoes: ["Administrativa / Escritório","Saúde e cuidados","Educação","Restauração e hotelaria","Diversão e vida noturna","Criativo / Arte / Moda","Gestão e negócios","Tecnologia","Comércio e retalho","Estudante","Empreendedora","Em trânsito","Prefiro não partilhar"],
@@ -706,7 +706,7 @@ const t = {
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
-    nome: "Nom complet", email: "Email", telefone: "Téléphone",
+    nome: "Nom complet", nomePub: "Nom public / Pseudonyme", nomePubDica: "Comment vous apparaissez sur la plateforme. Si non défini, utilise le nom réel.", email: "Email", telefone: "Téléphone",
     dataNascimento: "Date de naissance", genero: "Genre",
     generosOpcoes: ["Femme", "Homme", "Préfère ne pas préciser"],
     comoTeVes: "Comment vous voyez-vous aujourd'hui?", comoTeVesOpcoes: ["Administrative / Bureau","Santé et soins","Éducation","Restauration et hôtellerie","Divertissement et vie nocturne","Créatif / Art / Mode","Gestion et affaires","Technologie","Commerce et vente","Étudiante","Entrepreneuse","En transition","Je préfère ne pas partager"],
@@ -787,7 +787,7 @@ const t = {
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
-    nome: "Vardas, pavardė", email: "El. paštas", telefone: "Telefonas",
+    nome: "Vardas, pavardė", nomePub: "Viešas vardas / Slapyvardis", nomePubDica: "Kaip matote platformoje. Jei nenustatyta, naudojamas tikrasis vardas.", email: "El. paštas", telefone: "Telefonas",
     dataNascimento: "Gimimo data", genero: "Lytis",
     generosOpcoes: ["Moteris", "Vyras", "Nenoriu nurodyti"],
     comoTeVes: "Kaip šiandien save matote?", comoTeVesOpcoes: ["Administracinė / Biuras","Sveikata ir priežiūra","Švietimas","Restoranai ir viešbučiai","Pramogos ir naktinis gyvenimas","Kūryba / Menas / Mada","Vadyba ir verslas","Technologijos","Prekyba ir mažmeninė","Studentė","Verslininkė","Pereinamajame etape","Nenoriu dalintis"],
@@ -1206,7 +1206,7 @@ function MiniCalculadora({ lang, i }) {
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
-  const [perfil, setPerfil] = useState({ nome: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
+  const [perfil, setPerfil] = useState({ nome: "", nome_publico: "", telefone: "", morada: "", numero_porta: "", andar: "", avatar_url: "", nif: "", numero_cc: "", data_nascimento: "", genero: "", profissao: "", cidade: "", pais: "Portugal", codigo_postal: "", latitude: null, longitude: null });
   const [stats, setStats] = useState({ totalAlugueres: 0, totalGasto: 0, pecasAtivas: 0, reservas: 0, pontos: 0, totalPecas: 0 });
   const [alugueres, setAlugueres] = useState([]);
   const [reembolsosPendentes, setReembolsosPendentes] = useState([]);
@@ -1324,7 +1324,7 @@ export default function Perfil() {
 
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
-      setPerfil({ nome: c.nome||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: c.avatar_url||user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
+      setPerfil({ nome: c.nome||"", nome_publico: c.nome_publico||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", avatar_url: c.avatar_url||user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
       if (c.modo_lojista) {
         setModoLojista(true);
         setLojaEstado(c.lojista_estado||"teste");
@@ -1576,7 +1576,7 @@ export default function Perfil() {
   const guardarPerfil = async () => {
     if (!user) return;
     const perfilCompleto = CAMPOS_OBRIGATORIOS.every(campo => perfil[campo] && perfil[campo].toString().trim() !== "");
-    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, avatar_url: perfil.avatar_url||null });
+    await supabase.from("clientes").upsert({ id: user.id, email: user.email, nome: perfil.nome, nome_publico: perfil.nome_publico||null, telefone: perfil.telefone, morada: perfil.morada, numero_porta: perfil.numero_porta, andar: perfil.andar, nif: perfil.nif, numero_cc: perfil.numero_cc, data_nascimento: perfil.data_nascimento || null, genero: perfil.genero, profissao: perfil.profissao||null, cidade: perfil.cidade, pais: perfil.pais, codigo_postal: perfil.codigo_postal, latitude: perfil.latitude, longitude: perfil.longitude, perfil_completo: perfilCompleto, avatar_url: perfil.avatar_url||null });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 3000);
   };
@@ -2526,6 +2526,7 @@ export default function Perfil() {
             <div style={{padding:"0 2rem 2rem"}}>
               <div className="grid2">
                 <div className="fg"><label className="lbl">{i.nome} *</label><input className="inp" value={perfil.nome} onChange={e => set("nome", e.target.value)} placeholder="Maria Silva" /></div>
+                <div className="fg"><label className="lbl">{i.nomePub} <Tooltip texto={i.nomePubDica} /></label><input className="inp" value={perfil.nome_publico} onChange={e => set("nome_publico", e.target.value)} placeholder={perfil.nome || "Maria Silva"} /></div>
                 <div className="fg"><label className="lbl">{i.email}</label><input className="inp" value={user?.email||""} disabled /></div>
                 <div className="fg"><label className="lbl">{i.telefone} *</label><input className="inp" type="tel" value={perfil.telefone} onChange={e => set("telefone", e.target.value)} placeholder="+351 912 345 678" /></div>
                 <div className="fg"><label className="lbl">{i.dataNascimento}</label><input className="inp" type="date" value={perfil.data_nascimento} onChange={e => set("data_nascimento", e.target.value)} /></div>

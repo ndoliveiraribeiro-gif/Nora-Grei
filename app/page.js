@@ -509,7 +509,7 @@ export default function Home() {
 
     const { data: todasPecas } = await supabase.from("pecas").select("id, nome, fotos, ocasioes, preco_aluguer_dia, destaque, hero_position, categorias(nome), stock_tamanhos(id, quantidade_disponivel)").not("fotos", "is", null).neq("fotos", "{}");
 
-    const { data: lojasData } = await supabase.from("clientes").select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao").eq("modo_lojista", true).limit(6);
+    const { data: lojasData } = await supabase.from("clientes").select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao").eq("modo_lojista", true).limit(6);
     if (lojasData) setLojas(lojasData);
 
     if (cfg && cfg.hero_peca_id && todasPecas) {
@@ -1271,16 +1271,17 @@ export default function Home() {
           </div>
           <div className="lojas-grid">
             {lojas.map(loja => {
-              const initials = loja.nome ? loja.nome.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase() : "NG";
+              const nomeVis = loja.nome_publico || loja.nome;
+              const initials = nomeVis ? nomeVis.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase() : "NG";
               return (
                 <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
                   <div className="loja-avatar">
                     {loja.avatar_url
-                      ? <img src={loja.avatar_url} alt={loja.nome} />
+                      ? <img src={loja.avatar_url} alt={nomeVis} />
                       : <div className="loja-avatar-initials">{initials}</div>
                     }
                   </div>
-                  <div className="loja-nome">{loja.nome}</div>
+                  <div className="loja-nome">{nomeVis}</div>
                   {loja.cidade && <div className="loja-cidade">{loja.cidade}{loja.pais ? `, ${loja.pais}` : ""}</div>}
                   <div className="loja-cta">{t.lojasSec.verLoja} →</div>
                 </a>

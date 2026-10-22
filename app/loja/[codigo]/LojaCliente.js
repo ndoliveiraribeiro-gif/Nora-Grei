@@ -132,7 +132,8 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
   };
 
   const t = T[lang] || T.pt;
-  const initials = loja?.nome ? loja.nome.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
+  const nomeVis = loja?.nome_publico || loja?.nome;
+  const initials = nomeVis ? nomeVis.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
   const anoMembro = loja?.created_at ? new Date(loja.created_at).getFullYear() : null;
 
   if (!loja) return (
@@ -212,13 +213,13 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         <div className="loja-header-inner">
           <div className="loja-avatar-lg">
             {loja.avatar_url
-              ? <img src={loja.avatar_url} alt={loja.nome} />
+              ? <img src={loja.avatar_url} alt={nomeVis} />
               : <div className="loja-avatar-lg-initials">{initials}</div>
             }
           </div>
           <div className="loja-header-info">
             <p className="loja-header-membro">{t.membro}</p>
-            <h1 className="loja-header-nome">{loja.nome}</h1>
+            <h1 className="loja-header-nome">{nomeVis}</h1>
             {(loja.cidade || loja.pais) && (
               <p className="loja-header-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</p>
             )}

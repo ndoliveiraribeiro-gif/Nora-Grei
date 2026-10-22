@@ -15,7 +15,7 @@ export default async function OgLoja({ params }) {
 
   const { data: lojista } = await supabase
     .from("clientes")
-    .select("nome, avatar_url")
+    .select("nome, nome_publico, avatar_url")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
 
@@ -25,7 +25,7 @@ export default async function OgLoja({ params }) {
     .eq("codigo_cliente_id", lojista?.id)
     .limit(3);
 
-  const nome = lojista?.nome || codigo;
+  const nome = lojista?.nome_publico || lojista?.nome || codigo;
   const fotos = pecas?.flatMap(p => p.fotos?.[0] ? [p.fotos[0]] : []).slice(0, 3) || [];
 
   return new ImageResponse(

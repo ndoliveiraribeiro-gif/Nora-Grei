@@ -8,7 +8,7 @@ async function getLoja(codigo) {
   );
   const { data, error } = await supabaseServer
     .from("clientes")
-    .select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
+    .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
     .eq("codigo_cliente", codigo)
     .maybeSingle();
   return data || null;
@@ -40,10 +40,11 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const titulo = `${loja.nome} — Nora Grei`;
+  const nomeVis = loja.nome_publico || loja.nome;
+  const titulo = `${nomeVis} — Nora Grei`;
   const descricao = loja.descricao
     ? loja.descricao.slice(0, 155)
-    : `Descobre as peças de ${loja.nome} na plataforma Nora Grei — alugar ou comprar moda exclusiva.`;
+    : `Descobre as peças de ${nomeVis} na plataforma Nora Grei — alugar ou comprar moda exclusiva.`;
   const url = `https://noragrei.com/loja/${loja.codigo_cliente}`;
   const imagem = loja.avatar_url || "https://noragrei.com/og-default.jpg";
 
@@ -55,7 +56,7 @@ export async function generateMetadata({ params }) {
       description: descricao,
       url,
       siteName: "Nora Grei",
-      images: [{ url: imagem, width: 800, height: 800, alt: loja.nome }],
+      images: [{ url: imagem, width: 800, height: 800, alt: nomeVis }],
       type: "profile",
     },
     twitter: {
