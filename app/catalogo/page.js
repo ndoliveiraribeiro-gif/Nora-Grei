@@ -128,7 +128,7 @@ function PecaCardLojista({ peca, lang }) {
                 {!isSocial && (
                   <button onClick={e=>{e.preventDefault();e.stopPropagation();setModalAberto(true);}} style={{display:"inline-flex",alignItems:"center",gap:"0.2rem",background:"none",border:"none",padding:0,cursor:"pointer",marginTop:"0.18rem"}}>
                     <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.75rem",color:"#5a5855",fontWeight:500}}>
-                      {peca.tipo==="comprar" ? `${comVenda}€` : `${comAluguer}€`}/dia incl. 🛡
+                      {peca.tipo==="comprar" ? `${comVenda}€ venda incl.` : peca.tipo==="ambos" ? `${comAluguer}€/dia · ${comVenda}€ venda incl.` : `${comAluguer}€/dia incl.`} 🛡
                     </span>
                   </button>
                 )}
