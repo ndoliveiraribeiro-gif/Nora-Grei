@@ -1,6 +1,6 @@
 // Service Worker — Nora Grei
 // Muda este número em cada deploy para forçar actualização imediata
-const CACHE_VERSION = 'v20261021-1';
+const CACHE_VERSION = 'v20261022-1';
 const CACHE_NAME = `nora-grei-${CACHE_VERSION}`;
 
 // Instala e activa imediatamente, sem esperar por tabs antigas
