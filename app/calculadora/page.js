@@ -48,6 +48,10 @@ const T = {
     fotoDetectado: "Detectado pela IA — confirma ou ajusta",
     fotoErro: "Não foi possível analisar a foto. Preenche os campos manualmente.",
     fotoDescartar: "Remover foto",
+    corLabel: "Cor",
+    corPlaceholder: "ex: preto, branco, multicor...",
+    materialLabel: "Material",
+    materialPlaceholder: "ex: algodão, seda, couro...",
     semPreco: "Introduz o preço original para ver a estimativa",
     gateTitle: "Guarda a tua avaliação",
     gateSub: "Introduz o teu email para veres o resultado e receberes o resumo.",
@@ -104,6 +108,10 @@ const T = {
     fotoDetectado: "Détecté par l'IA — confirme ou ajuste",
     fotoErro: "Impossible d'analyser la photo. Remplis les champs manuellement.",
     fotoDescartar: "Supprimer la photo",
+    corLabel: "Couleur",
+    corPlaceholder: "ex : noir, blanc, multicolore...",
+    materialLabel: "Matière",
+    materialPlaceholder: "ex : coton, soie, cuir...",
     semPreco: "Saisis le prix original pour voir l'estimation",
     gateTitle: "Sauvegarde ton évaluation",
     gateSub: "Entre ton email pour voir le résultat et recevoir le résumé.",
@@ -160,6 +168,10 @@ const T = {
     fotoDetectado: "Aptikta DI — patvirtink arba pataisyk",
     fotoErro: "Nepavyko išanalizuoti nuotraukos. Užpildyk laukus rankiniu būdu.",
     fotoDescartar: "Pašalinti nuotrauką",
+    corLabel: "Spalva",
+    corPlaceholder: "pvz.: juoda, balta, spalvota...",
+    materialLabel: "Medžiaga",
+    materialPlaceholder: "pvz.: medvilnė, šilkas, oda...",
     semPreco: "Įvesk originalią kainą, kad pamatytum skaičiavimą",
     gateTitle: "Išsaugok savo įvertinimą",
     gateSub: "Įvesk el. paštą, kad pamatytum rezultatą ir gautum santrauką.",
@@ -337,6 +349,8 @@ export default function Calculadora() {
   const [lang, setLang] = useState("pt");
   const [preco, setPreco] = useState("");
   const [marca, setMarca] = useState("");
+  const [cor, setCor] = useState("");
+  const [material, setMaterial] = useState("");
   const [tipo, setTipo] = useState("Vestido");
   const [estado, setEstado] = useState("bom");
   const [uso, setUso] = useState("pouco");
@@ -438,10 +452,12 @@ export default function Calculadora() {
       }
       if (dados.cor) {
         detectados.cor = dados.cor;
+        setCor(dados.cor);
         setCamposIA(prev => ({ ...prev, cor: dados.cor, cor_confianca: dados.cor_confianca }));
       }
       if (dados.material) {
         detectados.material = dados.material;
+        setMaterial(dados.material);
         setCamposIA(prev => ({ ...prev, material: dados.material, material_confianca: dados.material_confianca }));
       }
 
@@ -1171,6 +1187,35 @@ export default function Calculadora() {
               : (lang==="fr"?"Haute marque":lang==="lt"?"Aukšta klasė":"Alta gama")}
             </span>
           )}
+        </div>
+
+        {/* ── 3b. COR + MATERIAL ── */}
+        <div className="card">
+          {(camposIA.cor || camposIA.material) && <div className="campo-ia-tag">{t.fotoDetectado}</div>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <div className="card-label">{t.corLabel}</div>
+              <input
+                className="marca-input"
+                type="text"
+                placeholder={t.corPlaceholder}
+                value={cor}
+                onChange={e => setCor(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <div className="card-label">{t.materialLabel}</div>
+              <input
+                className="marca-input"
+                type="text"
+                placeholder={t.materialPlaceholder}
+                value={material}
+                onChange={e => setMaterial(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+          </div>
         </div>
 
         {/* ── 4. ESTADO — pills grid 4 cols ── */}
