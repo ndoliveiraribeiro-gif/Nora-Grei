@@ -53,7 +53,7 @@ function ModalPrecoLanding({ peca, lang, onClose }) {
 
 const T = {
   pt: {
-    nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil", sobre: "Como funciona?" },
+    nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil", sobre: "A plataforma" },
     hero: { eyebrow: "Aluguer · Venda · Luxo", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Calcular o meu potencial", ctaSobre: "Conhecer a plataforma →", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "O teu guarda-roupa tem valor", preco: "Peça de", anual: "pode gerar", ano: "/ ano em aluguer", cta: "Calcular em detalhe" } },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
@@ -118,7 +118,7 @@ const T = {
     },
   },
   fr: {
-    nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil", sobre: "Comment ça marche ?" },
+    nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil", sobre: "La plateforme" },
     hero: { eyebrow: "Location · Vente · Luxe", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Calculer mon potentiel", ctaSobre: "Découvrir la plateforme →", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Votre garde-robe a de la valeur", preco: "Pièce à", anual: "peut générer", ano: "/ an en location", cta: "Calculer en détail" } },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
@@ -183,7 +183,7 @@ const T = {
     },
   },
   lt: {
-    nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis", sobre: "Kaip tai veikia?" },
+    nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis", sobre: "Platforma" },
     hero: { eyebrow: "Nuoma · Pardavimas · Prabanga", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Skaičiuoti savo potencialą", ctaSobre: "Sužinoti apie platformą →", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Tavo spinta turi vertę", preco: "Drabužis po", anual: "gali generuoti", ano: "/ metus nuomos", cta: "Skaičiuoti išsamiau" } },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
@@ -1064,7 +1064,6 @@ export default function Home() {
           <li><a href="/catalogo">{t.nav.catalogo}</a></li>
           <li><a href="/lojas">{t.nav.lojas}</a></li>
           <li><a href="/feed">Feed</a></li>
-          <li><a href="#como">{t.nav.comoFunciona}</a></li>
           <li><a href="/sobre">{t.nav.sobre}</a></li>
         </ul>
         <div className="nav-right">
