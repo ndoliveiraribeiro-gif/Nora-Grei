@@ -3124,6 +3124,18 @@ export default function Backoffice() {
 
           const aprovarPeca = async (peca) => {
             await supabase.from("pecas_lojista").update({ estado: "disponivel" }).eq("id", peca.id);
+            // Criar feed_post automaticamente para que apareça no feed "Seguindo"
+            await supabase.from("feed_posts").insert({
+              cliente_id: peca.cliente_id,
+              titulo: peca.nome,
+              descricao: peca.descricao || null,
+              imagem_url: peca.fotos?.[0] || null,
+              estado: "publicado",
+              publicado_em: new Date().toISOString(),
+              likes: 0,
+              visualizacoes: 0,
+              boosted: false,
+            });
             setPecasPendentes(prev => prev.filter(p => p.id !== peca.id));
           };
           const rejeitarPeca = async (peca) => {

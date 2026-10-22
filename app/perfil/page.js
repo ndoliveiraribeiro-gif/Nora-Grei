@@ -1341,7 +1341,7 @@ export default function Perfil() {
           if (als) {
             setAlugueresLoja(als);
             // carregar avaliações para cálculo da nota média no dashboard
-            const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma").eq("lojista_id", user.id);
+            const { data: avs } = await supabase.from("avaliacoes_lojista").select("nota_cliente_lojista, nota_plataforma, motivo_plataforma, comentario_cliente, created_at, clientes(nome, avatar_url)").eq("lojista_id", user.id).order("created_at", { ascending: false });
             if (avs) setAvaliacoesLoja(avs);
             // Carregar tabela de higienização do lojista
             const { data: hig } = await supabase.from("higienizacao_lojista").select("categoria, valor").eq("lojista_id", user.id);
@@ -3088,6 +3088,44 @@ export default function Perfil() {
                             ⚠ {penalizacoes.length} penalização{penalizacoes.length!==1?"ões":""} atribuída{penalizacoes.length!==1?"s":""} pela plataforma — cancela reservas ou incidentes afetam a tua nota.
                           </div>
                         )}
+                      </div>
+                    );
+                  })()}
+                  {/* ── AVALIAÇÕES DOS CLIENTES ── */}
+                  {(() => {
+                    const avsComComentario = avaliacoesLoja.filter(av => av.nota_cliente_lojista || av.comentario_cliente);
+                    if (avsComComentario.length === 0) return null;
+                    return (
+                      <div style={{background:"var(--white)",padding:"1.1rem",marginBottom:"0.6rem",border:"1.5px solid #f0eeeb"}}>
+                        <div style={{fontSize:"0.68rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"0.85rem"}}>💬 Avaliações recebidas</div>
+                        <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+                          {avsComComentario.slice(0,5).map((av, i) => {
+                            const nota = av.nota_cliente_lojista;
+                            const cor = nota >= 4 ? "#c4748a" : nota >= 3 ? "#f39c12" : "#e74c3c";
+                            const data = av.created_at ? new Date(av.created_at).toLocaleDateString("pt-PT",{day:"numeric",month:"short",year:"numeric"}) : "";
+                            return (
+                              <div key={i} style={{borderBottom:"1px solid #f5f3f0",paddingBottom:"0.75rem"}}>
+                                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"0.3rem"}}>
+                                  <div style={{display:"flex",alignItems:"center",gap:"0.5rem"}}>
+                                    <span style={{fontSize:"0.72rem",fontWeight:600,color:"var(--fg)",fontFamily:"var(--sans)"}}>{av.clientes?.nome || "Cliente"}</span>
+                                  </div>
+                                  <span style={{fontSize:"0.62rem",color:"var(--g4)"}}>{data}</span>
+                                </div>
+                                {nota && (
+                                  <div style={{display:"flex",gap:"0.1rem",marginBottom:"0.25rem"}}>
+                                    {[1,2,3,4,5].map(v=><span key={v} style={{fontSize:"0.9rem",color:v<=nota?cor:"#e2dfda"}}>★</span>)}
+                                  </div>
+                                )}
+                                {av.comentario_cliente && (
+                                  <p style={{fontSize:"0.78rem",color:"var(--g5)",lineHeight:1.4,margin:0,fontStyle:"italic"}}>"{av.comentario_cliente}"</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {avsComComentario.length > 5 && (
+                            <div style={{fontSize:"0.72rem",color:"var(--g4)",textAlign:"center"}}>+ {avsComComentario.length - 5} avaliações anteriores</div>
+                          )}
+                        </div>
                       </div>
                     );
                   })()}
