@@ -613,6 +613,9 @@ export default function PublicarPage() {
           ? { ...f, validando: false, valida: resultado.valida, motivo: resultado.motivo, categoria_ia: resultado.categoria }
           : f
       ));
+      // Preencher cor e material automaticamente se a IA os identificou
+      if (resultado.cor) setP("cor", resultado.cor);
+      if (resultado.material) setP("material", resultado.material);
     } catch {
       setFotos(prev => prev.map((f, i) =>
         i === index ? { ...f, validando: false, valida: true, motivo: "Validação indisponível" } : f

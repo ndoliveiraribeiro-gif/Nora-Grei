@@ -19,7 +19,7 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5",
-        max_tokens: 200,
+        max_tokens: 300,
         messages: [
           {
             role: "user",
@@ -54,15 +54,15 @@ SEGURANÇA (obrigatório):
 - Sem conteúdo adulto, violento ou ofensivo
 - Sem marcas d'água de outros sites de venda
 
-Responde com este JSON exato:
-{"valida": true/false, "categoria": "roupa|acessorio|calcado|outro", "motivo": "descrição curta em português — se inválida, explica o problema principal"}
+Responde com este JSON exato (sem texto adicional):
+{"valida": true/false, "categoria": "roupa|acessorio|calcado|outro", "motivo": "descrição curta em português — se inválida, explica o problema principal", "cor": "cor principal em português (ex: preto, branco, azul, vermelho, bege, verde, rosa, multicor, etc.) ou null se não aplicável", "material": "material principal em português (ex: algodão, seda, linho, lã, denim, couro, sintético, malha, etc.) ou null se não identificável"}
 
 Exemplos:
-{"valida": true, "categoria": "roupa", "motivo": "Camisola branca de malha, boa iluminação e foco"}
-{"valida": false, "categoria": "roupa", "motivo": "Imagem muito escura, peça quase invisível"}
-{"valida": false, "categoria": "roupa", "motivo": "Foto desfocada, qualidade insuficiente"}
-{"valida": false, "categoria": "outro", "motivo": "Screenshot de página web"}
-{"valida": false, "categoria": "outro", "motivo": "Fotografia de paisagem, sem peça de roupa"}`,
+{"valida": true, "categoria": "roupa", "motivo": "Camisola de malha, boa iluminação e foco", "cor": "branco", "material": "malha"}
+{"valida": true, "categoria": "roupa", "motivo": "Camisa floral com várias cores", "cor": "multicor", "material": "algodão"}
+{"valida": true, "categoria": "calcado", "motivo": "Sapatos de couro, bom enquadramento", "cor": "preto", "material": "couro"}
+{"valida": false, "categoria": "roupa", "motivo": "Imagem muito escura, peça quase invisível", "cor": null, "material": null}
+{"valida": false, "categoria": "outro", "motivo": "Screenshot de página web", "cor": null, "material": null}`,
               },
             ],
           },
