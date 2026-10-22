@@ -1187,9 +1187,14 @@ export default function Home() {
                     <div style={{padding:"0.65rem 0.7rem 0.3rem"}}>
                       {peca.categoria && <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"#b0ada6",fontFamily:"var(--sans)",marginBottom:"0.15rem"}}>{peca.categoria}</p>}
                       <h3 style={{fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:500,lineHeight:1.2,marginBottom:"0.3rem",color:"#111"}}>{peca.nome}</h3>
-                      <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem",paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
-                        <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
-                        <span style={{fontFamily:"var(--sans)",fontSize:"0.68rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+                      <div style={{paddingTop:"0.4rem",borderTop:"1px solid #ece9e4"}}>
+                        <div style={{display:"flex",alignItems:"baseline",gap:"0.3rem"}}>
+                          <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
+                          <span style={{fontFamily:"var(--sans)",fontSize:"0.68rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
+                        </div>
+                        <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"#888",marginTop:"0.1rem"}}>
+                          {Math.ceil(peca.preco_aluguer_dia / 0.90)}€/dia incl. proteção
+                        </div>
                       </div>
                     </div>
                   </a>
