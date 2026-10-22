@@ -11,7 +11,7 @@ const TXT = {
   pt: {
     hero_eyebrow: "O que é a Nora Grei?",
     hero_title: "Moda de luxo que circula,\nem vez de ficar parada.",
-    hero_desc: "A Nora Grei é moda para todos — do luxo ao acessível, de qualquer marca que uses e queiras fazer circular. Aluga, vende, dá ou abre a tua loja. A plataforma adapta-se ao teu estilo e ao que te dispões a investir.",
+    hero_desc: "A Nora Grei é moda para todos — do luxo ao acessível, de qualquer marca que uses e queiras fazer circular. Aluga, vende ou dá. A plataforma adapta-se ao teu estilo e ao que te dispões a investir.",
     cta_conta: "Criar conta gratuita",
     cta_loja: "Quero abrir uma loja",
     cta_catalogo: "Ver catálogo",
@@ -70,7 +70,7 @@ const TXT = {
   fr: {
     hero_eyebrow: "Qu'est-ce que Nora Grei ?",
     hero_title: "La mode de luxe qui circule,\nau lieu de rester au placard.",
-    hero_desc: "Nora Grei, c'est la mode pour tous — du luxe à l'accessible, quelle que soit la marque que vous portez et souhaitez faire circuler. Louez, vendez, donnez ou ouvrez votre boutique. La plateforme s'adapte à votre style et à ce que vous êtes prêt à investir.",
+    hero_desc: "Nora Grei, c'est la mode pour tous — du luxe à l'accessible, quelle que soit la marque que vous portez et souhaitez faire circuler. Louez, vendez ou donnez. La plateforme s'adapte à votre style et à ce que vous êtes prêt à investir.",
     cta_conta: "Créer un compte gratuit",
     cta_loja: "Je veux ouvrir une boutique",
     cta_catalogo: "Voir le catalogue",
@@ -118,7 +118,7 @@ const TXT = {
   lt: {
     hero_eyebrow: "Kas yra Nora Grei?",
     hero_title: "Prabangos mada, kuri cirkuliuoja,\no ne stovi spintoje.",
-    hero_desc: "Nora Grei — mada visiems: nuo prabangos iki prieinamos, nesvarbu kokio prekės ženklo drabužius nešiojate ir norite leisti jiems cirkuliuoti. Nuomokite, parduokite, dovanokite arba atidarykite savo parduotuvę. Platforma prisitaiko prie jūsų stiliaus ir to, kiek esate pasiryžę investuoti.",
+    hero_desc: "Nora Grei — mada visiems: nuo prabangos iki prieinamos, nesvarbu kokio prekės ženklo drabužius nešiojate ir norite leisti jiems cirkuliuoti. Nuomokite, parduokite ar dovanokite. Platforma prisitaiko prie jūsų stiliaus ir to, kiek esate pasiryžę investuoti.",
     cta_conta: "Sukurti nemokamą paskyrą",
     cta_loja: "Noriu atidaryti parduotuvę",
     cta_catalogo: "Žiūrėti katalogą",
