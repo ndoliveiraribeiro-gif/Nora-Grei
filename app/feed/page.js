@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { fmtData } from "@/lib/i18n";
 
 const T = {
   pt: { titulo:"Feed Nora Grei", sub:"Descobre as últimas peças e looks", buscar:"Pesquisar peças, looks, marcas...", publicar:"+ Publicar", boosted:"Destaque", novo:"Novo", verPeca:"Ver peça", alugar:"Alugar", semPosts:"Ainda sem posts. Sê o primeiro!", carregarMais:"Ver mais", likes:"gostos", hoje:"Hoje", ontem:"Ontem" },
@@ -8,12 +9,12 @@ const T = {
   lt: { titulo:"Nora Grei Srautas", sub:"Atraskite naujausias detales ir vaizdus", buscar:"Ieškoti...", publicar:"+ Skelbti", boosted:"Išskirta", novo:"Nauja", verPeca:"Žiūrėti", alugar:"Nuomoti", semPosts:"Dar nėra įrašų.", carregarMais:"Rodyti daugiau", likes:"patiktimai", hoje:"Šiandien", ontem:"Vakar" },
 };
 
-function tempoRelativo(dt, t) {
+function tempoRelativo(dt, t, lang = "pt") {
   const d = new Date(dt), n = new Date();
   const diff = n - d;
   if (diff < 86400000) return t.hoje;
   if (diff < 172800000) return t.ontem;
-  return d.toLocaleDateString("pt-PT", { day:"numeric", month:"short" });
+  return fmtData(dt, lang, { day:"numeric", month:"short" });
 }
 
 export default function FeedPage() {
@@ -217,7 +218,7 @@ function PostCard({ post, t, lang, liked, onLike }) {
   const [fotoIdx, setFotoIdx] = useState(0);
   const fotos = post.fotos?.filter(Boolean) || (post.pecas?.fotos?.filter(Boolean) || []);
   const fotoUrl = fotos[fotoIdx] || null;
-  const tempo = tempoRelativo(post.publicado_em || post.created_at, t);
+  const tempo = tempoRelativo(post.publicado_em || post.created_at, t, lang);
   const iniciais = (post.clientes?.nome || "N").split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
 
   const passarFoto = (dir) => {

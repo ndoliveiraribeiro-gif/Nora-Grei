@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import NotificationBell from "@/components/NotificationBell";
+import { fmtData, fmtDataHora } from "@/lib/i18n";
 
 // ── Estimativa de valor ─────────────────────────────────────────────────────
 // Marcas que podem APRECIAR acima do preço de compra (investimento)
@@ -307,7 +308,7 @@ function BotaoVerTalao({ aluguer, i }) {
               <span style={{ fontSize:"0.68rem",color:"#3f3e3c",fontFamily:"monospace" }}>{recibo.numero}</span>
             </div>
             {[
-              [i.dataLabel, new Date(recibo.created_at).toLocaleString("pt-PT")],
+              [i.dataLabel, fmtDataHora(recibo.created_at, lang)],
               [i.metodoLabel, recibo.metodo_pagamento],
             ].map(([k,v]) => (
               <div key={k} style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",padding:"0.35rem 0" }}><span style={{color:"#3f3e3c"}}>{k}</span><span style={{textTransform:"capitalize"}}>{v}</span></div>
@@ -2368,7 +2369,7 @@ export default function Perfil() {
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:"0.82rem",fontWeight:600,color:"var(--black)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.pecas_lojista?.nome||"Peça"}</div>
                       <div style={{fontSize:"0.72rem",color:"#7a6a5a",marginTop:"0.2rem"}}>{r.tipo==="aluguer"?"Aluguer":"Compra"} · {r.comprador_email||"visitante"}</div>
-                      <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.15rem"}}>{new Date(r.created_at).toLocaleDateString("pt-PT")}</div>
+                      <div style={{fontSize:"0.7rem",color:"#9c9894",marginTop:"0.15rem"}}>{fmtData(r.created_at, lang, {day:"2-digit",month:"short",year:"numeric"})}</div>
                     </div>
                     <div style={{textAlign:"right",flexShrink:0}}>
                       <div style={{fontSize:"0.9rem",fontFamily:"var(--serif)",fontWeight:600,color:r.status==="cancelado"?"#c0392b":r.comissao_paga?"#3a7a3a":"#c4a882"}}>
@@ -3102,7 +3103,7 @@ export default function Perfil() {
                           {avsComComentario.slice(0,5).map((av, i) => {
                             const nota = av.nota_cliente_lojista;
                             const cor = nota >= 4 ? "#c4748a" : nota >= 3 ? "#f39c12" : "#e74c3c";
-                            const data = av.created_at ? new Date(av.created_at).toLocaleDateString("pt-PT",{day:"numeric",month:"short",year:"numeric"}) : "";
+                            const data = av.created_at ? fmtData(av.created_at, lang, {day:"numeric",month:"short",year:"numeric"}) : "";
                             return (
                               <div key={i} style={{borderBottom:"1px solid #f5f3f0",paddingBottom:"0.75rem"}}>
                                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"0.3rem"}}>
@@ -3552,7 +3553,7 @@ export default function Perfil() {
                               <div>
                                 <span style={{fontWeight:500}}>{a.pecas_lojista?.nome||"—"}</span>
                                 <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
-                                {a.data_verificacao && <div style={{fontSize:"0.68rem",color:"#888"}}>Verificado em {new Date(a.data_verificacao).toLocaleDateString("pt-PT")}</div>}
+                                {a.data_verificacao && <div style={{fontSize:"0.68rem",color:"#888"}}>Verificado em {fmtData(a.data_verificacao, lang)}</div>}
                               </div>
                               <span style={{color:"#c4748a",fontWeight:600}}>{((a.valor_aluguer||0)*0.9).toFixed(2)}€</span>
                             </div>
@@ -3569,7 +3570,7 @@ export default function Perfil() {
                               <div>
                                 <span style={{fontWeight:500}}>{a.pecas_lojista?.nome||"—"}</span>
                                 <span style={{color:"#aaa",marginLeft:"0.5rem",fontSize:"0.72rem"}}>· {a.clientes?.nome}</span>
-                                {a.liquidado_em && <div style={{fontSize:"0.68rem",color:"#888"}}>Pago em {new Date(a.liquidado_em).toLocaleDateString("pt-PT")}</div>}
+                                {a.liquidado_em && <div style={{fontSize:"0.68rem",color:"#888"}}>Pago em {fmtData(a.liquidado_em, lang)}</div>}
                               </div>
                               <span style={{color:"#27ae60",fontWeight:600}}>{(a.valor_liquidacao||0).toFixed(2)}€</span>
                             </div>
@@ -3688,7 +3689,7 @@ export default function Perfil() {
                               <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{g.nome}</div>
                               <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
                                 <span style={{fontSize:"0.68rem",background:"var(--g1)",padding:"0.1rem 0.4rem",color:"#888"}}>{g.tipo}</span>
-                                {g.data && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(g.data).toLocaleDateString("pt-PT")}</span>}
+                                {g.data && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{fmtData(g.data, lang)}</span>}
                                 {g.liquidado
                                   ? <span style={{fontSize:"0.68rem",color:"#27ae60"}}>✓ Liquidado</span>
                                   : <span style={{fontSize:"0.68rem",color:"#b8860b"}}>Pendente</span>}
@@ -3739,7 +3740,7 @@ export default function Perfil() {
                               <div style={{fontSize:"0.82rem",fontWeight:500,marginBottom:"0.1rem"}}>{c.descricao||"Comissão de afiliado"}</div>
                               <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
                                 <span style={{fontSize:"0.68rem",background:"var(--g1)",padding:"0.1rem 0.4rem",color:"#888"}}>{c.tipo==="link_ref"?"Link ref":"Código"}</span>
-                                {c.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(c.created_at).toLocaleDateString("pt-PT")}</span>}
+                                {c.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{fmtData(c.created_at, lang)}</span>}
                                 {c.usado
                                   ? <span style={{fontSize:"0.68rem",color:"#bbb"}}>Usado</span>
                                   : <span style={{fontSize:"0.68rem",color:"#c4a882"}}>Disponível</span>}
@@ -3789,7 +3790,7 @@ export default function Perfil() {
                               <div>
                                 <div style={{fontSize:"0.85rem",fontWeight:500,marginBottom:"0.1rem"}}>{b.booster_tipos?.nome||b.booster_id}</div>
                                 <div style={{fontSize:"0.72rem",color:"#aaa"}}>{b.booster_tipos?.descricao||""}</div>
-                                {b.inicio_em && <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Desde {new Date(b.inicio_em).toLocaleDateString("pt-PT")}</div>}
+                                {b.inicio_em && <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Desde {fmtData(b.inicio_em, lang)}</div>}
                               </div>
                               <div style={{textAlign:"right",flexShrink:0,marginLeft:"1rem"}}>
                                 <div style={{fontWeight:600,color:"#c4748a",fontSize:"0.92rem"}}>{(b.preco_semana||0).toFixed(2)}€<span style={{fontSize:"0.68rem",color:"#aaa",fontWeight:400}}>/sem</span></div>
@@ -3812,9 +3813,9 @@ export default function Perfil() {
                                 <span style={{fontSize:"0.68rem",padding:"0.1rem 0.5rem",background:METODO_COR[p.metodo]||"#888",color:"#fff",fontWeight:600}}>
                                   {METODO_LABEL[p.metodo]||p.metodo}
                                 </span>
-                                {p.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{new Date(p.created_at).toLocaleDateString("pt-PT")}</span>}
+                                {p.created_at && <span style={{fontSize:"0.7rem",color:"#bbb"}}>{fmtData(p.created_at, lang)}</span>}
                                 {p.periodo_inicio && p.periodo_fim && (
-                                  <span style={{fontSize:"0.68rem",color:"#bbb"}}>{new Date(p.periodo_inicio).toLocaleDateString("pt-PT")} – {new Date(p.periodo_fim).toLocaleDateString("pt-PT")}</span>
+                                  <span style={{fontSize:"0.68rem",color:"#bbb"}}>{fmtData(p.periodo_inicio, lang)} – {fmtData(p.periodo_fim, lang)}</span>
                                 )}
                               </div>
                               {p.descricao && <div style={{fontSize:"0.72rem",color:"#aaa",marginTop:"0.1rem"}}>{p.descricao}</div>}
@@ -4020,7 +4021,7 @@ export default function Perfil() {
                   const agora = new Date();
                   const meses = Array.from({length:6}, (_,i) => {
                     const d = new Date(agora.getFullYear(), agora.getMonth()-i, 1);
-                    return { key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`, label: d.toLocaleDateString("pt-PT",{month:"short",year:"numeric"}) };
+                    return { key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`, label: fmtData(d, lang, {month:"short",year:"numeric"}) };
                   }).reverse();
                   const receitaMes = meses.map(m => ({
                     ...m,

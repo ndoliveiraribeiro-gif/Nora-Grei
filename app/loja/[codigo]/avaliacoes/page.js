@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { fmtData } from "@/lib/i18n";
 
 const T = {
   pt: {
@@ -25,10 +26,8 @@ function Estrelas({ nota, size = "1rem" }) {
   );
 }
 
-function formatarData(ts) {
-  if (!ts) return "";
-  const d = new Date(ts);
-  return d.toLocaleDateString("pt-PT", { year: "numeric", month: "long", day: "numeric" });
+function formatarData(ts, lang = "pt") {
+  return fmtData(ts, lang, { year: "numeric", month: "long", day: "numeric" });
 }
 
 export default function AvaliacoesLoja() {
@@ -164,7 +163,7 @@ export default function AvaliacoesLoja() {
                   <div className="av-nome">{av.nomeCliente}</div>
                   <Estrelas nota={av.nota_cliente_lojista} size="0.85rem" />
                 </div>
-                <div className="av-data">{formatarData(av.created_at)}</div>
+                <div className="av-data">{formatarData(av.created_at, lang)}</div>
               </div>
               {av.comentario_cliente_lojista && (
                 <p className="av-comentario">"{av.comentario_cliente_lojista}"</p>

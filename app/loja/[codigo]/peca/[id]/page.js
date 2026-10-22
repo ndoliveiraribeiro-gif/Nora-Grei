@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
+import { fmtData } from "@/lib/i18n";
 
 const OCASIOES_I18N = {
   pt: { "Casamento":"Casamento","Gala":"Gala","Cocktail":"Cocktail","Festa":"Festa","Trabalho":"Trabalho","Dia a dia":"Dia a dia","Jantar":"Jantar","Férias":"Férias","Praia":"Praia","Praia/Férias":"Praia/Férias" },
@@ -723,7 +724,7 @@ export default function PecaLojaPage() {
                 ))}
                 {stockEsgotado.map(s => {
                   const dataD = datasPorTamanho[s.id];
-                  const dataStr = dataD ? dataD.toLocaleDateString("pt-PT", { day:"numeric", month:"short" }) : null;
+                  const dataStr = dataD ? fmtData(dataD, lang, { day:"numeric", month:"short" }) : null;
                   return (
                     <div key={s.id} className="tam-wrap">
                       <button className="tam-btn sem-stock" disabled>{s.tamanho}</button>

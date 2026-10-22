@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useParams, useSearchParams } from "next/navigation";
+import { fmtDataHora } from "@/lib/i18n";
 
 const t = {
   pt: {
@@ -236,7 +237,7 @@ function Talao({ recibo, peca, tamanhoNome, dataInicio, dataFim, valorAluguer, v
         <span className="talao-logo">{nomeLojista || "LOJA"}</span>
         <span className="talao-num">{recibo.numero}</span>
       </div>
-      <div className="talao-linha"><span>Data</span><span>{new Date(recibo.created_at).toLocaleString("pt-PT")}</span></div>
+      <div className="talao-linha"><span>Data</span><span>{fmtDataHora(recibo.created_at, lang)}</span></div>
       <div className="talao-linha"><span>{i.peca}</span><span>{peca?.nome}</span></div>
       {tamanhoNome && <div className="talao-linha"><span>{i.tamanho}</span><span>{tamanhoNome}</span></div>}
       <div className="talao-linha"><span>{dataInicio} → {dataFim}</span></div>

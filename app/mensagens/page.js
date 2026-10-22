@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { fmtData } from "@/lib/i18n";
 
 const T = {
   pt: {
@@ -63,13 +64,15 @@ const T = {
   },
 };
 
-function formatHora(iso) {
+const LANG_LOCALE = { pt: "pt-PT", fr: "fr-FR", lt: "lt-LT" };
+
+function formatHora(iso, lang = "pt") {
   if (!iso) return "";
   const d = new Date(iso);
-  return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleTimeString(LANG_LOCALE[lang] || "pt-PT", { hour: "2-digit", minute: "2-digit" });
 }
 
-function formatData(iso, t) {
+function formatData(iso, t, lang = "pt") {
   if (!iso) return "";
   const d = new Date(iso);
   const hoje = new Date();
@@ -77,7 +80,7 @@ function formatData(iso, t) {
   ontem.setDate(ontem.getDate() - 1);
   if (d.toDateString() === hoje.toDateString()) return t.hoje;
   if (d.toDateString() === ontem.toDateString()) return t.ontem;
-  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
+  return fmtData(iso, lang, { day: "2-digit", month: "short" });
 }
 
 function MensagensInner() {
@@ -429,7 +432,7 @@ function MensagensInner() {
                   </div>
                   <div className="conv-meta">
                     {conv.ultima_mensagem_em && (
-                      <span className="conv-hora">{formatData(conv.ultima_mensagem_em, t)}</span>
+                      <span className="conv-hora">{formatData(conv.ultima_mensagem_em, t, lang)}</span>
                     )}
                     {naoLidas > 0 && <span className="conv-badge">{naoLidas}</span>}
                   </div>
@@ -469,7 +472,7 @@ function MensagensInner() {
                   <div className="chat-vazio">{t.semMensagens}</div>
                 ) : mensagensAgrupadas.map((item, i) => {
                   if (item.tipo === "separador") {
-                    return <div key={`sep-${i}`} className="separador-dia">{formatData(item.data, t)}</div>;
+                    return <div key={`sep-${i}`} className="separador-dia">{formatData(item.data, t, lang)}</div>;
                   }
                   const sou = item.remetente_id === cliente.id;
                   const trad = traducoes[item.id];
@@ -481,7 +484,7 @@ function MensagensInner() {
                       {trad?.mostrar && trad?.texto && (
                         <div className="msg-traducao">🌐 {item.conteudo}</div>
                       )}
-                      <div className="msg-hora">{formatHora(item.created_at)}</div>
+                      <div className="msg-hora">{formatHora(item.created_at, lang)}</div>
                       {!sou && (
                         <button
                           className="msg-traduzir"

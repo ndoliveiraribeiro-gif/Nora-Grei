@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { fmtData } from "@/lib/i18n";
 
 // Caução baseada em ROI: quantos alugueres são precisos para recuperar a peça
 // Fórmula: (valor_peca - receita_já_gerada) / alugueres_esperados_mes × fator_risco
@@ -555,7 +556,7 @@ export default function PecaDetalhe() {
                 ))}
                 {tamanhosSemStock.map(s => {
                   const dataDisp = datasPorTamanho[s.id];
-                  const dataStr = dataDisp ? dataDisp.toLocaleDateString("pt-PT", { day:"numeric", month:"short" }) : null;
+                  const dataStr = dataDisp ? fmtData(dataDisp, lang, { day:"numeric", month:"short" }) : null;
                   return (
                     <div key={s.id} className="tam-wrap">
                       <button className="tam-btn sem-stock" disabled>{s.tamanho}</button>
