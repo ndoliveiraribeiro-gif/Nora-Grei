@@ -2139,8 +2139,6 @@ export default function Perfil() {
         .avatar-btn{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);border:2.5px solid var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
         .hero-info{min-width:0;flex:1;overflow:hidden}
         .hero-nome{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.1;margin-bottom:0.3rem;color:var(--black)}
-        .tabs-scroll{display:flex;overflow-x:auto;border-bottom:2px solid var(--g2);margin-bottom:1.5rem;scrollbar-width:none;-ms-overflow-style:none}
-        .tabs-scroll::-webkit-scrollbar{display:none}
         .hero-email{font-size:0.92rem;color:var(--g6)}
         .alerta-perfil{background:#fff8e1;border-left:3px solid #b8860b;padding:1.25rem 1.5rem}
         .alerta-perfil-titulo{font-size:0.85rem;font-weight:700;color:#6b4500;margin-bottom:0.3rem}
@@ -2294,25 +2292,6 @@ export default function Perfil() {
 
       <div className="page">
 
-        <div className="tabs-scroll">
-          {[
-            {id:"perfil",label:i.tabPerfil},
-            {id:"pedidos",label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
-            {id:"guardados",label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
-            {id:"ganhos",label:{pt:"Ganhos",fr:"Gains",lt:"Pajamos"}[lang]||"Ganhos", badge: ganhos.totalPendente > 0 ? `€${ganhos.totalPendente.toFixed(0)}` : null},
-            {id:"calculadora",label:i.tabCalculadora},
-            ...(modoLojista ? [{id:"loja",label:i.tabLoja}] : []),
-          ].map(tab => (
-            <button key={tab.id} onClick={() => setTabAtiva(tab.id)} style={{padding:"0.85rem 1.25rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabAtiva===tab.id?"2px solid #c4748a":"2px solid transparent",color:tabAtiva===tab.id?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"0.35rem"}}>
-              {tab.label}
-              {tab.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.68rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{tab.badge}</span>}
-            </button>
-          ))}
-          <a href="/mensagens" style={{padding:"0.85rem 1.25rem",fontSize:"0.75rem",letterSpacing:"0.18em",textTransform:"uppercase",borderBottom:"2px solid transparent",color:"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",textDecoration:"none",display:"flex",alignItems:"center",gap:"0.4rem",whiteSpace:"nowrap"}}>
-            {i.tabMensagens}
-            {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.68rem",padding:"0.1rem 0.4rem",borderRadius:"10px"}}>{naoLidasMsg}</span>}
-          </a>
-        </div>
 
         <div style={{display:modoLojista && tabAtiva==="loja"?"none":"block"}}>
 
