@@ -2188,7 +2188,10 @@ export default function Perfil() {
                 {href:"/publicar", icon:"+", label:{pt:"Publicar peça",fr:"Publier une pièce",lt:"Publikuoti"}[lang]||"Publicar peça"},
                 {href:"/feed", icon:"◎", label:"Feed"},
                 {href:"/lojas", icon:"◫", label:{pt:"Lojistas",fr:"Boutiques",lt:"Parduotuvės"}[lang]||"Lojistas"},
-                ...(modoLojista && codigoLoja ? [{href:`/loja/${codigoLoja}?from=perfil`, icon:"→", label:{pt:"Ver a minha loja",fr:"Voir ma boutique",lt:"Mano parduotuvė"}[lang]||"Ver a minha loja"}] : []),
+                ...(modoLojista && codigoLoja ? [
+                  {href:`/loja/${codigoLoja}?from=perfil`, icon:"◫", label:{pt:"Ver a minha loja",fr:"Voir ma boutique",lt:"Mano parduotuvė"}[lang]||"Ver a minha loja"},
+                  {href:`/admin-loja`, icon:"⚙", label:{pt:"Gerir loja",fr:"Gérer la boutique",lt:"Tvarkyti parduotuvę"}[lang]||"Gerir loja"},
+                ] : []),
               ].map(item => (
                 <a key={item.href} href={item.href} style={{display:"flex",alignItems:"center",gap:"0.85rem",width:"100%",padding:"0.85rem 1.5rem",fontFamily:"var(--sans)",fontSize:"0.82rem",letterSpacing:"0.08em",color:"#5a5855",textDecoration:"none",borderLeft:"3px solid transparent"}}>
                   <span style={{fontSize:"0.9rem",width:"1.1rem",textAlign:"center",flexShrink:0}}>{item.icon}</span>
