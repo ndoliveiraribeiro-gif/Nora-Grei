@@ -110,23 +110,25 @@ function PecaCardLojista({ peca, lang }) {
             </div>
           )}
           {(() => {
-            const comAluguer = peca.preco_aluguer_dia > 0 ? Math.ceil(peca.preco_aluguer_dia / 0.90) : 0;
-            const comVenda   = peca.preco_venda > 0       ? Math.ceil(peca.preco_venda / 0.80)        : 0;
+            const baseAluguer = peca.preco_aluguer_dia || 0;
+            const baseVenda   = peca.preco_venda || 0;
+            const comAluguer  = baseAluguer > 0 ? Math.ceil(baseAluguer / 0.90) : 0;
+            const comVenda    = baseVenda > 0   ? Math.ceil(baseVenda / 0.80)   : 0;
             const isSocial = peca.tipo === "social";
             return (
               <div style={{paddingTop:"0.4rem",borderTop:"1px solid #e8e5e0"}}>
-                {/* linha principal do preço */}
+                {/* linha principal: preço base (sem taxa) */}
                 <div style={{display:"flex",alignItems:"baseline",gap:"0.25rem",flexWrap:"wrap"}}>
-                  {peca.tipo === "comprar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span></>}
+                  {peca.tipo === "comprar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{baseVenda}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>venda</span></>}
                   {isSocial && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>5€+</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>preço livre</span></>}
-                  {peca.tipo === "ambos" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {comVenda}€ venda</span></>}
-                  {peca.tipo === "alugar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{comAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span></>}
+                  {peca.tipo === "ambos" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{baseAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#c4748a",marginLeft:"0.2rem"}}>· {baseVenda}€ venda</span></>}
+                  {peca.tipo === "alugar" && <><span style={{fontFamily:"'Jost',sans-serif",fontSize:"1.15rem",fontWeight:600,color:"#111"}}>{baseAluguer}€</span><span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.72rem",color:"#8a8783"}}>/dia</span></>}
                 </div>
                 {/* segunda linha: preço incl. taxa + ícone clicável */}
                 {!isSocial && (
                   <button onClick={e=>{e.preventDefault();e.stopPropagation();setModalAberto(true);}} style={{display:"inline-flex",alignItems:"center",gap:"0.2rem",background:"none",border:"none",padding:0,cursor:"pointer",marginTop:"0.18rem"}}>
                     <span style={{fontFamily:"'Jost',sans-serif",fontSize:"0.75rem",color:"#5a5855",fontWeight:500}}>
-                      {peca.tipo==="comprar" ? `${comVenda}€` : `${comAluguer}€`} incl. 🛡
+                      {peca.tipo==="comprar" ? `${comVenda}€` : `${comAluguer}€`}/dia incl. 🛡
                     </span>
                   </button>
                 )}
