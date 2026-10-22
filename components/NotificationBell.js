@@ -15,6 +15,10 @@ const TXT = {
     ultimoDiaMsg: (nome) => `Amanhã é o último dia de uso de "${nome}". Prepara-te para enviar a devolução — tens 24h após o fim do aluguer.`,
     atrasoTitulo: "Devolução em atraso",
     atrasoMsg: (nome, dias) => `"${nome}" devia já ter sido devolvida. Estás ${dias} dia${dias !== 1 ? "s" : ""} em atraso — podem aplicar-se custos extra.`,
+    reservaTitulo: "Reserva disponível",
+    reservaMsg: (nome) => `A tua reserva de "${nome}" está disponível. Confirma antes que expire!`,
+    campanhaTitulo: "Nova campanha",
+    campanhaMsg: (titulo) => `${titulo}`,
     marcarLidas: "Marcar todas como lidas",
   },
   fr: {
@@ -29,6 +33,10 @@ const TXT = {
     ultimoDiaMsg: (nome) => `Demain est le dernier jour d'utilisation de "${nome}". Préparez le retour — vous avez 24h après la fin de la location.`,
     atrasoTitulo: "Retour en retard",
     atrasoMsg: (nome, dias) => `"${nome}" devrait déjà être retournée. Vous avez ${dias} jour${dias !== 1 ? "s" : ""} de retard — des frais supplémentaires peuvent s'appliquer.`,
+    reservaTitulo: "Réservation disponible",
+    reservaMsg: (nome) => `Votre réservation de "${nome}" est disponible. Confirmez avant qu'elle n'expire !`,
+    campanhaTitulo: "Nouvelle campagne",
+    campanhaMsg: (titulo) => `${titulo}`,
     marcarLidas: "Tout marquer comme lu",
   },
   lt: {
@@ -43,6 +51,10 @@ const TXT = {
     ultimoDiaMsg: (nome) => `Rytoj yra paskutinė "${nome}" naudojimo diena. Pasiruoškite grąžinimui — turite 24h po nuomos pabaigos.`,
     atrasoTitulo: "Vėluojantis grąžinimas",
     atrasoMsg: (nome, dias) => `"${nome}" turėjo būti grąžinta. Vėluojate ${dias} dieną(-as) — gali būti taikomi papildomi mokesčiai.`,
+    reservaTitulo: "Rezervacija prieinama",
+    reservaMsg: (nome) => `Jūsų "${nome}" rezervacija prieinama. Patvirtinkite prieš galiojimo pabaigą!`,
+    campanhaTitulo: "Nauja kampanija",
+    campanhaMsg: (titulo) => `${titulo}`,
     marcarLidas: "Pažymėti visus kaip skaitytus",
   },
 };
@@ -51,6 +63,8 @@ export default function NotificationBell({ lang = "pt" }) {
   const [notificacoes, setNotificacoes] = useState([]);
   const [mensagensNaoLidas, setMensagensNaoLidas] = useState([]);
   const [recibosRecentes, setRecibosRecentes] = useState([]);
+  const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
+  const [campanhasNovas, setCampanhasNovas] = useState([]);
   const [aberto, setAberto] = useState(false);
   const [userId, setUserId] = useState(null);
   const [modoLojista, setModoLojista] = useState(false);
@@ -75,6 +89,8 @@ export default function NotificationBell({ lang = "pt" }) {
     await carregarNotificacoes(user.id);
     await carregarMensagensNaoLidas(user.id, lojista);
     await carregarRecibosRecentes(user.id);
+    await carregarReservasDisponiveis(user.id);
+    await carregarCampanhasNovas();
   };
 
   const gerarNotificacoesAtuais = async (cliente_id) => {
@@ -153,6 +169,32 @@ export default function NotificationBell({ lang = "pt" }) {
     setRecibosRecentes(data || []);
   };
 
+  const carregarReservasDisponiveis = async (cliente_id) => {
+    const { data } = await supabase
+      .from("reservas_espera")
+      .select("id, estado, notificado_em, expira_confirmacao_em, peca:peca_id(nome)")
+      .eq("cliente_id", cliente_id)
+      .eq("estado", "notificado")
+      .order("notificado_em", { ascending: false })
+      .limit(5);
+    setReservasDisponiveis(data || []);
+  };
+
+  const carregarCampanhasNovas = async () => {
+    const trintaDias = new Date();
+    trintaDias.setDate(trintaDias.getDate() - 30);
+    const hoje = new Date().toISOString().split("T")[0];
+    const { data } = await supabase
+      .from("campanhas")
+      .select("id, titulo, titulo_fr, titulo_lt, mensagem, mensagem_fr, mensagem_lt, created_at, validade")
+      .eq("ativa", true)
+      .or(`validade.is.null,validade.gte.${hoje}`)
+      .gte("created_at", trintaDias.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(3);
+    setCampanhasNovas(data || []);
+  };
+
   const carregarMensagensNaoLidas = async (cliente_id, lojista) => {
     const campo = lojista ? "lojista_id" : "cliente_id";
     const campoCont = lojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
@@ -173,7 +215,7 @@ export default function NotificationBell({ lang = "pt" }) {
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
-  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length;
+  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length + reservasDisponiveis.length + campanhasNovas.length;
   const campoCont = modoLojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
 
   return (
@@ -231,6 +273,52 @@ export default function NotificationBell({ lang = "pt" }) {
                 </a>
               ))}
 
+              {/* Reservas disponíveis */}
+              {reservasDisponiveis.map(r => {
+                const nomePeca = r.peca?.nome || "a peça";
+                const expira = r.expira_confirmacao_em ? new Date(r.expira_confirmacao_em) : null;
+                const horasRestantes = expira ? Math.max(0, Math.round((expira - new Date()) / 3600000)) : null;
+                return (
+                  <a key={r.id} href="/pedidos" onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fff8e1", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>
+                      🏷 {i.reservaTitulo}
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>
+                      {i.reservaMsg(nomePeca)}
+                    </div>
+                    {horasRestantes !== null && (
+                      <div style={{ fontSize: "0.62rem", color: horasRestantes < 12 ? "#c0392b" : "#aaa89f", marginTop: "0.3rem", fontWeight: horasRestantes < 12 ? 600 : 400 }}>
+                        {horasRestantes > 0 ? `Expira em ${horasRestantes}h` : "Expirado"}
+                      </div>
+                    )}
+                  </a>
+                );
+              })}
+
+              {/* Campanhas / novidades */}
+              {campanhasNovas.map(c => {
+                const titulo = lang === "fr" ? (c.titulo_fr || c.titulo) : lang === "lt" ? (c.titulo_lt || c.titulo) : c.titulo;
+                const mensagem = lang === "fr" ? (c.mensagem_fr || c.mensagem) : lang === "lt" ? (c.mensagem_lt || c.mensagem) : c.mensagem;
+                return (
+                  <div key={c.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fdf6f9" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>
+                      ✦ {i.campanhaTitulo}
+                    </div>
+                    <div style={{ fontSize: "0.78rem", color: "#3f3e3c", fontWeight: 500, marginBottom: "0.15rem" }}>
+                      {titulo}
+                    </div>
+                    {mensagem && (
+                      <div style={{ fontSize: "0.72rem", color: "#5a5855", lineHeight: 1.4 }}>
+                        {mensagem.slice(0, 120)}{mensagem.length > 120 ? "…" : ""}
+                      </div>
+                    )}
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>
+                      {new Date(c.created_at).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}
+                    </div>
+                  </div>
+                );
+              })}
+
               {/* Notificações de alugueres */}
               {notificacoes.map(n => (
                 <div key={n.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: n.lida ? "#fff" : "#fff8e1" }}>
@@ -249,7 +337,7 @@ export default function NotificationBell({ lang = "pt" }) {
                 </div>
               ))}
 
-              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && (
+              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && recibosRecentes.length === 0 && reservasDisponiveis.length === 0 && campanhasNovas.length === 0 && (
                 <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
               )}
 
