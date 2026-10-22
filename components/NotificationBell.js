@@ -37,8 +37,10 @@ const TXT = {
 
 export default function NotificationBell({ lang = "pt" }) {
   const [notificacoes, setNotificacoes] = useState([]);
+  const [mensagensNaoLidas, setMensagensNaoLidas] = useState([]);
   const [aberto, setAberto] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [modoLojista, setModoLojista] = useState(false);
   const ref = useRef(null);
   const i = TXT[lang] || TXT.pt;
 
@@ -53,8 +55,12 @@ export default function NotificationBell({ lang = "pt" }) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     setUserId(user.id);
+    const { data: cli } = await supabase.from("clientes").select("modo_lojista").eq("id", user.id).single();
+    const lojista = cli?.modo_lojista || false;
+    setModoLojista(lojista);
     await gerarNotificacoesAtuais(user.id);
     await carregarNotificacoes(user.id);
+    await carregarMensagensNaoLidas(user.id, lojista);
   };
 
   const gerarNotificacoesAtuais = async (cliente_id) => {
@@ -119,6 +125,19 @@ export default function NotificationBell({ lang = "pt" }) {
     if (data) setNotificacoes(data);
   };
 
+  const carregarMensagensNaoLidas = async (cliente_id, lojista) => {
+    const campo = lojista ? "lojista_id" : "cliente_id";
+    const campoCont = lojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
+    const { data } = await supabase
+      .from("conversas")
+      .select(`id, assunto, ultima_mensagem_em, ${campoCont}, cliente:cliente_id(nome), lojista:lojista_id(nome)`)
+      .eq(campo, cliente_id)
+      .gt(campoCont, 0)
+      .order("ultima_mensagem_em", { ascending: false })
+      .limit(10);
+    setMensagensNaoLidas(data || []);
+  };
+
   const marcarTodasLidas = async () => {
     if (!userId) return;
     await supabase.from("notificacoes_cliente").update({ lida: true }).eq("cliente_id", userId).eq("lida", false);
@@ -126,6 +145,8 @@ export default function NotificationBell({ lang = "pt" }) {
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
+  const totalBadge = naoLidas + mensagensNaoLidas.length;
+  const campoCont = modoLojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -138,19 +159,36 @@ export default function NotificationBell({ lang = "pt" }) {
           <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 01-3.46 0" />
         </svg>
-        {naoLidas > 0 && (
+        {totalBadge > 0 && (
           <span style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: "#c0392b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Jost',sans-serif" }}>
-            {naoLidas > 9 ? "9+" : naoLidas}
+            {totalBadge > 9 ? "9+" : totalBadge}
           </span>
         )}
       </button>
 
       {aberto && (
         <div style={{ position: "fixed", top: "4rem", left: "50%", transform: "translateX(-50%)", width: "min(340px, calc(100vw - 2rem))", maxHeight: "70vh", overflowY: "auto", background: "#fff", boxShadow: "0 8px 32px rgba(0,0,0,0.18)", zIndex: 3000, fontFamily: "'Jost',sans-serif", borderRadius: "8px" }}>
-          {notificacoes.length === 0 ? (
+          {totalBadge === 0 && notificacoes.length === 0 ? (
             <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
           ) : (
             <>
+              {/* Mensagens não lidas */}
+              {mensagensNaoLidas.map(conv => {
+                const outro = modoLojista ? conv.cliente?.nome : conv.lojista?.nome;
+                const total = conv[campoCont] || 0;
+                return (
+                  <a key={conv.id} href="/mensagens" onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f0f7ff", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>
+                      ✉ {outro || "Mensagem"}
+                      <span style={{ marginLeft: "0.5rem", background: "#c4748a", color: "#fff", fontSize: "0.6rem", padding: "0.1rem 0.4rem", borderRadius: "10px", fontWeight: 700 }}>{total}</span>
+                    </div>
+                    {conv.assunto && <div style={{ fontSize: "0.72rem", color: "#5a5855", lineHeight: 1.4 }}>{conv.assunto}</div>}
+                    {conv.ultima_mensagem_em && <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{new Date(conv.ultima_mensagem_em).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}</div>}
+                  </a>
+                );
+              })}
+
+              {/* Notificações de alugueres */}
               {notificacoes.map(n => (
                 <div key={n.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: n.lida ? "#fff" : "#fff8e1" }}>
                   <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.25rem" }}>
@@ -167,6 +205,11 @@ export default function NotificationBell({ lang = "pt" }) {
                   </div>
                 </div>
               ))}
+
+              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && (
+                <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
+              )}
+
               {naoLidas > 0 && (
                 <button onClick={marcarTodasLidas} style={{ width: "100%", padding: "0.75rem", background: "#f0eeeb", border: "none", color: "#3f3e3c", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Jost',sans-serif" }}>
                   {i.marcarLidas}
