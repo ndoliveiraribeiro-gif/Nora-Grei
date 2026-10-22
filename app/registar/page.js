@@ -10,7 +10,7 @@ const t = {
     email: "Email",
     password: "Password",
     confirmar: "Confirmar password",
-    telefone: "Telefone (opcional)",
+    telefone: "Telemóvel (WhatsApp)",
     btn: "Criar conta",
     jatem: "Já tem conta?",
     link: "Entrar",
@@ -42,7 +42,7 @@ const t = {
     email: "Email",
     password: "Mot de passe",
     confirmar: "Confirmer le mot de passe",
-    telefone: "Téléphone (optionnel)",
+    telefone: "Téléphone (WhatsApp)",
     btn: "Créer un compte",
     jatem: "Vous avez déjà un compte ?",
     link: "Se connecter",
@@ -74,7 +74,7 @@ const t = {
     email: "El. paštas",
     password: "Slaptažodis",
     confirmar: "Patvirtinti slaptažodį",
-    telefone: "Telefonas (neprivaloma)",
+    telefone: "Telefonas (WhatsApp)",
     btn: "Sukurti paskyrą",
     jatem: "Jau turite paskyrą?",
     link: "Prisijungti",
@@ -338,6 +338,10 @@ function RegistarInner() {
                 <div className="form-group">
                   <label className="form-label">{i.email}</label>
                   <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="maria@email.com" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">{i.telefone}</label>
+                  <input className="form-input" type="tel" value={telefone} onChange={e => setTelefone(e.target.value)} autoComplete="tel" placeholder="+351 912 345 678" />
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.dataNasc}</label>
