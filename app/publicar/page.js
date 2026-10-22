@@ -944,7 +944,7 @@ export default function PublicarPage() {
               <input
                 ref={inputFotoRef}
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png,.webp,.heic,.heif"
                 multiple
                 style={{ display: "none" }}
                 onChange={e => adicionarFotos(e.target.files)}
