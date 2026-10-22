@@ -24,7 +24,7 @@ async function getLoja(codigo) {
   return withRetry(async () => {
     const { data, error } = await sbServer()
       .from("clientes")
-      .select("id, nome, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
       .eq("codigo_cliente", codigo)
       .maybeSingle();
     console.log("[getLoja] codigo:", codigo, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const nomeVis = loja.nome;
+  const nomeVis = loja.nome_publico || loja.nome;
   const titulo = `${nomeVis} — Nora Grei`;
   const descricao = loja.descricao
     ? loja.descricao.slice(0, 155)
