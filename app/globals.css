@@ -30,6 +30,17 @@ html {
   overflow-x: hidden;
 }
 
+/* Inputs, selects e textareas: sempre modo claro — evita texto invisível em dark mode do sistema */
+input, select, textarea {
+  color-scheme: light;
+  color: #1a1816;
+  background-color: #fff;
+}
+input::placeholder, textarea::placeholder {
+  color: #7a776f;
+  opacity: 1;
+}
+
 /* Safe area CSS variable — disponível em todas as páginas */
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
