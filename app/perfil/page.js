@@ -3380,6 +3380,107 @@ export default function Perfil() {
                       <span style={{fontSize:"0.7rem",color:"#b8860b"}}>Ver →</span>
                     </div>
                   )}
+                  {/* ── INSIGHTS DE MERCADO ── */}
+                  {(() => {
+                    const [mktData, setMktData] = React.useState(null);
+                    const [mktLoaded, setMktLoaded] = React.useState(false);
+                    React.useEffect(() => {
+                      const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+                      Promise.all([
+                        supabase.from("alugueres").select("valor_aluguer, stock_tamanho_id, estado, created_at").gte("created_at", inicioMes.toISOString()).neq("estado","cancelado"),
+                        supabase.from("alugueres_lojista").select("preco_venda, lojista_id, estado, created_at").gte("created_at", inicioMes.toISOString()).neq("estado","cancelado"),
+                        supabase.from("stock_tamanhos").select("id, pecas(nome, categorias(nome))"),
+                        supabase.from("reservas_espera").select("id, estado, stock_tamanho_id").eq("estado","aguarda"),
+                        supabase.from("clientes").select("cidade").eq("modo_lojista",false).not("cidade","is",null),
+                      ]).then(([alRes, alLojRes, stRes, resRes, cliRes]) => {
+                        const al = alRes.data || [];
+                        const alLoj = alLojRes.data || [];
+                        const st = stRes.data || [];
+                        const res = resRes.data || [];
+                        const clis = cliRes.data || [];
+                        const total = al.length + alLoj.length;
+                        if (total < 5) { setMktData({ semDados: true }); setMktLoaded(true); return; }
+                        // Categorias mais alugadas
+                        const catMap = {};
+                        const catValores = {};
+                        for (const a of al) {
+                          const peca = st.find(s => s.id === a.stock_tamanho_id);
+                          const cat = peca?.pecas?.categorias?.nome || "Outra";
+                          catMap[cat] = (catMap[cat]||0) + 1;
+                          if (!catValores[cat]) catValores[cat] = [];
+                          if (a.valor_aluguer) catValores[cat].push(a.valor_aluguer);
+                        }
+                        const topCats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([cat, n]) => ({
+                          cat,
+                          n,
+                          avgValor: catValores[cat]?.length > 0 ? Math.round(catValores[cat].reduce((s,v)=>s+v,0)/catValores[cat].length) : null,
+                        }));
+                        // Categorias com lista de espera
+                        const espCats = {};
+                        for (const r of res) {
+                          const peca = st.find(s => s.id === r.stock_tamanho_id);
+                          const cat = peca?.pecas?.categorias?.nome || "Outra";
+                          espCats[cat] = (espCats[cat]||0) + 1;
+                        }
+                        const topEsp = Object.entries(espCats).sort((a,b)=>b[1]-a[1]).slice(0,3);
+                        // Cidades com mais clientes
+                        const cidMap = {};
+                        clis.forEach(c => { cidMap[c.cidade] = (cidMap[c.cidade]||0)+1; });
+                        const topCidades = Object.entries(cidMap).sort((a,b)=>b[1]-a[1]).slice(0,4);
+                        setMktData({ total, topCats, topEsp, topCidades });
+                        setMktLoaded(true);
+                      });
+                    }, []);
+                    if (!mktLoaded) return null;
+                    if (mktData?.semDados) return (
+                      <div style={{background:"#f8f7f5",border:"1px solid #e8e4df",padding:"1.1rem 1.25rem",marginBottom:"0.6rem",borderLeft:"3px solid var(--rosa)"}}>
+                        <div style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--rosa)",marginBottom:"0.35rem"}}>Insights de Mercado</div>
+                        <p style={{fontSize:"0.8rem",color:"var(--g4)",margin:0,lineHeight:1.5}}>A plataforma está em crescimento. Em breve terás dados reais de procura para saberes exactamente que peças publicar e a que preço.</p>
+                      </div>
+                    );
+                    const maxCat = mktData.topCats[0]?.n || 1;
+                    return (
+                      <div style={{background:"#f8f7f5",border:"1px solid #e8e4df",padding:"1.1rem 1.25rem",marginBottom:"0.6rem"}}>
+                        <div style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"var(--rosa)",marginBottom:"0.75rem"}}>Insights de Mercado · Este mês</div>
+                        {/* Categorias em procura */}
+                        <div style={{marginBottom:"0.85rem"}}>
+                          <div style={{fontSize:"0.68rem",color:"var(--g4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"0.5rem"}}>O que mais se aluga</div>
+                          {mktData.topCats.map(({cat,n,avgValor},i) => (
+                            <div key={cat} style={{marginBottom:"0.5rem"}}>
+                              <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.78rem",marginBottom:"0.2rem"}}>
+                                <span style={{fontWeight:500}}>{cat}</span>
+                                <span style={{color:"var(--g4)",fontSize:"0.72rem"}}>{n} aluguer{n!==1?"es":""}{avgValor?` · ø ${avgValor}€`:""}</span>
+                              </div>
+                              <div style={{height:4,background:"#e8e4df",borderRadius:2}}>
+                                <div style={{height:"100%",width:`${Math.round(n/maxCat*100)}%`,background:"var(--rosa)",borderRadius:2}}/>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Lista de espera */}
+                        {mktData.topEsp.length > 0 && (
+                          <div style={{background:"#fff8f0",padding:"0.75rem",borderRadius:3,marginBottom:"0.75rem",borderLeft:"2px solid #f39c12"}}>
+                            <div style={{fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#b8860b",marginBottom:"0.35rem"}}>Oportunidade — clientes à espera</div>
+                            {mktData.topEsp.map(([cat,n]) => (
+                              <div key={cat} style={{fontSize:"0.78rem",color:"#7a5200",marginBottom:"0.1rem"}}>· {cat} — {n} cliente{n!==1?"s":""} sem peça disponível</div>
+                            ))}
+                          </div>
+                        )}
+                        {/* Cidades */}
+                        {mktData.topCidades.length > 0 && (
+                          <div>
+                            <div style={{fontSize:"0.68rem",color:"var(--g4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"0.4rem"}}>Onde estão os clientes</div>
+                            <div style={{display:"flex",flexWrap:"wrap",gap:"0.35rem"}}>
+                              {mktData.topCidades.map(([cidade,n]) => (
+                                <span key={cidade} style={{fontSize:"0.72rem",padding:"0.2rem 0.6rem",background:"#fff",border:"1px solid #ddd",borderRadius:20,color:"var(--g4)"}}>{cidade} <strong style={{color:"var(--black)"}}>{n}</strong></span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {/* KPIs principais */}
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.6rem",marginBottom:"0.6rem"}}>
                     <div style={{background:"var(--white)",padding:"1.25rem",borderTop:"3px solid var(--rosa)",gridColumn:"1/-1"}}>
