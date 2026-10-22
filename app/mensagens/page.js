@@ -233,7 +233,22 @@ function MensagensInner() {
       remetente_id: cliente.id,
       conteudo,
     });
-    if (error) setTexto(conteudo); // restaurar se falhou
+    if (error) {
+      setTexto(conteudo); // restaurar se falhou
+    } else {
+      // Atualizar ultima_mensagem_em e incrementar nao_lidas do destinatário
+      const campoNaoLidas = cliente.modo_lojista ? "nao_lidas_cliente" : "nao_lidas_lojista";
+      const convAtual = conversas.find(c => c.id === conversaAtiva.id);
+      const naoLidasAtual = convAtual?.[campoNaoLidas] || 0;
+      await supabase.from("conversas").update({
+        ultima_mensagem_em: new Date().toISOString(),
+        [campoNaoLidas]: naoLidasAtual + 1,
+      }).eq("id", conversaAtiva.id);
+      setConversas(prev => prev.map(c => c.id === conversaAtiva.id
+        ? { ...c, ultima_mensagem_em: new Date().toISOString(), [campoNaoLidas]: naoLidasAtual + 1 }
+        : c
+      ));
+    }
     setEnviando(false);
   };
 
