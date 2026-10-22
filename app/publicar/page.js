@@ -31,6 +31,10 @@ const T = {
     tocaFotos: "Toca para adicionar fotos",
     fotosFormatos: "JPG, PNG, WEBP — até 5 fotos",
     adicionarFoto: "Adicionar",
+    tirarFoto: "Tirar foto",
+    usarCamera: "Câmara",
+    escolherFoto: "Galeria / Ficheiro",
+    daBiblioteca: "Biblioteca de fotos",
     removerFoto: "Remover",
     aAnalisar: "A analisar...",
     fotoRejeitada: "✕ Foto rejeitada",
@@ -164,6 +168,10 @@ const T = {
     tocaFotos: "Touche pour ajouter des photos",
     fotosFormatos: "JPG, PNG, WEBP — jusqu'à 5 photos",
     adicionarFoto: "Ajouter",
+    tirarFoto: "Prendre une photo",
+    usarCamera: "Appareil photo",
+    escolherFoto: "Galerie / Fichier",
+    daBiblioteca: "Bibliothèque de photos",
     removerFoto: "Supprimer",
     aAnalisar: "Analyse...",
     fotoRejeitada: "✕ Photo rejetée",
@@ -294,6 +302,10 @@ const T = {
     tocaFotos: "Palieski, kad pridėtum nuotraukas",
     fotosFormatos: "JPG, PNG, WEBP — iki 5 nuotraukų",
     adicionarFoto: "Pridėti",
+    tirarFoto: "Nufotografuoti",
+    usarCamera: "Fotoaparatas",
+    escolherFoto: "Galerija / Failas",
+    daBiblioteca: "Nuotraukų biblioteka",
     removerFoto: "Pašalinti",
     aAnalisar: "Analizuojama...",
     fotoRejeitada: "✕ Nuotrauka atmesta",
@@ -524,6 +536,7 @@ export default function PublicarPage() {
   const [erro, setErro] = useState("");
   const [pecaCriada, setPecaCriada] = useState(null);
   const inputFotoRef = useRef();
+  const inputCameraRef = useRef();
 
   useEffect(() => {
     try { const l = localStorage.getItem("ng_lang"); if (l) setLang(l); } catch (_) {}
@@ -899,10 +912,17 @@ export default function PublicarPage() {
               <p className="pub-card-t">{tl.fotosCard}</p>
 
               {fotos.length === 0 && (
-                <div className="upload-area" onClick={() => inputFotoRef.current?.click()}>
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8c4bc" strokeWidth="1.2" style={{marginBottom:"0.75rem"}}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  <p style={{fontSize:"0.9rem",color:"#5a5855",fontWeight:500,marginBottom:"0.25rem"}}>{tl.tocaFotos}</p>
-                  <p style={{fontSize:"0.72rem",color:"#9c9894"}}>{tl.fotosFormatos}</p>
+                <div style={{display:"flex",gap:"0.75rem"}}>
+                  <div className="upload-area" style={{flex:1}} onClick={() => inputCameraRef.current?.click()}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8c4bc" strokeWidth="1.2" style={{marginBottom:"0.5rem"}}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <p style={{fontSize:"0.82rem",color:"#5a5855",fontWeight:500,marginBottom:"0.1rem"}}>{tl.tirarFoto}</p>
+                    <p style={{fontSize:"0.68rem",color:"#9c9894"}}>{tl.usarCamera}</p>
+                  </div>
+                  <div className="upload-area" style={{flex:1}} onClick={() => inputFotoRef.current?.click()}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8c4bc" strokeWidth="1.2" style={{marginBottom:"0.5rem"}}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <p style={{fontSize:"0.82rem",color:"#5a5855",fontWeight:500,marginBottom:"0.1rem"}}>{tl.escolherFoto}</p>
+                    <p style={{fontSize:"0.68rem",color:"#9c9894"}}>{tl.daBiblioteca}</p>
+                  </div>
                 </div>
               )}
 
@@ -933,19 +953,35 @@ export default function PublicarPage() {
                     </div>
                   ))}
                   {fotos.length < 5 && (
-                    <div className="foto-add" onClick={() => inputFotoRef.current?.click()}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                      <span>{tl.adicionarFoto}</span>
+                    <div style={{display:"flex",flexDirection:"column",gap:"0.4rem"}}>
+                      <div className="foto-add" onClick={() => inputCameraRef.current?.click()}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        <span style={{fontSize:"0.72rem"}}>{tl.tirarFoto}</span>
+                      </div>
+                      <div className="foto-add" onClick={() => inputFotoRef.current?.click()}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span style={{fontSize:"0.72rem"}}>{tl.escolherFoto}</span>
+                      </div>
                     </div>
                   )}
                 </div>
               )}
 
+              {/* Galeria / ficheiros */}
               <input
                 ref={inputFotoRef}
                 type="file"
                 accept=".jpg,.jpeg,.png,.webp,.heic,.heif"
                 multiple
+                style={{ display: "none" }}
+                onChange={e => adicionarFotos(e.target.files)}
+              />
+              {/* Câmara directa */}
+              <input
+                ref={inputCameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
                 style={{ display: "none" }}
                 onChange={e => adicionarFotos(e.target.files)}
               />
