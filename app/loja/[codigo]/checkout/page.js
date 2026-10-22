@@ -56,7 +56,7 @@ const t = {
     semCaucao: "Sem caução",
     erroNumCartao: "Número de cartão inválido", erroNomeCartao: "Nome obrigatório",
     erroValidadeCartao: "Validade inválida", erroCvcCartao: "CVC inválido",
-    erroTelefone: "Telefone inválido",
+    erroTelefone: "Telefone inválido", erroGeral: "Ocorreu um erro. Tenta novamente.",
   },
   fr: {
     peca: "Votre pièce", datas: "Dates de location", dataInicio: "Date de début", dataFim: "Date de fin",
@@ -109,7 +109,7 @@ const t = {
     semCaucao: "Sans caution",
     erroNumCartao: "Numéro de carte invalide", erroNomeCartao: "Nom obligatoire",
     erroValidadeCartao: "Validité invalide", erroCvcCartao: "CVC invalide",
-    erroTelefone: "Téléphone invalide",
+    erroTelefone: "Téléphone invalide", erroGeral: "Une erreur s'est produite. Réessayez.",
   },
   lt: {
     peca: "Jūsų drabužis", datas: "Nuomos datos", dataInicio: "Pradžios data", dataFim: "Pabaigos data",
@@ -162,7 +162,7 @@ const t = {
     semCaucao: "Be užstato",
     erroNumCartao: "Neteisingas kortelės numeris", erroNomeCartao: "Vardas privalomas",
     erroValidadeCartao: "Neteisingas galiojimas", erroCvcCartao: "Neteisingas CVC",
-    erroTelefone: "Neteisingas telefono numeris",
+    erroTelefone: "Neteisingas telefono numeris", erroGeral: "Įvyko klaida. Bandykite dar kartą.",
   },
 };
 
@@ -410,7 +410,7 @@ function CheckoutLojaContent() {
       }).select().single();
 
       setRecibo(reciboData);
-    } catch(e) { setErro(e.message); }
+    } catch(e) { console.error("Checkout error:", e); setErro(i.erroGeral); }
     setLoading(false); setQrAtivo(false);
   };
 

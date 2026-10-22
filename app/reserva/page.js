@@ -44,9 +44,12 @@ const t = {
     rPeca: "Peça", rTamanho: "Tamanho", rDatas: "Datas", rEntrega: "Entrega",
     envioPostal: "Envio postal", presencial: "Presencial",
     tamanhoNaoEncontrado: "Tamanho não encontrado",
+    erroGeral: "Ocorreu um erro. Tenta novamente.",
     conflitoTitulo: "Datas com conflito",
     conflitoDesc: (inicio, fim) => `Já existe um aluguer que ocupa esta peça entre ${inicio} e ${fim} (inclui envio e higienização). Escolhe outro período ou deixa as datas em branco.`,
     semDatas: "Sem datas definidas",
+    loading: "A carregar...",
+    lblDias: "dias", lblHoras: "horas", lblMin: "min",
   },
   fr: {
     heroBadge: "Pièce indisponible",
@@ -81,6 +84,9 @@ const t = {
     rPeca: "Pièce", rTamanho: "Taille", rDatas: "Dates", rEntrega: "Livraison",
     envioPostal: "Envoi postal", presencial: "En personne",
     tamanhoNaoEncontrado: "Taille non trouvée",
+    erroGeral: "Une erreur s'est produite. Veuillez réessayer.",
+    loading: "Chargement...",
+    lblDias: "j", lblHoras: "h", lblMin: "min",
     conflitoTitulo: "Dates en conflit",
     conflitoDesc: (inicio, fim) => `Une location occupe déjà cette pièce entre ${inicio} et ${fim}. Choisissez une autre période ou laissez les dates vides.`,
     semDatas: "Sans dates définies",
@@ -118,13 +124,16 @@ const t = {
     rPeca: "Drabužis", rTamanho: "Dydis", rDatas: "Datos", rEntrega: "Pristatymas",
     envioPostal: "Pristatymas paštu", presencial: "Asmeniškai",
     tamanhoNaoEncontrado: "Dydis nerastas",
+    erroGeral: "Įvyko klaida. Bandykite dar kartą.",
+    loading: "Kraunama...",
+    lblDias: "d.", lblHoras: "val.", lblMin: "min",
     conflitoTitulo: "Datų konfliktas",
     conflitoDesc: (inicio, fim) => `Jau yra nuoma, kuri užima šį drabužį nuo ${inicio} iki ${fim}. Pasirinkite kitą laikotarpį arba palikite datas tuščias.`,
     semDatas: "Be datų",
   },
 };
 
-function HeroTimer({ dataFim, labelDisponivel, labelEmBreve }) {
+function HeroTimer({ dataFim, labelDisponivel, labelEmBreve, lblDias, lblHoras, lblMin }) {
   const [tempo, setTempo] = useState({ dias: 0, horas: 0, mins: 0, total: 0 });
   useEffect(() => {
     const calc = () => {
@@ -153,16 +162,16 @@ function HeroTimer({ dataFim, labelDisponivel, labelEmBreve }) {
         {tempo.dias > 0 && (
           <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
             <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{tempo.dias}</div>
-            <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>dias</div>
+            <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>{lblDias || "dias"}</div>
           </div>
         )}
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
           <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.horas).padStart(2,'0')}</div>
-          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>horas</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>{lblHoras || "horas"}</div>
         </div>
         <div style={{textAlign:'center',background:'#080808',color:'#f8f7f5',padding:'0.75rem 1.25rem',minWidth:'64px'}}>
           <div style={{fontFamily:"var(--sans)",fontSize:'2rem',fontWeight:600,lineHeight:1}}>{String(tempo.mins).padStart(2,'0')}</div>
-          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>min</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:'0.68rem',letterSpacing:'0.18em',textTransform:'uppercase',opacity:0.6,marginTop:'0.2rem'}}>{lblMin || "min"}</div>
         </div>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
@@ -299,7 +308,7 @@ function ReservaContent() {
       estado: "aguarda",
     });
 
-    if (error) { setErro(error.message); setLoading(false); return; }
+    if (error) { setErro(i.erroGeral); setLoading(false); return; }
     setSucesso(true);
     setLoading(false);
   };
@@ -456,7 +465,7 @@ function ReservaContent() {
         <p className="hero-desc">{i.heroDesc}</p>
 
         {dataFimAluguer && (
-          <HeroTimer dataFim={dataFimAluguer} labelDisponivel={i.disponivelEm} labelEmBreve={i.emBreve} />
+          <HeroTimer dataFim={dataFimAluguer} labelDisponivel={i.disponivelEm} labelEmBreve={i.emBreve} lblDias={i.lblDias} lblHoras={i.lblHoras} lblMin={i.lblMin} />
         )}
 
         <div className="passos">
