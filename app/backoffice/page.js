@@ -5,9 +5,9 @@ import { supabase } from "@/lib/supabase";
 const SENHA = process.env.NEXT_PUBLIC_BACKOFFICE_SENHA || "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "suporte", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", suporte: "Suporte", config: "Config" };
-const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", suporte: "🎫", config: "⚙️" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "suporte", "relatorio", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", suporte: "Suporte", relatorio: "Relatório Executivo", config: "Config" };
+const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", suporte: "🎫", relatorio: "📋", config: "⚙️" };
 const TABS_PRIMARIOS = ["dashboard", "alugueres", "catalogo", "feed", "caixa"];
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
@@ -3540,6 +3540,385 @@ export default function Backoffice() {
                   </table>
                 </div>
               )}
+            </div>
+          );
+        })()}
+
+        {tab === "relatorio" && (() => {
+          const [periodo, setPeriodo] = React.useState("mes");
+          const [relData, setRelData] = React.useState(null);
+          const [carregando, setCarregando] = React.useState(false);
+
+          const periodos = [
+            { v: "dia", l: "Hoje" },
+            { v: "semana", l: "Esta semana" },
+            { v: "mes", l: "Este mês" },
+            { v: "trimestre", l: "Este trimestre" },
+          ];
+
+          const getRange = (p) => {
+            const agora = new Date();
+            const fim = agora.toISOString();
+            if (p === "dia") {
+              const inicio = new Date(agora); inicio.setHours(0,0,0,0);
+              const antInicio = new Date(inicio); antInicio.setDate(antInicio.getDate()-1);
+              const antFim = new Date(inicio); antFim.setMilliseconds(-1);
+              return { inicio: inicio.toISOString(), fim, antInicio: antInicio.toISOString(), antFim: antFim.toISOString(), label: "ontem" };
+            }
+            if (p === "semana") {
+              const inicio = new Date(agora); inicio.setDate(agora.getDate() - agora.getDay()); inicio.setHours(0,0,0,0);
+              const antInicio = new Date(inicio); antInicio.setDate(antInicio.getDate()-7);
+              const antFim = new Date(inicio); antFim.setMilliseconds(-1);
+              return { inicio: inicio.toISOString(), fim, antInicio: antInicio.toISOString(), antFim: antFim.toISOString(), label: "semana passada" };
+            }
+            if (p === "mes") {
+              const inicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
+              const antInicio = new Date(agora.getFullYear(), agora.getMonth()-1, 1);
+              const antFim = new Date(inicio); antFim.setMilliseconds(-1);
+              return { inicio: inicio.toISOString(), fim, antInicio: antInicio.toISOString(), antFim: antFim.toISOString(), label: "mês passado" };
+            }
+            // trimestre
+            const q = Math.floor(agora.getMonth()/3);
+            const inicio = new Date(agora.getFullYear(), q*3, 1);
+            const antInicio = new Date(agora.getFullYear(), q*3-3, 1);
+            const antFim = new Date(inicio); antFim.setMilliseconds(-1);
+            return { inicio: inicio.toISOString(), fim, antInicio: antInicio.toISOString(), antFim: antFim.toISOString(), label: "trimestre passado" };
+          };
+
+          const carregar = async (p) => {
+            setCarregando(true);
+            const { inicio, fim, antInicio, antFim } = getRange(p);
+
+            const [
+              alRes, alAntRes,
+              clientesRes, clientesAntRes, clientesTodosRes,
+              recibosRes, recibosAntRes,
+              reservasRes,
+              pecasRes,
+              lojistasRes,
+              alLojRes,
+              feedRes,
+              ticketsRes,
+            ] = await Promise.all([
+              supabase.from("alugueres").select("id, estado, valor_aluguer, created_at, cliente_id, stock_tamanho_id").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("alugueres").select("id, estado, valor_aluguer, created_at, cliente_id").gte("created_at", antInicio).lte("created_at", antFim),
+              supabase.from("clientes").select("id, created_at, ultimo_acesso, total_pecas_alugadas, cidade, modo_lojista").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("clientes").select("id, created_at").gte("created_at", antInicio).lte("created_at", antFim),
+              supabase.from("clientes").select("id, created_at, ultimo_acesso, total_pecas_alugadas, modo_lojista, cidade"),
+              supabase.from("recibos").select("valor_aluguer, valor_higienizacao, valor_deposito, created_at").eq("estado", "pago").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("recibos").select("valor_aluguer, valor_higienizacao, created_at").eq("estado", "pago").gte("created_at", antInicio).lte("created_at", antFim),
+              supabase.from("reservas_espera").select("id, estado, created_at").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("stock_tamanhos").select("id, pecas(nome, categoria_id, categorias(nome)), quantidade_total, quantidade_disponivel"),
+              supabase.from("clientes").select("id, nome, codigo_loja, created_at").eq("modo_lojista", true),
+              supabase.from("alugueres_lojista").select("id, estado, preco_venda, lojista_id, created_at").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("feed_posts").select("id, created_at, likes_count").gte("created_at", inicio).lte("created_at", fim),
+              supabase.from("tickets_lojista").select("id, estado, prioridade, created_at").gte("created_at", inicio).lte("created_at", fim),
+            ]);
+
+            const al = alRes.data || [];
+            const alAnt = alAntRes.data || [];
+            const clientes = clientesRes.data || [];
+            const clientesAnt = clientesAntRes.data || [];
+            const clientesTodos = clientesTodosRes.data || [];
+            const recibos = recibosRes.data || [];
+            const recibosAnt = recibosAntRes.data || [];
+            const pecas = pecasRes.data || [];
+            const alLoj = alLojRes.data || [];
+            const feed = feedRes.data || [];
+            const tickets = ticketsRes.data || [];
+
+            // Receita
+            const receita = recibos.reduce((s,r) => s + (r.valor_aluguer||0) + (r.valor_higienizacao||0), 0);
+            const receitaAnt = recibosAnt.reduce((s,r) => s + (r.valor_aluguer||0) + (r.valor_higienizacao||0), 0);
+            const receitaVar = receitaAnt > 0 ? Math.round((receita - receitaAnt) / receitaAnt * 100) : null;
+
+            // Alugueres
+            const numAl = al.length;
+            const numAlAnt = alAnt.length;
+            const alVar = numAlAnt > 0 ? Math.round((numAl - numAlAnt) / numAlAnt * 100) : null;
+            const alCancelados = al.filter(a => a.estado === "cancelado").length;
+            const taxaCancel = numAl > 0 ? Math.round(alCancelados / numAl * 100) : 0;
+
+            // Clientes novos / activos / perdidos
+            const novos = clientes.filter(c => !c.modo_lojista).length;
+            const novosAnt = clientesAnt.length;
+            const novosVar = novosAnt > 0 ? Math.round((novos - novosAnt) / novosAnt * 100) : null;
+            const limiteInativo = new Date(); limiteInativo.setDate(limiteInativo.getDate() - 30);
+            const ativos = clientesTodos.filter(c => !c.modo_lojista && c.ultimo_acesso && new Date(c.ultimo_acesso) > limiteInativo).length;
+            const inativos30 = clientesTodos.filter(c => !c.modo_lojista && (!c.ultimo_acesso || new Date(c.ultimo_acesso) <= limiteInativo)).length;
+            const totalClientes = clientesTodos.filter(c => !c.modo_lojista).length;
+            const churn = totalClientes > 0 ? Math.round(inativos30 / totalClientes * 100) : 0;
+
+            // Ticket médio
+            const ticketMedio = numAl > 0 ? (receita / numAl).toFixed(0) : 0;
+            const ticketMedioAnt = numAlAnt > 0 ? (receitaAnt / numAlAnt).toFixed(0) : 0;
+
+            // Stock
+            const totalStock = pecas.reduce((s,p) => s + (p.quantidade_total||0), 0);
+            const dispStock = pecas.reduce((s,p) => s + (p.quantidade_disponivel||0), 0);
+            const ocupacao = totalStock > 0 ? Math.round((totalStock - dispStock) / totalStock * 100) : 0;
+
+            // Categorias em procura (por nº de alugueres neste período)
+            const catMap = {};
+            for (const a of al) {
+              const peca = pecas.find(p => p.id === a.stock_tamanho_id);
+              const cat = peca?.pecas?.categorias?.nome || peca?.categorias?.nome || "Outra";
+              catMap[cat] = (catMap[cat]||0) + 1;
+            }
+            const topCats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+            // Lojistas activos (com vendas no período)
+            const lojistasAtivos = new Set(alLoj.map(a => a.lojista_id)).size;
+            const receitaLojistas = alLoj.filter(a=>a.estado!=="cancelado").reduce((s,a)=>s+(a.preco_venda||0),0);
+
+            // Reservas (lista espera)
+            const reservas = reservasRes.data || [];
+            const reservasAguarda = reservas.filter(r => r.estado === "aguarda").length;
+
+            // Cidades com mais actividade
+            const cidadesMap = {};
+            clientes.filter(c=>c.cidade).forEach(c => { cidadesMap[c.cidade] = (cidadesMap[c.cidade]||0)+1; });
+            const topCidades = Object.entries(cidadesMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+            // Break-even estimado (simplificado: custos fixos assumidos ~2000€/mês, ajustável)
+            const custoFixoMes = 2000;
+            const diasPeriodo = p === "dia" ? 1 : p === "semana" ? 7 : p === "mes" ? 30 : 90;
+            const custoEstimado = custoFixoMes * diasPeriodo / 30;
+            const margemOp = receita - custoEstimado;
+            const bePct = custoEstimado > 0 ? Math.round(receita / custoEstimado * 100) : 0;
+
+            // Tickets suporte urgentes abertos
+            const ticketsUrgentes = tickets.filter(t => t.prioridade === "urgente" && t.estado !== "fechado").length;
+
+            // Feed engagement
+            const totalLikes = feed.reduce((s,p)=>s+(p.likes_count||0),0);
+
+            // Sinais de alerta
+            const alertas = [];
+            if (churn > 40) alertas.push({ tipo: "danger", msg: `Churn elevado: ${churn}% dos clientes inativos há +30 dias` });
+            if (taxaCancel > 15) alertas.push({ tipo: "danger", msg: `Taxa de cancelamento alta: ${taxaCancel}% neste período` });
+            if (ocupacao < 30) alertas.push({ tipo: "warn", msg: `Stock pouco utilizado: apenas ${ocupacao}% em aluguer` });
+            if (receitaVar !== null && receitaVar < -10) alertas.push({ tipo: "warn", msg: `Receita caiu ${Math.abs(receitaVar)}% vs. ${antFim.slice(0,7)}` });
+            if (novos < 3) alertas.push({ tipo: "warn", msg: `Poucos clientes novos: apenas ${novos} registos neste período` });
+            if (ticketsUrgentes > 0) alertas.push({ tipo: "danger", msg: `${ticketsUrgentes} ticket(s) urgentes por resolver` });
+            if (reservasAguarda > 5) alertas.push({ tipo: "info", msg: `${reservasAguarda} clientes em lista de espera — oportunidade de stock` });
+            if (margemOp > 0 && bePct > 150) alertas.push({ tipo: "ok", msg: `Operação sólida: ${bePct}% do break-even coberto` });
+
+            // Decisões sugeridas
+            const decisoes = [];
+            if (churn > 30) decisoes.push("Activar campanha de reactivação: email/WhatsApp para clientes sem aluguer há +30 dias.");
+            if (topCats.length > 0) decisoes.push(`Reforçar stock em "${topCats[0][0]}" — categoria mais procurada este período.`);
+            if (ocupacao < 40) decisoes.push("Promover peças disponíveis com desconto temporário no feed e campanhas.");
+            if (reservasAguarda > 3) decisoes.push("Há reservas em espera — acelerar publicação de novas peças nessas categorias.");
+            if (lojistasAtivos < (lojistasRes.data||[]).length * 0.5) decisoes.push("Mais de metade dos lojistas sem vendas neste período — contactar e apoiar.");
+            if (ticketsUrgentes > 0) decisoes.push("Resolver tickets urgentes de suporte antes de qualquer outra prioridade.");
+
+            setRelData({ receita, receitaVar, numAl, alVar, novos, novosVar, ativos, inativos30, churn, ticketMedio, ocupacao, totalStock, dispStock, topCats, topCidades, lojistasAtivos, totalLojistas:(lojistasRes.data||[]).length, receitaLojistas, reservasAguarda, taxaCancel, margemOp, bePct, custoEstimado, ticketsUrgentes, totalLikes, alertas, decisoes, periodo: p, inicio, fim });
+            setCarregando(false);
+          };
+
+          React.useEffect(() => { carregar(periodo); }, [periodo]);
+
+          const VAR = (v) => v === null ? null : (
+            <span style={{ fontSize:"0.72rem",fontWeight:600,color:v>=0?"#27ae60":"#e74c3c",marginLeft:"0.4rem" }}>
+              {v>=0?"+":""}{v}%
+            </span>
+          );
+
+          const KPI = ({ val, lbl, var: v, cor="#1a1816", sub }) => (
+            <div style={{ background:"#fff",padding:"1.25rem 1.5rem",borderTop:`3px solid ${cor}` }}>
+              <div style={{ fontFamily:"var(--sans)",fontSize:"1.8rem",fontWeight:300,color:cor }}>{val}{VAR(v)}</div>
+              <div style={{ fontSize:"0.68rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#888",marginTop:"0.35rem" }}>{lbl}</div>
+              {sub && <div style={{ fontSize:"0.72rem",color:"#aaa",marginTop:"0.15rem" }}>{sub}</div>}
+            </div>
+          );
+
+          const BARRA = ({ pct, cor="#c4748a" }) => (
+            <div style={{ height:5,background:"#f0eeeb",borderRadius:3,marginTop:"0.3rem" }}>
+              <div style={{ height:"100%",width:`${Math.min(pct,100)}%`,background:cor,borderRadius:3,transition:"width 0.5s" }}/>
+            </div>
+          );
+
+          if (carregando || !relData) return (
+            <div style={{ textAlign:"center",padding:"4rem",color:"#888" }}>
+              <div style={{ fontSize:"2rem",marginBottom:"1rem" }}>📋</div>
+              <div style={{ fontFamily:"var(--sans)",fontSize:"0.85rem",letterSpacing:"0.1em" }}>A compilar relatório…</div>
+            </div>
+          );
+
+          const d = relData;
+
+          return (
+            <div>
+              {/* CABEÇALHO */}
+              <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:"1.5rem",flexWrap:"wrap",gap:"1rem" }}>
+                <div>
+                  <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,margin:"0 0 0.25rem" }}>Relatório Executivo</h1>
+                  <p style={{ fontSize:"0.78rem",color:"#888",margin:0 }}>
+                    {new Date(d.inicio).toLocaleDateString("pt-PT",{day:"numeric",month:"long"})} – {new Date().toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"})}
+                  </p>
+                </div>
+                <div style={{ display:"flex",gap:"0.35rem",flexWrap:"wrap" }}>
+                  {periodos.map(p => (
+                    <button key={p.v} onClick={()=>setPeriodo(p.v)} style={{ padding:"0.4rem 0.9rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",background:periodo===p.v?"#1a1816":"#fff",color:periodo===p.v?"#fff":"#888",border:"1px solid #ddd",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)" }}>{p.l}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ALERTAS */}
+              {d.alertas.length > 0 && (
+                <div style={{ display:"flex",flexDirection:"column",gap:"0.4rem",marginBottom:"1.5rem" }}>
+                  {d.alertas.map((a,i) => {
+                    const cores = { danger:["#fff5f5","#e74c3c"], warn:["#fffbf0","#f39c12"], ok:["#f0fff4","#27ae60"], info:["#f0f4ff","#3498db"] };
+                    const [bg,cor] = cores[a.tipo]||cores.info;
+                    return <div key={i} style={{ background:bg,borderLeft:`3px solid ${cor}`,padding:"0.6rem 1rem",fontSize:"0.82rem",color:cor,fontWeight:500 }}>{a.msg}</div>;
+                  })}
+                </div>
+              )}
+
+              {/* KPIs PRINCIPAIS */}
+              <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1px",background:"#e2dfda",marginBottom:"1.5rem" }}>
+                <KPI val={`${d.receita.toFixed(0)}€`} lbl="Receita" var={d.receitaVar} cor="#c4748a"/>
+                <KPI val={d.numAl} lbl="Alugueres" var={d.alVar}/>
+                <KPI val={`${d.ticketMedio}€`} lbl="Ticket médio"/>
+                <KPI val={`${d.ocupacao}%`} lbl="Ocupação stock" cor={d.ocupacao<40?"#e74c3c":d.ocupacao>70?"#27ae60":"#f39c12"}/>
+              </div>
+
+              {/* UTILIZADORES */}
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"1.5rem" }}>
+                <div style={CARD}>
+                  <p style={CARD_T}>Utilizadores</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem" }}>
+                    <div style={{ textAlign:"center",padding:"0.75rem",background:"#f0fff4",borderRadius:4 }}>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.8rem",fontWeight:300,color:"#27ae60" }}>{d.novos}{VAR(d.novosVar)}</div>
+                      <div style={{ fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888" }}>Novos registos</div>
+                    </div>
+                    <div style={{ textAlign:"center",padding:"0.75rem",background:"#f0f4ff",borderRadius:4 }}>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.8rem",fontWeight:300,color:"#3498db" }}>{d.ativos}</div>
+                      <div style={{ fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888" }}>Activos (30d)</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.75rem",background:d.churn>40?"#fff5f5":"#fafafa",borderRadius:4,border:`1px solid ${d.churn>40?"#e74c3c":"#f0eeeb"}` }}>
+                    <span style={{ fontSize:"0.82rem" }}>Churn (inativos +30d)</span>
+                    <span style={{ fontFamily:"var(--sans)",fontSize:"1.4rem",fontWeight:300,color:d.churn>40?"#e74c3c":d.churn>25?"#f39c12":"#27ae60" }}>{d.churn}%</span>
+                  </div>
+                  <BARRA pct={100-d.churn} cor={d.churn>40?"#e74c3c":d.churn>25?"#f39c12":"#27ae60"}/>
+                  <p style={{ fontSize:"0.72rem",color:"#aaa",marginTop:"0.5rem" }}>{d.inativos30} clientes sem actividade há mais de 30 dias.</p>
+                </div>
+
+                <div style={CARD}>
+                  <p style={CARD_T}>Lojistas</p>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem" }}>
+                    <div style={{ textAlign:"center",padding:"0.75rem",background:"#f8f7f5",borderRadius:4 }}>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.8rem",fontWeight:300 }}>{d.lojistasAtivos}</div>
+                      <div style={{ fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888" }}>Com vendas</div>
+                    </div>
+                    <div style={{ textAlign:"center",padding:"0.75rem",background:"#f8f7f5",borderRadius:4 }}>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.8rem",fontWeight:300 }}>{d.totalLojistas}</div>
+                      <div style={{ fontSize:"0.65rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888" }}>Total lojistas</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem" }}>
+                    <span style={{ fontSize:"0.82rem" }}>Receita gerada lojistas</span>
+                    <span style={{ fontFamily:"var(--sans)",fontSize:"1.2rem",fontWeight:300,color:"#c4748a" }}>{d.receitaLojistas.toFixed(0)}€</span>
+                  </div>
+                  <BARRA pct={d.totalLojistas>0?Math.round(d.lojistasAtivos/d.totalLojistas*100):0} cor="#c4748a"/>
+                  <p style={{ fontSize:"0.72rem",color:"#aaa",marginTop:"0.5rem" }}>{d.totalLojistas>0?Math.round(d.lojistasAtivos/d.totalLojistas*100):0}% dos lojistas activos neste período.</p>
+                </div>
+              </div>
+
+              {/* PRODUTOS + GEOGRAFIA */}
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"1.5rem" }}>
+                <div style={CARD}>
+                  <p style={CARD_T}>Categorias mais procuradas</p>
+                  {d.topCats.length === 0 ? <p style={{ fontSize:"0.82rem",color:"#aaa" }}>Sem dados neste período.</p> : d.topCats.map(([cat,n],i) => {
+                    const max = d.topCats[0][1];
+                    return (
+                      <div key={cat} style={{ marginBottom:"0.75rem" }}>
+                        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",marginBottom:"0.2rem" }}>
+                          <span style={{ display:"flex",alignItems:"center",gap:"0.4rem" }}><span style={{ fontSize:"0.7rem",color:"#aaa",width:"1rem" }}>#{i+1}</span>{cat}</span>
+                          <strong>{n} aluguer{n!==1?"es":""}</strong>
+                        </div>
+                        <BARRA pct={Math.round(n/max*100)} cor={["#c4748a","#1a1816","#3498db","#27ae60","#f39c12"][i]}/>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={CARD}>
+                  <p style={CARD_T}>Novos clientes por cidade</p>
+                  {d.topCidades.length === 0 ? <p style={{ fontSize:"0.82rem",color:"#aaa" }}>Sem dados de localização.</p> : d.topCidades.map(([cidade,n],i) => {
+                    const max = d.topCidades[0][1];
+                    return (
+                      <div key={cidade} style={{ marginBottom:"0.75rem" }}>
+                        <div style={{ display:"flex",justifyContent:"space-between",fontSize:"0.85rem",marginBottom:"0.2rem" }}>
+                          <span>{cidade}</span><strong>{n}</strong>
+                        </div>
+                        <BARRA pct={Math.round(n/max*100)} cor="#1a1816"/>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* OPERACIONAL + BREAK-EVEN */}
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"1.5rem" }}>
+                <div style={CARD}>
+                  <p style={CARD_T}>Operacional</p>
+                  <div style={{ display:"flex",flexDirection:"column",gap:"0.75rem" }}>
+                    {[
+                      { lbl:"Taxa de cancelamento", val:`${d.taxaCancel}%`, cor:d.taxaCancel>15?"#e74c3c":d.taxaCancel>8?"#f39c12":"#27ae60" },
+                      { lbl:"Reservas em lista de espera", val:d.reservasAguarda, cor:d.reservasAguarda>5?"#3498db":"#888" },
+                      { lbl:"Tickets suporte urgentes", val:d.ticketsUrgentes, cor:d.ticketsUrgentes>0?"#e74c3c":"#27ae60" },
+                      { lbl:"Posts no feed", val:d.totalLikes ? `${d.totalLikes} likes` : "—", cor:"#888" },
+                    ].map((r,i) => (
+                      <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0.6rem 0",borderBottom:"1px solid #f0eeeb" }}>
+                        <span style={{ fontSize:"0.82rem",color:"#555" }}>{r.lbl}</span>
+                        <span style={{ fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:300,color:r.cor }}>{r.val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={CARD}>
+                  <p style={CARD_T}>Break-even estimado</p>
+                  <div style={{ textAlign:"center",padding:"1rem 0" }}>
+                    <div style={{ fontFamily:"var(--sans)",fontSize:"3rem",fontWeight:300,color:d.bePct>=100?"#27ae60":d.bePct>=70?"#f39c12":"#e74c3c" }}>{d.bePct}%</div>
+                    <div style={{ fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888",marginBottom:"1rem" }}>do ponto de equilíbrio</div>
+                  </div>
+                  <BARRA pct={d.bePct} cor={d.bePct>=100?"#27ae60":d.bePct>=70?"#f39c12":"#e74c3c"}/>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem",marginTop:"1rem" }}>
+                    <div style={{ padding:"0.75rem",background:"#f8f7f5",borderRadius:4,textAlign:"center" }}>
+                      <div style={{ fontSize:"0.68rem",color:"#888",letterSpacing:"0.1em",textTransform:"uppercase" }}>Custo estimado</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.2rem",fontWeight:300,marginTop:"0.2rem" }}>{d.custoEstimado.toFixed(0)}€</div>
+                    </div>
+                    <div style={{ padding:"0.75rem",background:d.margemOp>=0?"#f0fff4":"#fff5f5",borderRadius:4,textAlign:"center" }}>
+                      <div style={{ fontSize:"0.68rem",color:"#888",letterSpacing:"0.1em",textTransform:"uppercase" }}>Margem op.</div>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.2rem",fontWeight:300,marginTop:"0.2rem",color:d.margemOp>=0?"#27ae60":"#e74c3c" }}>{d.margemOp>=0?"+":""}{d.margemOp.toFixed(0)}€</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize:"0.65rem",color:"#bbb",marginTop:"0.75rem",fontStyle:"italic" }}>Custo fixo base: 2000€/mês. Ajustável em Config.</p>
+                </div>
+              </div>
+
+              {/* DECISÕES SUGERIDAS */}
+              {d.decisoes.length > 0 && (
+                <div style={{ ...CARD,borderTop:"3px solid #1a1816",marginBottom:"1.5rem" }}>
+                  <p style={CARD_T}>Decisões recomendadas para este período</p>
+                  <div style={{ display:"flex",flexDirection:"column",gap:"0.6rem" }}>
+                    {d.decisoes.map((dec,i) => (
+                      <div key={i} style={{ display:"flex",gap:"0.75rem",alignItems:"flex-start",padding:"0.75rem",background:"#f8f7f5",borderRadius:4 }}>
+                        <span style={{ fontFamily:"var(--sans)",fontSize:"0.78rem",fontWeight:700,color:"#c4748a",minWidth:"1.5rem" }}>{i+1}.</span>
+                        <span style={{ fontSize:"0.85rem",lineHeight:1.5,color:"#1a1816" }}>{dec}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* RODAPÉ */}
+              <p style={{ fontSize:"0.68rem",color:"#bbb",textAlign:"right",letterSpacing:"0.08em" }}>
+                Relatório gerado em {new Date().toLocaleString("pt-PT")} · Dados em tempo real via Supabase
+              </p>
             </div>
           );
         })()}
