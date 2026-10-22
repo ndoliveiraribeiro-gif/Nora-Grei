@@ -82,6 +82,7 @@ const t = {
     platinaSemCaucao: "💎 Platina — caução mínima garantida (8%)",
     datasIndisponiveis: "⚠️ Algumas datas estão indisponíveis para este tamanho. As datas bloqueadas não podem ser selecionadas.",
     faltamPara: (n, nome) => `Faltam ${n} para ${nome}`,
+    erroCartao: "Preenche os dados do cartão correctamente.", erroNomeCartao: "Preenche o nome no cartão.", erroValidadeCartao: "Preenche a validade do cartão.", erroCvcCartao: "Preenche o CVC do cartão.", erroMbway: "Preenche o número de telemóvel para o MB Way.", erroTamanho: "Tamanho não selecionado. Volta atrás e escolhe um tamanho.", erroProcessar: "Ocorreu um erro. Tenta novamente.", erroConflitoDatas: "O período escolhido inclui datas indisponíveis. Escolhe outro intervalo.",
   },
   fr: {
     peca: "Votre pièce",
@@ -160,6 +161,7 @@ const t = {
     platinaSemCaucao: "💎 Platine — dépôt minimal garanti (8%)",
     datasIndisponiveis: "⚠️ Certaines dates sont indisponibles pour cette taille. Les dates bloquées ne peuvent pas être sélectionnées.",
     faltamPara: (n, nome) => `${n} location${n !== 1 ? "s" : ""} pour ${nome}`,
+    erroCartao: "Remplissez correctement les données de la carte.", erroNomeCartao: "Remplissez le nom sur la carte.", erroValidadeCartao: "Remplissez la date d'expiration.", erroCvcCartao: "Remplissez le CVC.", erroMbway: "Remplissez le numéro de téléphone MB Way.", erroTamanho: "Taille non sélectionnée. Revenez en arrière et choisissez une taille.", erroProcessar: "Une erreur s'est produite. Réessayez.", erroConflitoDatas: "La période choisie inclut des dates indisponibles. Choisissez un autre intervalle.",
   },
   lt: {
     peca: "Jūsų drabužis",
@@ -238,6 +240,7 @@ const t = {
     platinaSemCaucao: "💎 Platina — minimalus užstatas (8%)",
     datasIndisponiveis: "⚠️ Kai kurios datos neprieinamos šiam dydžiui. Užblokuotų datų pasirinkti negalima.",
     faltamPara: (n, nome) => `Dar ${n} iki ${nome}`,
+    erroCartao: "Teisingai užpildykite kortelės duomenis.", erroNomeCartao: "Įveskite vardą ant kortelės.", erroValidadeCartao: "Įveskite galiojimo datą.", erroCvcCartao: "Įveskite CVC.", erroMbway: "Įveskite MB Way telefono numerį.", erroTamanho: "Dydis nepasirinktas. Grįžkite atgal ir pasirinkite dydį.", erroProcessar: "Įvyko klaida. Bandykite dar kartą.", erroConflitoDatas: "Pasirinktas laikotarpis apima neprieinamas datas. Pasirinkite kitą intervalą.",
   },
 };
 
@@ -691,13 +694,13 @@ function CheckoutContent() {
 
   const validarFormularioPagamento = () => {
     if (pagamento === "cartao") {
-      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo("Número do cartão inválido"); setErro("Preenche os dados do cartão correctamente."); return false; }
-      if (!dadosCartao.nome) { setErroCampo("Nome obrigatório"); setErro("Preenche o nome no cartão."); return false; }
-      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("Validade inválida"); setErro("Preenche a validade do cartão."); return false; }
-      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("CVC inválido"); setErro("Preenche o CVC do cartão."); return false; }
+      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo(i.formCartaoNumero); setErro(i.erroCartao); return false; }
+      if (!dadosCartao.nome) { setErroCampo(i.formCartaoNome); setErro(i.erroNomeCartao); return false; }
+      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo(i.formCartaoValidade); setErro(i.erroValidadeCartao); return false; }
+      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo(i.formCartaoCvc); setErro(i.erroCvcCartao); return false; }
     }
     if (pagamento === "mbway") {
-      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("Número de telemóvel inválido"); setErro("Preenche o número de telemóvel para o MB Way."); return false; }
+      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo(i.formMbwayTelefone); setErro(i.erroMbway); return false; }
     }
     if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo(i.comprovativoErro); return false; }
     if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo(i.comprovativoErroDeposito); return false; }
@@ -708,7 +711,7 @@ function CheckoutContent() {
 
   const confirmar = async () => {
     if (!modoCompra && (!dataInicio || !dataFim)) { setErro(i.obrigatorio); return; }
-    if (!modoCompra && !stockId) { setErro("Tamanho não selecionado. Volta atrás e escolhe um tamanho."); return; }
+    if (!modoCompra && !stockId) { setErro(i.erroTamanho); return; }
     if (!user) { window.location.href = `/entrar?redirect=/checkout?peca=${pecaId}&tamanho=${tamanhoParam}`; return; }
 
     if (pagamento === "mbway" && !qrAtivo) {
@@ -834,8 +837,7 @@ function CheckoutContent() {
       setRecibo(reciboData);
     } catch(e) {
       console.error("[Checkout] Erro em finalizar:", e);
-      const msg = e?.message || JSON.stringify(e) || "Erro desconhecido";
-      setErro(`Erro ao processar: ${msg}`);
+      setErro(i.erroProcessar);
       // Scroll para o erro
       setTimeout(() => {
         document.querySelector(".erro")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -967,7 +969,7 @@ function CheckoutContent() {
                         if (dataBloqueada(d.toISOString().split("T")[0])) { conflito = true; break; }
                         d = new Date(d.getTime() + 86400000);
                       }
-                      if (conflito) { setErro("O período escolhido inclui datas indisponíveis. Escolhe outro intervalo."); return; }
+                      if (conflito) { setErro(i.erroConflitoDatas); return; }
                     }
                     setDataFim(val); setErro("");
                   }}
