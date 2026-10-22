@@ -5,9 +5,9 @@ import { supabase } from "@/lib/supabase";
 const SENHA = process.env.NEXT_PUBLIC_BACKOFFICE_SENHA || "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "suporte", "relatorio", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", suporte: "Suporte", relatorio: "Relatório Executivo", config: "Config" };
-const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", suporte: "🎫", relatorio: "📋", config: "⚙️" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "suporte", "relatorio", "loja", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", suporte: "Suporte", relatorio: "Relatório Executivo", loja: "Loja Nora Grei", config: "Config" };
+const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", suporte: "🎫", relatorio: "📋", loja: "✦", config: "⚙️" };
 const TABS_PRIMARIOS = ["dashboard", "alugueres", "catalogo", "feed", "caixa"];
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
@@ -3919,6 +3919,215 @@ export default function Backoffice() {
               <p style={{ fontSize:"0.68rem",color:"#bbb",textAlign:"right",letterSpacing:"0.08em" }}>
                 Relatório gerado em {new Date().toLocaleString("pt-PT")} · Dados em tempo real via Supabase
               </p>
+            </div>
+          );
+        })()}
+
+        {tab === "loja" && (() => {
+          const ADMIN_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+          const [ngPecas, setNgPecas] = React.useState(null);
+          const [ngStats, setNgStats] = React.useState(null);
+          const [ngFiltro, setNgFiltro] = React.useState("todas");
+          const [ngForm, setNgForm] = React.useState(null); // null | "nova" | {id,...} editar
+          const [ngLoading, setNgLoading] = React.useState(false);
+          const [ngMsg, setNgMsg] = React.useState("");
+          const [ngPeca, setNgPeca] = React.useState({ nome:"", descricao:"", categoria:"", cor:"", condicao:"novo", preco_aluguer_dia:"", preco_venda:"", valor_peca:"", material:"", marca:"Nora Grei", tamanhos:[{tamanho:"M",quantidade:1}], ocasioes:[], higienizacao_ativa:false, higienizacao_valor:"" });
+          const CATS_NG = ["Vestido","Fato","Casaco","Calças","Saia","Blusa","Acessório","Outra"];
+          const CONDICOES = [{v:"novo",l:"Novo / Etiqueta"},{v:"como_novo",l:"Como novo"},{v:"bom",l:"Bom estado"},{v:"usado",l:"Usado"}];
+          React.useEffect(() => {
+            if (ngPecas !== null) return;
+            Promise.all([
+              supabase.from("pecas_lojista").select("*").eq("lojista_id", ADMIN_ID).order("created_at", { ascending: false }),
+              supabase.from("alugueres_lojista").select("valor_lojista, created_at").eq("lojista_id", ADMIN_ID).neq("estado","cancelado"),
+            ]).then(([{data:pecas},{data:als}]) => {
+              setNgPecas(pecas||[]);
+              const receita = (als||[]).reduce((s,a) => s+(a.valor_lojista||0), 0);
+              const mes = new Date(); mes.setDate(1); mes.setHours(0,0,0,0);
+              const receitaMes = (als||[]).filter(a => new Date(a.created_at) >= mes).reduce((s,a) => s+(a.valor_lojista||0), 0);
+              setNgStats({ total: pecas?.length||0, ativos: pecas?.filter(p=>p.estado==="disponivel").length||0, alugadas: pecas?.filter(p=>p.estado==="alugada").length||0, receita: receita.toFixed(0), receitaMes: receitaMes.toFixed(0), als: als?.length||0 });
+            });
+          }, []);
+          const salvarPeca = async () => {
+            if (!ngPeca.nome.trim() || !ngPeca.categoria) { setNgMsg("Preenche nome e categoria."); return; }
+            setNgLoading(true); setNgMsg("");
+            const payload = { lojista_id: ADMIN_ID, nome: ngPeca.nome.trim(), descricao: ngPeca.descricao||null, categoria: ngPeca.categoria, cor: ngPeca.cor||null, condicao: ngPeca.condicao, preco_aluguer_dia: ngPeca.preco_aluguer_dia ? parseFloat(ngPeca.preco_aluguer_dia) : null, preco_venda: ngPeca.preco_venda ? parseFloat(ngPeca.preco_venda) : null, valor_peca: ngPeca.valor_peca ? parseFloat(ngPeca.valor_peca) : null, material: ngPeca.material||null, marca: "Nora Grei", estado: "disponivel", tipo: ngPeca.preco_aluguer_dia && !ngPeca.preco_venda ? "alugar" : ngPeca.preco_venda && !ngPeca.preco_aluguer_dia ? "vender" : "ambos", higienizacao_ativa: ngPeca.higienizacao_ativa, higienizacao_valor: ngPeca.higienizacao_valor ? parseFloat(ngPeca.higienizacao_valor) : null };
+            if (ngForm === "nova") {
+              const { data, error } = await supabase.from("pecas_lojista").insert([payload]).select().single();
+              if (!error && ngPeca.tamanhos?.length > 0) await supabase.from("stock_tamanhos").insert(ngPeca.tamanhos.map(t => ({ peca_lojista_id: data.id, tamanho: t.tamanho, quantidade: parseInt(t.quantidade)||1 })));
+              if (!error) { setNgPecas(prev => [data, ...(prev||[])]);  setNgMsg("Peça adicionada com sucesso!"); setNgForm(null); }
+              else setNgMsg("Erro ao guardar. Tenta novamente.");
+            } else {
+              const { error } = await supabase.from("pecas_lojista").update(payload).eq("id", ngForm.id);
+              if (!error) { setNgPecas(prev => (prev||[]).map(p => p.id===ngForm.id ? {...p,...payload} : p)); setNgMsg("Peça actualizada!"); setNgForm(null); }
+              else setNgMsg("Erro ao actualizar.");
+            }
+            setNgLoading(false);
+          };
+          const mudarEstado = async (peca, estado) => {
+            await supabase.from("pecas_lojista").update({ estado }).eq("id", peca.id);
+            setNgPecas(prev => (prev||[]).map(p => p.id===peca.id ? {...p,estado} : p));
+          };
+          const filtradas = (ngPecas||[]).filter(p => ngFiltro==="todas" || p.estado===ngFiltro);
+          const EST_COR = { disponivel:"#27ae60", alugada:"#f39c12", indisponivel:"#e74c3c", vendida:"#8e44ad" };
+          const EST_LBL = { disponivel:"Disponível", alugada:"Alugada", indisponivel:"Indisponível", vendida:"Vendida" };
+          return (
+            <div>
+              <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:"1.5rem",flexWrap:"wrap",gap:"1rem" }}>
+                <div>
+                  <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,marginBottom:"0.25rem" }}>✦ Loja Nora Grei</h1>
+                  <p style={{ fontSize:"0.82rem",color:"#888" }}>Gestão do stock oficial da marca — peças novas para aluguer e venda</p>
+                </div>
+                <button onClick={() => { setNgForm("nova"); setNgPeca({ nome:"", descricao:"", categoria:"", cor:"", condicao:"novo", preco_aluguer_dia:"", preco_venda:"", valor_peca:"", material:"", marca:"Nora Grei", tamanhos:[{tamanho:"M",quantidade:1}], ocasioes:[], higienizacao_ativa:false, higienizacao_valor:"" }); setNgMsg(""); }} style={{ ...BTN("primary","md"), display:"flex",alignItems:"center",gap:"0.4rem" }}>+ Nova peça</button>
+              </div>
+
+              {/* KPIs */}
+              {ngStats && (
+                <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:"0.75rem",marginBottom:"1.75rem" }}>
+                  {[
+                    { v: ngStats.total, l:"Total de peças", c:"#c4748a" },
+                    { v: ngStats.ativos, l:"Disponíveis", c:"#27ae60" },
+                    { v: ngStats.alugadas, l:"Em aluguer agora", c:"#f39c12" },
+                    { v: `${ngStats.receitaMes}€`, l:"Receita este mês", c:"#9b59b6" },
+                    { v: `${ngStats.receita}€`, l:"Receita total", c:"#2980b9" },
+                    { v: ngStats.als, l:"Alugueres totais", c:"#16a085" },
+                  ].map((k,idx) => (
+                    <div key={idx} style={{ background:"#fff",padding:"1rem 1.1rem",borderTop:`3px solid ${k.c}`,borderRadius:"0 0 4px 4px" }}>
+                      <div style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:700,color:k.c,lineHeight:1 }}>{k.v}</div>
+                      <div style={{ fontSize:"0.7rem",color:"#888",marginTop:"0.25rem",letterSpacing:"0.05em" }}>{k.l}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {ngMsg && <div style={{ padding:"0.75rem 1rem",marginBottom:"1rem",background: ngMsg.includes("Erro")?"#fef5f5":"#f0f7f0",border:`1px solid ${ngMsg.includes("Erro")?"#f5c6cb":"#b8dbb8"}`,color:ngMsg.includes("Erro")?"#c0392b":"#27ae60",fontSize:"0.85rem",borderRadius:"4px" }}>{ngMsg}</div>}
+
+              {/* Formulário nova / editar peça */}
+              {ngForm && (
+                <div style={{ background:"#fafaf8",border:"1px solid #e2dfda",padding:"1.5rem",marginBottom:"1.75rem",borderRadius:"4px" }}>
+                  <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1.25rem" }}>
+                    <h2 style={{ fontFamily:"var(--sans)",fontSize:"1rem",fontWeight:600,margin:0 }}>{ngForm==="nova" ? "Nova peça Nora Grei" : `Editar: ${ngForm.nome}`}</h2>
+                    <button onClick={() => { setNgForm(null); setNgMsg(""); }} style={{ background:"none",border:"none",cursor:"pointer",fontSize:"1.2rem",color:"#888" }}>✕</button>
+                  </div>
+                  <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1rem" }}>
+                    {[
+                      { label:"Nome da peça *", field:"nome", placeholder:"Ex: Vestido Celestine" },
+                      { label:"Categoria *", field:"categoria", type:"select", opts:CATS_NG },
+                      { label:"Cor", field:"cor", placeholder:"Ex: Marfim, Preto" },
+                      { label:"Material", field:"material", placeholder:"Ex: Seda, Linho" },
+                      { label:"Aluguer por dia (€)", field:"preco_aluguer_dia", placeholder:"Ex: 45" },
+                      { label:"Preço de venda (€)", field:"preco_venda", placeholder:"Deixar vazio = só aluguer" },
+                      { label:"Valor de mercado (€)", field:"valor_peca", placeholder:"Preço original" },
+                    ].map(({label,field,placeholder,type,opts}) => (
+                      <div key={field}>
+                        <label style={{ fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)" }}>{label}</label>
+                        {type==="select" ? (
+                          <select value={ngPeca[field]} onChange={e => setNgPeca(p=>({...p,[field]:e.target.value}))} style={{ width:"100%",padding:"0.6rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.85rem",borderRadius:"2px" }}>
+                            <option value="">— Selecionar —</option>
+                            {opts.map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        ) : (
+                          <input type={field.includes("preco")||field.includes("valor")?"number":"text"} value={ngPeca[field]} onChange={e => setNgPeca(p=>({...p,[field]:e.target.value}))} placeholder={placeholder} style={{ width:"100%",padding:"0.6rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.85rem",borderRadius:"2px",boxSizing:"border-box" }} />
+                        )}
+                      </div>
+                    ))}
+                    <div>
+                      <label style={{ fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)" }}>Estado</label>
+                      <select value={ngPeca.condicao} onChange={e => setNgPeca(p=>({...p,condicao:e.target.value}))} style={{ width:"100%",padding:"0.6rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.85rem",borderRadius:"2px" }}>
+                        {CONDICOES.map(c => <option key={c.v} value={c.v}>{c.l}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom:"1rem" }}>
+                    <label style={{ fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)" }}>Descrição</label>
+                    <textarea value={ngPeca.descricao} onChange={e => setNgPeca(p=>({...p,descricao:e.target.value}))} placeholder="Descrição da peça, ocasiões, detalhes..." rows={3} style={{ width:"100%",padding:"0.6rem",border:"1px solid #e2dfda",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.85rem",resize:"vertical",borderRadius:"2px",boxSizing:"border-box" }} />
+                  </div>
+                  <div style={{ marginBottom:"1rem" }}>
+                    <label style={{ fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",display:"block",marginBottom:"0.5rem",fontFamily:"var(--sans)" }}>Tamanhos disponíveis</label>
+                    <div style={{ display:"flex",flexWrap:"wrap",gap:"0.5rem",marginBottom:"0.5rem" }}>
+                      {(ngPeca.tamanhos||[]).map((t,idx) => (
+                        <div key={idx} style={{ display:"flex",alignItems:"center",gap:"0.4rem",background:"#fff",border:"1px solid #e2dfda",padding:"0.35rem 0.6rem",borderRadius:"2px" }}>
+                          <select value={t.tamanho} onChange={e => setNgPeca(p=>({...p,tamanhos:p.tamanhos.map((tt,ii)=>ii===idx?{...tt,tamanho:e.target.value}:tt)}))} style={{ border:"none",background:"none",fontFamily:"var(--sans)",fontSize:"0.82rem",padding:"0" }}>
+                            {["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","Único"].map(s=><option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <span style={{ fontSize:"0.75rem",color:"#aaa" }}>×</span>
+                          <input type="number" min="1" value={t.quantidade} onChange={e => setNgPeca(p=>({...p,tamanhos:p.tamanhos.map((tt,ii)=>ii===idx?{...tt,quantidade:e.target.value}:tt)}))} style={{ width:"2.5rem",border:"none",background:"none",fontFamily:"var(--sans)",fontSize:"0.82rem",textAlign:"center" }} />
+                          <button onClick={() => setNgPeca(p=>({...p,tamanhos:p.tamanhos.filter((_,ii)=>ii!==idx)}))} style={{ background:"none",border:"none",cursor:"pointer",color:"#c0392b",fontSize:"0.85rem",padding:"0",lineHeight:1 }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={() => setNgPeca(p=>({...p,tamanhos:[...(p.tamanhos||[]),{tamanho:"M",quantidade:1}]}))} style={{ ...BTN("outline","sm") }}>+ Tamanho</button>
+                  </div>
+                  <div style={{ display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1rem" }}>
+                    <input type="checkbox" id="ng-hig" checked={ngPeca.higienizacao_ativa} onChange={e => setNgPeca(p=>({...p,higienizacao_ativa:e.target.checked}))} />
+                    <label htmlFor="ng-hig" style={{ fontSize:"0.85rem",fontFamily:"var(--sans)" }}>Cobrar higienização</label>
+                    {ngPeca.higienizacao_ativa && <input type="number" value={ngPeca.higienizacao_valor} onChange={e => setNgPeca(p=>({...p,higienizacao_valor:e.target.value}))} placeholder="€" style={{ width:"5rem",padding:"0.4rem 0.6rem",border:"1px solid #e2dfda",fontFamily:"var(--sans)",fontSize:"0.85rem",borderRadius:"2px" }} />}
+                  </div>
+                  <div style={{ display:"flex",gap:"0.75rem" }}>
+                    <button onClick={salvarPeca} disabled={ngLoading} style={{ ...BTN("primary","md"), opacity:ngLoading?0.6:1 }}>{ngLoading?"A guardar...":(ngForm==="nova"?"Publicar peça":"Guardar alterações")}</button>
+                    <button onClick={() => { setNgForm(null); setNgMsg(""); }} style={BTN("outline","md")}>Cancelar</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Filtro */}
+              <div style={{ display:"flex",gap:"0.5rem",marginBottom:"1rem",flexWrap:"wrap" }}>
+                {["todas","disponivel","alugada","indisponivel","vendida"].map(f => (
+                  <button key={f} onClick={() => setNgFiltro(f)} style={{ padding:"0.4rem 0.85rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"var(--sans)",border:`1px solid ${ngFiltro===f?"#c4748a":"#e2dfda"}`,background:ngFiltro===f?"#c4748a":"#fff",color:ngFiltro===f?"#fff":"#5a5855",cursor:"pointer",borderRadius:"2px" }}>
+                    {f==="todas"?"Todas":EST_LBL[f]}
+                  </button>
+                ))}
+              </div>
+
+              {/* Lista de peças */}
+              {ngPecas === null ? (
+                <div style={{ padding:"3rem",textAlign:"center",color:"#aaa" }}>A carregar...</div>
+              ) : filtradas.length === 0 ? (
+                <div style={{ padding:"3rem",textAlign:"center" }}>
+                  <p style={{ color:"#aaa",marginBottom:"0.75rem",fontSize:"0.9rem" }}>{ngFiltro==="todas" ? "Ainda não há peças na loja Nora Grei." : `Nenhuma peça com estado "${EST_LBL[ngFiltro]}".`}</p>
+                  {ngFiltro==="todas" && <button onClick={() => setNgForm("nova")} style={BTN("primary","sm")}>Adicionar a primeira peça</button>}
+                </div>
+              ) : (
+                <div style={{ background:"#fff",borderRadius:"4px",overflow:"hidden",border:"1px solid #e2dfda" }}>
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead>
+                      <tr style={{ background:"#fafaf8",borderBottom:"2px solid #e2dfda" }}>
+                        {["Peça","Categoria","Estado","Aluguer/dia","Venda",""].map(h => (
+                          <th key={h} style={{ padding:"0.75rem 1rem",textAlign:"left",fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#888",fontFamily:"var(--sans)",fontWeight:600 }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtradas.map((p,idx) => (
+                        <tr key={p.id} style={{ borderBottom:"1px solid #f0ece6",background:idx%2===0?"#fff":"#fdfcfb" }}>
+                          <td style={{ padding:"0.85rem 1rem" }}>
+                            <div style={{ display:"flex",alignItems:"center",gap:"0.65rem" }}>
+                              {p.fotos?.[0] ? <img src={p.fotos[0]} alt={p.nome} style={{ width:"2.5rem",height:"3rem",objectFit:"cover",flexShrink:0,borderRadius:"2px" }} /> : <div style={{ width:"2.5rem",height:"3rem",background:"#f0ece6",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,borderRadius:"2px",fontSize:"1rem" }}>✦</div>}
+                              <div>
+                                <div style={{ fontFamily:"var(--sans)",fontWeight:600,fontSize:"0.85rem" }}>{p.nome}</div>
+                                {p.condicao && <div style={{ fontSize:"0.72rem",color:"#aaa",marginTop:"0.1rem" }}>{CONDICOES.find(c=>c.v===p.condicao)?.l||p.condicao}</div>}
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ padding:"0.85rem 1rem",fontSize:"0.82rem",color:"#5a5855" }}>{p.categoria||"—"}</td>
+                          <td style={{ padding:"0.85rem 1rem" }}>
+                            <select value={p.estado} onChange={e => mudarEstado(p, e.target.value)} style={{ padding:"0.3rem 0.5rem",border:`1px solid ${EST_COR[p.estado]||"#e2dfda"}`,background:"#fff",color:EST_COR[p.estado]||"#5a5855",fontSize:"0.75rem",fontFamily:"var(--sans)",borderRadius:"2px",cursor:"pointer",fontWeight:600 }}>
+                              {Object.entries(EST_LBL).map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding:"0.85rem 1rem",fontSize:"0.85rem",fontWeight:600,color:"#c4748a" }}>{p.preco_aluguer_dia ? `${p.preco_aluguer_dia}€` : "—"}</td>
+                          <td style={{ padding:"0.85rem 1rem",fontSize:"0.85rem",color:"#5a5855" }}>{p.preco_venda ? `${p.preco_venda}€` : "—"}</td>
+                          <td style={{ padding:"0.85rem 1rem" }}>
+                            <div style={{ display:"flex",gap:"0.4rem" }}>
+                              <button onClick={() => { setNgForm(p); setNgPeca({...p, tamanhos:p.tamanhos||[{tamanho:"M",quantidade:1}]}); setNgMsg(""); }} style={BTN("outline","sm")}>Editar</button>
+                              <a href={`/catalogo/${p.id}`} target="_blank" style={{ ...BTN("ghost","sm"), textDecoration:"none" }}>Ver →</a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           );
         })()}
