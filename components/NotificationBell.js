@@ -5,6 +5,10 @@ import { supabase } from "@/lib/supabase";
 const TXT = {
   pt: {
     semNotificacoes: "Sem notificações por agora.",
+    pagamentoTitulo: "Pagamento processado",
+    pagamentoMsg: (valor, ref) => `Foi cobrado €${valor} ao teu cartão${ref ? ` — ref. ${ref}` : ""}.`,
+    transferenciaTitulo: "Transferência enviada",
+    transferenciaMsg: (valor) => `Foi enviado €${valor} para o teu IBAN.`,
     seiHorasTitulo: "Devolução em 6 horas",
     seisHorasMsg: (nome, horas) => `O teu aluguer de "${nome}" termina em ${horas}h. Prepara a devolução — envia a peça hoje para evitar dias extra.`,
     ultimoDiaTitulo: "Último dia de uso",
@@ -15,6 +19,10 @@ const TXT = {
   },
   fr: {
     semNotificacoes: "Aucune notification pour le moment.",
+    pagamentoTitulo: "Paiement traité",
+    pagamentoMsg: (valor, ref) => `€${valor} ont été débités de votre carte${ref ? ` — réf. ${ref}` : ""}.`,
+    transferenciaTitulo: "Virement envoyé",
+    transferenciaMsg: (valor) => `€${valor} ont été envoyés sur votre IBAN.`,
     seiHorasTitulo: "Retour dans 6 heures",
     seisHorasMsg: (nome, horas) => `Votre location de "${nome}" se termine dans ${horas}h. Préparez le retour — envoyez la pièce aujourd'hui pour éviter des jours supplémentaires.`,
     ultimoDiaTitulo: "Dernier jour d'utilisation",
@@ -25,6 +33,10 @@ const TXT = {
   },
   lt: {
     semNotificacoes: "Kol kas nėra pranešimų.",
+    pagamentoTitulo: "Mokėjimas apdorotas",
+    pagamentoMsg: (valor, ref) => `Iš jūsų kortelės nurašyta €${valor}${ref ? ` — ref. ${ref}` : ""}.`,
+    transferenciaTitulo: "Pavedimas išsiųstas",
+    transferenciaMsg: (valor) => `€${valor} išsiųsta į jūsų IBAN.`,
     seiHorasTitulo: "Grąžinimas per 6 valandas",
     seisHorasMsg: (nome, horas) => `Jūsų "${nome}" nuoma baigiasi per ${horas}h. Pasiruoškite grąžinimui — išsiųskite šiandien, kad išvengtumėte papildomų dienų.`,
     ultimoDiaTitulo: "Paskutinė naudojimo diena",
@@ -38,6 +50,7 @@ const TXT = {
 export default function NotificationBell({ lang = "pt" }) {
   const [notificacoes, setNotificacoes] = useState([]);
   const [mensagensNaoLidas, setMensagensNaoLidas] = useState([]);
+  const [recibosRecentes, setRecibosRecentes] = useState([]);
   const [aberto, setAberto] = useState(false);
   const [userId, setUserId] = useState(null);
   const [modoLojista, setModoLojista] = useState(false);
@@ -61,6 +74,7 @@ export default function NotificationBell({ lang = "pt" }) {
     await gerarNotificacoesAtuais(user.id);
     await carregarNotificacoes(user.id);
     await carregarMensagensNaoLidas(user.id, lojista);
+    await carregarRecibosRecentes(user.id);
   };
 
   const gerarNotificacoesAtuais = async (cliente_id) => {
@@ -125,6 +139,20 @@ export default function NotificationBell({ lang = "pt" }) {
     if (data) setNotificacoes(data);
   };
 
+  const carregarRecibosRecentes = async (cliente_id) => {
+    const sete = new Date();
+    sete.setDate(sete.getDate() - 7);
+    const { data } = await supabase
+      .from("recibos")
+      .select("id, valor_total, estado, created_at, referencia, aluguer_id")
+      .eq("cliente_id", cliente_id)
+      .eq("estado", "pago")
+      .gte("created_at", sete.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(5);
+    setRecibosRecentes(data || []);
+  };
+
   const carregarMensagensNaoLidas = async (cliente_id, lojista) => {
     const campo = lojista ? "lojista_id" : "cliente_id";
     const campoCont = lojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
@@ -145,7 +173,7 @@ export default function NotificationBell({ lang = "pt" }) {
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
-  const totalBadge = naoLidas + mensagensNaoLidas.length;
+  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length;
   const campoCont = modoLojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
 
   return (
@@ -187,6 +215,21 @@ export default function NotificationBell({ lang = "pt" }) {
                   </a>
                 );
               })}
+
+              {/* Recibos / pagamentos recentes */}
+              {recibosRecentes.map(r => (
+                <a key={r.id} href="/pedidos" onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f0fff4", textDecoration: "none" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>
+                    💳 {i.pagamentoTitulo}
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>
+                    {i.pagamentoMsg(Number(r.valor_total).toFixed(2), r.referencia)}
+                  </div>
+                  <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>
+                    {new Date(r.created_at).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}
+                  </div>
+                </a>
+              ))}
 
               {/* Notificações de alugueres */}
               {notificacoes.map(n => (
