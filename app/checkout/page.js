@@ -690,13 +690,13 @@ function CheckoutContent() {
 
   const validarFormularioPagamento = () => {
     if (pagamento === "cartao") {
-      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo("..."); return false; }
-      if (!dadosCartao.nome) { setErroCampo("..."); return false; }
-      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("..."); return false; }
-      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("..."); return false; }
+      if (!dadosCartao.numero || dadosCartao.numero.replace(/\s/g, "").length < 16) { setErroCampo("Número do cartão inválido"); setErro("Preenche os dados do cartão correctamente."); return false; }
+      if (!dadosCartao.nome) { setErroCampo("Nome obrigatório"); setErro("Preenche o nome no cartão."); return false; }
+      if (!dadosCartao.validade || dadosCartao.validade.length < 5) { setErroCampo("Validade inválida"); setErro("Preenche a validade do cartão."); return false; }
+      if (!dadosCartao.cvc || dadosCartao.cvc.length < 3) { setErroCampo("CVC inválido"); setErro("Preenche o CVC do cartão."); return false; }
     }
     if (pagamento === "mbway") {
-      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("..."); return false; }
+      if (!telefoneMbway || telefoneMbway.replace(/\D/g, "").length < 9) { setErroCampo("Número de telemóvel inválido"); setErro("Preenche o número de telemóvel para o MB Way."); return false; }
     }
     if (pagamento === "transferencia" && !comprovativoPagamento) { setErroComprovativo(i.comprovativoErro); return false; }
     if (deposito === "transferencia" && !comprovativoDeposito && pagamento !== "transferencia") { setErroComprovativo(i.comprovativoErroDeposito); return false; }
@@ -776,7 +776,7 @@ function CheckoutContent() {
         ...(refAfiliadoId && !afiliadoAtivo ? { ref_afiliado_id: refAfiliadoId } : {}),
         ...(afiliadoAtivo ? { codigo_afiliado_usado: codigoAfiliado.trim().toUpperCase() } : {}),
       }).select().single();
-      if (error) throw error;
+      if (error) { console.error("[Checkout] Erro ao criar aluguer:", error); throw error; }
 
       // Créditos são registados automaticamente pelo trigger Supabase
       // ao confirmar o aluguer (estado = 'confirmado' ou 'ativo')
@@ -786,7 +786,7 @@ function CheckoutContent() {
       }
 
       const numeroRecibo = gerarNumeroRecibo();
-      const { data: reciboData } = await supabase.from("recibos").insert({
+      const { data: reciboData, error: reciboError } = await supabase.from("recibos").insert({
         numero: numeroRecibo,
         aluguer_id: novoAluguer.id,
         cliente_id: user.id,
@@ -800,6 +800,7 @@ function CheckoutContent() {
         comprovativo_url: urlComprovativoFinal,
         detalhes: { entrega, deposito_modalidade: deposito, peca_nome: peca?.nome, tamanho: tamanhoNome },
       }).select().single();
+      if (reciboError) throw reciboError;
 
       // Pontos: só descontar aluguer grátis agora; +1 ponto e contagem acumulam quando devolvido (no backoffice)
       if (temGratis) {
@@ -830,7 +831,15 @@ function CheckoutContent() {
       } catch (_) { /* notificação não bloqueia o fluxo */ }
 
       setRecibo(reciboData);
-    } catch(e) { setErro(e.message); }
+    } catch(e) {
+      console.error("[Checkout] Erro em finalizar:", e);
+      const msg = e?.message || JSON.stringify(e) || "Erro desconhecido";
+      setErro(`Erro ao processar: ${msg}`);
+      // Scroll para o erro
+      setTimeout(() => {
+        document.querySelector(".erro")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
     setLoading(false);
     setQrAtivo(false);
   };
