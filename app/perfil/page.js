@@ -702,7 +702,7 @@ const t = {
     verTalao: "Ver talão",
     dataLabel: "Data", metodoLabel: "Método",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", tabCalculadora: "Calculadora", tabNotificacoes: "Notificações", falarLojista: "Falar com o lojista", semNotificacoes: "Sem notificações por agora.", marcarLidas: "Marcar todas como lidas", caucaoLabel: "Caução", popCuriosidade: "Já avaliaste alguma peça hoje que te pode trazer valor?", popCuriosidadeBtn: "Avaliar agora →", calcTitulo: "Quanto vale a tua peça?", calcSub: "Descobre o potencial da tua peça no circuito circular de moda.", calcPrecoLabel: "Valor original da peça (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marca", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "Estado", calcIdadeLabel: "Idade da peça", calcResultado: "Estimativa de retorno", calcVerMais: "Calculadora completa →", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.", erroFoto: "Erro ao guardar foto. Tenta novamente.", erroGeral: "Ocorreu um erro. Tenta novamente.", tabSuporte: "Suporte", novoTicket: "Novo ticket", semTickets: "Sem tickets de suporte.", ticketAssunto: "Assunto do ticket", ticketCategoria: "Categoria", ticketPrioridade: "Prioridade", ticketMensagem: "Descreve o problema", criarTicket: "Criar ticket", ticketCriado: "Ticket criado com sucesso!", ticketAberto: "Aberto", ticketEmCurso: "Em curso", ticketFechado: "Fechado", prioUrgente: "Urgente", prioNormal: "Normal", prioBaixa: "Baixa", catBug: "Bug técnico", catPagamento: "Pagamento", catConta: "Conta", catStock: "Stock / Peças", catEnvios: "Envios", catOutro: "Outro", enviarResposta: "Enviar resposta", respostaAdmin: "Nora Grei", respostaLojista: "Tu",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", tabCalculadora: "Calculadora", tabNotificacoes: "Notificações", falarLojista: "Falar com o lojista", semNotificacoes: "Sem notificações por agora.", marcarLidas: "Marcar todas como lidas", caucaoLabel: "Caução", popCuriosidade: "Já avaliaste alguma peça hoje que te pode trazer valor?", popCuriosidadeBtn: "Avaliar agora →", calcTitulo: "Quanto vale a tua peça?", calcSub: "Descobre o potencial da tua peça no circuito circular de moda.", calcPrecoLabel: "Valor original da peça (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marca", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "Estado", calcIdadeLabel: "Idade da peça", calcResultado: "Estimativa de retorno", calcVerMais: "Calculadora completa →", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.", erroFoto: "Erro ao guardar foto. Tenta novamente.", erroGeral: "Ocorreu um erro. Tenta novamente.", tabSuporte: "Suporte", novoTicket: "Novo ticket", semTickets: "Sem tickets de suporte.", ticketAssunto: "Assunto do ticket", ticketCategoria: "Categoria", ticketPrioridade: "Prioridade", ticketMensagem: "Descreve o problema", criarTicket: "Criar ticket", ticketCriado: "Ticket criado com sucesso!", ticketAberto: "Aberto", ticketEmCurso: "Em curso", ticketFechado: "Fechado", prioUrgente: "Urgente", prioNormal: "Normal", prioBaixa: "Baixa", catBug: "Bug técnico", catPagamento: "Pagamento", catConta: "Conta", catStock: "Stock / Peças", catEnvios: "Envios", catOutro: "Outro", enviarResposta: "Enviar resposta", respostaAdmin: "Nora Grei", respostaLojista: "Tu", tabProcura: "Pedir uma peça", procuraTitulo: "Pedidos de procura", procuraDesc: "Não encontras o que procuras? Publica o teu pedido e os lojistas respondem.", novoPedido: "Novo pedido", categoriaPedido: "Categoria", tipoPeca: "Tipo de peça", tamanhoPedido: "Tamanho", orcamentoMax: "Orçamento máximo (€/dia)", cidadePedido: "Cidade de entrega", dataInicioPedido: "Data de início", dataFimPedido: "Data de fim", descricaoPedido: "Descrição (opcional)", descricaoPlaceholder: "Ex: Vestido longo para casamento, cor clara, elegante...", publicarPedido: "Publicar pedido", pedidoPublicado: "Pedido publicado! Os lojistas serão notificados.", semPedidosProcura: "Ainda não publicaste nenhum pedido.", pedidoAberto: "Aberto", pedidoRespondido: "Respondido", pedidoConcluido: "Concluído", pedidoExpirado: "Expirado", respostasLojistas: "Respostas dos lojistas", semRespostas: "Ainda sem respostas.", verPeca: "Ver peça →", responderPedido: "Responder a este pedido", minhaResposta: "A tua proposta", enviarResposta2: "Enviar proposta", respostaEnviada: "Proposta enviada!", pedidosFeed: "Pedidos na tua zona", semPedidosFeed: "Sem pedidos activos na tua zona neste momento.",
     dadosFinanceiros: "Dados financeiros", dadosFinanceirosDesc: "Informação bancária para recebimento dos ganhos e pagamento de serviços Nora Grei.", ibanLabel: "IBAN (para onde são enviados os ganhos)", ibanPlaceholder: "PT50 0000 0000 0000 0000 0000 0", ibanVazio: "IBAN não configurado", ibanValido: "IBAN válido ✓", ibanInvalido: "Formato de IBAN inválido", cartaoLabel: "Cartão de crédito ou débito (pagamento de serviços)", cartaoNumero: "Número do cartão", cartaoNome: "Nome no cartão", cartaoValidade: "Validade (MM/AA)", cartaoVazio: "Cartão não configurado", cartaoValido: "Cartão válido ✓", cartaoInvalido: "Número de cartão inválido", cartaoValidadeInvalida: "Data de validade inválida", cartaoGuardadoFim: "Cartão a terminar em", guardarFinanceiros: "Guardar dados financeiros", navPessoal: "Pessoal", navMorada: "Morada", navDocs: "Documentos", navFinanceiros: "Financeiros", navSeguranca: "Segurança",
   },
   fr: {
@@ -784,7 +784,7 @@ const t = {
     verTalao: "Voir le reçu",
     dataLabel: "Date", metodoLabel: "Méthode",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", tabCalculadora: "Calculatrice", tabNotificacoes: "Notifications", falarLojista: "Contacter la boutique", semNotificacoes: "Aucune notification pour le moment.", marcarLidas: "Tout marquer comme lu", caucaoLabel: "Dépôt", popCuriosidade: "Avez-vous évalué une pièce aujourd'hui qui pourrait vous rapporter ?", popCuriosidadeBtn: "Évaluer maintenant →", calcTitulo: "Combien vaut votre pièce ?", calcSub: "Découvrez le potentiel de votre pièce dans le circuit de mode circulaire.", calcPrecoLabel: "Valeur d'origine (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marque", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "État", calcIdadeLabel: "Âge de la pièce", calcResultado: "Estimation de retour", calcVerMais: "Calculatrice complète →", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.", erroFoto: "Erreur lors de l'enregistrement de la photo. Réessayez.", erroGeral: "Une erreur s'est produite. Réessayez.", tabSuporte: "Support", novoTicket: "Nouveau ticket", semTickets: "Aucun ticket de support.", ticketAssunto: "Sujet du ticket", ticketCategoria: "Catégorie", ticketPrioridade: "Priorité", ticketMensagem: "Décrivez le problème", criarTicket: "Créer le ticket", ticketCriado: "Ticket créé avec succès !", ticketAberto: "Ouvert", ticketEmCurso: "En cours", ticketFechado: "Fermé", prioUrgente: "Urgent", prioNormal: "Normal", prioBaixa: "Basse", catBug: "Bug technique", catPagamento: "Paiement", catConta: "Compte", catStock: "Stock / Pièces", catEnvios: "Livraisons", catOutro: "Autre", enviarResposta: "Envoyer la réponse", respostaAdmin: "Nora Grei", respostaLojista: "Vous",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", tabCalculadora: "Calculatrice", tabNotificacoes: "Notifications", falarLojista: "Contacter la boutique", semNotificacoes: "Aucune notification pour le moment.", marcarLidas: "Tout marquer comme lu", caucaoLabel: "Dépôt", popCuriosidade: "Avez-vous évalué une pièce aujourd'hui qui pourrait vous rapporter ?", popCuriosidadeBtn: "Évaluer maintenant →", calcTitulo: "Combien vaut votre pièce ?", calcSub: "Découvrez le potentiel de votre pièce dans le circuit de mode circulaire.", calcPrecoLabel: "Valeur d'origine (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marque", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "État", calcIdadeLabel: "Âge de la pièce", calcResultado: "Estimation de retour", calcVerMais: "Calculatrice complète →", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.", erroFoto: "Erreur lors de l'enregistrement de la photo. Réessayez.", erroGeral: "Une erreur s'est produite. Réessayez.", tabSuporte: "Support", novoTicket: "Nouveau ticket", semTickets: "Aucun ticket de support.", ticketAssunto: "Sujet du ticket", ticketCategoria: "Catégorie", ticketPrioridade: "Priorité", ticketMensagem: "Décrivez le problème", criarTicket: "Créer le ticket", ticketCriado: "Ticket créé avec succès !", ticketAberto: "Ouvert", ticketEmCurso: "En cours", ticketFechado: "Fermé", prioUrgente: "Urgent", prioNormal: "Normal", prioBaixa: "Basse", catBug: "Bug technique", catPagamento: "Paiement", catConta: "Compte", catStock: "Stock / Pièces", catEnvios: "Livraisons", catOutro: "Autre", enviarResposta: "Envoyer la réponse", respostaAdmin: "Nora Grei", respostaLojista: "Vous", tabProcura: "Demander une pièce", procuraTitulo: "Demandes", procuraDesc: "Vous ne trouvez pas ce que vous cherchez ? Publiez votre demande.", novoPedido: "Nouvelle demande", categoriaPedido: "Catégorie", tipoPeca: "Type de pièce", tamanhoPedido: "Taille", orcamentoMax: "Budget maximum (€/jour)", cidadePedido: "Ville de livraison", dataInicioPedido: "Date de début", dataFimPedido: "Date de fin", descricaoPedido: "Description (facultatif)", descricaoPlaceholder: "Ex: Robe longue pour mariage, couleur claire...", publicarPedido: "Publier la demande", pedidoPublicado: "Demande publiée !", semPedidosProcura: "Vous n'avez encore publié aucune demande.", pedidoAberto: "Ouvert", pedidoRespondido: "Répondu", pedidoConcluido: "Conclu", pedidoExpirado: "Expiré", respostasLojistas: "Réponses des boutiques", semRespostas: "Pas encore de réponses.", verPeca: "Voir la pièce →", responderPedido: "Répondre à cette demande", minhaResposta: "Votre proposition", enviarResposta2: "Envoyer la proposition", respostaEnviada: "Proposition envoyée !", pedidosFeed: "Demandes dans votre zone", semPedidosFeed: "Aucune demande active dans votre zone.",
     dadosFinanceiros: "Données financières", dadosFinanceirosDesc: "Coordonnées bancaires pour la réception des gains et le paiement des services Nora Grei.", ibanLabel: "IBAN (pour recevoir vos gains)", ibanPlaceholder: "FR76 0000 0000 0000 0000 0000 000", ibanVazio: "IBAN non configuré", ibanValido: "IBAN valide ✓", ibanInvalido: "Format IBAN invalide", cartaoLabel: "Carte de crédit ou débit (paiement des services)", cartaoNumero: "Numéro de carte", cartaoNome: "Nom sur la carte", cartaoValidade: "Validité (MM/AA)", cartaoVazio: "Carte non configurée", cartaoValido: "Carte valide ✓", cartaoInvalido: "Numéro de carte invalide", cartaoValidadeInvalida: "Date de validité invalide", cartaoGuardadoFim: "Carte se terminant par", guardarFinanceiros: "Enregistrer les données financières", navPessoal: "Personnel", navMorada: "Adresse", navDocs: "Documents", navFinanceiros: "Finances", navSeguranca: "Sécurité",
   },
   lt: {
@@ -866,7 +866,7 @@ const t = {
     verTalao: "Žiūrėti kvitą",
     dataLabel: "Data", metodoLabel: "Mokėjimo būdas",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", tabCalculadora: "Skaičiuoklė", tabNotificacoes: "Pranešimai", falarLojista: "Susisiekti su pardavėju", semNotificacoes: "Kol kas nėra pranešimų.", marcarLidas: "Pažymėti visus kaip skaitytus", caucaoLabel: "Užstatas", popCuriosidade: "Ar šiandien įvertinote kokį drabužį, kuris galėtų jums atnešti vertės?", popCuriosidadeBtn: "Įvertinti dabar →", calcTitulo: "Kiek verta jūsų dalis?", calcSub: "Atraskite savo drabužio potencialą aplinkai draugiškoje madoje.", calcPrecoLabel: "Originali drabužio kaina (€)", calcPrecoPlaceholder: "Pvz: 350", calcMarcaLabel: "Prekės ženklas", calcMarcaPlaceholder: "Pvz: Gucci, Zara…", calcEstadoLabel: "Būklė", calcIdadeLabel: "Amžius", calcResultado: "Grąžos įvertinimas", calcVerMais: "Išsami skaičiuoklė →", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.", erroFoto: "Klaida išsaugant nuotrauką. Bandykite dar kartą.", erroGeral: "Įvyko klaida. Bandykite dar kartą.", tabSuporte: "Pagalba", novoTicket: "Naujas bilietas", semTickets: "Nėra pagalbos bilietų.", ticketAssunto: "Bilieto tema", ticketCategoria: "Kategorija", ticketPrioridade: "Prioritetas", ticketMensagem: "Aprašykite problemą", criarTicket: "Sukurti bilietą", ticketCriado: "Bilietas sėkmingai sukurtas!", ticketAberto: "Atidarytas", ticketEmCurso: "Vykdomas", ticketFechado: "Uždarytas", prioUrgente: "Skubus", prioNormal: "Normalus", prioBaixa: "Žemas", catBug: "Techninis klaida", catPagamento: "Mokėjimas", catConta: "Paskyra", catStock: "Sandėlis / Drabužiai", catEnvios: "Pristatymas", catOutro: "Kita", enviarResposta: "Siųsti atsakymą", respostaAdmin: "Nora Grei", respostaLojista: "Jūs",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", tabCalculadora: "Skaičiuoklė", tabNotificacoes: "Pranešimai", falarLojista: "Susisiekti su pardavėju", semNotificacoes: "Kol kas nėra pranešimų.", marcarLidas: "Pažymėti visus kaip skaitytus", caucaoLabel: "Užstatas", popCuriosidade: "Ar šiandien įvertinote kokį drabužį, kuris galėtų jums atnešti vertės?", popCuriosidadeBtn: "Įvertinti dabar →", calcTitulo: "Kiek verta jūsų dalis?", calcSub: "Atraskite savo drabužio potencialą aplinkai draugiškoje madoje.", calcPrecoLabel: "Originali drabužio kaina (€)", calcPrecoPlaceholder: "Pvz: 350", calcMarcaLabel: "Prekės ženklas", calcMarcaPlaceholder: "Pvz: Gucci, Zara…", calcEstadoLabel: "Būklė", calcIdadeLabel: "Amžius", calcResultado: "Grąžos įvertinimas", calcVerMais: "Išsami skaičiuoklė →", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.", erroFoto: "Klaida išsaugant nuotrauką. Bandykite dar kartą.", erroGeral: "Įvyko klaida. Bandykite dar kartą.", tabSuporte: "Pagalba", novoTicket: "Naujas bilietas", semTickets: "Nėra pagalbos bilietų.", ticketAssunto: "Bilieto tema", ticketCategoria: "Kategorija", ticketPrioridade: "Prioritetas", ticketMensagem: "Aprašykite problemą", criarTicket: "Sukurti bilietą", ticketCriado: "Bilietas sėkmingai sukurtas!", ticketAberto: "Atidarytas", ticketEmCurso: "Vykdomas", ticketFechado: "Uždarytas", prioUrgente: "Skubus", prioNormal: "Normalus", prioBaixa: "Žemas", catBug: "Techninis klaida", catPagamento: "Mokėjimas", catConta: "Paskyra", catStock: "Sandėlis / Drabužiai", catEnvios: "Pristatymas", catOutro: "Kita", enviarResposta: "Siųsti atsakymą", respostaAdmin: "Nora Grei", respostaLojista: "Jūs", tabProcura: "Prašyti drabužio", procuraTitulo: "Paieškos prašymai", procuraDesc: "Nerandate ko ieškote? Paskelbkite prašymą ir pardavėjai atsakys.", novoPedido: "Naujas prašymas", categoriaPedido: "Kategorija", tipoPeca: "Drabužio tipas", tamanhoPedido: "Dydis", orcamentoMax: "Maks. biudžetas (€/d.)", cidadePedido: "Pristatymo miestas", dataInicioPedido: "Pradžios data", dataFimPedido: "Pabaigos data", descricaoPedido: "Aprašymas (neprivaloma)", descricaoPlaceholder: "Pvz: Ilga suknelė vestuvėms, šviesi spalva...", publicarPedido: "Paskelbti prašymą", pedidoPublicado: "Prašymas paskelbtas!", semPedidosProcura: "Dar nepaskelbėte jokio prašymo.", pedidoAberto: "Atidarytas", pedidoRespondido: "Atsakyta", pedidoConcluido: "Užbaigtas", pedidoExpirado: "Pasibaigęs", respostasLojistas: "Pardavėjų atsakymai", semRespostas: "Dar nėra atsakymų.", verPeca: "Žiūrėti →", responderPedido: "Atsakyti į šį prašymą", minhaResposta: "Jūsų pasiūlymas", enviarResposta2: "Siųsti pasiūlymą", respostaEnviada: "Pasiūlymas išsiųstas!", pedidosFeed: "Prašymai jūsų zonoje", semPedidosFeed: "Šiuo metu nėra aktyvių prašymų jūsų zonoje.",
     dadosFinanceiros: "Finansiniai duomenys", dadosFinanceirosDesc: "Banko informacija pajamų gavimui ir Nora Grei paslaugų apmokėjimui.", ibanLabel: "IBAN (kur siunčiamos pajamos)", ibanPlaceholder: "LT00 0000 0000 0000 0000", ibanVazio: "IBAN nesukonfigūruotas", ibanValido: "IBAN galioja ✓", ibanInvalido: "Neteisingas IBAN formatas", cartaoLabel: "Kredito arba debeto kortelė (paslaugų apmokėjimas)", cartaoNumero: "Kortelės numeris", cartaoNome: "Vardas ant kortelės", cartaoValidade: "Galioja iki (MM/MM)", cartaoVazio: "Kortelė nesukonfigūruota", cartaoValido: "Kortelė galioja ✓", cartaoInvalido: "Neteisingas kortelės numeris", cartaoValidadeInvalida: "Neteisinga galiojimo data", cartaoGuardadoFim: "Kortelė baigiasi", guardarFinanceiros: "Išsaugoti finansinius duomenis", navPessoal: "Asmeniniai", navMorada: "Adresas", navDocs: "Dokumentai", navFinanceiros: "Finansai", navSeguranca: "Saugumas",
   },
 };
@@ -2252,6 +2252,7 @@ export default function Perfil() {
                 {id:"perfil", icon:"👤", label:i.tabPerfil},
                 {id:"pedidos", icon:"📦", label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
                 {id:"guardados", icon:"♡", label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+                {id:"procura", icon:"🔍", label:i.tabProcura},
                 {id:"ganhos", icon:"€", label:{pt:"Ganhos",fr:"Gains",lt:"Pajamos"}[lang]||"Ganhos"},
                 {id:"notificacoes", icon:"◎", label:i.tabNotificacoes, badge: naoLidasNotifs > 0 ? naoLidasNotifs : null},
                 {id:"calculadora", icon:"✦", label:i.tabCalculadora},
@@ -2435,6 +2436,150 @@ export default function Perfil() {
             )}
           </div>
         )}
+
+        {/* TAB PROCURA — cliente pede uma peça */}
+        {tabAtiva === "procura" && (() => {
+          const [pedidos, setPedidos] = React.useState([]);
+          const [pedidoAberto2, setPedidoAberto2] = React.useState(null); // pedido a ver respostas
+          const [respostas, setRespostas] = React.useState([]);
+          const [showForm, setShowForm] = React.useState(false);
+          const [form, setForm] = React.useState({ categoria:"", tipo_peca:"", tamanho:"", orcamento_max:"", cidade:"", data_inicio:"", data_fim:"", descricao:"" });
+          const [formMsg, setFormMsg] = React.useState("");
+          const [formLoading2, setFormLoading2] = React.useState(false);
+          const CATS = ["Vestido","Fato","Casaco","Calças","Saia","Blusa","Mala","Acessório","Outra"];
+          const SIZES = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","Único"];
+          React.useEffect(() => {
+            supabase.auth.getUser().then(({ data: { user } }) => {
+              if (!user) return;
+              supabase.from("pedidos_procura").select("*").eq("cliente_id", user.id).order("created_at", { ascending: false }).then(({ data }) => { if (data) setPedidos(data); });
+            });
+          }, []);
+          const publicar = async () => {
+            if (!form.categoria || !form.cidade) { setFormMsg({pt:"Preenche categoria e cidade.",fr:"Remplis catégorie et ville.",lt:"Užpildyk kategoriją ir miestą."}[lang]||"Preenche categoria e cidade."); return; }
+            setFormLoading2(true); setFormMsg("");
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data, error } = await supabase.from("pedidos_procura").insert([{ cliente_id: user.id, categoria: form.categoria, descricao: form.descricao||null, tamanho: form.tamanho||null, orcamento_max: form.orcamento_max ? parseFloat(form.orcamento_max) : null, cidade: form.cidade, data_inicio: form.data_inicio||null, data_fim: form.data_fim||null }]).select().single();
+            setFormLoading2(false);
+            if (error) { setFormMsg(i.erroGeral); return; }
+            setPedidos(prev => [data, ...prev]); setShowForm(false); setForm({ categoria:"", tipo_peca:"", tamanho:"", orcamento_max:"", cidade:"", data_inicio:"", data_fim:"", descricao:"" }); setFormMsg(i.pedidoPublicado);
+          };
+          const verRespostas = async (ped) => {
+            setPedidoAberto2(ped);
+            const { data } = await supabase.from("pedidos_respostas").select("*, lojista:lojista_id(nome, codigo_loja), peca:peca_lojista_id(nome, fotos, preco_aluguer_dia)").eq("pedido_id", ped.id).order("created_at", { ascending: true });
+            if (data) setRespostas(data);
+          };
+          const EST_COR2 = { aberto:"#27ae60", respondido:"#f39c12", concluido:"#8e44ad", expirado:"#95a5a6" };
+          const EST_LBL = { aberto: i.pedidoAberto, respondido: i.pedidoRespondido, concluido: i.pedidoConcluido, expirado: i.pedidoExpirado };
+          return (
+            <div style={{padding:"0 0 3rem"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1rem"}}>
+                <div>
+                  <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontFamily:"var(--sans)",marginBottom:"0.3rem"}}>{i.procuraTitulo}</p>
+                  <p style={{fontSize:"0.8rem",color:"#7a7775"}}>{i.procuraDesc}</p>
+                </div>
+                <button onClick={() => { setShowForm(!showForm); setFormMsg(""); }} style={{background:"#c4748a",color:"#fff",border:"none",padding:"0.55rem 1rem",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0,marginLeft:"1rem"}}>+ {i.novoPedido}</button>
+              </div>
+              {formMsg && <div style={{padding:"0.75rem 1rem",background: formMsg===i.pedidoPublicado?"#f0f7f0":"#fef5f5",border:`1px solid ${formMsg===i.pedidoPublicado?"#b8dbb8":"#f5c6cb"}`,fontSize:"0.8rem",marginBottom:"1rem",color:formMsg===i.pedidoPublicado?"#27ae60":"#c0392b"}}>{formMsg}</div>}
+              {showForm && (
+                <div style={{background:"#fafaf8",border:"1px solid var(--g2)",padding:"1.25rem",marginBottom:"1.5rem"}}>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.75rem",marginBottom:"0.75rem"}}>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.categoriaPedido} *</label>
+                      <select value={form.categoria} onChange={e => setForm(f=>({...f,categoria:e.target.value}))} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem"}}>
+                        <option value="">{i.selecionar}</option>
+                        {CATS.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.tamanhoPedido}</label>
+                      <select value={form.tamanho} onChange={e => setForm(f=>({...f,tamanho:e.target.value}))} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem"}}>
+                        <option value="">{i.selecionar}</option>
+                        {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.orcamentoMax}</label>
+                      <input type="number" value={form.orcamento_max} onChange={e => setForm(f=>({...f,orcamento_max:e.target.value}))} placeholder="Ex: 25" style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",boxSizing:"border-box"}} />
+                    </div>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.cidadePedido} *</label>
+                      <input type="text" value={form.cidade} onChange={e => setForm(f=>({...f,cidade:e.target.value}))} placeholder="Ex: Lisboa" style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",boxSizing:"border-box"}} />
+                    </div>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.dataInicioPedido}</label>
+                      <input type="date" value={form.data_inicio} onChange={e => setForm(f=>({...f,data_inicio:e.target.value}))} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",boxSizing:"border-box"}} />
+                    </div>
+                    <div>
+                      <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.dataFimPedido}</label>
+                      <input type="date" value={form.data_fim} onChange={e => setForm(f=>({...f,data_fim:e.target.value}))} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",boxSizing:"border-box"}} />
+                    </div>
+                  </div>
+                  <div style={{marginBottom:"0.75rem"}}>
+                    <label style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",display:"block",marginBottom:"0.3rem",fontFamily:"var(--sans)"}}>{i.descricaoPedido}</label>
+                    <textarea value={form.descricao} onChange={e => setForm(f=>({...f,descricao:e.target.value}))} placeholder={i.descricaoPlaceholder} rows={3} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",resize:"vertical",boxSizing:"border-box"}} />
+                  </div>
+                  <button onClick={publicar} disabled={formLoading2} style={{background:"#1a1816",color:"#fff",border:"none",padding:"0.75rem 1.5rem",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:formLoading2?"not-allowed":"pointer",opacity:formLoading2?0.6:1}}>{formLoading2?"...":{pt:"A publicar…",fr:"Publication…",lt:"Skelbiama…"}[lang]||"A publicar…" || i.publicarPedido}</button>
+                </div>
+              )}
+              {pedidoAberto2 ? (
+                <div>
+                  <button onClick={() => { setPedidoAberto2(null); setRespostas([]); }} style={{background:"none",border:"none",cursor:"pointer",color:"#c4748a",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",padding:"0",marginBottom:"1rem"}}>← {i.procuraTitulo}</button>
+                  <div style={{background:"#fafaf8",border:"1px solid var(--g2)",padding:"1rem",marginBottom:"1.5rem"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.4rem"}}>
+                      <span style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"var(--sans)",color:"#fff",background:EST_COR2[pedidoAberto2.estado]||"#aaa",padding:"0.15rem 0.5rem",borderRadius:"2px"}}>{EST_LBL[pedidoAberto2.estado]||pedidoAberto2.estado}</span>
+                      <span style={{fontSize:"0.72rem",color:"var(--g4)",fontFamily:"var(--sans)"}}>{pedidoAberto2.categoria}{pedidoAberto2.tamanho ? ` · ${pedidoAberto2.tamanho}` : ""}{pedidoAberto2.orcamento_max ? ` · ${i.orcamentoMax.split("(")[0].trim()}: ${pedidoAberto2.orcamento_max}€/dia` : ""}</span>
+                    </div>
+                    <div style={{fontSize:"0.8rem",marginBottom:"0.4rem"}}>{pedidoAberto2.cidade}{pedidoAberto2.data_inicio ? ` · ${pedidoAberto2.data_inicio}${pedidoAberto2.data_fim ? ` → ${pedidoAberto2.data_fim}` : ""}` : ""}</div>
+                    {pedidoAberto2.descricao && <p style={{fontSize:"0.82rem",color:"#5a5855",margin:0}}>{pedidoAberto2.descricao}</p>}
+                  </div>
+                  <p style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",marginBottom:"1rem",fontFamily:"var(--sans)"}}>{i.respostasLojistas} ({respostas.length})</p>
+                  {respostas.length === 0 ? (
+                    <div style={{textAlign:"center",padding:"2rem",color:"#9c9894",fontSize:"0.85rem"}}>{i.semRespostas}</div>
+                  ) : respostas.map(r => (
+                    <div key={r.id} style={{borderBottom:"1px solid var(--g2)",padding:"1rem 0"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.4rem"}}>
+                        <span style={{fontSize:"0.72rem",fontWeight:600,letterSpacing:"0.05em",fontFamily:"var(--sans)"}}>{r.lojista?.nome||"Lojista"}</span>
+                        {r.lojista?.codigo_loja && <a href={`/loja/${r.lojista.codigo_loja}`} style={{fontSize:"0.7rem",color:"#c4748a",textDecoration:"none",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)"}}>ver loja →</a>}
+                        <span style={{marginLeft:"auto",fontSize:"0.68rem",color:"var(--g4)",fontFamily:"var(--sans)"}}>{new Date(r.created_at).toLocaleDateString(lang==="pt"?"pt-PT":lang==="fr"?"fr-FR":"lt-LT")}</span>
+                      </div>
+                      <p style={{fontSize:"0.82rem",margin:"0 0 0.5rem"}}>{r.mensagem}</p>
+                      {r.peca && (
+                        <div style={{display:"flex",alignItems:"center",gap:"0.75rem",background:"var(--g1)",padding:"0.5rem 0.75rem",borderRadius:"2px"}}>
+                          {r.peca.fotos?.[0] && <img src={r.peca.fotos[0]} alt={r.peca.nome} style={{width:"2.5rem",height:"3rem",objectFit:"cover",flexShrink:0}} />}
+                          <div>
+                            <div style={{fontSize:"0.78rem",fontFamily:"var(--serif)"}}>{r.peca.nome}</div>
+                            {r.peca.preco_aluguer_dia && <div style={{fontSize:"0.7rem",color:"var(--g4)"}}>{r.peca.preco_aluguer_dia}€/dia</div>}
+                          </div>
+                          {r.peca_lojista_id && <a href={`/catalogo/${r.peca_lojista_id}`} style={{marginLeft:"auto",fontSize:"0.7rem",color:"#c4748a",textDecoration:"none",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"var(--sans)",flexShrink:0}}>{i.verPeca}</a>}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {pedidos.length === 0 ? (
+                    <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
+                      <p style={{fontSize:"0.85rem",marginBottom:"0.75rem"}}>{i.semPedidosProcura}</p>
+                      <button onClick={() => setShowForm(true)} style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#c4748a",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)"}}>{i.novoPedido} →</button>
+                    </div>
+                  ) : pedidos.map(ped => (
+                    <div key={ped.id} onClick={() => verRespostas(ped)} style={{borderBottom:"1px solid var(--g2)",padding:"0.9rem 0",cursor:"pointer",display:"flex",alignItems:"center",gap:"0.75rem"}}>
+                      <div style={{flex:1}}>
+                        <div style={{display:"flex",alignItems:"center",gap:"0.4rem",marginBottom:"0.2rem"}}>
+                          <span style={{fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"var(--sans)",color:"#fff",background:EST_COR2[ped.estado]||"#aaa",padding:"0.1rem 0.4rem",borderRadius:"2px"}}>{EST_LBL[ped.estado]||ped.estado}</span>
+                          <span style={{fontFamily:"var(--serif)",fontSize:"0.9rem"}}>{ped.categoria}{ped.tamanho ? ` · ${ped.tamanho}` : ""}</span>
+                        </div>
+                        <div style={{fontSize:"0.75rem",color:"var(--g4)",fontFamily:"var(--sans)"}}>{ped.cidade}{ped.orcamento_max ? ` · até ${ped.orcamento_max}€/dia` : ""}</div>
+                      </div>
+                      <span style={{fontSize:"0.7rem",color:"#c4748a",fontFamily:"var(--sans)",flexShrink:0}}>{i.respostasLojistas} →</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          );
+        })()}
 
         {/* TAB NOTIFICAÇÕES */}
         {tabAtiva === "notificacoes" && (
@@ -2646,7 +2791,7 @@ export default function Perfil() {
         )}
 
         {/* PERFIL NORMAL — oculto nas tabs guardados, pedidos, ganhos e loja */}
-        <div style={{display: (tabAtiva === "guardados" || tabAtiva === "pedidos" || tabAtiva === "ganhos" || tabAtiva === "loja" || tabAtiva === "calculadora") ? "none" : "block"}}>
+        <div style={{display: (tabAtiva === "guardados" || tabAtiva === "pedidos" || tabAtiva === "ganhos" || tabAtiva === "loja" || tabAtiva === "calculadora" || tabAtiva === "procura") ? "none" : "block"}}>
 
         {/* POP DE CURIOSIDADE — banner único por sessão, leva à calculadora */}
         {!popCuriosidadeVisto && (
@@ -3477,6 +3622,75 @@ export default function Perfil() {
                             </div>
                           </div>
                         )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* FEED PEDIDOS DA ZONA */}
+                  {(() => {
+                    const [feedPed, setFeedPed] = React.useState(null);
+                    const [pedResponder, setPedResponder] = React.useState(null);
+                    const [respMsg, setRespMsg] = React.useState("");
+                    const [respPeca, setRespPeca] = React.useState("");
+                    const [respLoading, setRespLoading] = React.useState(false);
+                    const [respOk, setRespOk] = React.useState(false);
+                    React.useEffect(() => {
+                      if (feedPed !== null) return;
+                      supabase.auth.getUser().then(async ({ data: { user } }) => {
+                        if (!user) return;
+                        const { data: cli } = await supabase.from("clientes").select("cidade").eq("id", user.id).single();
+                        const cidade = cli?.cidade || "";
+                        const inicio = new Date(); inicio.setDate(1);
+                        const { data } = await supabase.from("pedidos_procura").select("*").eq("estado", "aberto").gte("created_at", inicio.toISOString()).order("created_at", { ascending: false }).limit(10);
+                        const pedsCidade = (data||[]).filter(p => !cidade || p.cidade?.toLowerCase().includes(cidade.toLowerCase()) || cidade.toLowerCase().includes(p.cidade?.toLowerCase()||""));
+                        setFeedPed(pedsCidade.length > 0 ? pedsCidade : []);
+                      });
+                    }, []);
+                    const enviarResposta = async () => {
+                      if (!respMsg.trim()) return;
+                      setRespLoading(true);
+                      const { data: { user } } = await supabase.auth.getUser();
+                      await supabase.from("pedidos_respostas").insert([{ pedido_id: pedResponder.id, lojista_id: user.id, mensagem: respMsg, peca_lojista_id: respPeca || null }]);
+                      await supabase.from("pedidos_procura").update({ estado: "respondido" }).eq("id", pedResponder.id);
+                      setRespLoading(false); setRespOk(true); setRespMsg(""); setRespPeca(""); setPedResponder(null);
+                      setFeedPed(prev => prev.filter(p => p.id !== pedResponder.id));
+                    };
+                    if (feedPed === null) return null;
+                    return (
+                      <div style={{marginBottom:"1.25rem",background:"#fff8f4",border:"1px solid #f0d5c8",padding:"1rem 1.25rem"}}>
+                        <div style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",marginBottom:"0.65rem",fontFamily:"var(--sans)"}}>{i.pedidosFeed}</div>
+                        {respOk && <div style={{fontSize:"0.8rem",color:"#27ae60",marginBottom:"0.75rem",padding:"0.5rem 0.75rem",background:"#f0f7f0",border:"1px solid #b8dbb8"}}>{i.respostaEnviada}</div>}
+                        {feedPed.length === 0 ? (
+                          <p style={{fontSize:"0.82rem",color:"#9c9894",margin:0}}>{i.semPedidosFeed}</p>
+                        ) : feedPed.map(ped => (
+                          <div key={ped.id} style={{borderBottom:"1px solid #f0d5c8",paddingBottom:"0.75rem",marginBottom:"0.75rem"}}>
+                            <div style={{display:"flex",alignItems:"flex-start",gap:"0.5rem",marginBottom:"0.3rem",flexWrap:"wrap"}}>
+                              <span style={{fontFamily:"var(--serif)",fontSize:"0.95rem"}}>{ped.categoria}{ped.tamanho ? ` · ${ped.tamanho}` : ""}</span>
+                              <span style={{fontSize:"0.7rem",fontFamily:"var(--sans)",color:"var(--g4)",marginLeft:"auto"}}>{ped.cidade}</span>
+                            </div>
+                            {ped.orcamento_max && <div style={{fontSize:"0.72rem",color:"#c4748a",fontFamily:"var(--sans)",marginBottom:"0.2rem"}}>até {ped.orcamento_max}€/dia</div>}
+                            {ped.descricao && <p style={{fontSize:"0.8rem",color:"#5a5855",margin:"0 0 0.5rem"}}>{ped.descricao}</p>}
+                            {ped.data_inicio && <div style={{fontSize:"0.72rem",color:"var(--g4)",fontFamily:"var(--sans)",marginBottom:"0.5rem"}}>{ped.data_inicio}{ped.data_fim ? ` → ${ped.data_fim}` : ""}</div>}
+                            {pedResponder?.id === ped.id ? (
+                              <div style={{background:"#fff",border:"1px solid var(--g2)",padding:"0.75rem",marginTop:"0.5rem"}}>
+                                <p style={{fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",fontFamily:"var(--sans)",marginBottom:"0.5rem"}}>{i.minhaResposta}</p>
+                                <textarea value={respMsg} onChange={e => setRespMsg(e.target.value)} placeholder={{pt:"Descreve o que tens disponível e como podes ajudar...",fr:"Décris ce que tu as de disponible...",lt:"Aprašyk, ką turi ir kaip gali padėti..."}[lang]||"A tua proposta..."} rows={3} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fafaf8",fontFamily:"var(--sans)",fontSize:"0.82rem",resize:"vertical",boxSizing:"border-box",marginBottom:"0.5rem"}} />
+                                {pecasLoja.length > 0 && (
+                                  <select value={respPeca} onChange={e => setRespPeca(e.target.value)} style={{width:"100%",padding:"0.55rem",border:"1px solid var(--g2)",background:"#fff",fontFamily:"var(--sans)",fontSize:"0.82rem",marginBottom:"0.5rem"}}>
+                                    <option value="">{{pt:"Associar peça (opcional)",fr:"Associer une pièce (facultatif)",lt:"Susieti drabužį (neprivaloma)"}[lang]||"Associar peça (opcional)"}</option>
+                                    {pecasLoja.filter(p=>p.estado==="disponivel").map(p => <option key={p.id} value={p.id}>{p.nome} — {p.preco_aluguer_dia}€/dia</option>)}
+                                  </select>
+                                )}
+                                <div style={{display:"flex",gap:"0.5rem"}}>
+                                  <button onClick={enviarResposta} disabled={respLoading||!respMsg.trim()} style={{flex:1,background:"#c4748a",color:"#fff",border:"none",padding:"0.65rem",fontSize:"0.72rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:respLoading?"not-allowed":"pointer",opacity:respLoading||!respMsg.trim()?0.6:1}}>{respLoading?"...":{pt:"Enviar proposta",fr:"Envoyer la proposition",lt:"Siųsti pasiūlymą"}[lang]||i.enviarResposta2}</button>
+                                  <button onClick={() => { setPedResponder(null); setRespMsg(""); setRespPeca(""); }} style={{padding:"0.65rem 1rem",background:"var(--g1)",color:"var(--black)",border:"none",fontSize:"0.72rem",letterSpacing:"0.08em",fontFamily:"var(--sans)",cursor:"pointer"}}>✕</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button onClick={() => { setPedResponder(ped); setRespMsg(""); setRespPeca(""); setRespOk(false); }} style={{background:"none",border:"1px solid #c4748a",color:"#c4748a",padding:"0.4rem 0.85rem",fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"var(--sans)",cursor:"pointer"}}>{i.responderPedido}</button>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     );
                   })()}
