@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 const SENHA = process.env.NEXT_PUBLIC_BACKOFFICE_SENHA || "noragrei2024admin";
-const ADMIN_ID = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+const ADMIN_ID = "1497eabb-48c2-4d29-9da8-65fe9964f5d3"; // conta Nora Grei (noragrei@gmail.com)
 
 const CATEGORIAS = ["Vestidos","Conjuntos","Casacos","Calças","Saias","Blusas","Malhas","Fatos","Malas","Acessórios","Calçado","Outra"];
 const CONDICOES = ["novo","como_novo","muito_bom","bom","usado"];
