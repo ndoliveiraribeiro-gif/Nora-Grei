@@ -12,6 +12,7 @@ const TXT = {
     hero_eyebrow: "O que é a Nora Grei?",
     hero_title: "Moda de luxo que circula,\nem vez de ficar parada.",
     hero_desc: "A Nora Grei é moda para todos — do luxo ao acessível, de qualquer marca que uses e queiras fazer circular. Aluga, vende ou dá. A plataforma adapta-se ao teu estilo e ao que te dispões a investir.",
+    hero_atitude: "Compra, aluga, vende. Sê cliente ou sê lojista e cliente. O que vais fazer? Isso é contigo.",
     cta_conta: "Criar conta gratuita",
     cta_loja: "Quero abrir uma loja",
     cta_catalogo: "Ver catálogo",
@@ -71,6 +72,7 @@ const TXT = {
     hero_eyebrow: "Qu'est-ce que Nora Grei ?",
     hero_title: "La mode de luxe qui circule,\nau lieu de rester au placard.",
     hero_desc: "Nora Grei, c'est la mode pour tous — du luxe à l'accessible, quelle que soit la marque que vous portez et souhaitez faire circuler. Louez, vendez ou donnez. La plateforme s'adapte à votre style et à ce que vous êtes prêt à investir.",
+    hero_atitude: "Achetez, louez, vendez. Soyez client ou client-boutique. Que voulez-vous faire ? C'est vous qui décidez.",
     cta_conta: "Créer un compte gratuit",
     cta_loja: "Je veux ouvrir une boutique",
     cta_catalogo: "Voir le catalogue",
@@ -119,6 +121,7 @@ const TXT = {
     hero_eyebrow: "Kas yra Nora Grei?",
     hero_title: "Prabangos mada, kuri cirkuliuoja,\no ne stovi spintoje.",
     hero_desc: "Nora Grei — mada visiems: nuo prabangos iki prieinamos, nesvarbu kokio prekės ženklo drabužius nešiojate ir norite leisti jiems cirkuliuoti. Nuomokite, parduokite ar dovanokite. Platforma prisitaiko prie jūsų stiliaus ir to, kiek esate pasiryžę investuoti.",
+    hero_atitude: "Pirkite, nuomokite, parduokite. Būkite klientas arba klientas-pardavėjas. Ką darysite? Tai jūsų pasirinkimas.",
     cta_conta: "Sukurti nemokamą paskyrą",
     cta_loja: "Noriu atidaryti parduotuvę",
     cta_catalogo: "Žiūrėti katalogą",
@@ -197,8 +200,11 @@ export default function SobrePage() {
           <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 300, lineHeight: 1.15, marginBottom: "1.5rem", whiteSpace: "pre-line" }}>
             {i.hero_title}
           </h1>
-          <p style={{ fontSize: "0.95rem", color: "rgba(248,247,245,0.75)", lineHeight: 1.75, maxWidth: 560, margin: "0 auto 2.5rem" }}>
+          <p style={{ fontSize: "0.95rem", color: "rgba(248,247,245,0.75)", lineHeight: 1.75, maxWidth: 560, margin: "0 auto 1.25rem" }}>
             {i.hero_desc}
+          </p>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "1.1rem", fontStyle: "italic", color: "rgba(248,247,245,0.55)", lineHeight: 1.6, maxWidth: 480, margin: "0 auto 2.5rem" }}>
+            {i.hero_atitude}
           </p>
           <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/registar" style={{ background: "#c4748a", color: "#fff", padding: "0.8rem 1.6rem", borderRadius: "2px", textDecoration: "none", fontSize: "0.82rem", letterSpacing: "0.08em", fontWeight: 500 }}>
