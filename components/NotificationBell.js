@@ -23,6 +23,10 @@ const TXT = {
     novoAluguerMsg: (nome, cliente) => `"${nome}" pedido por ${cliente}. Confirma ou recusa.`,
     novaVendaTitulo: "Nova venda",
     novaVendaMsg: (nome, cliente) => `"${nome}" comprada por ${cliente}. Confirma o envio.`,
+    atrasoClienteTitulo: "Débito por atraso",
+    atrasoClienteMsg: (nome, dia, valor) => `Dia ${dia} de atraso na devolução de "${nome}" — €${Number(valor).toFixed(2)} cobrado ao teu cartão.`,
+    atrasoLojistaAviso: "Devolução em atraso",
+    atrasoLojistaMsg: (nome, dias) => `"${nome}" ainda não foi devolvida — ${dias} dia${dias !== 1 ? "s" : ""} em atraso. O cliente está a ser cobrado diariamente.`,
     devolucaoTitulo: "Devolução a verificar",
     devolucaoMsg: (nome) => `"${nome}" foi devolvida. Confirma o estado da peça.`,
     liquidacaoTitulo: "Liquidação disponível",
@@ -51,6 +55,10 @@ const TXT = {
     novoAluguerMsg: (nome, cliente) => `"${nome}" demandée par ${cliente}. Confirmez ou refusez.`,
     novaVendaTitulo: "Nouvelle vente",
     novaVendaMsg: (nome, cliente) => `"${nome}" achetée par ${cliente}. Confirmez l'expédition.`,
+    atrasoClienteTitulo: "Débit pour retard",
+    atrasoClienteMsg: (nome, dia, valor) => `Jour ${dia} de retard pour "${nome}" — €${Number(valor).toFixed(2)} débités de votre carte.`,
+    atrasoLojistaAviso: "Retour en retard",
+    atrasoLojistaMsg: (nome, dias) => `"${nome}" n'a pas encore été retournée — ${dias} jour${dias !== 1 ? "s" : ""} de retard. Le client est débité chaque jour.`,
     devolucaoTitulo: "Retour à vérifier",
     devolucaoMsg: (nome) => `"${nome}" a été retournée. Vérifiez l'état de la pièce.`,
     liquidacaoTitulo: "Liquidation disponible",
@@ -79,6 +87,10 @@ const TXT = {
     novoAluguerMsg: (nome, cliente) => `"${nome}" užsakė ${cliente}. Patvirtinkite arba atmeskite.`,
     novaVendaTitulo: "Naujas pardavimas",
     novaVendaMsg: (nome, cliente) => `"${nome}" nupirko ${cliente}. Patvirtinkite siuntimą.`,
+    atrasoClienteTitulo: "Debetas už vėlavimą",
+    atrasoClienteMsg: (nome, dia, valor) => `${dia} vėlavimo diena grąžinant "${nome}" — €${Number(valor).toFixed(2)} nurašyta iš jūsų kortelės.`,
+    atrasoLojistaAviso: "Vėluojantis grąžinimas",
+    atrasoLojistaMsg: (nome, dias) => `"${nome}" dar negrąžinta — ${dias} dienų vėlavimas. Klientui skaičiuojamas dienos mokestis.`,
     devolucaoTitulo: "Grąžinimas tikrinimui",
     devolucaoMsg: (nome) => `"${nome}" buvo grąžinta. Patikrinkite daikto būklę.`,
     liquidacaoTitulo: "Išmoka prieinama",
@@ -96,6 +108,7 @@ export default function NotificationBell({ lang = "pt" }) {
   const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
   const [campanhasNovas, setCampanhasNovas] = useState([]);
   const [alertasLojista, setAlertasLojista] = useState([]);
+  const [debitosAtraso, setDebitosAtraso] = useState([]);
   const [aberto, setAberto] = useState(false);
   const [userId, setUserId] = useState(null);
   const [modoLojista, setModoLojista] = useState(false);
@@ -123,6 +136,7 @@ export default function NotificationBell({ lang = "pt" }) {
     await carregarReservasDisponiveis(user.id);
     await carregarCampanhasNovas();
     if (lojista) await carregarAlertasLojista(user.id);
+    await carregarDebitosAtraso(user.id);
   };
 
   const gerarNotificacoesAtuais = async (cliente_id) => {
@@ -201,6 +215,21 @@ export default function NotificationBell({ lang = "pt" }) {
     setRecibosRecentes(data || []);
   };
 
+  const carregarDebitosAtraso = async (cliente_id) => {
+    // Débitos cobrados ao cliente nas últimas 72h por atraso na devolução
+    const setentaeDuas = new Date();
+    setentaeDuas.setHours(setentaeDuas.getHours() - 72);
+    const { data } = await supabase
+      .from("debitos_cliente")
+      .select("id, valor, dia_atraso, created_at, estado, descricao, alugueres(pecas(nome))")
+      .eq("cliente_id", cliente_id)
+      .eq("tipo", "atraso_devolucao")
+      .gte("created_at", setentaeDuas.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(5);
+    setDebitosAtraso(data || []);
+  };
+
   const carregarAlertasLojista = async (lojista_id) => {
     const alertas = [];
 
@@ -263,6 +292,25 @@ export default function NotificationBell({ lang = "pt" }) {
       created_at: p.created_at, href: "/perfil?tab=loja",
     }));
 
+    // 5. Alugueres do lojista com devolução em atraso (data_fim < hoje, estado ativo)
+    const hoje = new Date().toISOString().split("T")[0];
+    const { data: atrasadosLoja } = await supabase
+      .from("alugueres_lojista")
+      .select("id, data_fim, created_at, pecas_lojista(nome)")
+      .eq("lojista_id", lojista_id)
+      .eq("estado", "ativo")
+      .lt("data_fim", hoje)
+      .order("data_fim", { ascending: true })
+      .limit(5);
+    (atrasadosLoja || []).forEach(a => {
+      const dias = Math.floor((new Date() - new Date(a.data_fim)) / 86400000);
+      alertas.push({
+        id: `atraso-loja-${a.id}`, tipo: "atraso_lojista",
+        nome: a.pecas_lojista?.nome || "Peça", dias,
+        created_at: a.data_fim, href: "/perfil?tab=loja&subtab=alugueres",
+      });
+    });
+
     setAlertasLojista(alertas);
   };
 
@@ -312,7 +360,7 @@ export default function NotificationBell({ lang = "pt" }) {
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
-  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length + reservasDisponiveis.length + campanhasNovas.length + alertasLojista.length;
+  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length + reservasDisponiveis.length + campanhasNovas.length + alertasLojista.length + debitosAtraso.length;
   const campoCont = modoLojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
 
   return (
@@ -368,6 +416,21 @@ export default function NotificationBell({ lang = "pt" }) {
                     {new Date(r.created_at).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}
                   </div>
                 </a>
+              ))}
+
+              {/* Débitos por atraso na devolução (cliente) */}
+              {debitosAtraso.map(d => (
+                <div key={d.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fff2f2" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c0392b", marginBottom: "0.2rem" }}>
+                    🚨 {i.atrasoClienteTitulo}
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>
+                    {i.atrasoClienteMsg(d.alugueres?.pecas?.nome || "peça", d.dia_atraso, d.valor)}
+                  </div>
+                  <div style={{ fontSize: "0.62rem", color: d.estado === "falhou" ? "#c0392b" : "#aaa89f", marginTop: "0.3rem", fontWeight: d.estado === "falhou" ? 600 : 400 }}>
+                    {d.estado === "falhou" ? "⚠ Pagamento falhado — actualiza o cartão" : new Date(d.created_at).toLocaleDateString(lang === "pt" ? "pt-PT" : lang === "fr" ? "fr-FR" : "lt-LT")}
+                  </div>
+                </div>
               ))}
 
               {/* Reservas disponíveis */}
@@ -473,10 +536,17 @@ export default function NotificationBell({ lang = "pt" }) {
                     <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
                   </div>
                 );
+                if (a.tipo === "atraso_lojista") return (
+                  <div key={a.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fff2f2" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c0392b", marginBottom: "0.2rem" }}>⏰ {i.atrasoLojistaAviso}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.atrasoLojistaMsg(a.nome, a.dias)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </div>
+                );
                 return null;
               })}
 
-              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && recibosRecentes.length === 0 && reservasDisponiveis.length === 0 && campanhasNovas.length === 0 && alertasLojista.length === 0 && (
+              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && recibosRecentes.length === 0 && reservasDisponiveis.length === 0 && campanhasNovas.length === 0 && alertasLojista.length === 0 && debitosAtraso.length === 0 && (
                 <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
               )}
 
