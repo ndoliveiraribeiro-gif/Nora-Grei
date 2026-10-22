@@ -54,6 +54,7 @@ const TRADUCOES = {
     anexarComp: "📎 Anexar comprovativo",
     reservado24h: "O pedido fica reservado 24h até confirmarmos o comprovativo.",
     confirmarCompra: "Confirmar compra",
+    falarLojista: "Falar com o lojista",
   },
   fr: {
     titulo: "Mes commandes",
@@ -104,6 +105,7 @@ const TRADUCOES = {
     anexarComp: "📎 Joindre le justificatif",
     reservado24h: "Votre commande sera réservée 24h en attendant confirmation.",
     confirmarCompra: "Confirmer l'achat",
+    falarLojista: "Contacter la boutique",
   },
   lt: {
     titulo: "Mano užsakymai",
@@ -154,6 +156,7 @@ const TRADUCOES = {
     anexarComp: "📎 Pridėti įrodymą",
     reservado24h: "Jūsų užsakymas bus rezervuotas 24h, kol patvirtinsime.",
     confirmarCompra: "Patvirtinti pirkimą",
+    falarLojista: "Susisiekti su pardavėju",
   },
 };
 
@@ -553,7 +556,7 @@ function PedidosContent() {
 
     const { data: alugueres } = await supabase
       .from("alugueres")
-      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos, preco_aluguer_dia, valor_peca)), envios(transportadora, codigo_rastreio, data_envio)")
+      .select("*, stock_tamanhos(tamanho, pecas(nome, fotos, preco_aluguer_dia, valor_peca, lojista_id)), envios(transportadora, codigo_rastreio, data_envio)")
       .eq("cliente_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -741,6 +744,11 @@ function PedidosContent() {
         </div>
         {mostrarComprar && a.estado === "devolvido" && <BotaoComprarPeca aluguer={a} i={i} lang={lang} />}
         <BotaoVerTalao a={a} i={i} />
+        {a.stock_tamanhos?.pecas?.lojista_id && (
+          <a href={`/mensagens?lojista=${a.stock_tamanhos.pecas.lojista_id}`} style={{display:"inline-flex",alignItems:"center",gap:"0.4rem",marginTop:"0.5rem",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#5a5855",textDecoration:"none",border:"1px solid #ddd",padding:"0.35rem 0.75rem",borderRadius:"4px",fontFamily:"var(--sans)"}}>
+            ✉ {i.falarLojista}
+          </a>
+        )}
         {(a.estado === "devolvido" || a.estado === "devolvido_danificado") && <CartaoAvaliacao a={a} />}
       </div>
     );
@@ -832,6 +840,13 @@ function PedidosContent() {
         {/* COMPRAR USADA — após devolução (apenas devolvido, não danificado) */}
         {a.estado === "devolvido" && (
           <BotaoComprarPeca aluguer={a} i={0} lang={lang} isLojista={true} lojista_id={a.lojista_id} />
+        )}
+
+        {/* FALAR COM O LOJISTA */}
+        {a.lojista_id && (
+          <a href={`/mensagens?lojista=${a.lojista_id}`} style={{display:"inline-flex",alignItems:"center",gap:"0.4rem",marginTop:"0.5rem",fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#5a5855",textDecoration:"none",border:"1px solid #ddd",padding:"0.35rem 0.75rem",borderRadius:"4px",fontFamily:"var(--sans)"}}>
+            ✉ {i.falarLojista}
+          </a>
         )}
 
         {/* AVALIAÇÃO — após devolução */}
