@@ -703,6 +703,7 @@ const t = {
     dataLabel: "Data", metodoLabel: "Método",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
     pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", tabCalculadora: "Calculadora", caucaoLabel: "Caução", popCuriosidade: "Já avaliaste alguma peça hoje que te pode trazer valor?", popCuriosidadeBtn: "Avaliar agora →", calcTitulo: "Quanto vale a tua peça?", calcSub: "Descobre o potencial da tua peça no circuito circular de moda.", calcPrecoLabel: "Valor original da peça (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marca", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "Estado", calcIdadeLabel: "Idade da peça", calcResultado: "Estimativa de retorno", calcVerMais: "Calculadora completa →", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.", erroFoto: "Erro ao guardar foto. Tenta novamente.", erroGeral: "Ocorreu um erro. Tenta novamente.",
+    dadosFinanceiros: "Dados financeiros", dadosFinanceirosDesc: "Informação bancária para recebimento dos ganhos e débito de serviços Nora Grei.", ibanLabel: "IBAN (para onde são enviados os ganhos)", ibanPlaceholder: "PT50 0000 0000 0000 0000 0000 0", ibanVazio: "IBAN não configurado", ibanValido: "IBAN válido ✓", ibanInvalido: "Formato de IBAN inválido", cartaoLabel: "Cartão de débito (débito de serviços)", cartaoNumero: "Número do cartão", cartaoNome: "Nome no cartão", cartaoValidade: "Validade (MM/AA)", cartaoVazio: "Cartão não configurado", cartaoValido: "Cartão válido ✓", cartaoInvalido: "Número de cartão inválido", cartaoValidadeInvalida: "Data de validade inválida", cartaoGuardadoFim: "Cartão a terminar em", guardarFinanceiros: "Guardar dados financeiros", navPessoal: "Pessoal", navMorada: "Morada", navDocs: "Documentos", navFinanceiros: "Financeiros", navSeguranca: "Segurança",
   },
   fr: {
     titulo: "Mon profil", dadosPessoais: "Informations personnelles",
@@ -784,6 +785,7 @@ const t = {
     dataLabel: "Date", metodoLabel: "Méthode",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
     pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", tabCalculadora: "Calculatrice", caucaoLabel: "Dépôt", popCuriosidade: "Avez-vous évalué une pièce aujourd'hui qui pourrait vous rapporter ?", popCuriosidadeBtn: "Évaluer maintenant →", calcTitulo: "Combien vaut votre pièce ?", calcSub: "Découvrez le potentiel de votre pièce dans le circuit de mode circulaire.", calcPrecoLabel: "Valeur d'origine (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marque", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "État", calcIdadeLabel: "Âge de la pièce", calcResultado: "Estimation de retour", calcVerMais: "Calculatrice complète →", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.", erroFoto: "Erreur lors de l'enregistrement de la photo. Réessayez.", erroGeral: "Une erreur s'est produite. Réessayez.",
+    dadosFinanceiros: "Données financières", dadosFinanceirosDesc: "Coordonnées bancaires pour la réception des gains et le débit des services Nora Grei.", ibanLabel: "IBAN (pour recevoir vos gains)", ibanPlaceholder: "FR76 0000 0000 0000 0000 0000 000", ibanVazio: "IBAN non configuré", ibanValido: "IBAN valide ✓", ibanInvalido: "Format IBAN invalide", cartaoLabel: "Carte de débit (débit des services)", cartaoNumero: "Numéro de carte", cartaoNome: "Nom sur la carte", cartaoValidade: "Validité (MM/AA)", cartaoVazio: "Carte non configurée", cartaoValido: "Carte valide ✓", cartaoInvalido: "Numéro de carte invalide", cartaoValidadeInvalida: "Date de validité invalide", cartaoGuardadoFim: "Carte se terminant par", guardarFinanceiros: "Enregistrer les données financières", navPessoal: "Personnel", navMorada: "Adresse", navDocs: "Documents", navFinanceiros: "Finances", navSeguranca: "Sécurité",
   },
   lt: {
     titulo: "Mano profilis", dadosPessoais: "Asmeniniai duomenys",
@@ -865,6 +867,7 @@ const t = {
     dataLabel: "Data", metodoLabel: "Mokėjimo būdas",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
     pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", tabCalculadora: "Skaičiuoklė", caucaoLabel: "Užstatas", popCuriosidade: "Ar šiandien įvertinote kokį drabužį, kuris galėtų jums atnešti vertės?", popCuriosidadeBtn: "Įvertinti dabar →", calcTitulo: "Kiek verta jūsų dalis?", calcSub: "Atraskite savo drabužio potencialą aplinkai draugiškoje madoje.", calcPrecoLabel: "Originali drabužio kaina (€)", calcPrecoPlaceholder: "Pvz: 350", calcMarcaLabel: "Prekės ženklas", calcMarcaPlaceholder: "Pvz: Gucci, Zara…", calcEstadoLabel: "Būklė", calcIdadeLabel: "Amžius", calcResultado: "Grąžos įvertinimas", calcVerMais: "Išsami skaičiuoklė →", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.", erroFoto: "Klaida išsaugant nuotrauką. Bandykite dar kartą.", erroGeral: "Įvyko klaida. Bandykite dar kartą.",
+    dadosFinanceiros: "Finansiniai duomenys", dadosFinanceirosDesc: "Banko informacija pajamų gavimui ir Nora Grei paslaugų debetui.", ibanLabel: "IBAN (kur siunčiamos pajamos)", ibanPlaceholder: "LT00 0000 0000 0000 0000", ibanVazio: "IBAN nesukonfigūruotas", ibanValido: "IBAN galioja ✓", ibanInvalido: "Neteisingas IBAN formatas", cartaoLabel: "Debeto kortelė (paslaugų debetas)", cartaoNumero: "Kortelės numeris", cartaoNome: "Vardas ant kortelės", cartaoValidade: "Galioja iki (MM/MM)", cartaoVazio: "Kortelė nesukonfigūruota", cartaoValido: "Kortelė galioja ✓", cartaoInvalido: "Neteisingas kortelės numeris", cartaoValidadeInvalida: "Neteisinga galiojimo data", cartaoGuardadoFim: "Kortelė baigiasi", guardarFinanceiros: "Išsaugoti finansinius duomenis", navPessoal: "Asmeniniai", navMorada: "Adresas", navDocs: "Dokumentai", navFinanceiros: "Finansai", navSeguranca: "Saugumas",
   },
 };
 
@@ -1253,6 +1256,13 @@ export default function Perfil() {
   const [fotoValidacao, setFotoValidacao] = useState([]); // [{ok, motivo, categoria}] por foto
   const fotosLojistaRef = typeof window !== "undefined" ? { current: null } : { current: null };
   const [lojaIban, setLojaIban] = useState("");
+  const [lojaIbanValido, setLojaIbanValido] = useState(null); // null | true | false
+  const [lojaCartaoNumero, setLojaCartaoNumero] = useState("");
+  const [lojaCartaoNome, setLojaCartaoNome] = useState("");
+  const [lojaCartaoValidade, setLojaCartaoValidade] = useState("");
+  const [lojaCartaoGuardadoUltimos4, setLojaCartaoGuardadoUltimos4] = useState("");
+  const [financeirosMsg, setFinanceirosMsg] = useState("");
+  const [financeirosLoading, setFinanceirosLoading] = useState(false);
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
@@ -1331,6 +1341,9 @@ export default function Perfil() {
         setLojaEstado(c.lojista_estado||"teste");
         if (c.codigo_cliente) setCodigoLoja(c.codigo_cliente);
         setLojaIban(c.lojista_iban||"");
+        if (c.lojista_cartao_ultimo4) setLojaCartaoGuardadoUltimos4(c.lojista_cartao_ultimo4);
+        if (c.lojista_cartao_nome) setLojaCartaoNome(c.lojista_cartao_nome);
+        if (c.lojista_cartao_validade) setLojaCartaoValidade(c.lojista_cartao_validade);
         if (c.candidatura_lojista) setCandidaturaLojista(c.candidatura_lojista);
         if (c.lojista_desde) {
           const diasPassados = Math.floor((new Date() - new Date(c.lojista_desde)) / 86400000);
@@ -1573,6 +1586,79 @@ export default function Perfil() {
     setUrlStatus(null);
   };
   // ──────────────────────────────────────────────────────────────────────
+
+  // Validação Luhn para cartão de débito
+  const validarLuhn = (num) => {
+    const digits = num.replace(/\s|-/g, "");
+    if (!/^\d{13,19}$/.test(digits)) return false;
+    let sum = 0;
+    let alt = false;
+    for (let i = digits.length - 1; i >= 0; i--) {
+      let d = parseInt(digits[i], 10);
+      if (alt) { d *= 2; if (d > 9) d -= 9; }
+      sum += d;
+      alt = !alt;
+    }
+    return sum % 10 === 0;
+  };
+
+  // Validação IBAN simplificada (formato + módulo 97)
+  const validarIBAN = (iban) => {
+    const clean = iban.replace(/\s/g, "").toUpperCase();
+    if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(clean)) return false;
+    const rearranged = clean.slice(4) + clean.slice(0, 4);
+    const numeric = rearranged.split("").map(c => isNaN(c) ? (c.charCodeAt(0) - 55).toString() : c).join("");
+    let remainder = 0;
+    for (let i = 0; i < numeric.length; i++) {
+      remainder = (remainder * 10 + parseInt(numeric[i], 10)) % 97;
+    }
+    return remainder === 1;
+  };
+
+  const guardarDadosFinanceiros = async () => {
+    setFinanceirosMsg("");
+    const ibanLimpo = lojaIban.replace(/\s/g, "").toUpperCase();
+    if (ibanLimpo && !validarIBAN(ibanLimpo)) {
+      setFinanceirosMsg(i.ibanInvalido);
+      return;
+    }
+    const cartaoDigits = lojaCartaoNumero.replace(/\s|-/g, "");
+    if (cartaoDigits && !validarLuhn(cartaoDigits)) {
+      setFinanceirosMsg(i.cartaoInvalido);
+      return;
+    }
+    if (lojaCartaoValidade) {
+      const [mm, aa] = lojaCartaoValidade.split("/");
+      const agora = new Date();
+      const exp = new Date(2000 + parseInt(aa||"0", 10), parseInt(mm||"0", 10) - 1, 1);
+      if (!mm || !aa || isNaN(exp.getTime()) || exp < agora) {
+        setFinanceirosMsg(i.cartaoValidadeInvalida);
+        return;
+      }
+    }
+    setFinanceirosLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setFinanceirosLoading(false); return; }
+    const updateData = {};
+    if (ibanLimpo) updateData.lojista_iban = ibanLimpo;
+    if (cartaoDigits) {
+      updateData.lojista_cartao_ultimo4 = cartaoDigits.slice(-4);
+      updateData.lojista_cartao_nome = lojaCartaoNome.trim();
+      updateData.lojista_cartao_validade = lojaCartaoValidade.trim();
+    }
+    const { error } = await supabase.from("clientes").update(updateData).eq("id", user.id);
+    setFinanceirosLoading(false);
+    if (error) {
+      setFinanceirosMsg(i.erroGeral);
+    } else {
+      if (ibanLimpo) setLojaIban(ibanLimpo);
+      if (cartaoDigits) {
+        setLojaCartaoGuardadoUltimos4(cartaoDigits.slice(-4));
+        setLojaCartaoNumero("");
+      }
+      setFinanceirosMsg(i.guardado);
+    }
+  };
 
   const guardarPerfil = async () => {
     if (!user) return;
@@ -2576,12 +2662,30 @@ export default function Perfil() {
           </div>
         )}
 
+        {/* QUICK-NAV: atalhos para as secções */}
+        <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap",marginBottom:"0.25rem"}}>
+          {[
+            {key:"pessoal",label:i.navPessoal},
+            {key:"morada",label:i.navMorada},
+            {key:"docs",label:i.navDocs},
+            ...(modoLojista ? [{key:"financeiros",label:i.navFinanceiros}] : []),
+            {key:"seguranca",label:i.navSeguranca},
+          ].map(({key,label}) => (
+            <button key={key} onClick={() => {
+              setSecaoAberta(key);
+              setTimeout(() => { document.getElementById(`sec-${key}`)?.scrollIntoView({behavior:"smooth",block:"start"}); }, 80);
+            }} style={{padding:"0.35rem 0.8rem",fontSize:"0.7rem",letterSpacing:"0.06em",textTransform:"uppercase",fontFamily:"var(--sans)",border:"1px solid",borderColor:secaoAberta===key?"var(--black)":"var(--g2)",background:secaoAberta===key?"var(--black)":"transparent",color:secaoAberta===key?"var(--white)":"var(--g5)",borderRadius:"20px",cursor:"pointer",transition:"all 0.15s"}}>
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* SECÇÃO: Dados pessoais */}
-        <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <div id="sec-pessoal" className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => setSecaoAberta(s => s==="pessoal"?null:"pessoal")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <div>
               <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.dadosPessoais}</p>
-              {secaoAberta !== "pessoal" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nome || "—"} · {perfil.telefone || "—"}</p>}
+              {secaoAberta !== "pessoal" && <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>{perfil.nome_publico || perfil.nome || "—"} · {perfil.telefone || "—"}</p>}
             </div>
             <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="pessoal"?"▲":"▼"}</span>
           </div>
@@ -2612,7 +2716,7 @@ export default function Perfil() {
         </div>
 
         {/* SECÇÃO: Morada de entrega */}
-        <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <div id="sec-morada" className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => setSecaoAberta(s => s==="morada"?null:"morada")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <div>
               <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.moradaEntrega}</p>
@@ -2640,7 +2744,7 @@ export default function Perfil() {
         </div>
 
         {/* SECÇÃO: Documentos */}
-        <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <div id="sec-docs" className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => setSecaoAberta(s => s==="docs"?null:"docs")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <div>
               <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.documentosIdentidade}</p>
@@ -2660,13 +2764,117 @@ export default function Perfil() {
           )}
         </div>
 
+        {/* SECÇÃO: Dados Financeiros (só para lojistas) */}
+        {modoLojista && (
+          <div id="sec-financeiros" className="card" style={{padding:0,overflow:"hidden"}}>
+            <div onClick={() => setSecaoAberta(s => s==="financeiros"?null:"financeiros")} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
+              <div>
+                <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.dadosFinanceiros}</p>
+                {secaoAberta !== "financeiros" && (
+                  <p style={{fontSize:"0.75rem",color:"var(--g4)",marginTop:"0.2rem"}}>
+                    {lojaIban ? `IBAN: ${lojaIban.slice(0,4)} •••• ${lojaIban.slice(-4)}` : i.ibanVazio}
+                    {lojaCartaoGuardadoUltimos4 ? ` · ${i.cartaoGuardadoFim} •••• ${lojaCartaoGuardadoUltimos4}` : ` · ${i.cartaoVazio}`}
+                  </p>
+                )}
+              </div>
+              <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="financeiros"?"▲":"▼"}</span>
+            </div>
+            {secaoAberta === "financeiros" && (
+              <div style={{padding:"0 2rem 2rem"}}>
+                <p style={{fontSize:"0.78rem",color:"var(--g4)",marginBottom:"1.5rem",lineHeight:1.5}}>{i.dadosFinanceirosDesc}</p>
+
+                {/* IBAN */}
+                <div style={{marginBottom:"1.5rem"}}>
+                  <label className="lbl" style={{display:"block",marginBottom:"0.4rem"}}>{i.ibanLabel}</label>
+                  <input
+                    className="inp"
+                    value={lojaIban}
+                    onChange={e => {
+                      const v = e.target.value.toUpperCase();
+                      setLojaIban(v);
+                      const clean = v.replace(/\s/g,"");
+                      if (clean.length >= 15) setLojaIbanValido(validarIBAN(clean));
+                      else setLojaIbanValido(null);
+                    }}
+                    placeholder={i.ibanPlaceholder}
+                    style={{fontFamily:"monospace",letterSpacing:"0.05em"}}
+                  />
+                  {lojaIbanValido === true && <p style={{fontSize:"0.72rem",color:"#27ae60",marginTop:"0.3rem"}}>{i.ibanValido}</p>}
+                  {lojaIbanValido === false && <p style={{fontSize:"0.72rem",color:"#c0392b",marginTop:"0.3rem"}}>{i.ibanInvalido}</p>}
+                </div>
+
+                {/* Cartão de débito */}
+                <div style={{padding:"1.25rem",background:"var(--g1)",borderRadius:"6px",marginBottom:"1.25rem"}}>
+                  <p style={{fontFamily:"var(--serif)",fontSize:"0.85rem",color:"var(--black)",margin:"0 0 1rem 0"}}>{i.cartaoLabel}</p>
+                  {lojaCartaoGuardadoUltimos4 && !lojaCartaoNumero && (
+                    <div style={{fontSize:"0.75rem",color:"#27ae60",marginBottom:"0.75rem",padding:"0.5rem 0.75rem",background:"rgba(39,174,96,0.08)",borderRadius:"4px"}}>
+                      {i.cartaoValido} — {i.cartaoGuardadoFim} •••• {lojaCartaoGuardadoUltimos4}
+                    </div>
+                  )}
+                  <div className="grid2">
+                    <div className="fg full">
+                      <label className="lbl">{i.cartaoNumero}</label>
+                      <input
+                        className="inp"
+                        value={lojaCartaoNumero}
+                        onChange={e => {
+                          let v = e.target.value.replace(/[^\d]/g, "");
+                          v = v.replace(/(.{4})/g,"$1 ").trim();
+                          setLojaCartaoNumero(v);
+                        }}
+                        placeholder="0000 0000 0000 0000"
+                        maxLength={23}
+                        style={{fontFamily:"monospace",letterSpacing:"0.1em"}}
+                        inputMode="numeric"
+                      />
+                      {lojaCartaoNumero.replace(/\s/g,"").length >= 13 && (
+                        validarLuhn(lojaCartaoNumero)
+                          ? <p style={{fontSize:"0.72rem",color:"#27ae60",marginTop:"0.3rem"}}>{i.cartaoValido}</p>
+                          : <p style={{fontSize:"0.72rem",color:"#c0392b",marginTop:"0.3rem"}}>{i.cartaoInvalido}</p>
+                      )}
+                    </div>
+                    <div className="fg">
+                      <label className="lbl">{i.cartaoNome}</label>
+                      <input className="inp" value={lojaCartaoNome} onChange={e => setLojaCartaoNome(e.target.value.toUpperCase())} placeholder="NOME SOBRENOME" style={{textTransform:"uppercase",letterSpacing:"0.04em"}} />
+                    </div>
+                    <div className="fg">
+                      <label className="lbl">{i.cartaoValidade}</label>
+                      <input
+                        className="inp"
+                        value={lojaCartaoValidade}
+                        onChange={e => {
+                          let v = e.target.value.replace(/[^\d]/g,"");
+                          if (v.length > 2) v = v.slice(0,2) + "/" + v.slice(2,4);
+                          setLojaCartaoValidade(v);
+                        }}
+                        placeholder="MM/AA"
+                        maxLength={5}
+                        inputMode="numeric"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {financeirosMsg && (
+                  <p style={{fontSize:"0.78rem",color:financeirosMsg===i.guardado?"#27ae60":"#c0392b",marginBottom:"1rem"}}>{financeirosMsg}</p>
+                )}
+                <div className="save-row">
+                  <button className={`btn-save${financeirosMsg===i.guardado?" btn-ok":""}`} onClick={guardarDadosFinanceiros} disabled={financeirosLoading}>
+                    {financeirosLoading?"...":financeirosMsg===i.guardado?i.guardado:i.guardarFinanceiros}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {alugueresHistorico.length > 0 && (
           <div style={{textAlign:"center",padding:"0.5rem 0"}}>
             <a href="/pedidos" style={{fontSize:"0.7rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g4)",textDecoration:"none",fontFamily:"var(--sans)"}}>{i.verPedidos} →</a>
           </div>
         )}
         {/* SECÇÃO: Segurança */}
-        <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <div id="sec-seguranca" className="card" style={{padding:0,overflow:"hidden"}}>
           <div onClick={() => { setSecaoAberta(s => s==="seguranca"?null:"seguranca"); setPassMsg(""); }} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.5rem 2rem",cursor:"pointer",userSelect:"none"}}>
             <p style={{fontFamily:"var(--serif)",fontSize:"1rem",fontWeight:400,color:"var(--black)",margin:0}}>{i.mudarPassword}</p>
             <span style={{color:"var(--g4)",fontSize:"0.85rem"}}>{secaoAberta==="seguranca"?"▲":"▼"}</span>
