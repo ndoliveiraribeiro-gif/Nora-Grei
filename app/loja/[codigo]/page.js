@@ -1,32 +1,45 @@
 import { createClient } from "@supabase/supabase-js";
 import LojaCliente from "./LojaCliente";
 
+const sbServer = () => createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+async function withRetry(fn, tentativas = 3, espera = 600) {
+  for (let i = 0; i < tentativas; i++) {
+    try {
+      const result = await fn();
+      if (result !== null && result !== undefined) return result;
+    } catch {}
+    if (i < tentativas - 1) await new Promise(r => setTimeout(r, espera * (i + 1)));
+  }
+  return null;
+}
+
 async function getLoja(codigo) {
-  const supabaseServer = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-  const { data, error } = await supabaseServer
-    .from("clientes")
-    .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
-    .eq("codigo_cliente", codigo)
-    .maybeSingle();
-  return data || null;
+  return withRetry(async () => {
+    const { data } = await sbServer()
+      .from("clientes")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, avatar_url, descricao, created_at")
+      .eq("codigo_cliente", codigo)
+      .maybeSingle();
+    return data || null;
+  });
 }
 
 async function getPecas(clienteId) {
-  const supabaseServer = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-  const { data } = await supabaseServer
-    .from("pecas_lojista")
-    .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor")
-    .eq("cliente_id", clienteId)
-    .not("fotos", "is", null)
-    .neq("fotos", "{}")
-    .order("created_at", { ascending: false });
-  return data || [];
+  const result = await withRetry(async () => {
+    const { data } = await sbServer()
+      .from("pecas_lojista")
+      .select("id, nome, fotos, preco_aluguer_dia, preco_venda, cor")
+      .eq("cliente_id", clienteId)
+      .not("fotos", "is", null)
+      .neq("fotos", "{}")
+      .order("created_at", { ascending: false });
+    return data?.length ? data : null;
+  });
+  return result || [];
 }
 
 export async function generateMetadata({ params }) {
