@@ -455,6 +455,7 @@ export default function Home() {
   const [pwaBanner, setPwaBanner] = useState(false);
   const [pwaPrompt, setPwaPrompt] = useState(null);
   const [pwaInstalado, setPwaInstalado] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [cestoCont, setCestoCont] = useState(0);
   const [numerosReais, setNumerosReais] = useState(null);
   const [lojas, setLojas] = useState([]);
@@ -971,7 +972,31 @@ export default function Home() {
           .nav-links,.nav-right .nb-o,.nav-right .nb-f{display:none}
           .nav-right{gap:0.5rem}
           .hero-sound{bottom:4rem}
+          .nav-burger{display:flex}
         }
+        /* HAMBURGER */
+        .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:none;border:none;cursor:pointer;padding:8px;margin-left:0.25rem;flex-shrink:0}
+        .nav-burger span{display:block;width:22px;height:1.5px;background:currentColor;transition:all 0.25s;transform-origin:center}
+        .nav-burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+        .nav-burger.open span:nth-child(2){opacity:0}
+        .nav-burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+        /* MOBILE DRAWER */
+        .nav-drawer{position:fixed;inset:0;z-index:9998;pointer-events:none}
+        .nav-drawer-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);opacity:0;transition:opacity 0.3s;pointer-events:none}
+        .nav-drawer.open .nav-drawer-overlay{opacity:1;pointer-events:all}
+        .nav-drawer-panel{position:absolute;top:0;right:0;width:min(300px,85vw);height:100%;background:#f8f7f5;transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);pointer-events:none}
+        .nav-drawer.open .nav-drawer-panel{transform:translateX(0);pointer-events:all}
+        .nav-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid #ece9e4}
+        .nav-drawer-logo{font-family:var(--serif);font-size:1rem;letter-spacing:0.15em;color:#1a1816}
+        .nav-drawer-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;padding:0.25rem;line-height:1}
+        .nav-drawer-links{display:flex;flex-direction:column;padding:1.5rem 0;flex:1;overflow-y:auto}
+        .nav-drawer-links a{font-family:var(--sans);font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:#1a1816;text-decoration:none;padding:1rem 1.5rem;border-bottom:1px solid #ece9e4;transition:background 0.15s}
+        .nav-drawer-links a:hover{background:#f0ede8}
+        .nav-drawer-bottom{padding:1.5rem;border-top:1px solid #ece9e4;display:flex;flex-direction:column;gap:0.75rem}
+        .nav-drawer-cta{display:block;text-align:center;background:#1a1816;color:#f8f7f5;font-family:var(--sans);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.9rem 1.5rem;text-decoration:none}
+        .nav-drawer-lang{display:flex;gap:0.75rem;justify-content:center}
+        .nav-drawer-lang button{background:none;border:none;font-family:var(--sans);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#888;cursor:pointer;padding:0.25rem}
+        .nav-drawer-lang button.on{color:#1a1816;font-weight:500}
 
         /* CALC STRIP — removida */
 
