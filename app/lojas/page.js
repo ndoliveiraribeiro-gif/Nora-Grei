@@ -50,8 +50,9 @@ export default function Lojas() {
   const carregar = async () => {
     const { data } = await supabase
       .from("clientes")
-      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao, is_marca_propria")
       .eq("modo_lojista", true)
+      .order("is_marca_propria", { ascending: false })
       .order("nome");
     setLojas(data || []);
     setLoading(false);
@@ -92,6 +93,15 @@ export default function Lojas() {
         .loja-local{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--g4);font-family:var(--sans)}
         .loja-desc{font-size:0.76rem;color:var(--g4);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
         .loja-cta{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);margin-top:auto}
+        .loja-card.marca-propria{background:#100c0a;border:1px solid rgba(196,116,138,0.3)}
+        .loja-card.marca-propria:hover{background:#1a1614}
+        .loja-card.marca-propria .loja-nome{color:#f8f7f5}
+        .loja-card.marca-propria .loja-local{color:rgba(248,247,245,0.45)}
+        .loja-card.marca-propria .loja-desc{color:rgba(248,247,245,0.55)}
+        .loja-card.marca-propria .loja-cta{color:#c4748a}
+        .loja-card.marca-propria .loja-avatar{border-color:rgba(196,116,138,0.4);background:#2a2420}
+        .loja-card.marca-propria .loja-initials{color:#c4748a}
+        .loja-badge-marca{display:inline-block;font-size:0.52rem;letter-spacing:0.22em;text-transform:uppercase;font-family:var(--sans);color:#c4748a;border:1px solid rgba(196,116,138,0.5);padding:0.18rem 0.5rem;margin-bottom:0.25rem}
 
         .pg-vazio{padding:4rem 1.5rem;text-align:center;color:var(--g4);font-family:var(--serif);font-size:1.1rem;font-weight:300}
         .pg-loading{padding:4rem 1.5rem;text-align:center;color:var(--g4);font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;font-family:var(--sans)}
@@ -131,13 +141,14 @@ export default function Lojas() {
             const nomeVis = loja.nome_publico || loja.nome;
             const initials = nomeVis ? nomeVis.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
             return (
-              <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className="loja-card">
+              <a key={loja.id} href={`/loja/${loja.codigo_cliente}`} className={`loja-card${loja.is_marca_propria ? " marca-propria" : ""}`}>
                 <div className="loja-avatar">
                   {loja.foto_perfil
                     ? <img src={loja.foto_perfil} alt={nomeVis} />
                     : <div className="loja-initials">{initials}</div>
                   }
                 </div>
+                {loja.is_marca_propria && <span className="loja-badge-marca">Marca Oficial</span>}
                 <div className="loja-nome">{nomeVis}</div>
                 {(loja.cidade || loja.pais) && (
                   <div className="loja-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</div>
