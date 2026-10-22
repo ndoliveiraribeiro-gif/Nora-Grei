@@ -44,6 +44,8 @@ const T = {
     fotoLabel: "Analisa a peça com IA",
     fotoSub: "Tira uma foto ou faz upload — preenchemos os campos automaticamente",
     fotoBtn: "Tirar foto / Upload",
+    fotoBtnCamera: "Câmara",
+    fotoBtnGaleria: "Galeria",
     fotoAnalisando: "A analisar...",
     fotoDetectado: "Detectado pela IA — confirma ou ajusta",
     fotoErro: "Não foi possível analisar a foto. Preenche os campos manualmente.",
@@ -104,6 +106,8 @@ const T = {
     fotoLabel: "Analyse la pièce avec l'IA",
     fotoSub: "Prends une photo ou uploade — on remplit les champs automatiquement",
     fotoBtn: "Photo / Upload",
+    fotoBtnCamera: "Appareil photo",
+    fotoBtnGaleria: "Galerie",
     fotoAnalisando: "Analyse en cours...",
     fotoDetectado: "Détecté par l'IA — confirme ou ajuste",
     fotoErro: "Impossible d'analyser la photo. Remplis les champs manuellement.",
@@ -164,6 +168,8 @@ const T = {
     fotoLabel: "Analizuok drabužį su DI",
     fotoSub: "Nufotografuok arba įkelk — automatiškai užpildysime laukus",
     fotoBtn: "Nuotrauka / Įkelti",
+    fotoBtnCamera: "Fotoaparatas",
+    fotoBtnGaleria: "Galerija",
     fotoAnalisando: "Analizuojama...",
     fotoDetectado: "Aptikta DI — patvirtink arba pataisyk",
     fotoErro: "Nepavyko išanalizuoti nuotraukos. Užpildyk laukus rankiniu būdu.",
@@ -415,6 +421,7 @@ export default function Calculadora() {
   const [fotoErro, setFotoErro] = useState(null);
   const [camposIA, setCamposIA] = useState({}); // campos detectados pela IA
   const fotoInputRef = useRef(null);
+  const fotoGaleriaRef = useRef(null);
 
   const ESTADO_MAP_IA = { comEtiqueta: "comEtiqueta", bom: "bom", usado: "usado", defeito: "defeito" };
   const COR_LABEL = { pt: "cor", fr: "couleur", lt: "spalva" };
@@ -1058,25 +1065,35 @@ export default function Calculadora() {
         <input
           ref={fotoInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/*"
           capture="environment"
           style={{ display: "none" }}
           onChange={e => { if (e.target.files?.[0]) analisarFoto(e.target.files[0]); }}
         />
+        <input
+          ref={fotoGaleriaRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+          style={{ display: "none" }}
+          onChange={e => { if (e.target.files?.[0]) analisarFoto(e.target.files[0]); }}
+        />
 
-        <div className="foto-card" onClick={() => !fotoPreview && fotoInputRef.current?.click()}>
+        <div className="foto-card">
           <div className="card-label">{t.fotoLabel}</div>
 
           {!fotoPreview && (
             <div className="foto-upload-area">
-              <div className="foto-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
-              </div>
-              <span className="foto-upload-label">{t.fotoBtn}</span>
               <span className="foto-upload-sub">{t.fotoSub}</span>
+              <div style={{display:"flex",gap:"8px",marginTop:"0.6rem"}}>
+                <button className="btn btn-outline" style={{flex:1,fontSize:"0.72rem",padding:"0.6rem"}}
+                  onClick={e => { e.stopPropagation(); fotoInputRef.current?.click(); }}>
+                  📷 {t.fotoBtnCamera}
+                </button>
+                <button className="btn btn-outline" style={{flex:1,fontSize:"0.72rem",padding:"0.6rem"}}
+                  onClick={e => { e.stopPropagation(); fotoGaleriaRef.current?.click(); }}>
+                  🖼 {t.fotoBtnGaleria}
+                </button>
+              </div>
             </div>
           )}
 
@@ -1112,10 +1129,16 @@ export default function Calculadora() {
               {fotoErro && <div className="foto-erro">{t.fotoErro}</div>}
 
               {!fotoAnalisando && (
-                <button className="btn btn-outline" style={{marginTop:"0.4rem",fontSize:"0.68rem",padding:"0.6rem"}}
-                  onClick={e => { e.stopPropagation(); fotoInputRef.current?.click(); }}>
-                  {t.fotoBtn}
-                </button>
+                <div style={{display:"flex",gap:"8px",marginTop:"0.4rem"}}>
+                  <button className="btn btn-outline" style={{flex:1,fontSize:"0.68rem",padding:"0.6rem"}}
+                    onClick={e => { e.stopPropagation(); fotoInputRef.current?.click(); }}>
+                    📷 {t.fotoBtnCamera}
+                  </button>
+                  <button className="btn btn-outline" style={{flex:1,fontSize:"0.68rem",padding:"0.6rem"}}
+                    onClick={e => { e.stopPropagation(); fotoGaleriaRef.current?.click(); }}>
+                    🖼 {t.fotoBtnGaleria}
+                  </button>
+                </div>
               )}
             </>
           )}
