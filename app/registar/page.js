@@ -26,6 +26,15 @@ const t = {
     cidade: "Cidade",
     cidadePlaceholder: "Lisboa, Porto, Paris...",
     paises: { pt:"Portugal", fr:"França", lt:"Lituânia", es:"Espanha", br:"Brasil", outro:"Outro" },
+    mostrarPass: "Mostrar",
+    ocultarPass: "Ocultar",
+    forcaPass: ["Muito fraca", "Fraca", "Razoável", "Boa", "Excelente"],
+    erroJaExiste: "Este email já tem conta.",
+    erroJaExisteLink: "Entrar na conta",
+    erroEmailInvalido: "Email inválido.",
+    erroGeral: "Ocorreu um erro. Tenta novamente.",
+    erroEmailNaoConfirmado: "Este email já foi registado mas ainda não confirmado. Verifica a tua caixa de entrada ou tenta entrar directamente.",
+    erroPassFraca: "A password é demasiado fraca. Usa pelo menos 6 caracteres.",
   },
   fr: {
     titulo: "Créer un compte",
@@ -49,6 +58,15 @@ const t = {
     cidade: "Ville",
     cidadePlaceholder: "Lisbonne, Paris...",
     paises: { pt:"Portugal", fr:"France", lt:"Lituanie", es:"Espagne", br:"Brésil", outro:"Autre" },
+    mostrarPass: "Afficher",
+    ocultarPass: "Masquer",
+    forcaPass: ["Très faible", "Faible", "Correcte", "Bonne", "Excellente"],
+    erroJaExiste: "Cet email a déjà un compte.",
+    erroJaExisteLink: "Se connecter",
+    erroEmailInvalido: "Email invalide.",
+    erroGeral: "Une erreur s'est produite. Réessayez.",
+    erroEmailNaoConfirmado: "Cet email a déjà été enregistré mais pas encore confirmé. Vérifiez votre boîte de réception ou essayez de vous connecter directement.",
+    erroPassFraca: "Le mot de passe est trop faible. Utilisez au moins 6 caractères.",
   },
   lt: {
     titulo: "Sukurti paskyrą",
@@ -72,6 +90,15 @@ const t = {
     cidade: "Miestas",
     cidadePlaceholder: "Vilnius, Kaunas...",
     paises: { pt:"Portugalija", fr:"Prancūzija", lt:"Lietuva", es:"Ispanija", br:"Brazilija", outro:"Kita" },
+    mostrarPass: "Rodyti",
+    ocultarPass: "Slėpti",
+    forcaPass: ["Labai silpnas", "Silpnas", "Vidutinis", "Geras", "Puikus"],
+    erroJaExiste: "Šis el. paštas jau turi paskyrą.",
+    erroJaExisteLink: "Prisijungti",
+    erroEmailInvalido: "Neteisingas el. paštas.",
+    erroGeral: "Įvyko klaida. Bandykite dar kartą.",
+    erroEmailNaoConfirmado: "Šis el. paštas jau užregistruotas, bet dar nepatvirtintas. Patikrinkite savo pašto dėžutę arba bandykite prisijungti tiesiogiai.",
+    erroPassFraca: "Slaptažodis per silpnas. Naudokite bent 6 simbolius.",
   },
 };
 
@@ -89,14 +116,52 @@ function RegistarInner() {
   const [password, setPassword] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [erro, setErro] = useState("");
+  const [erroTipo, setErroTipo] = useState(""); // "jaexiste" | "naoconfirmado" | ""
   const [sucesso, setSucesso] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verPass, setVerPass] = useState(false);
+  const [verConfirmar, setVerConfirmar] = useState(false);
   const lang = typeof window !== "undefined" ? (localStorage.getItem("ng_lang") || "pt") : "pt";
   const i = t[lang] || t.pt;
+
+  // Força da password: 0-4
+  const calcForca = (p) => {
+    if (!p) return -1;
+    let score = 0;
+    if (p.length >= 6) score++;
+    if (p.length >= 10) score++;
+    if (/[A-Z]/.test(p)) score++;
+    if (/[0-9]/.test(p)) score++;
+    if (/[^A-Za-z0-9]/.test(p)) score++;
+    return Math.min(4, score - 1 < 0 ? 0 : score - 1);
+  };
+  const forca = calcForca(password);
+  const forcaCores = ["#e74c3c", "#e67e22", "#f1c40f", "#27ae60", "#1a8a4c"];
+
+  // Mapear erros Supabase → mensagens traduzidas
+  const traduzirErro = (msg) => {
+    const m = (msg || "").toLowerCase();
+    if (m.includes("user already registered") || m.includes("already been registered") || m.includes("already exists")) {
+      setErroTipo("jaexiste");
+      return i.erroJaExiste;
+    }
+    if (m.includes("email not confirmed") || m.includes("email link is invalid") || m.includes("for security purposes")) {
+      setErroTipo("naoconfirmado");
+      return i.erroEmailNaoConfirmado;
+    }
+    if (m.includes("invalid email") || m.includes("unable to validate email")) {
+      return i.erroEmailInvalido;
+    }
+    if (m.includes("password should be") || m.includes("password is too short") || m.includes("weak password")) {
+      return i.erroPassFraca;
+    }
+    return i.erroGeral;
+  };
 
   const handleRegistar = async (e) => {
     e.preventDefault();
     setErro("");
+    setErroTipo("");
     if (password.length < 6) { setErro(i.erroMin); return; }
     if (password !== confirmar) { setErro(i.erroPass); return; }
     setLoading(true);
@@ -105,7 +170,14 @@ function RegistarInner() {
       password,
       options: { data: { nome, telefone, data_nascimento: dataNasc, genero } }
     });
-    if (error) { setErro(error.message); setLoading(false); return; }
+    if (error) { setErro(traduzirErro(error.message)); setLoading(false); return; }
+    // Supabase pode devolver user sem erro mesmo quando o email já existe (modo silencioso)
+    // Nesse caso identities estará vazio
+    if (signUpData?.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
+      setErro(traduzirErro("User already registered"));
+      setLoading(false);
+      return;
+    }
 
     // Usar o user devolvido diretamente pelo signUp (getUser() pode falhar
     // se a confirmação de email estiver ativa e a sessão ainda não existir)
@@ -203,8 +275,14 @@ function RegistarInner() {
         .form-input { width: 100%; padding: 1rem 1.1rem; border: 1.5px solid var(--grey-200); background: var(--white); font-size: 1.05rem; font-family: var(--sans); font-weight: 400; color: var(--black); outline: none; transition: border-color 0.2s; border-radius: 0; -webkit-appearance: none; }
         .form-input:focus { border-color: var(--black); }
         .form-input::placeholder { color: var(--grey-200); }
-        .form-erro { font-size: 0.9rem; color: #c0392b; margin-bottom: 1rem; font-weight: 400; padding: 0.75rem 1rem; background: #fff5f5; border: 1px solid #f5c6cb; }
+        .form-erro { font-size: 0.9rem; color: #c0392b; margin-bottom: 1rem; font-weight: 400; padding: 0.75rem 1rem; background: #fff5f5; border: 1px solid #f5c6cb; line-height: 1.5; }
+        .form-erro a { color: #c0392b; font-weight: 600; }
         .form-sucesso { font-size: 0.95rem; color: #27ae60; padding: 1.25rem; border: 1px solid #27ae60; background: #f0fff4; line-height: 1.6; font-weight: 400; }
+        .pass-wrap { position: relative; }
+        .pass-toggle { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey-500); font-family: var(--sans); font-weight: 500; padding: 0; }
+        .forca-bar { display: flex; gap: 3px; margin-top: 0.5rem; height: 3px; }
+        .forca-seg { flex: 1; border-radius: 2px; background: var(--grey-200); transition: background 0.3s; }
+        .forca-label { font-size: 0.72rem; color: var(--grey-500); margin-top: 0.35rem; letter-spacing: 0.05em; }
         .form-btn { width: 100%; padding: 1.1rem; background: var(--black); color: var(--white); border: none; font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; font-family: var(--sans); font-weight: 500; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; -webkit-appearance: none; }
         .form-btn:hover { background: var(--grey-700); }
         .form-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -292,13 +370,35 @@ function RegistarInner() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.password}</label>
-                  <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" placeholder="••••••••" />
+                  <div className="pass-wrap">
+                    <input className="form-input" type={verPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" placeholder="••••••••" style={{paddingRight:"5rem"}} />
+                    <button type="button" className="pass-toggle" onClick={() => setVerPass(v => !v)}>{verPass ? i.ocultarPass : i.mostrarPass}</button>
+                  </div>
+                  {password.length > 0 && (
+                    <>
+                      <div className="forca-bar">
+                        {[0,1,2,3,4].map(n => (
+                          <div key={n} className="forca-seg" style={{background: n <= forca ? forcaCores[forca] : undefined}} />
+                        ))}
+                      </div>
+                      <div className="forca-label">{i.forcaPass[forca]}</div>
+                    </>
+                  )}
                 </div>
                 <div className="form-group">
                   <label className="form-label">{i.confirmar}</label>
-                  <input className="form-input" type="password" value={confirmar} onChange={e => setConfirmar(e.target.value)} required autoComplete="new-password" placeholder="••••••••" />
+                  <div className="pass-wrap">
+                    <input className="form-input" type={verConfirmar ? "text" : "password"} value={confirmar} onChange={e => setConfirmar(e.target.value)} required autoComplete="new-password" placeholder="••••••••" style={{paddingRight:"5rem"}} />
+                    <button type="button" className="pass-toggle" onClick={() => setVerConfirmar(v => !v)}>{verConfirmar ? i.ocultarPass : i.mostrarPass}</button>
+                  </div>
                 </div>
-                {erro && <p className="form-erro">{erro}</p>}
+                {erro && (
+                  <p className="form-erro">
+                    {erro}
+                    {erroTipo === "jaexiste" && <> — <a href="/entrar">{i.erroJaExisteLink}</a></>}
+                    {erroTipo === "naoconfirmado" && <> — <a href="/entrar">{i.erroJaExisteLink}</a></>}
+                  </p>
+                )}
                 <button className="form-btn" type="submit" disabled={loading}>
                   {loading ? "..." : i.btn}
                 </button>
