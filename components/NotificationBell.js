@@ -19,6 +19,14 @@ const TXT = {
     reservaMsg: (nome) => `A tua reserva de "${nome}" está disponível. Confirma antes que expire!`,
     campanhaTitulo: "Nova campanha",
     campanhaMsg: (titulo) => `${titulo}`,
+    novoAluguerTitulo: "Novo aluguer",
+    novoAluguerMsg: (nome, cliente) => `"${nome}" pedido por ${cliente}. Confirma ou recusa.`,
+    devolucaoTitulo: "Devolução a verificar",
+    devolucaoMsg: (nome) => `"${nome}" foi devolvida. Confirma o estado da peça.`,
+    liquidacaoTitulo: "Liquidação disponível",
+    liquidacaoMsg: (valor) => `Tens €${Number(valor).toFixed(2)} prontos a transferir.`,
+    penalizacaoTitulo: "Penalização atribuída",
+    penalizacaoMsg: (motivo, valor) => `${motivo || "Incidente registado"}${valor ? ` — €${Number(valor).toFixed(2)}` : ""}.`,
     marcarLidas: "Marcar todas como lidas",
   },
   fr: {
@@ -37,6 +45,14 @@ const TXT = {
     reservaMsg: (nome) => `Votre réservation de "${nome}" est disponible. Confirmez avant qu'elle n'expire !`,
     campanhaTitulo: "Nouvelle campagne",
     campanhaMsg: (titulo) => `${titulo}`,
+    novoAluguerTitulo: "Nouvelle location",
+    novoAluguerMsg: (nome, cliente) => `"${nome}" demandée par ${cliente}. Confirmez ou refusez.`,
+    devolucaoTitulo: "Retour à vérifier",
+    devolucaoMsg: (nome) => `"${nome}" a été retournée. Vérifiez l'état de la pièce.`,
+    liquidacaoTitulo: "Liquidation disponible",
+    liquidacaoMsg: (valor) => `Vous avez €${Number(valor).toFixed(2)} prêts à transférer.`,
+    penalizacaoTitulo: "Pénalité attribuée",
+    penalizacaoMsg: (motivo, valor) => `${motivo || "Incident enregistré"}${valor ? ` — €${Number(valor).toFixed(2)}` : ""}.`,
     marcarLidas: "Tout marquer comme lu",
   },
   lt: {
@@ -55,6 +71,14 @@ const TXT = {
     reservaMsg: (nome) => `Jūsų "${nome}" rezervacija prieinama. Patvirtinkite prieš galiojimo pabaigą!`,
     campanhaTitulo: "Nauja kampanija",
     campanhaMsg: (titulo) => `${titulo}`,
+    novoAluguerTitulo: "Nauja nuoma",
+    novoAluguerMsg: (nome, cliente) => `"${nome}" užsakė ${cliente}. Patvirtinkite arba atmeskite.`,
+    devolucaoTitulo: "Grąžinimas tikrinimui",
+    devolucaoMsg: (nome) => `"${nome}" buvo grąžinta. Patikrinkite daikto būklę.`,
+    liquidacaoTitulo: "Išmoka prieinama",
+    liquidacaoMsg: (valor) => `Turite €${Number(valor).toFixed(2)} paruoštų pervedimui.`,
+    penalizacaoTitulo: "Skirta bauda",
+    penalizacaoMsg: (motivo, valor) => `${motivo || "Įvykis užregistruotas"}${valor ? ` — €${Number(valor).toFixed(2)}` : ""}.`,
     marcarLidas: "Pažymėti visus kaip skaitytus",
   },
 };
@@ -65,6 +89,7 @@ export default function NotificationBell({ lang = "pt" }) {
   const [recibosRecentes, setRecibosRecentes] = useState([]);
   const [reservasDisponiveis, setReservasDisponiveis] = useState([]);
   const [campanhasNovas, setCampanhasNovas] = useState([]);
+  const [alertasLojista, setAlertasLojista] = useState([]);
   const [aberto, setAberto] = useState(false);
   const [userId, setUserId] = useState(null);
   const [modoLojista, setModoLojista] = useState(false);
@@ -91,6 +116,7 @@ export default function NotificationBell({ lang = "pt" }) {
     await carregarRecibosRecentes(user.id);
     await carregarReservasDisponiveis(user.id);
     await carregarCampanhasNovas();
+    if (lojista) await carregarAlertasLojista(user.id);
   };
 
   const gerarNotificacoesAtuais = async (cliente_id) => {
@@ -169,6 +195,70 @@ export default function NotificationBell({ lang = "pt" }) {
     setRecibosRecentes(data || []);
   };
 
+  const carregarAlertasLojista = async (lojista_id) => {
+    const alertas = [];
+
+    // 1. Alugueres novos (pendente) — precisam confirmação
+    const { data: pendentes } = await supabase
+      .from("alugueres_lojista")
+      .select("id, estado, created_at, pecas_lojista(nome), clientes(nome)")
+      .eq("lojista_id", lojista_id)
+      .eq("estado", "pendente")
+      .order("created_at", { ascending: false })
+      .limit(5);
+    (pendentes || []).forEach(a => alertas.push({
+      id: `aluguer-${a.id}`, tipo: "novo_aluguer",
+      nome: a.pecas_lojista?.nome || "Peça", cliente: a.clientes?.nome || "Cliente",
+      created_at: a.created_at, href: "/perfil?tab=loja&subtab=alugueres",
+    }));
+
+    // 2. Devoluções por verificar
+    const { data: devolucoes } = await supabase
+      .from("alugueres_lojista")
+      .select("id, estado, created_at, pecas_lojista(nome)")
+      .eq("lojista_id", lojista_id)
+      .eq("estado", "em_devolucao")
+      .order("created_at", { ascending: false })
+      .limit(5);
+    (devolucoes || []).forEach(a => alertas.push({
+      id: `dev-${a.id}`, tipo: "devolucao",
+      nome: a.pecas_lojista?.nome || "Peça",
+      created_at: a.created_at, href: "/perfil?tab=loja&subtab=alugueres",
+    }));
+
+    // 3. Liquidações prontas (estado = "disponivel" ou equivalente)
+    const { data: liquidacoes } = await supabase
+      .from("liquidacoes")
+      .select("id, valor, created_at, estado")
+      .eq("lojista_id", lojista_id)
+      .eq("estado", "disponivel")
+      .order("created_at", { ascending: false })
+      .limit(3);
+    (liquidacoes || []).forEach(l => alertas.push({
+      id: `liq-${l.id}`, tipo: "liquidacao",
+      valor: l.valor,
+      created_at: l.created_at, href: "/perfil?tab=loja&subtab=liquidacoes",
+    }));
+
+    // 4. Penalizações recentes (últimos 30 dias)
+    const trintaDias = new Date();
+    trintaDias.setDate(trintaDias.getDate() - 30);
+    const { data: penalizacoes } = await supabase
+      .from("penalizacoes_lojista")
+      .select("id, motivo, valor, created_at")
+      .eq("lojista_id", lojista_id)
+      .gte("created_at", trintaDias.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(3);
+    (penalizacoes || []).forEach(p => alertas.push({
+      id: `pen-${p.id}`, tipo: "penalizacao",
+      motivo: p.motivo, valor: p.valor,
+      created_at: p.created_at, href: "/perfil?tab=loja",
+    }));
+
+    setAlertasLojista(alertas);
+  };
+
   const carregarReservasDisponiveis = async (cliente_id) => {
     const { data } = await supabase
       .from("reservas_espera")
@@ -215,7 +305,7 @@ export default function NotificationBell({ lang = "pt" }) {
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
-  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length + reservasDisponiveis.length + campanhasNovas.length;
+  const totalBadge = naoLidas + mensagensNaoLidas.length + recibosRecentes.length + reservasDisponiveis.length + campanhasNovas.length + alertasLojista.length;
   const campoCont = modoLojista ? "nao_lidas_lojista" : "nao_lidas_cliente";
 
   return (
@@ -337,7 +427,42 @@ export default function NotificationBell({ lang = "pt" }) {
                 </div>
               ))}
 
-              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && recibosRecentes.length === 0 && reservasDisponiveis.length === 0 && campanhasNovas.length === 0 && (
+              {/* Alertas de lojista: operacionais + económicos */}
+              {alertasLojista.map(a => {
+                const locale = lang === "fr" ? "fr-FR" : lang === "lt" ? "lt-LT" : "pt-PT";
+                const data = new Date(a.created_at).toLocaleDateString(locale);
+                if (a.tipo === "novo_aluguer") return (
+                  <a key={a.id} href={a.href} onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f0f7ff", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>📦 {i.novoAluguerTitulo}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.novoAluguerMsg(a.nome, a.cliente)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </a>
+                );
+                if (a.tipo === "devolucao") return (
+                  <a key={a.id} href={a.href} onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fff8e1", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>🔄 {i.devolucaoTitulo}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.devolucaoMsg(a.nome)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </a>
+                );
+                if (a.tipo === "liquidacao") return (
+                  <a key={a.id} href={a.href} onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f0fff4", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>💶 {i.liquidacaoTitulo}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.liquidacaoMsg(a.valor)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </a>
+                );
+                if (a.tipo === "penalizacao") return (
+                  <div key={a.id} style={{ padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#fff2f2" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c0392b", marginBottom: "0.2rem" }}>⚠ {i.penalizacaoTitulo}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.penalizacaoMsg(a.motivo, a.valor)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </div>
+                );
+                return null;
+              })}
+
+              {notificacoes.length === 0 && mensagensNaoLidas.length === 0 && recibosRecentes.length === 0 && reservasDisponiveis.length === 0 && campanhasNovas.length === 0 && alertasLojista.length === 0 && (
                 <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
               )}
 
