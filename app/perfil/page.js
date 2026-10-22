@@ -1263,6 +1263,10 @@ export default function Perfil() {
   const [lojaCartaoGuardadoUltimos4, setLojaCartaoGuardadoUltimos4] = useState("");
   const [financeirosMsg, setFinanceirosMsg] = useState("");
   const [financeirosLoading, setFinanceirosLoading] = useState(false);
+  const [stripeFinDisponivel, setStripeFinDisponivel] = useState(false);
+  const [stripeFinCarregando, setStripeFinCarregando] = useState(false);
+  const [stripeFinClientSecret, setStripeFinClientSecret] = useState(null);
+  const [stripeFinUltimos4, setStripeFinUltimos4] = useState("");
   const [lojaEstado, setLojaEstado] = useState("inativo");
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
@@ -1622,41 +1626,48 @@ export default function Perfil() {
       setFinanceirosMsg(i.ibanInvalido);
       return;
     }
-    const cartaoDigits = lojaCartaoNumero.replace(/\s|-/g, "");
-    if (cartaoDigits && !validarLuhn(cartaoDigits)) {
-      setFinanceirosMsg(i.cartaoInvalido);
-      return;
-    }
-    if (lojaCartaoValidade) {
-      const [mm, aa] = lojaCartaoValidade.split("/");
-      const agora = new Date();
-      const exp = new Date(2000 + parseInt(aa||"0", 10), parseInt(mm||"0", 10) - 1, 1);
-      if (!mm || !aa || isNaN(exp.getTime()) || exp < agora) {
-        setFinanceirosMsg(i.cartaoValidadeInvalida);
-        return;
-      }
-    }
     setFinanceirosLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setFinanceirosLoading(false); return; }
     const updateData = {};
     if (ibanLimpo) updateData.lojista_iban = ibanLimpo;
-    if (cartaoDigits) {
-      updateData.lojista_cartao_ultimo4 = cartaoDigits.slice(-4);
-      updateData.lojista_cartao_nome = lojaCartaoNome.trim();
-      updateData.lojista_cartao_validade = lojaCartaoValidade.trim();
+
+    // Guardar cartão via Stripe SetupIntent
+    if (stripeFinDisponivel && window._stripeFinElements) {
+      const { stripe, cardElement } = window._stripeFinElements;
+      const { setupIntent, error: stripeErr } = await stripe.confirmCardSetup(stripeFinClientSecret, {
+        payment_method: { card: cardElement },
+      });
+      if (stripeErr) {
+        setFinanceirosMsg(`Erro no cartão: ${stripeErr.message}`);
+        setFinanceirosLoading(false);
+        return;
+      }
+      if (setupIntent?.payment_method) {
+        updateData.stripe_payment_method_id = setupIntent.payment_method;
+        // Obter últimos 4 dígitos da resposta Stripe
+        try {
+          const { data: pmData } = await fetch(`/api/stripe/payment-method?id=${setupIntent.payment_method}`).then(r => r.json()).catch(() => ({ data: null }));
+          if (pmData?.card?.last4) {
+            updateData.lojista_cartao_ultimo4 = pmData.card.last4;
+            setStripeFinUltimos4(pmData.card.last4);
+          }
+        } catch (_) {}
+        // Obter stripe_customer_id do setupIntent se disponível
+        if (setupIntent.customer) updateData.stripe_customer_id = setupIntent.customer;
+      }
     }
+
     const { error } = await supabase.from("clientes").update(updateData).eq("id", user.id);
     setFinanceirosLoading(false);
     if (error) {
       setFinanceirosMsg(i.erroGeral);
     } else {
       if (ibanLimpo) setLojaIban(ibanLimpo);
-      if (cartaoDigits) {
-        setLojaCartaoGuardadoUltimos4(cartaoDigits.slice(-4));
-        setLojaCartaoNumero("");
-      }
       setFinanceirosMsg(i.guardado);
+      // Resetar o SetupIntent para a próxima vez
+      setStripeFinClientSecret(null);
+      setStripeFinDisponivel(false);
     }
   };
 
@@ -1742,6 +1753,53 @@ export default function Perfil() {
     iniciarStripe();
     return () => { cancelled = true; };
   }, [showFormLojista]);
+
+  // Iniciar SetupIntent Stripe quando o accordion Dados Financeiros abre
+  useEffect(() => {
+    if (secaoAberta !== "financeiros" || !modoLojista) return;
+    if (stripeFinClientSecret) return; // já iniciado
+    let cancelled = false;
+    setStripeFinCarregando(true);
+    setStripeFinDisponivel(false);
+    const iniciarStripeFin = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || cancelled) return;
+        const { data: perfil } = await supabase.from("clientes").select("email, nome").eq("id", user.id).single();
+        const res = await fetch("/api/stripe/setup-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cliente_id: user.id, email: perfil?.email || user.email, nome: perfil?.nome || "" }),
+        });
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.modo === "real" && json.client_secret) {
+          setStripeFinClientSecret(json.client_secret);
+          setStripeFinDisponivel(true);
+          if (window.Stripe) {
+            const stripe = window.Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+            const elements = stripe.elements({ clientSecret: json.client_secret });
+            const cardElement = elements.create("card", {
+              style: { base: { fontFamily: "'Jost', sans-serif", fontSize: "15px", color: "#1a1a1a" } },
+            });
+            // Montar com pequeno delay para garantir que o DOM está pronto
+            setTimeout(() => {
+              if (!cancelled && document.getElementById("stripe-card-financeiros")) {
+                cardElement.mount("#stripe-card-financeiros");
+                window._stripeFinElements = { stripe, elements, cardElement };
+              }
+            }, 100);
+          }
+        }
+      } catch (e) {
+        // Silencioso — modo simulado
+      } finally {
+        if (!cancelled) setStripeFinCarregando(false);
+      }
+    };
+    iniciarStripeFin();
+    return () => { cancelled = true; };
+  }, [secaoAberta, modoLojista]);
 
   const submeterCandidaturaLojista = async () => {
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
@@ -2803,56 +2861,25 @@ export default function Perfil() {
                   {lojaIbanValido === false && <p style={{fontSize:"0.72rem",color:"#c0392b",marginTop:"0.3rem"}}>{i.ibanInvalido}</p>}
                 </div>
 
-                {/* Cartão de débito */}
+                {/* Cartão — Stripe Elements */}
                 <div style={{padding:"1.25rem",background:"var(--g1)",borderRadius:"6px",marginBottom:"1.25rem"}}>
                   <p style={{fontFamily:"var(--serif)",fontSize:"0.85rem",color:"var(--black)",margin:"0 0 1rem 0"}}>{i.cartaoLabel}</p>
-                  {lojaCartaoGuardadoUltimos4 && !lojaCartaoNumero && (
+                  {(lojaCartaoGuardadoUltimos4 || stripeFinUltimos4) && (
                     <div style={{fontSize:"0.75rem",color:"#27ae60",marginBottom:"0.75rem",padding:"0.5rem 0.75rem",background:"rgba(39,174,96,0.08)",borderRadius:"4px"}}>
-                      {i.cartaoValido} — {i.cartaoGuardadoFim} •••• {lojaCartaoGuardadoUltimos4}
+                      {i.cartaoValido} — {i.cartaoGuardadoFim} •••• {stripeFinUltimos4 || lojaCartaoGuardadoUltimos4}
                     </div>
                   )}
-                  <div className="grid2">
-                    <div className="fg full">
-                      <label className="lbl">{i.cartaoNumero}</label>
-                      <input
-                        className="inp"
-                        value={lojaCartaoNumero}
-                        onChange={e => {
-                          let v = e.target.value.replace(/[^\d]/g, "");
-                          v = v.replace(/(.{4})/g,"$1 ").trim();
-                          setLojaCartaoNumero(v);
-                        }}
-                        placeholder="0000 0000 0000 0000"
-                        maxLength={23}
-                        style={{fontFamily:"monospace",letterSpacing:"0.1em"}}
-                        inputMode="numeric"
-                      />
-                      {lojaCartaoNumero.replace(/\s/g,"").length >= 13 && (
-                        validarLuhn(lojaCartaoNumero)
-                          ? <p style={{fontSize:"0.72rem",color:"#27ae60",marginTop:"0.3rem"}}>{i.cartaoValido}</p>
-                          : <p style={{fontSize:"0.72rem",color:"#c0392b",marginTop:"0.3rem"}}>{i.cartaoInvalido}</p>
-                      )}
-                    </div>
-                    <div className="fg">
-                      <label className="lbl">{i.cartaoNome}</label>
-                      <input className="inp" value={lojaCartaoNome} onChange={e => setLojaCartaoNome(e.target.value.toUpperCase())} placeholder="NOME SOBRENOME" style={{textTransform:"uppercase",letterSpacing:"0.04em"}} />
-                    </div>
-                    <div className="fg">
-                      <label className="lbl">{i.cartaoValidade}</label>
-                      <input
-                        className="inp"
-                        value={lojaCartaoValidade}
-                        onChange={e => {
-                          let v = e.target.value.replace(/[^\d]/g,"");
-                          if (v.length > 2) v = v.slice(0,2) + "/" + v.slice(2,4);
-                          setLojaCartaoValidade(v);
-                        }}
-                        placeholder="MM/AA"
-                        maxLength={5}
-                        inputMode="numeric"
-                      />
-                    </div>
-                  </div>
+                  {stripeFinCarregando && (
+                    <p style={{fontSize:"0.75rem",color:"var(--g4)",marginBottom:"0.5rem"}}>A carregar formulário seguro...</p>
+                  )}
+                  {stripeFinDisponivel && (
+                    <div id="stripe-card-financeiros" style={{padding:"0.75rem 1rem",border:"1px solid var(--g2)",borderRadius:"6px",background:"var(--bg)",minHeight:"42px"}} />
+                  )}
+                  {!stripeFinCarregando && !stripeFinDisponivel && (
+                    <p style={{fontSize:"0.72rem",color:"#b8860b",marginTop:"0.25rem"}}>
+                      {(lojaCartaoGuardadoUltimos4 || stripeFinUltimos4) ? "Para actualizar o cartão, recarrega a página e abre esta secção." : "Stripe em activação — tenta novamente em breve."}
+                    </p>
+                  )}
                 </div>
 
                 {financeirosMsg && (
