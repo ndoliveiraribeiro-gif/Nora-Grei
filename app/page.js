@@ -53,8 +53,8 @@ function ModalPrecoLanding({ peca, lang, onClose }) {
 
 const T = {
   pt: {
-    nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
-    hero: { eyebrow: "Aluguer · Venda · Luxo", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Calcular o meu potencial", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "O teu guarda-roupa tem valor", preco: "Peça de", anual: "pode gerar", ano: "/ ano em aluguer", cta: "Calcular em detalhe" } },
+    nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil", sobre: "Como funciona?" },
+    hero: { eyebrow: "Aluguer · Venda · Luxo", titulo: "Veste o extraordinário.", sub: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", desc: "Aluga peças exclusivas da Nora Grei e renova o teu guarda-roupa sempre que quiseres.", cta1: "Explorar colecção", cta2: "Calcular o meu potencial", ctaSobre: "Conhecer a plataforma →", rotary: ["Aluga","o que tens","no teu armário","há já algum tempo.","o casaco,","a camisola,","o vestido,","o sapato..","vende usado.","gera valor."], sim: { label: "O teu guarda-roupa tem valor", preco: "Peça de", anual: "pode gerar", ano: "/ ano em aluguer", cta: "Calcular em detalhe" } },
     video: { label: "A experiência Nora Grei", titulo: "Vê como funciona." },
     como: { label: "O processo", titulo: "Moda sem compromisso.", passos: [
       { num: "01", titulo: "Escolhe", desc: "Explora a colecção e reserva a peça dos teus sonhos. Selecciona as datas e o tamanho." },
@@ -78,7 +78,7 @@ const T = {
     footer: {
       copy:"© 2026 Nora Grei. Todos os direitos reservados.",
       cols: [
-        { titulo: "Explorar", links: [{ l:"Colecção", h:"/catalogo" },{ l:"Como funciona", h:"#como" },{ l:"Sustentabilidade", h:"#sustentabilidade" }] },
+        { titulo: "Explorar", links: [{ l:"Colecção", h:"/catalogo" },{ l:"Como funciona", h:"#como" },{ l:"Sobre a plataforma", h:"/sobre" },{ l:"Centro de ajuda", h:"/ajuda" },{ l:"Sustentabilidade", h:"#sustentabilidade" }] },
         { titulo: "Conta", links: [{ l:"Entrar", h:"/entrar" },{ l:"Registar", h:"/registar" },{ l:"Os meus pedidos", h:"/pedidos" },{ l:"Perfil", h:"/perfil" }] },
         { titulo: "Informação", links: [{ l:"Contacto", h:"mailto:hello@noragrei.com" },{ l:"Termos de uso", h:"/termos" },{ l:"Política de privacidade", h:"/privacidade" }] },
       ],
@@ -118,8 +118,8 @@ const T = {
     },
   },
   fr: {
-    nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil" },
-    hero: { eyebrow: "Location · Vente · Luxe", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Calculer mon potentiel", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Votre garde-robe a de la valeur", preco: "Pièce à", anual: "peut générer", ano: "/ an en location", cta: "Calculer en détail" } },
+    nav: { catalogo: "Collection", lojas: "Boutiques", comoFunciona: "Comment ça marche", entrar: "Connexion", pedidos: "Commandes", perfil: "Profil", sobre: "Comment ça marche ?" },
+    hero: { eyebrow: "Location · Vente · Luxe", titulo: "Habillez l'extraordinaire.", sub: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", desc: "Louez des pièces exclusives Nora Grei et renouvelez votre garde-robe à volonté.", cta1: "Explorer la collection", cta2: "Calculer mon potentiel", ctaSobre: "Découvrir la plateforme →", rotary: ["Louez","ce que vous avez","dans votre armoire","depuis un moment.","le manteau,","le pull,","la robe,","les chaussures..","vendez d'occasion.","créez de la valeur."], sim: { label: "Votre garde-robe a de la valeur", preco: "Pièce à", anual: "peut générer", ano: "/ an en location", cta: "Calculer en détail" } },
     video: { label: "L'expérience Nora Grei", titulo: "Découvrez comment ça marche." },
     como: { label: "Le processus", titulo: "La mode sans engagement.", passos: [
       { num: "01", titulo: "Choisissez", desc: "Explorez la collection et réservez la pièce de vos rêves. Sélectionnez les dates et la taille." },
@@ -143,7 +143,7 @@ const T = {
     footer: {
       copy:"© 2026 Nora Grei. Tous droits réservés.",
       cols: [
-        { titulo: "Explorer", links: [{ l:"Collection", h:"/catalogo" },{ l:"Comment ça marche", h:"#como" },{ l:"Durabilité", h:"#sustentabilidade" }] },
+        { titulo: "Explorer", links: [{ l:"Collection", h:"/catalogo" },{ l:"Comment ça marche", h:"#como" },{ l:"À propos", h:"/sobre" },{ l:"Aide", h:"/ajuda" },{ l:"Durabilité", h:"#sustentabilidade" }] },
         { titulo: "Compte", links: [{ l:"Connexion", h:"/entrar" },{ l:"S'inscrire", h:"/registar" },{ l:"Mes commandes", h:"/pedidos" },{ l:"Profil", h:"/perfil" }] },
         { titulo: "Informations", links: [{ l:"Contact", h:"mailto:hello@noragrei.com" },{ l:"Conditions d'utilisation", h:"/termos" },{ l:"Politique de confidentialité", h:"/privacidade" }] },
       ],
@@ -183,8 +183,8 @@ const T = {
     },
   },
   lt: {
-    nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis" },
-    hero: { eyebrow: "Nuoma · Pardavimas · Prabanga", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Skaičiuoti savo potencialą", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Tavo spinta turi vertę", preco: "Drabužis po", anual: "gali generuoti", ano: "/ metus nuomos", cta: "Skaičiuoti išsamiau" } },
+    nav: { catalogo: "Kolekcija", lojas: "Parduotuvės", comoFunciona: "Kaip tai veikia", entrar: "Prisijungti", pedidos: "Užsakymai", perfil: "Profilis", sobre: "Kaip tai veikia?" },
+    hero: { eyebrow: "Nuoma · Pardavimas · Prabanga", titulo: "Apsirenkite išskirtinai.", sub: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", desc: "Nuomokitės išskirtinius Nora Grei drabužius ir atnaujinkite savo spintą kada panorėję.", cta1: "Naršyti kolekciją", cta2: "Skaičiuoti savo potencialą", ctaSobre: "Sužinoti apie platformą →", rotary: ["Išnuomokite","ką turite","savo spintoje","jau kurį laiką.","paltą,","megztinį,","suknelę,","batus..","parduokite naudotą.","kurkite vertę."], sim: { label: "Tavo spinta turi vertę", preco: "Drabužis po", anual: "gali generuoti", ano: "/ metus nuomos", cta: "Skaičiuoti išsamiau" } },
     video: { label: "Nora Grei patirtis", titulo: "Pažiūrėkite, kaip tai veikia." },
     como: { label: "Procesas", titulo: "Mada be įsipareigojimų.", passos: [
       { num: "01", titulo: "Pasirinkite", desc: "Naršykite kolekciją ir rezervuokite svajonių drabužį. Pasirinkite datas ir dydį." },
@@ -208,7 +208,7 @@ const T = {
     footer: {
       copy:"© 2026 Nora Grei. Visos teisės saugomos.",
       cols: [
-        { titulo: "Naršyti", links: [{ l:"Kolekcija", h:"/catalogo" },{ l:"Kaip tai veikia", h:"#como" },{ l:"Tvarumas", h:"#sustentabilidade" }] },
+        { titulo: "Naršyti", links: [{ l:"Kolekcija", h:"/catalogo" },{ l:"Kaip tai veikia", h:"#como" },{ l:"Apie platformą", h:"/sobre" },{ l:"Pagalbos centras", h:"/ajuda" },{ l:"Tvarumas", h:"#sustentabilidade" }] },
         { titulo: "Paskyra", links: [{ l:"Prisijungti", h:"/entrar" },{ l:"Registruotis", h:"/registar" },{ l:"Mano užsakymai", h:"/pedidos" },{ l:"Profilis", h:"/perfil" }] },
         { titulo: "Informacija", links: [{ l:"Kontaktai", h:"mailto:hello@noragrei.com" },{ l:"Naudojimo sąlygos", h:"/termos" },{ l:"Privatumo politika", h:"/privacidade" }] },
       ],
@@ -1065,6 +1065,7 @@ export default function Home() {
           <li><a href="/lojas">{t.nav.lojas}</a></li>
           <li><a href="/feed">Feed</a></li>
           <li><a href="#como">{t.nav.comoFunciona}</a></li>
+          <li><a href="/sobre">{t.nav.sobre}</a></li>
         </ul>
         <div className="nav-right">
           <div className="nav-lang">
@@ -1151,6 +1152,7 @@ export default function Home() {
           <div className="hero-btns">
             <a href="/catalogo" className="hero-cta1">{t.hero.cta1}</a>
             <a href="/calculadora" className="hero-cta2">{t.hero.cta2} →</a>
+            <a href="/sobre" className="hero-cta2" style={{marginTop:"0.5rem",borderTop:"none",fontSize:"0.58rem",opacity:0.6}}>{t.hero.ctaSobre}</a>
           </div>
 
           <div className="hero-scroll-cue">
