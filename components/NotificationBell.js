@@ -146,7 +146,7 @@ export default function NotificationBell({ lang = "pt" }) {
       </button>
 
       {aberto && (
-        <div style={{ position: "absolute", top: "calc(100% + 0.5rem)", right: 0, width: 320, maxHeight: 420, overflowY: "auto", background: "#fff", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 300, fontFamily: "'Jost',sans-serif" }}>
+        <div style={{ position: "fixed", top: "4rem", left: "50%", transform: "translateX(-50%)", width: "min(340px, calc(100vw - 2rem))", maxHeight: "70vh", overflowY: "auto", background: "#fff", boxShadow: "0 8px 32px rgba(0,0,0,0.18)", zIndex: 3000, fontFamily: "'Jost',sans-serif", borderRadius: "8px" }}>
           {notificacoes.length === 0 ? (
             <div style={{ padding: "2rem 1.25rem", textAlign: "center", color: "#5a5855", fontSize: "0.85rem" }}>{i.semNotificacoes}</div>
           ) : (
