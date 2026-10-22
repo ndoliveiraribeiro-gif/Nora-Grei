@@ -5,9 +5,9 @@ import { supabase } from "@/lib/supabase";
 const SENHA = process.env.NEXT_PUBLIC_BACKOFFICE_SENHA || "noragrei2024admin";
 const OCASIOES = ["Festa", "Dia a dia", "Trabalho", "Jantar", "Férias", "Casamento", "Praia", "Cerimónia", "Cocktail", "Gala"];
 const TAMANHOS = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
-const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "config"];
-const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", config: "Config" };
-const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", config: "⚙️" };
+const TABS = ["dashboard", "seewhois", "caixa", "catalogo", "alugueres", "lojistas", "clientes", "reservas", "campanhas", "mensagens", "afiliados", "feed", "landing", "estatisticas", "suporte", "config"];
+const TAB_LABELS = { dashboard: "Dashboard", seewhois: "SeeWhois", caixa: "Caixa", catalogo: "Catálogo", alugueres: "Alugueres", lojistas: "Lojistas", clientes: "Clientes", reservas: "Reservas", campanhas: "Campanhas", mensagens: "Mensagens", afiliados: "Afiliados", feed: "Feed", landing: "Landing Page", estatisticas: "Estatísticas", suporte: "Suporte", config: "Config" };
+const TAB_ICONS = { dashboard: "📊", seewhois: "👁", caixa: "💰", catalogo: "👗", alugueres: "🔑", lojistas: "🏪", clientes: "👤", reservas: "📅", campanhas: "📢", mensagens: "💬", afiliados: "🤝", feed: "📸", landing: "🌐", estatisticas: "📈", suporte: "🎫", config: "⚙️" };
 const TABS_PRIMARIOS = ["dashboard", "alugueres", "catalogo", "feed", "caixa"];
 
 const PECA_VAZIA = { nome: "", categoria_id: "", preco_aluguer_dia: "", preco_avulso: "", valor_peca: "", descricao: "", material: "", origem: "Portugal", destaque: false, hero_position: "center top", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade_total: 1 }] };
@@ -3406,6 +3406,141 @@ export default function Backoffice() {
                 ))}
               </div>
             </>
+          );
+        })()}
+
+        {tab === "suporte" && (() => {
+          const [boTickets, setBoTickets] = React.useState(null);
+          const [boTicketAtivo, setBoTicketAtivo] = React.useState(null);
+          const [boMsgs, setBoMsgs] = React.useState([]);
+          const [boResposta, setBoResposta] = React.useState("");
+          const [boEnviando, setBoEnviando] = React.useState(false);
+          const [boFiltro, setBoFiltro] = React.useState("todos");
+
+          React.useEffect(() => {
+            supabase.from("tickets_lojista").select("*, clientes:lojista_id(nome, codigo_loja)").order("prioridade", { ascending: true }).order("created_at", { ascending: false }).then(({ data }) => {
+              if (data) setBoTickets(data);
+            });
+          }, []);
+
+          const abrirTicketBo = async (tk) => {
+            setBoTicketAtivo(tk);
+            const { data } = await supabase.from("tickets_mensagens").select("*").eq("ticket_id", tk.id).order("created_at", { ascending: true });
+            if (data) setBoMsgs(data);
+          };
+
+          const responderTicket = async () => {
+            if (!boResposta.trim() || !boTicketAtivo) return;
+            setBoEnviando(true);
+            const adminId = "2f6afc17-8e46-41a7-9b9f-4f407c76919f";
+            await supabase.from("tickets_mensagens").insert({ ticket_id: boTicketAtivo.id, remetente_id: adminId, texto: boResposta, is_admin: true });
+            if (boTicketAtivo.estado === "aberto") {
+              await supabase.from("tickets_lojista").update({ estado: "em_curso", updated_at: new Date().toISOString() }).eq("id", boTicketAtivo.id);
+              setBoTicketAtivo(p => ({ ...p, estado: "em_curso" }));
+              setBoTickets(prev => prev.map(t => t.id === boTicketAtivo.id ? { ...t, estado: "em_curso" } : t));
+            }
+            setBoResposta("");
+            const { data } = await supabase.from("tickets_mensagens").select("*").eq("ticket_id", boTicketAtivo.id).order("created_at", { ascending: true });
+            if (data) setBoMsgs(data);
+            setBoEnviando(false);
+          };
+
+          const fecharTicket = async () => {
+            await supabase.from("tickets_lojista").update({ estado: "fechado", updated_at: new Date().toISOString() }).eq("id", boTicketAtivo.id);
+            setBoTicketAtivo(p => ({ ...p, estado: "fechado" }));
+            setBoTickets(prev => prev.map(t => t.id === boTicketAtivo.id ? { ...t, estado: "fechado" } : t));
+          };
+
+          const reabrirTicket = async () => {
+            await supabase.from("tickets_lojista").update({ estado: "aberto", updated_at: new Date().toISOString() }).eq("id", boTicketAtivo.id);
+            setBoTicketAtivo(p => ({ ...p, estado: "aberto" }));
+            setBoTickets(prev => prev.map(t => t.id === boTicketAtivo.id ? { ...t, estado: "aberto" } : t));
+          };
+
+          const PRIO_COR = { urgente: "#e74c3c", normal: "#f39c12", baixa: "#3498db" };
+          const EST_COR = { aberto: "#e74c3c", em_curso: "#f39c12", fechado: "#27ae60" };
+          const EST_LABEL = { aberto: "Aberto", em_curso: "Em curso", fechado: "Fechado" };
+          const PRIO_LABEL = { urgente: "Urgente", normal: "Normal", baixa: "Baixa" };
+          const CAT_LABEL = { bug: "Bug técnico", pagamento: "Pagamento", conta: "Conta", stock: "Stock", envios: "Envios", outro: "Outro" };
+
+          const ticketsFiltrados = (boTickets || []).filter(t => boFiltro === "todos" || t.estado === boFiltro);
+
+          if (boTicketAtivo) return (
+            <div>
+              <button onClick={() => { setBoTicketAtivo(null); setBoMsgs([]); }} style={{ background:"none",border:"none",cursor:"pointer",fontSize:"0.78rem",color:"#888",fontFamily:"var(--sans)",letterSpacing:"0.05em",padding:"0 0 1rem",display:"flex",alignItems:"center",gap:"0.4rem" }}>← Todos os tickets</button>
+              <div style={CARD}>
+                <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:"1rem",flexWrap:"wrap" }}>
+                  <div>
+                    <p style={{ fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,margin:"0 0 0.25rem" }}>{boTicketAtivo.assunto}</p>
+                    <p style={{ fontSize:"0.78rem",color:"#888",margin:"0 0 0.1rem" }}>{boTicketAtivo.referencia} · {boTicketAtivo.clientes?.nome || "Lojista"} · {CAT_LABEL[boTicketAtivo.categoria]}</p>
+                    <p style={{ fontSize:"0.72rem",color:"#aaa",margin:0 }}>{new Date(boTicketAtivo.created_at).toLocaleString("pt-PT")}</p>
+                  </div>
+                  <div style={{ display:"flex",gap:"0.4rem",alignItems:"center",flexWrap:"wrap" }}>
+                    <span style={{ fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:PRIO_COR[boTicketAtivo.prioridade]+"22",color:PRIO_COR[boTicketAtivo.prioridade],padding:"0.2rem 0.5rem",borderRadius:3 }}>{PRIO_LABEL[boTicketAtivo.prioridade]}</span>
+                    <span style={{ fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:EST_COR[boTicketAtivo.estado]+"22",color:EST_COR[boTicketAtivo.estado],padding:"0.2rem 0.5rem",borderRadius:3 }}>{EST_LABEL[boTicketAtivo.estado]}</span>
+                    {boTicketAtivo.estado !== "fechado"
+                      ? <button onClick={fecharTicket} style={BTN("outline","sm")}>✓ Fechar ticket</button>
+                      : <button onClick={reabrirTicket} style={BTN("outline","sm")}>↺ Reabrir</button>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div style={{ display:"flex",flexDirection:"column",gap:"0.75rem",margin:"1rem 0" }}>
+                {boMsgs.map(m => (
+                  <div key={m.id} style={{ display:"flex",flexDirection:"column",alignItems:m.is_admin?"flex-end":"flex-start" }}>
+                    <div style={{ maxWidth:"75%",background:m.is_admin?"#1a1816":"#f0ece6",color:m.is_admin?"#f8f7f5":"#1a1816",padding:"0.75rem 1rem",borderRadius:m.is_admin?"8px 0 8px 8px":"0 8px 8px 8px",fontSize:"0.85rem",lineHeight:1.5 }}>
+                      {m.texto}
+                    </div>
+                    <span style={{ fontSize:"0.65rem",color:"#aaa",marginTop:"0.2rem" }}>{m.is_admin?"Nora Grei (admin)":"Lojista"} · {new Date(m.created_at).toLocaleString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</span>
+                  </div>
+                ))}
+              </div>
+              {boTicketAtivo.estado !== "fechado" && (
+                <div style={{ display:"flex",gap:"0.5rem" }}>
+                  <textarea value={boResposta} onChange={e=>setBoResposta(e.target.value)} placeholder="Resposta ao lojista..." rows={3} style={{ flex:1,padding:"0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",resize:"vertical" }}/>
+                  <button onClick={responderTicket} disabled={boEnviando||!boResposta.trim()} style={{ ...BTN("black"),alignSelf:"flex-end",opacity:boEnviando||!boResposta.trim()?0.5:1 }}>Responder</button>
+                </div>
+              )}
+            </div>
+          );
+
+          return (
+            <div>
+              <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1.5rem",flexWrap:"wrap",gap:"0.75rem" }}>
+                <h1 style={{ fontFamily:"var(--sans)",fontSize:"1.6rem",fontWeight:600,margin:0 }}>Suporte Lojistas</h1>
+                <div style={{ display:"flex",gap:"0.4rem" }}>
+                  {[["todos","Todos"],["aberto","Abertos"],["em_curso","Em curso"],["fechado","Fechados"]].map(([v,l]) => (
+                    <button key={v} onClick={()=>setBoFiltro(v)} style={{ padding:"0.35rem 0.75rem",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",background:boFiltro===v?"#1a1816":"none",color:boFiltro===v?"#fff":"#888",border:"1px solid #ddd",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)" }}>{l}</button>
+                  ))}
+                </div>
+              </div>
+              {boTickets === null ? (
+                <p style={{ color:"#888",fontSize:"0.85rem" }}>A carregar…</p>
+              ) : ticketsFiltrados.length === 0 ? (
+                <p style={{ color:"#888",fontSize:"0.85rem" }}>Sem tickets {boFiltro !== "todos" ? EST_LABEL[boFiltro]?.toLowerCase() + "s" : ""}.</p>
+              ) : (
+                <div style={CARD}>
+                  <table style={{ width:"100%",borderCollapse:"collapse" }}>
+                    <thead>
+                      <tr>{["Ref.","Lojista","Assunto","Categoria","Prioridade","Estado","Data"].map(h=><th key={h} style={TH}>{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {ticketsFiltrados.map(tk => (
+                        <tr key={tk.id} onClick={()=>abrirTicketBo(tk)} style={{ cursor:"pointer",borderBottom:"1px solid #f0eeeb",transition:"background 0.1s" }} onMouseEnter={e=>e.currentTarget.style.background="#fafafa"} onMouseLeave={e=>e.currentTarget.style.background=""}>
+                          <td style={TD}><span style={{ fontSize:"0.72rem",fontFamily:"var(--sans)",color:"#888" }}>{tk.referencia}</span></td>
+                          <td style={TD}><span style={{ fontWeight:500 }}>{tk.clientes?.nome || "—"}</span></td>
+                          <td style={{ ...TD,maxWidth:200 }}><span style={{ overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block" }}>{tk.assunto}</span></td>
+                          <td style={TD}><span style={{ fontSize:"0.72rem",color:"#888" }}>{CAT_LABEL[tk.categoria]}</span></td>
+                          <td style={TD}><span style={{ fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:PRIO_COR[tk.prioridade]+"22",color:PRIO_COR[tk.prioridade],padding:"0.15rem 0.4rem",borderRadius:3 }}>{PRIO_LABEL[tk.prioridade]}</span></td>
+                          <td style={TD}><span style={{ fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:EST_COR[tk.estado]+"22",color:EST_COR[tk.estado],padding:"0.15rem 0.4rem",borderRadius:3 }}>{EST_LABEL[tk.estado]}</span></td>
+                          <td style={TD}><span style={{ fontSize:"0.72rem",color:"#aaa" }}>{new Date(tk.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short"})}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           );
         })()}
 

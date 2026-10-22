@@ -702,7 +702,7 @@ const t = {
     verTalao: "Ver talão",
     dataLabel: "Data", metodoLabel: "Método",
     aluguer: "Aluguer", higienizacao: "Higienização", deposito: "Depósito", total: "Total",
-    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", tabCalculadora: "Calculadora", tabNotificacoes: "Notificações", falarLojista: "Falar com o lojista", semNotificacoes: "Sem notificações por agora.", marcarLidas: "Marcar todas como lidas", caucaoLabel: "Caução", popCuriosidade: "Já avaliaste alguma peça hoje que te pode trazer valor?", popCuriosidadeBtn: "Avaliar agora →", calcTitulo: "Quanto vale a tua peça?", calcSub: "Descobre o potencial da tua peça no circuito circular de moda.", calcPrecoLabel: "Valor original da peça (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marca", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "Estado", calcIdadeLabel: "Idade da peça", calcResultado: "Estimativa de retorno", calcVerMais: "Calculadora completa →", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.", erroFoto: "Erro ao guardar foto. Tenta novamente.", erroGeral: "Ocorreu um erro. Tenta novamente.",
+    pago: "✓ Pago", aguardarPagamento: "A aguardar pagamento", mudarPassword: "Alterar password", novaPassword: "Nova password", confirmarPassword: "Confirmar nova password", guardarPassword: "Guardar password", passwordMin: "A password deve ter pelo menos 6 caracteres.", passwordMatch: "As passwords não coincidem.", passwordOk: "Password alterada com sucesso!", passwordErro: "Erro ao alterar. Tenta novamente.", reclamacoes: "Reclamações", novaReclamacao: "Nova reclamação", assunto: "Assunto", mensagem: "Mensagem", enviarReclamacao: "Enviar reclamação", reclamacaoEnviada: "Reclamação enviada! Entraremos em contacto brevemente.", reclamacaoPendente: "Pendente", reclamacaoResolvida: "Resolvida", semReclamacoes: "Sem reclamações.", assuntoPlaceholder: "Ex: Peça danificada, atraso na entrega...", mensagemPlaceholder: "Descreve o problema em detalhe...", avaliacoes: "Avaliações", avaliarExperiencia: "Avalia a tua experiência", avaliacaoEnviada: "Avaliação enviada! Obrigado.", comentarioPlaceholder: "Deixa um comentário (opcional)...", enviarAvaliacao: "Enviar avaliação", tuaAvaliacao: "A tua avaliação", avaliacaoEmpresa: "Avaliação da Nora Grei", semAvaliacoes: "Ainda não tens alugueres concluídos para avaliar.", tabPerfil: "Perfil", tabPedidos: "Pedidos", tabGuardados: "Guardados", tabLoja: "A minha loja", tabMensagens: "Mensagens", tabCalculadora: "Calculadora", tabNotificacoes: "Notificações", falarLojista: "Falar com o lojista", semNotificacoes: "Sem notificações por agora.", marcarLidas: "Marcar todas como lidas", caucaoLabel: "Caução", popCuriosidade: "Já avaliaste alguma peça hoje que te pode trazer valor?", popCuriosidadeBtn: "Avaliar agora →", calcTitulo: "Quanto vale a tua peça?", calcSub: "Descobre o potencial da tua peça no circuito circular de moda.", calcPrecoLabel: "Valor original da peça (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marca", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "Estado", calcIdadeLabel: "Idade da peça", calcResultado: "Estimativa de retorno", calcVerMais: "Calculadora completa →", semPedidos: "Ainda não tens pedidos.", explorarCatalogo: "Explorar catálogo →", pecasGuardadas: "Peças guardadas", semGuardados: "Ainda não guardaste nenhuma peça.", indisponivel: "Indisponível", disponivel: "Disponível", alugada: "Alugada", disponivelEm: "Disponível em", alugar: "Alugar →", reservar: "Reservar →", selecionar: "— Selecionar —", moradaEntrega: "Morada de entrega", moradaVazia: "Não preenchida", documentosIdentidade: "Documentos de identidade", docsVazios: "Não preenchidos", docsDesc: "Necessários para verificação de identidade e caução.", erroFoto: "Erro ao guardar foto. Tenta novamente.", erroGeral: "Ocorreu um erro. Tenta novamente.", tabSuporte: "Suporte", novoTicket: "Novo ticket", semTickets: "Sem tickets de suporte.", ticketAssunto: "Assunto do ticket", ticketCategoria: "Categoria", ticketPrioridade: "Prioridade", ticketMensagem: "Descreve o problema", criarTicket: "Criar ticket", ticketCriado: "Ticket criado com sucesso!", ticketAberto: "Aberto", ticketEmCurso: "Em curso", ticketFechado: "Fechado", prioUrgente: "Urgente", prioNormal: "Normal", prioBaixa: "Baixa", catBug: "Bug técnico", catPagamento: "Pagamento", catConta: "Conta", catStock: "Stock / Peças", catEnvios: "Envios", catOutro: "Outro", enviarResposta: "Enviar resposta", respostaAdmin: "Nora Grei", respostaLojista: "Tu",
     dadosFinanceiros: "Dados financeiros", dadosFinanceirosDesc: "Informação bancária para recebimento dos ganhos e pagamento de serviços Nora Grei.", ibanLabel: "IBAN (para onde são enviados os ganhos)", ibanPlaceholder: "PT50 0000 0000 0000 0000 0000 0", ibanVazio: "IBAN não configurado", ibanValido: "IBAN válido ✓", ibanInvalido: "Formato de IBAN inválido", cartaoLabel: "Cartão de crédito ou débito (pagamento de serviços)", cartaoNumero: "Número do cartão", cartaoNome: "Nome no cartão", cartaoValidade: "Validade (MM/AA)", cartaoVazio: "Cartão não configurado", cartaoValido: "Cartão válido ✓", cartaoInvalido: "Número de cartão inválido", cartaoValidadeInvalida: "Data de validade inválida", cartaoGuardadoFim: "Cartão a terminar em", guardarFinanceiros: "Guardar dados financeiros", navPessoal: "Pessoal", navMorada: "Morada", navDocs: "Documentos", navFinanceiros: "Financeiros", navSeguranca: "Segurança",
   },
   fr: {
@@ -784,7 +784,7 @@ const t = {
     verTalao: "Voir le reçu",
     dataLabel: "Date", metodoLabel: "Méthode",
     aluguer: "Location", higienizacao: "Nettoyage", deposito: "Dépôt", total: "Total",
-    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", tabCalculadora: "Calculatrice", tabNotificacoes: "Notifications", falarLojista: "Contacter la boutique", semNotificacoes: "Aucune notification pour le moment.", marcarLidas: "Tout marquer comme lu", caucaoLabel: "Dépôt", popCuriosidade: "Avez-vous évalué une pièce aujourd'hui qui pourrait vous rapporter ?", popCuriosidadeBtn: "Évaluer maintenant →", calcTitulo: "Combien vaut votre pièce ?", calcSub: "Découvrez le potentiel de votre pièce dans le circuit de mode circulaire.", calcPrecoLabel: "Valeur d'origine (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marque", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "État", calcIdadeLabel: "Âge de la pièce", calcResultado: "Estimation de retour", calcVerMais: "Calculatrice complète →", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.", erroFoto: "Erreur lors de l'enregistrement de la photo. Réessayez.", erroGeral: "Une erreur s'est produite. Réessayez.",
+    pago: "✓ Payé", aguardarPagamento: "En attente de paiement", mudarPassword: "Changer le mot de passe", novaPassword: "Nouveau mot de passe", confirmarPassword: "Confirmer", guardarPassword: "Enregistrer", passwordMin: "Au moins 6 caractères.", passwordMatch: "Les mots de passe ne correspondent pas.", passwordOk: "Mot de passe modifié !", passwordErro: "Erreur. Réessayez.", reclamacoes: "Réclamations", novaReclamacao: "Nouvelle réclamation", assunto: "Sujet", mensagem: "Message", enviarReclamacao: "Envoyer", reclamacaoEnviada: "Réclamation envoyée !", reclamacaoPendente: "En attente", reclamacaoResolvida: "Résolue", semReclamacoes: "Aucune réclamation.", assuntoPlaceholder: "Ex: Article endommagé...", mensagemPlaceholder: "Décrivez le problème...", avaliacoes: "Évaluations", avaliarExperiencia: "Évaluez votre expérience", avaliacaoEnviada: "Évaluation envoyée ! Merci.", comentarioPlaceholder: "Laissez un commentaire (facultatif)...", enviarAvaliacao: "Envoyer", tuaAvaliacao: "Votre évaluation", avaliacaoEmpresa: "Évaluation de Nora Grei", semAvaliacoes: "Pas encore de locations terminées.", tabPerfil: "Profil", tabPedidos: "Commandes", tabGuardados: "Favoris", tabLoja: "Ma boutique", tabMensagens: "Messages", tabCalculadora: "Calculatrice", tabNotificacoes: "Notifications", falarLojista: "Contacter la boutique", semNotificacoes: "Aucune notification pour le moment.", marcarLidas: "Tout marquer comme lu", caucaoLabel: "Dépôt", popCuriosidade: "Avez-vous évalué une pièce aujourd'hui qui pourrait vous rapporter ?", popCuriosidadeBtn: "Évaluer maintenant →", calcTitulo: "Combien vaut votre pièce ?", calcSub: "Découvrez le potentiel de votre pièce dans le circuit de mode circulaire.", calcPrecoLabel: "Valeur d'origine (€)", calcPrecoPlaceholder: "Ex: 350", calcMarcaLabel: "Marque", calcMarcaPlaceholder: "Ex: Gucci, Zara…", calcEstadoLabel: "État", calcIdadeLabel: "Âge de la pièce", calcResultado: "Estimation de retour", calcVerMais: "Calculatrice complète →", semPedidos: "Vous n'avez pas encore de commandes.", explorarCatalogo: "Explorer le catalogue →", pecasGuardadas: "Pièces sauvegardées", semGuardados: "Vous n'avez encore rien sauvegardé.", indisponivel: "Indisponible", disponivel: "Disponible", alugada: "Louée", disponivelEm: "Disponible dans", alugar: "Louer →", reservar: "Réserver →", selecionar: "— Sélectionner —", moradaEntrega: "Adresse de livraison", moradaVazia: "Non renseignée", documentosIdentidade: "Documents d'identité", docsVazios: "Non renseignés", docsDesc: "Nécessaires pour la vérification d'identité et le dépôt.", erroFoto: "Erreur lors de l'enregistrement de la photo. Réessayez.", erroGeral: "Une erreur s'est produite. Réessayez.", tabSuporte: "Support", novoTicket: "Nouveau ticket", semTickets: "Aucun ticket de support.", ticketAssunto: "Sujet du ticket", ticketCategoria: "Catégorie", ticketPrioridade: "Priorité", ticketMensagem: "Décrivez le problème", criarTicket: "Créer le ticket", ticketCriado: "Ticket créé avec succès !", ticketAberto: "Ouvert", ticketEmCurso: "En cours", ticketFechado: "Fermé", prioUrgente: "Urgent", prioNormal: "Normal", prioBaixa: "Basse", catBug: "Bug technique", catPagamento: "Paiement", catConta: "Compte", catStock: "Stock / Pièces", catEnvios: "Livraisons", catOutro: "Autre", enviarResposta: "Envoyer la réponse", respostaAdmin: "Nora Grei", respostaLojista: "Vous",
     dadosFinanceiros: "Données financières", dadosFinanceirosDesc: "Coordonnées bancaires pour la réception des gains et le paiement des services Nora Grei.", ibanLabel: "IBAN (pour recevoir vos gains)", ibanPlaceholder: "FR76 0000 0000 0000 0000 0000 000", ibanVazio: "IBAN non configuré", ibanValido: "IBAN valide ✓", ibanInvalido: "Format IBAN invalide", cartaoLabel: "Carte de crédit ou débit (paiement des services)", cartaoNumero: "Numéro de carte", cartaoNome: "Nom sur la carte", cartaoValidade: "Validité (MM/AA)", cartaoVazio: "Carte non configurée", cartaoValido: "Carte valide ✓", cartaoInvalido: "Numéro de carte invalide", cartaoValidadeInvalida: "Date de validité invalide", cartaoGuardadoFim: "Carte se terminant par", guardarFinanceiros: "Enregistrer les données financières", navPessoal: "Personnel", navMorada: "Adresse", navDocs: "Documents", navFinanceiros: "Finances", navSeguranca: "Sécurité",
   },
   lt: {
@@ -866,7 +866,7 @@ const t = {
     verTalao: "Žiūrėti kvitą",
     dataLabel: "Data", metodoLabel: "Mokėjimo būdas",
     aluguer: "Nuoma", higienizacao: "Valymas", deposito: "Užstatas", total: "Iš viso",
-    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", tabCalculadora: "Skaičiuoklė", tabNotificacoes: "Pranešimai", falarLojista: "Susisiekti su pardavėju", semNotificacoes: "Kol kas nėra pranešimų.", marcarLidas: "Pažymėti visus kaip skaitytus", caucaoLabel: "Užstatas", popCuriosidade: "Ar šiandien įvertinote kokį drabužį, kuris galėtų jums atnešti vertės?", popCuriosidadeBtn: "Įvertinti dabar →", calcTitulo: "Kiek verta jūsų dalis?", calcSub: "Atraskite savo drabužio potencialą aplinkai draugiškoje madoje.", calcPrecoLabel: "Originali drabužio kaina (€)", calcPrecoPlaceholder: "Pvz: 350", calcMarcaLabel: "Prekės ženklas", calcMarcaPlaceholder: "Pvz: Gucci, Zara…", calcEstadoLabel: "Būklė", calcIdadeLabel: "Amžius", calcResultado: "Grąžos įvertinimas", calcVerMais: "Išsami skaičiuoklė →", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.", erroFoto: "Klaida išsaugant nuotrauką. Bandykite dar kartą.", erroGeral: "Įvyko klaida. Bandykite dar kartą.",
+    pago: "✓ Apmokėta", aguardarPagamento: "Laukiama mokėjimo", mudarPassword: "Keisti slaptažodį", novaPassword: "Naujas slaptažodis", confirmarPassword: "Patvirtinti", guardarPassword: "Išsaugoti", passwordMin: "Mažiausiai 6 simboliai.", passwordMatch: "Slaptažodžiai nesutampa.", passwordOk: "Slaptažodis pakeistas!", passwordErro: "Klaida. Bandykite dar kartą.", reclamacoes: "Skundai", novaReclamacao: "Naujas skundas", assunto: "Tema", mensagem: "Žinutė", enviarReclamacao: "Siųsti", reclamacaoEnviada: "Skundas išsiųstas!", reclamacaoPendente: "Laukiama", reclamacaoResolvida: "Išspręsta", semReclamacoes: "Nėra skundų.", assuntoPlaceholder: "Pvz: Sugadintas drabužis...", mensagemPlaceholder: "Aprašykite problemą...", avaliacoes: "Atsiliepimai", avaliarExperiencia: "Įvertinkite savo patirtį", avaliacaoEnviada: "Atsiliepimas išsiųstas!", comentarioPlaceholder: "Palikite komentarą...", enviarAvaliacao: "Siųsti", tuaAvaliacao: "Jūsų įvertinimas", avaliacaoEmpresa: "Nora Grei įvertinimas", semAvaliacoes: "Dar nėra užbaigtų nuomų.", tabPerfil: "Profilis", tabPedidos: "Užsakymai", tabGuardados: "Išsaugoti", tabLoja: "Mano parduotuvė", tabMensagens: "Žinutės", tabCalculadora: "Skaičiuoklė", tabNotificacoes: "Pranešimai", falarLojista: "Susisiekti su pardavėju", semNotificacoes: "Kol kas nėra pranešimų.", marcarLidas: "Pažymėti visus kaip skaitytus", caucaoLabel: "Užstatas", popCuriosidade: "Ar šiandien įvertinote kokį drabužį, kuris galėtų jums atnešti vertės?", popCuriosidadeBtn: "Įvertinti dabar →", calcTitulo: "Kiek verta jūsų dalis?", calcSub: "Atraskite savo drabužio potencialą aplinkai draugiškoje madoje.", calcPrecoLabel: "Originali drabužio kaina (€)", calcPrecoPlaceholder: "Pvz: 350", calcMarcaLabel: "Prekės ženklas", calcMarcaPlaceholder: "Pvz: Gucci, Zara…", calcEstadoLabel: "Būklė", calcIdadeLabel: "Amžius", calcResultado: "Grąžos įvertinimas", calcVerMais: "Išsami skaičiuoklė →", semPedidos: "Dar neturite užsakymų.", explorarCatalogo: "Naršyti katalogą →", pecasGuardadas: "Išsaugoti drabužiai", semGuardados: "Dar nieko neišsaugojote.", indisponivel: "Neprieinama", disponivel: "Prieinama", alugada: "Išnuomota", disponivelEm: "Prieinama po", alugar: "Nuomoti →", reservar: "Rezervuoti →", selecionar: "— Pasirinkti —", moradaEntrega: "Pristatymo adresas", moradaVazia: "Nepildyta", documentosIdentidade: "Tapatybės dokumentai", docsVazios: "Nepildyti", docsDesc: "Reikalingi tapatybės patikrinimui ir užstatui.", erroFoto: "Klaida išsaugant nuotrauką. Bandykite dar kartą.", erroGeral: "Įvyko klaida. Bandykite dar kartą.", tabSuporte: "Pagalba", novoTicket: "Naujas bilietas", semTickets: "Nėra pagalbos bilietų.", ticketAssunto: "Bilieto tema", ticketCategoria: "Kategorija", ticketPrioridade: "Prioritetas", ticketMensagem: "Aprašykite problemą", criarTicket: "Sukurti bilietą", ticketCriado: "Bilietas sėkmingai sukurtas!", ticketAberto: "Atidarytas", ticketEmCurso: "Vykdomas", ticketFechado: "Uždarytas", prioUrgente: "Skubus", prioNormal: "Normalus", prioBaixa: "Žemas", catBug: "Techninis klaida", catPagamento: "Mokėjimas", catConta: "Paskyra", catStock: "Sandėlis / Drabužiai", catEnvios: "Pristatymas", catOutro: "Kita", enviarResposta: "Siųsti atsakymą", respostaAdmin: "Nora Grei", respostaLojista: "Jūs",
     dadosFinanceiros: "Finansiniai duomenys", dadosFinanceirosDesc: "Banko informacija pajamų gavimui ir Nora Grei paslaugų apmokėjimui.", ibanLabel: "IBAN (kur siunčiamos pajamos)", ibanPlaceholder: "LT00 0000 0000 0000 0000", ibanVazio: "IBAN nesukonfigūruotas", ibanValido: "IBAN galioja ✓", ibanInvalido: "Neteisingas IBAN formatas", cartaoLabel: "Kredito arba debeto kortelė (paslaugų apmokėjimas)", cartaoNumero: "Kortelės numeris", cartaoNome: "Vardas ant kortelės", cartaoValidade: "Galioja iki (MM/MM)", cartaoVazio: "Kortelė nesukonfigūruota", cartaoValido: "Kortelė galioja ✓", cartaoInvalido: "Neteisingas kortelės numeris", cartaoValidadeInvalida: "Neteisinga galiojimo data", cartaoGuardadoFim: "Kortelė baigiasi", guardarFinanceiros: "Išsaugoti finansinius duomenis", navPessoal: "Asmeniniai", navMorada: "Adresas", navDocs: "Dokumentai", navFinanceiros: "Finansai", navSeguranca: "Saugumas",
   },
 };
@@ -1239,6 +1239,16 @@ export default function Perfil() {
   const [urlStatus, setUrlStatus] = useState(null); // null | "checking" | "ok" | "taken" | "invalid"
   const [urlCheckTimer, setUrlCheckTimer] = useState(null);
   const [tabLoja, setTabLoja] = useState("dashboard");
+  const [tickets, setTickets] = useState([]);
+  const [ticketAtivo, setTicketAtivo] = useState(null);
+  const [ticketMsgs, setTicketMsgs] = useState([]);
+  const [novoTicketAberto, setNovoTicketAberto] = useState(false);
+  const [tkAssunto, setTkAssunto] = useState("");
+  const [tkCategoria, setTkCategoria] = useState("outro");
+  const [tkPrioridade, setTkPrioridade] = useState("normal");
+  const [tkMensagem, setTkMensagem] = useState("");
+  const [tkResposta, setTkResposta] = useState("");
+  const [tkEnviando, setTkEnviando] = useState(false);
   const [showNovaPeca, setShowNovaPeca] = useState(false);
   const [novaPeca, setNovaPeca] = useState({ nome: "", descricao: "", tipo: "alugar", preco_aluguer_dia: "", preco_venda: "", valor_peca: "", material: "", marca: "", cor: "", categoria: "", condicao: "como_novo", tem_defeito: false, descricao_defeito: "", higienizacao_ativa: false, higienizacao_valor: "", ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }], link_compra_externa: "" });
   const [novaPecaLoading, setNovaPecaLoading] = useState(false);
@@ -3261,7 +3271,7 @@ export default function Perfil() {
             </div>
             {/* Tabs da loja — scroll horizontal no mobile */}
             <div className="tabs-scroll">
-              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["higienizacao","Higienização"],["estatisticas","Estatísticas"],["gerir","Gerir loja"]].map(([key,label]) => (
+              {[["dashboard","Dashboard"],["pecas","Peças"],["alugueres","Alugueres"],["liquidacoes","Liquidações"],["custos","Custos"],["avaliacoes","Avaliações"],["higienizacao","Higienização"],["estatisticas","Estatísticas"],["gerir","Gerir loja"],["suporte",i.tabSuporte]].map(([key,label]) => (
                 <button key={key} onClick={() => setTabLoja(key)} style={{padding:"0.75rem 1rem",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",background:"none",border:"none",borderBottom:tabLoja===key?"2px solid #c4748a":"2px solid transparent",color:tabLoja===key?"#c4748a":"var(--g4)",cursor:"pointer",fontFamily:"var(--sans)",marginBottom:"-2px",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
               ))}
             </div>
@@ -4466,6 +4476,149 @@ export default function Perfil() {
                 })()}
               </div>
             )}
+
+            {tabLoja === "suporte" && (() => {
+              const carregarTickets = async () => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                const { data } = await supabase.from("tickets_lojista").select("*").eq("lojista_id", user.id).order("created_at", { ascending: false });
+                if (data) setTickets(data);
+              };
+              const abrirTicket = async (tk) => {
+                setTicketAtivo(tk);
+                const { data } = await supabase.from("tickets_mensagens").select("*").eq("ticket_id", tk.id).order("created_at", { ascending: true });
+                if (data) setTicketMsgs(data);
+              };
+              const criarNovoTicket = async () => {
+                if (!tkAssunto.trim() || !tkMensagem.trim()) return;
+                setTkEnviando(true);
+                const { data: { user } } = await supabase.auth.getUser();
+                const { data: tk } = await supabase.from("tickets_lojista").insert({ lojista_id: user.id, assunto: tkAssunto, categoria: tkCategoria, prioridade: tkPrioridade, estado: "aberto" }).select().single();
+                if (tk) {
+                  await supabase.from("tickets_mensagens").insert({ ticket_id: tk.id, remetente_id: user.id, texto: tkMensagem, is_admin: false });
+                  setTkAssunto(""); setTkCategoria("outro"); setTkPrioridade("normal"); setTkMensagem("");
+                  setNovoTicketAberto(false);
+                  await carregarTickets();
+                }
+                setTkEnviando(false);
+              };
+              const enviarResposta = async () => {
+                if (!tkResposta.trim() || !ticketAtivo) return;
+                setTkEnviando(true);
+                const { data: { user } } = await supabase.auth.getUser();
+                await supabase.from("tickets_mensagens").insert({ ticket_id: ticketAtivo.id, remetente_id: user.id, texto: tkResposta, is_admin: false });
+                await supabase.from("tickets_lojista").update({ updated_at: new Date().toISOString(), estado: ticketAtivo.estado === "fechado" ? "aberto" : ticketAtivo.estado }).eq("id", ticketAtivo.id);
+                setTkResposta("");
+                const { data } = await supabase.from("tickets_mensagens").select("*").eq("ticket_id", ticketAtivo.id).order("created_at", { ascending: true });
+                if (data) setTicketMsgs(data);
+                setTkEnviando(false);
+              };
+              if (tickets.length === 0 && !novoTicketAberto) carregarTickets();
+              const PRIO_COR = { urgente: "#e74c3c", normal: "#f39c12", baixa: "#3498db" };
+              const PRIO_LABEL = { urgente: i.prioUrgente, normal: i.prioNormal, baixa: i.prioBaixa };
+              const EST_LABEL = { aberto: i.ticketAberto, em_curso: i.ticketEmCurso, fechado: i.ticketFechado };
+              const EST_COR = { aberto: "#e74c3c", em_curso: "#f39c12", fechado: "#27ae60" };
+              const CAT_LABEL = { bug: i.catBug, pagamento: i.catPagamento, conta: i.catConta, stock: i.catStock, envios: i.catEnvios, outro: i.catOutro };
+              return (
+                <div style={{padding:"0 0 3rem"}}>
+                  {ticketAtivo ? (
+                    <div>
+                      <button onClick={() => { setTicketAtivo(null); setTicketMsgs([]); }} style={{background:"none",border:"none",cursor:"pointer",fontSize:"0.78rem",color:"#5a5855",fontFamily:"var(--sans)",letterSpacing:"0.05em",padding:"0 0 1rem",display:"flex",alignItems:"center",gap:"0.4rem"}}>← Todos os tickets</button>
+                      <div className="card" style={{padding:"1.25rem 1.5rem",marginBottom:"1rem"}}>
+                        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:"0.75rem",flexWrap:"wrap"}}>
+                          <div>
+                            <p style={{fontFamily:"var(--serif)",fontSize:"1.05rem",margin:"0 0 0.3rem"}}>{ticketAtivo.assunto}</p>
+                            <p style={{fontSize:"0.72rem",color:"#888",margin:0,letterSpacing:"0.05em"}}>{ticketAtivo.referencia} · {CAT_LABEL[ticketAtivo.categoria]}</p>
+                          </div>
+                          <div style={{display:"flex",gap:"0.4rem",flexShrink:0}}>
+                            <span style={{fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:PRIO_COR[ticketAtivo.prioridade]+"22",color:PRIO_COR[ticketAtivo.prioridade],padding:"0.2rem 0.5rem",borderRadius:3,fontFamily:"var(--sans)"}}>{PRIO_LABEL[ticketAtivo.prioridade]}</span>
+                            <span style={{fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:EST_COR[ticketAtivo.estado]+"22",color:EST_COR[ticketAtivo.estado],padding:"0.2rem 0.5rem",borderRadius:3,fontFamily:"var(--sans)"}}>{EST_LABEL[ticketAtivo.estado]}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:"0.75rem",marginBottom:"1rem"}}>
+                        {ticketMsgs.map(m => (
+                          <div key={m.id} style={{display:"flex",flexDirection:"column",alignItems:m.is_admin?"flex-start":"flex-end"}}>
+                            <div style={{maxWidth:"80%",background:m.is_admin?"#f0ece6":"#1a1816",color:m.is_admin?"#1a1816":"#f8f7f5",padding:"0.75rem 1rem",borderRadius:m.is_admin?"0 8px 8px 8px":"8px 0 8px 8px",fontSize:"0.85rem",lineHeight:1.5}}>
+                              {m.texto}
+                            </div>
+                            <span style={{fontSize:"0.65rem",color:"#aaa",marginTop:"0.2rem"}}>{m.is_admin ? i.respostaAdmin : i.respostaLojista} · {new Date(m.created_at).toLocaleDateString(lang==="pt"?"pt-PT":lang==="fr"?"fr-FR":"lt-LT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {ticketAtivo.estado !== "fechado" && (
+                        <div style={{display:"flex",gap:"0.5rem"}}>
+                          <textarea value={tkResposta} onChange={e=>setTkResposta(e.target.value)} placeholder={i.ticketMensagem} rows={3} style={{flex:1,padding:"0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",resize:"vertical"}}/>
+                          <button onClick={enviarResposta} disabled={tkEnviando||!tkResposta.trim()} style={{padding:"0.75rem 1rem",background:"#1a1816",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",alignSelf:"flex-end",opacity:tkEnviando||!tkResposta.trim()?0.5:1}}>{i.enviarResposta}</button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.25rem"}}>
+                        <p style={{fontFamily:"var(--serif)",fontSize:"1.1rem",margin:0}}>{i.tabSuporte}</p>
+                        <button onClick={() => setNovoTicketAberto(v=>!v)} style={{padding:"0.5rem 1rem",background:"#1a1816",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase"}}>{i.novoTicket}</button>
+                      </div>
+                      {novoTicketAberto && (
+                        <div className="card" style={{padding:"1.5rem",marginBottom:"1.25rem"}}>
+                          <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
+                            <div>
+                              <label style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",fontFamily:"var(--sans)",display:"block",marginBottom:"0.3rem"}}>{i.ticketAssunto}</label>
+                              <input value={tkAssunto} onChange={e=>setTkAssunto(e.target.value)} placeholder="Ex: Erro ao publicar peça" style={{width:"100%",padding:"0.6rem 0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",boxSizing:"border-box"}}/>
+                            </div>
+                            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.75rem"}}>
+                              <div>
+                                <label style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",fontFamily:"var(--sans)",display:"block",marginBottom:"0.3rem"}}>{i.ticketCategoria}</label>
+                                <select value={tkCategoria} onChange={e=>setTkCategoria(e.target.value)} style={{width:"100%",padding:"0.6rem 0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",boxSizing:"border-box"}}>
+                                  {[["bug",i.catBug],["pagamento",i.catPagamento],["conta",i.catConta],["stock",i.catStock],["envios",i.catEnvios],["outro",i.catOutro]].map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",fontFamily:"var(--sans)",display:"block",marginBottom:"0.3rem"}}>{i.ticketPrioridade}</label>
+                                <select value={tkPrioridade} onChange={e=>setTkPrioridade(e.target.value)} style={{width:"100%",padding:"0.6rem 0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",boxSizing:"border-box"}}>
+                                  <option value="urgente">🔴 {i.prioUrgente}</option>
+                                  <option value="normal">🟡 {i.prioNormal}</option>
+                                  <option value="baixa">🔵 {i.prioBaixa}</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div>
+                              <label style={{fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#888",fontFamily:"var(--sans)",display:"block",marginBottom:"0.3rem"}}>{i.ticketMensagem}</label>
+                              <textarea value={tkMensagem} onChange={e=>setTkMensagem(e.target.value)} rows={4} style={{width:"100%",padding:"0.6rem 0.75rem",border:"1px solid #ddd",borderRadius:4,fontFamily:"var(--sans)",fontSize:"0.85rem",resize:"vertical",boxSizing:"border-box"}}/>
+                            </div>
+                            <div style={{display:"flex",gap:"0.5rem",justifyContent:"flex-end"}}>
+                              <button onClick={()=>setNovoTicketAberto(false)} style={{padding:"0.5rem 1rem",background:"none",border:"1px solid #ddd",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#5a5855"}}>Cancelar</button>
+                              <button onClick={criarNovoTicket} disabled={tkEnviando||!tkAssunto.trim()||!tkMensagem.trim()} style={{padding:"0.5rem 1rem",background:"#c4748a",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",opacity:tkEnviando||!tkAssunto.trim()||!tkMensagem.trim()?0.5:1}}>{tkEnviando?"…":i.criarTicket}</button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {tickets.length === 0 ? (
+                        <div style={{textAlign:"center",padding:"3rem 1rem",color:"#9c9894"}}>
+                          <p style={{fontSize:"0.85rem"}}>{i.semTickets}</p>
+                        </div>
+                      ) : (
+                        <div className="card" style={{padding:0,overflow:"hidden"}}>
+                          {tickets.map((tk,idx) => (
+                            <div key={tk.id} onClick={()=>abrirTicket(tk)} style={{padding:"1rem 1.5rem",borderBottom:idx<tickets.length-1?"1px solid #f0ece6":"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem"}}>
+                              <div style={{flex:1,minWidth:0}}>
+                                <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.2rem",flexWrap:"wrap"}}>
+                                  <span style={{fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:PRIO_COR[tk.prioridade]+"22",color:PRIO_COR[tk.prioridade],padding:"0.15rem 0.4rem",borderRadius:3,fontFamily:"var(--sans)",flexShrink:0}}>{PRIO_LABEL[tk.prioridade]}</span>
+                                  <span style={{fontSize:"0.65rem",color:"#aaa",fontFamily:"var(--sans)"}}>{tk.referencia}</span>
+                                </div>
+                                <p style={{fontFamily:"var(--serif)",fontSize:"0.9rem",margin:"0 0 0.15rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{tk.assunto}</p>
+                                <p style={{fontSize:"0.72rem",color:"#888",margin:0,fontFamily:"var(--sans)"}}>{CAT_LABEL[tk.categoria]} · {new Date(tk.created_at).toLocaleDateString(lang==="pt"?"pt-PT":lang==="fr"?"fr-FR":"lt-LT",{day:"2-digit",month:"short",year:"numeric"})}</p>
+                              </div>
+                              <span style={{fontSize:"0.65rem",letterSpacing:"0.1em",textTransform:"uppercase",background:EST_COR[tk.estado]+"22",color:EST_COR[tk.estado],padding:"0.2rem 0.5rem",borderRadius:3,fontFamily:"var(--sans)",flexShrink:0}}>{EST_LABEL[tk.estado]}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
       {modalEnvio && (
