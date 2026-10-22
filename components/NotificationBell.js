@@ -21,6 +21,8 @@ const TXT = {
     campanhaMsg: (titulo) => `${titulo}`,
     novoAluguerTitulo: "Novo aluguer",
     novoAluguerMsg: (nome, cliente) => `"${nome}" pedido por ${cliente}. Confirma ou recusa.`,
+    novaVendaTitulo: "Nova venda",
+    novaVendaMsg: (nome, cliente) => `"${nome}" comprada por ${cliente}. Confirma o envio.`,
     devolucaoTitulo: "Devolução a verificar",
     devolucaoMsg: (nome) => `"${nome}" foi devolvida. Confirma o estado da peça.`,
     liquidacaoTitulo: "Liquidação disponível",
@@ -47,6 +49,8 @@ const TXT = {
     campanhaMsg: (titulo) => `${titulo}`,
     novoAluguerTitulo: "Nouvelle location",
     novoAluguerMsg: (nome, cliente) => `"${nome}" demandée par ${cliente}. Confirmez ou refusez.`,
+    novaVendaTitulo: "Nouvelle vente",
+    novaVendaMsg: (nome, cliente) => `"${nome}" achetée par ${cliente}. Confirmez l'expédition.`,
     devolucaoTitulo: "Retour à vérifier",
     devolucaoMsg: (nome) => `"${nome}" a été retournée. Vérifiez l'état de la pièce.`,
     liquidacaoTitulo: "Liquidation disponible",
@@ -73,6 +77,8 @@ const TXT = {
     campanhaMsg: (titulo) => `${titulo}`,
     novoAluguerTitulo: "Nauja nuoma",
     novoAluguerMsg: (nome, cliente) => `"${nome}" užsakė ${cliente}. Patvirtinkite arba atmeskite.`,
+    novaVendaTitulo: "Naujas pardavimas",
+    novaVendaMsg: (nome, cliente) => `"${nome}" nupirko ${cliente}. Patvirtinkite siuntimą.`,
     devolucaoTitulo: "Grąžinimas tikrinimui",
     devolucaoMsg: (nome) => `"${nome}" buvo grąžinta. Patikrinkite daikto būklę.`,
     liquidacaoTitulo: "Išmoka prieinama",
@@ -198,16 +204,17 @@ export default function NotificationBell({ lang = "pt" }) {
   const carregarAlertasLojista = async (lojista_id) => {
     const alertas = [];
 
-    // 1. Alugueres novos (pendente) — precisam confirmação
+    // 1. Alugueres e vendas novos (pendente) — precisam confirmação
     const { data: pendentes } = await supabase
       .from("alugueres_lojista")
-      .select("id, estado, created_at, pecas_lojista(nome), clientes(nome)")
+      .select("id, estado, tipo_transacao, created_at, pecas_lojista(nome), clientes(nome)")
       .eq("lojista_id", lojista_id)
       .eq("estado", "pendente")
       .order("created_at", { ascending: false })
-      .limit(5);
+      .limit(10);
     (pendentes || []).forEach(a => alertas.push({
-      id: `aluguer-${a.id}`, tipo: "novo_aluguer",
+      id: `aluguer-${a.id}`,
+      tipo: a.tipo_transacao === "venda" ? "nova_venda" : "novo_aluguer",
       nome: a.pecas_lojista?.nome || "Peça", cliente: a.clientes?.nome || "Cliente",
       created_at: a.created_at, href: "/perfil?tab=loja&subtab=alugueres",
     }));
@@ -435,6 +442,13 @@ export default function NotificationBell({ lang = "pt" }) {
                   <a key={a.id} href={a.href} onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f0f7ff", textDecoration: "none" }}>
                     <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>📦 {i.novoAluguerTitulo}</div>
                     <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.novoAluguerMsg(a.nome, a.cliente)}</div>
+                    <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
+                  </a>
+                );
+                if (a.tipo === "nova_venda") return (
+                  <a key={a.id} href={a.href} onClick={() => setAberto(false)} style={{ display: "block", padding: "0.9rem 1.1rem", borderBottom: "1px solid #f0eeeb", background: "#f5f0ff", textDecoration: "none" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#080808", marginBottom: "0.2rem" }}>🛍 {i.novaVendaTitulo}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#3f3e3c", lineHeight: 1.4 }}>{i.novaVendaMsg(a.nome, a.cliente)}</div>
                     <div style={{ fontSize: "0.62rem", color: "#aaa89f", marginTop: "0.3rem" }}>{data}</div>
                   </a>
                 );
