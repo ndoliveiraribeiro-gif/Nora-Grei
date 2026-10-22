@@ -532,6 +532,7 @@ export default function PublicarPage() {
   const [fotos, setFotos] = useState([]);
   const [peca, setPeca] = useState(PECA_VAZIA);
   const [enviando, setEnviando] = useState(false);
+  const [marcaSugestoes, setMarcaSugestoes] = useState([]);
   const [progresso, setProgresso] = useState("");
   const [erro, setErro] = useState("");
   const [pecaCriada, setPecaCriada] = useState(null);
@@ -653,6 +654,14 @@ export default function PublicarPage() {
     img.src = url;
   });
   const setP = (k, v) => setPeca(prev => ({ ...prev, [k]: v }));
+
+  const TODAS_MARCAS_PUB = [...new Set([...MARCAS_PREMIUM, ...MARCAS_ALTA])];
+  const handleMarcaChange = (val) => {
+    setP("marca", val);
+    if (val.length < 1) { setMarcaSugestoes([]); return; }
+    const q = val.toLowerCase();
+    setMarcaSugestoes(TODAS_MARCAS_PUB.filter(m => m.toLowerCase().includes(q)).slice(0, 6));
+  };
 
   // Obter dicionário da língua activa
   const tl = T[lang] || T.pt;
@@ -1058,9 +1067,29 @@ export default function PublicarPage() {
                   <label className="pub-label">{tl.nomeLabel}</label>
                   <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder={tl.nomePlaceholder} />
                 </div>
-                <div className="pub-fg">
+                <div className="pub-fg" style={{position:"relative"}}>
                   <label className="pub-label">{tl.marcaLabel}</label>
-                  <input className="pub-input" value={peca.marca} onChange={e => setP("marca", e.target.value)} placeholder={tl.marcaPlaceholder} />
+                  <input
+                    className="pub-input"
+                    value={peca.marca}
+                    onChange={e => handleMarcaChange(e.target.value)}
+                    onBlur={() => setTimeout(() => setMarcaSugestoes([]), 150)}
+                    placeholder={tl.marcaPlaceholder}
+                    autoComplete="off"
+                  />
+                  {marcaSugestoes.length > 0 && (
+                    <div style={{position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1px solid #e2dfda",zIndex:50,boxShadow:"0 4px 16px rgba(0,0,0,0.08)"}}>
+                      {marcaSugestoes.map(m => (
+                        <div
+                          key={m}
+                          onMouseDown={() => { setP("marca", m); setMarcaSugestoes([]); }}
+                          style={{padding:"0.65rem 1rem",fontSize:"0.88rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",borderBottom:"1px solid #f0eeeb",textTransform:"capitalize"}}
+                          onMouseEnter={e => e.currentTarget.style.background="#f8f7f5"}
+                          onMouseLeave={e => e.currentTarget.style.background="#fff"}
+                        >{m}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="pub-fg">
                   <label className="pub-label" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
