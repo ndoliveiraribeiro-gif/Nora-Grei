@@ -34,10 +34,12 @@ html {
 input, select, textarea {
   color-scheme: light;
   color: #1a1816;
+  -webkit-text-fill-color: #1a1816;
   background-color: #fff;
 }
 input::placeholder, textarea::placeholder {
   color: #7a776f;
+  -webkit-text-fill-color: #7a776f;
   opacity: 1;
 }
 
