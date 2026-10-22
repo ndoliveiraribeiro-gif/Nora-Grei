@@ -3,6 +3,54 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import ChatWidget from "@/components/ChatWidget";
 
+function ModalPrecoLanding({ peca, lang, onClose }) {
+  const base = peca.preco_aluguer_dia || 0;
+  const taxa = base > 0 ? Math.ceil(base / 0.90) - base : 0;
+  const total = Math.ceil(base / 0.90);
+  const T = {
+    pt:{ titulo:"Detalhes do preço", peca:"Preço da peça", taxa:"Taxa de serviço e proteção", envio:"Envio", envioSub:"A calcular no pagamento", total:"Total", fechar:"OK, fechar", dia:"/dia", escudo:"Proteção Nora Grei — transações seguras e política de reembolso." },
+    fr:{ titulo:"Détails du prix", peca:"Prix de l'article", taxa:"Frais de service et protection", envio:"Livraison", envioSub:"Calculés au paiement", total:"Total", fechar:"OK, fermer", dia:"/jour", escudo:"Protection Nora Grei — transactions sécurisées et politique de remboursement." },
+    lt:{ titulo:"Kainos detalės", peca:"Prekės kaina", taxa:"Paslaugų ir apsaugos mokestis", envio:"Pristatymas", envioSub:"Skaičiuojama mokėjimo metu", total:"Iš viso", fechar:"Gerai, uždaryti", dia:"/d.", escudo:"Nora Grei apsauga — saugios operacijos ir grąžinimo politika." },
+  };
+  const t = T[lang] || T.pt;
+  return (
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:"8px",width:"100%",maxWidth:"420px",padding:"1.5rem",position:"relative",fontFamily:"'Jost',sans-serif"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"1.25rem"}}>
+          <span style={{fontSize:"1rem",fontWeight:600,color:"#111"}}>{t.titulo}</span>
+          <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.25rem",color:"#8a8783",lineHeight:1,padding:"0.25rem"}}>✕</button>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.9rem"}}>
+          <div style={{width:"40px",height:"40px",borderRadius:"4px",background:"#e8e5e0",overflow:"hidden",flexShrink:0}}>
+            {peca.fotos?.[0] && <img src={peca.fotos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{peca.nome}</div>
+            <div style={{fontSize:"0.85rem",color:"#555",marginTop:"0.15rem"}}>{base}€{t.dia}</div>
+          </div>
+        </div>
+        <hr style={{border:"none",borderTop:"1px solid #e8e5e0",marginBottom:"0.9rem"}}/>
+        <div style={{display:"flex",alignItems:"flex-start",gap:"0.75rem",marginBottom:"0.9rem"}}>
+          <div style={{width:"32px",height:"32px",borderRadius:"50%",background:"#e8f4f0",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:"1rem"}}>🛡</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{t.taxa}</div>
+            <div style={{fontSize:"0.85rem",color:"#555",marginTop:"0.15rem"}}>{taxa}€{t.dia}</div>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"flex-start",gap:"0.75rem",marginBottom:"1rem"}}>
+          <div style={{width:"32px",height:"32px",borderRadius:"50%",background:"#e8f0f8",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:"1rem"}}>📦</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:"0.85rem",color:"#111",fontWeight:500}}>{t.envio}</div>
+            <div style={{fontSize:"0.78rem",color:"#8a8783",marginTop:"0.1rem"}}>{t.envioSub}</div>
+          </div>
+        </div>
+        <p style={{fontSize:"0.75rem",color:"#8a8783",lineHeight:1.5,marginBottom:"1.25rem"}}>{t.escudo}</p>
+        <button onClick={onClose} style={{width:"100%",padding:"0.9rem",background:"#100c0a",color:"#f8f7f5",border:"none",borderRadius:"4px",fontSize:"0.85rem",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif",fontWeight:500,cursor:"pointer"}}>{t.fechar}</button>
+      </div>
+    </div>
+  );
+}
+
 const T = {
   pt: {
     nav: { catalogo: "Colecção", lojas: "Lojistas", comoFunciona: "Como funciona", entrar: "Entrar", pedidos: "Pedidos", perfil: "Perfil" },
@@ -402,6 +450,7 @@ export default function Home() {
   const [videoComSom, setVideoComSom] = useState(false);
   const [simVal, setSimVal] = useState(400);
   const [pecasDestaque, setPecasDestaque] = useState([]);
+  const [modalPrecoPeca, setModalPrecoPeca] = useState(null);
   const [campanha, setCampanha] = useState(null);
   const [pwaBanner, setPwaBanner] = useState(false);
   const [pwaPrompt, setPwaPrompt] = useState(null);
@@ -1192,9 +1241,9 @@ export default function Home() {
                           <span style={{fontFamily:"var(--sans)",fontSize:"1.1rem",fontWeight:600,color:"#111"}}>{peca.preco_aluguer_dia}€</span>
                           <span style={{fontFamily:"var(--sans)",fontSize:"0.68rem",color:"#b0ada6",fontWeight:300}}>/dia</span>
                         </div>
-                        <div style={{fontFamily:"var(--sans)",fontSize:"0.72rem",color:"#888",marginTop:"0.1rem"}}>
-                          {Math.ceil(peca.preco_aluguer_dia / 0.90)}€/dia incl. proteção
-                        </div>
+                        <button onClick={e=>{e.preventDefault();setModalPrecoPeca(peca);}} style={{background:"none",border:"none",padding:0,cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.72rem",color:"#888",marginTop:"0.1rem",textDecoration:"underline dotted",textUnderlineOffset:"2px",display:"flex",alignItems:"center",gap:"0.25rem"}}>
+                          {Math.ceil(peca.preco_aluguer_dia / 0.90)}€/dia incl. 🛡
+                        </button>
                       </div>
                     </div>
                   </a>
@@ -1390,6 +1439,7 @@ export default function Home() {
         </div>
       </footer>
 
+      {modalPrecoPeca && <ModalPrecoLanding peca={modalPrecoPeca} lang={lang} onClose={()=>setModalPrecoPeca(null)} />}
       <ChatWidget lang={lang} />
     </>
   );
