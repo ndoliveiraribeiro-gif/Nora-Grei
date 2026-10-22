@@ -98,7 +98,8 @@ export default function Admin() {
 
   // LOJISTAS
   const [alugueresLojista, setAlugueresLojista] = useState([]);
-  const [subTabLojistas, setSubTabLojistas] = useState("depositos");
+  const [subTabLojistas, setSubTabLojistas] = useState("candidaturas");
+  const [candidaturas, setCandidaturas] = useState([]);
 
   // RESERVAS
   const [reservas, setReservas] = useState([]);
@@ -201,6 +202,8 @@ export default function Admin() {
     if (tab === "lojistas") {
       const { data } = await supabase.from("alugueres_lojista").select("*, clientes!alugueres_lojista_cliente_id_fkey(nome, email, telefone), lojista:clientes!alugueres_lojista_lojista_id_fkey(nome, email, codigo_cliente), pecas_lojista(nome, preco_aluguer_dia)").order("created_at", { ascending: false });
       if (data) setAlugueresLojista(data);
+      const { data: cands } = await supabase.from("clientes").select("id, nome, email, telefone, nome_publico, descricao_loja, morada, numero_porta, codigo_postal, cidade, nif, iban, created_at").eq("lojista_pendente", true).eq("lojista", false).order("created_at", { ascending: false });
+      if (cands) setCandidaturas(cands);
     }
     if (tab === "clientes") {
       const { data } = await supabase.from("clientes").select("*").order("created_at", { ascending: false });
@@ -869,12 +872,37 @@ export default function Admin() {
               </div>
               {/* sub-tabs */}
               <div style={{display:"flex",gap:"0.5rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
-                {[["depositos",`Depósitos a devolver (${depositos.length})`],["pagamentos",`Pagamentos pendentes (${pagamentos.length})`],["disputas",`Disputas (${disputas.length})`],["todos","Todos os alugueres"]].map(([k,l])=>(
+                {[["candidaturas",`Candidaturas (${candidaturas.length})`],["depositos",`Depósitos a devolver (${depositos.length})`],["pagamentos",`Pagamentos pendentes (${pagamentos.length})`],["disputas",`Disputas (${disputas.length})`],["todos","Todos os alugueres"]].map(([k,l])=>(
                   <button key={k} onClick={()=>setSubTabLojistas(k)} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1rem",border:"1.5px solid",borderColor:subTabLojistas===k?"#080808":"#e2dfda",background:subTabLojistas===k?"#080808":"transparent",color:subTabLojistas===k?"#fff":"#5a5855",cursor:"pointer",fontFamily:"inherit"}}>{l}</button>
                 ))}
               </div>
-              {/* lista */}
-              {(()=>{
+              {/* candidaturas pendentes */}
+              {subTabLojistas === "candidaturas" && (
+                candidaturas.length === 0
+                  ? <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"#888"}}>Nenhuma candidatura pendente.</p>
+                  : <div style={{display:"flex",flexDirection:"column",gap:"0"}}>
+                      {candidaturas.map(c => (
+                        <div key={c.id} style={{padding:"1.25rem 1.5rem",borderBottom:"1px solid #f0eeeb",background:"#fff"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:"1rem",flexWrap:"wrap"}}>
+                            <div>
+                              <div style={{fontFamily:"var(--sans)",fontSize:"0.95rem",fontWeight:600,marginBottom:"0.15rem"}}>{c.nome_publico || c.nome}</div>
+                              <div style={{fontSize:"0.72rem",color:"#5a5855",marginBottom:"0.1rem"}}>{c.email} {c.telefone ? `· ${c.telefone}` : ""}</div>
+                              {c.descricao_loja && <div style={{fontSize:"0.78rem",color:"#7a7673",marginBottom:"0.1rem",fontStyle:"italic"}}>"{c.descricao_loja}"</div>}
+                              <div style={{fontSize:"0.72rem",color:"#5a5855"}}>{[c.morada,c.numero_porta,c.codigo_postal,c.cidade].filter(Boolean).join(", ")}</div>
+                              <div style={{fontSize:"0.7rem",color:"#999",marginTop:"0.15rem"}}>NIF: {c.nif||"—"} · IBAN: {c.iban||"—"}</div>
+                              <div style={{fontSize:"0.68rem",color:"#bbb",marginTop:"0.1rem"}}>Candidatura em {new Date(c.created_at).toLocaleDateString("pt-PT")}</div>
+                            </div>
+                            <div style={{display:"flex",gap:"0.5rem",flexDirection:"column",alignItems:"flex-end"}}>
+                              <button onClick={async()=>{await supabase.from("clientes").update({lojista:true,lojista_pendente:false}).eq("id",c.id);carregarDados();}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1.1rem",background:"#27ae60",color:"#fff",border:"none",cursor:"pointer",fontFamily:"inherit"}}>✓ Aprovar</button>
+                              <button onClick={async()=>{if(confirm(`Rejeitar candidatura de ${c.nome}?`)){await supabase.from("clientes").update({lojista_pendente:false}).eq("id",c.id);carregarDados();}}} style={{fontSize:"0.75rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.45rem 1.1rem",background:"none",border:"1.5px solid #e74c3c",color:"#e74c3c",cursor:"pointer",fontFamily:"inherit"}}>✕ Rejeitar</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+              )}
+              {/* lista alugueres */}
+              {subTabLojistas !== "candidaturas" && (()=>{
                 const lista = subTabLojistas==="depositos" ? depositos : subTabLojistas==="pagamentos" ? pagamentos : subTabLojistas==="disputas" ? disputas : alugueresLojista;
                 if (lista.length === 0) return <p style={{padding:"2rem",textAlign:"center",fontSize:"0.85rem",color:"#888"}}>Nenhum registo.</p>;
                 return (
