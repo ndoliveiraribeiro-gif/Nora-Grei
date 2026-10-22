@@ -73,6 +73,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
   const [aSegui, setASegui] = useState(false);
   const [seguirLoading, setSeguirLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [voltarUrl, setVoltarUrl] = useState("/lojas");
 
   useEffect(() => {
     const saved = localStorage.getItem("ng_lang");
@@ -81,6 +82,17 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
       carregarAvaliacoes(loja.id);
       carregarSeguir(loja.id);
     }
+    // Detectar origem para o botão voltar
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const from = params.get("from");
+      if (from === "perfil") { setVoltarUrl("/perfil"); return; }
+      if (from === "mensagens") { setVoltarUrl("/mensagens"); return; }
+      const ref = document.referrer;
+      if (ref && ref.includes("/perfil")) setVoltarUrl("/perfil");
+      else if (ref && ref.includes("/mensagens")) setVoltarUrl("/mensagens");
+      else if (ref && ref.includes("/dashboard")) setVoltarUrl("/perfil");
+    } catch {}
   }, [loja?.id]);
 
   const carregarAvaliacoes = async (lojistaId) => {
@@ -135,11 +147,16 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
   const nomeVis = loja?.nome_publico || loja?.nome;
   const initials = nomeVis ? nomeVis.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "NG";
   const anoMembro = loja?.created_at ? new Date(loja.created_at).getFullYear() : null;
+  const voltarLabel = voltarUrl === "/perfil"
+    ? {pt:"← Perfil",fr:"← Profil",lt:"← Profilis"}[lang]||"← Perfil"
+    : voltarUrl === "/mensagens"
+    ? {pt:"← Mensagens",fr:"← Messages",lt:"← Žinutės"}[lang]||"← Mensagens"
+    : t.voltar;
 
   if (!loja) return (
     <div style={{minHeight:"100svh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"1rem",fontFamily:"'Jost',sans-serif",color:"#5a5855"}}>
       <p style={{fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>{t.notFound}</p>
-      <a href="/lojas" style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>{t.voltar}</a>
+      <a href={voltarUrl} style={{fontSize:"0.65rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#c4748a",textDecoration:"none"}}>{voltarLabel}</a>
     </div>
   );
 
@@ -208,7 +225,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
       `}</style>
 
       <div className="loja-header">
-        <a href="/lojas" className="loja-header-voltar">{t.voltar}</a>
+        <a href={voltarUrl} className="loja-header-voltar">{voltarLabel}</a>
         <div className="loja-header-deco">NG</div>
         <div className="loja-header-inner">
           <div className="loja-avatar-lg">

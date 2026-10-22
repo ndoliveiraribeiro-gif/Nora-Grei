@@ -1222,6 +1222,7 @@ export default function Perfil() {
   const [lang, setLang] = useState("pt");
   const [modoLojista, setModoLojista] = useState(false);
   const [tabAtiva, setTabAtiva] = useState("perfil");
+  const [menuAberto, setMenuAberto] = useState(false);
   const [naoLidasMsg, setNaoLidasMsg] = useState(0);
   const [popCuriosidadeVisto, setPopCuriosidadeVisto] = useState(false);
   const [pecasLoja, setPecasLoja] = useState([]);
@@ -2073,6 +2074,65 @@ export default function Perfil() {
         }
       `}</style>
 
+      {/* DRAWER DE NAVEGAÇÃO RÁPIDA */}
+      {menuAberto && (
+        <div onClick={() => setMenuAberto(false)} style={{position:"fixed",inset:0,background:"rgba(10,8,6,0.55)",zIndex:3000,backdropFilter:"blur(2px)"}}>
+          <div onClick={e => e.stopPropagation()} style={{position:"fixed",top:0,right:0,bottom:0,width:"min(320px,85vw)",background:"#faf9f7",display:"flex",flexDirection:"column",boxShadow:"-8px 0 32px rgba(0,0,0,0.18)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"1.25rem 1.5rem",borderBottom:"1px solid #ece8e2"}}>
+              <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.1rem",letterSpacing:"0.05em",color:"#1a1816"}}>Nora Grei</span>
+              <button onClick={() => setMenuAberto(false)} style={{background:"none",border:"none",cursor:"pointer",color:"#888",fontSize:"1.4rem",lineHeight:1,padding:"0.2rem"}}>✕</button>
+            </div>
+            <div style={{overflowY:"auto",flex:1,padding:"1rem 0"}}>
+              {/* Secções do perfil */}
+              <div style={{padding:"0.4rem 1.5rem 0.6rem",fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#aaa",fontFamily:"var(--sans)"}}>
+                {{pt:"O teu espaço",fr:"Ton espace",lt:"Tavo erdvė"}[lang]||"O teu espaço"}
+              </div>
+              {[
+                {id:"perfil", icon:"👤", label:i.tabPerfil},
+                {id:"pedidos", icon:"📦", label:i.tabPedidos, badge: alugueresAtivos.length > 0 ? alugueresAtivos.length : null},
+                {id:"guardados", icon:"♡", label:i.tabGuardados, badge: wishlistPecas.length > 0 ? wishlistPecas.length : null},
+                {id:"ganhos", icon:"€", label:{pt:"Ganhos",fr:"Gains",lt:"Pajamos"}[lang]||"Ganhos"},
+                {id:"calculadora", icon:"✦", label:i.tabCalculadora},
+                ...(modoLojista ? [{id:"loja", icon:"🏪", label:i.tabLoja}] : []),
+              ].map(item => (
+                <button key={item.id} onClick={() => { setTabAtiva(item.id); if(item.id==="loja") setTabLoja("dashboard"); setMenuAberto(false); window.scrollTo({top:0,behavior:"smooth"}); }}
+                  style={{display:"flex",alignItems:"center",gap:"0.85rem",width:"100%",padding:"0.85rem 1.5rem",background:tabAtiva===item.id?"#f0ece6":"none",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.82rem",letterSpacing:"0.08em",color:tabAtiva===item.id?"#1a1816":"#5a5855",textAlign:"left",transition:"background 0.15s",borderLeft:tabAtiva===item.id?"3px solid #c4748a":"3px solid transparent"}}>
+                  <span style={{fontSize:"0.9rem",width:"1.1rem",textAlign:"center",flexShrink:0}}>{item.icon}</span>
+                  <span style={{flex:1}}>{item.label}</span>
+                  {item.badge && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.65rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600,minWidth:"1.2rem",textAlign:"center"}}>{item.badge}</span>}
+                </button>
+              ))}
+              <a href="/mensagens" style={{display:"flex",alignItems:"center",gap:"0.85rem",width:"100%",padding:"0.85rem 1.5rem",border:"none",cursor:"pointer",fontFamily:"var(--sans)",fontSize:"0.82rem",letterSpacing:"0.08em",color:"#5a5855",textDecoration:"none",borderLeft:"3px solid transparent"}}>
+                <span style={{fontSize:"0.9rem",width:"1.1rem",textAlign:"center",flexShrink:0}}>✉</span>
+                <span style={{flex:1}}>{i.tabMensagens}</span>
+                {naoLidasMsg > 0 && <span style={{background:"#c4748a",color:"#fff",fontSize:"0.65rem",padding:"0.1rem 0.4rem",borderRadius:"10px",fontWeight:600}}>{naoLidasMsg}</span>}
+              </a>
+              {/* Explorar */}
+              <div style={{padding:"0.4rem 1.5rem 0.6rem",fontSize:"0.62rem",letterSpacing:"0.18em",textTransform:"uppercase",color:"#aaa",fontFamily:"var(--sans)",marginTop:"0.75rem",borderTop:"1px solid #ece8e2",paddingTop:"1rem"}}>
+                {{pt:"Explorar",fr:"Explorer",lt:"Naršyti"}[lang]||"Explorar"}
+              </div>
+              {[
+                {href:"/catalogo", icon:"◈", label:{pt:"Catálogo",fr:"Catalogue",lt:"Katalogas"}[lang]||"Catálogo"},
+                {href:"/publicar", icon:"+", label:{pt:"Publicar peça",fr:"Publier une pièce",lt:"Publikuoti"}[lang]||"Publicar peça"},
+                {href:"/feed", icon:"◎", label:"Feed"},
+                {href:"/lojas", icon:"◫", label:{pt:"Lojistas",fr:"Boutiques",lt:"Parduotuvės"}[lang]||"Lojistas"},
+                ...(modoLojista && codigoLoja ? [{href:`/loja/${codigoLoja}?from=perfil`, icon:"→", label:{pt:"Ver a minha loja",fr:"Voir ma boutique",lt:"Mano parduotuvė"}[lang]||"Ver a minha loja"}] : []),
+              ].map(item => (
+                <a key={item.href} href={item.href} style={{display:"flex",alignItems:"center",gap:"0.85rem",width:"100%",padding:"0.85rem 1.5rem",fontFamily:"var(--sans)",fontSize:"0.82rem",letterSpacing:"0.08em",color:"#5a5855",textDecoration:"none",borderLeft:"3px solid transparent"}}>
+                  <span style={{fontSize:"0.9rem",width:"1.1rem",textAlign:"center",flexShrink:0}}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </a>
+              ))}
+            </div>
+            <div style={{padding:"1rem 1.5rem",borderTop:"1px solid #ece8e2"}}>
+              <button onClick={async () => { await supabase.auth.signOut(); window.location.href = "/"; }} style={{width:"100%",padding:"0.75rem",background:"none",border:"1px solid #e2dfda",fontFamily:"var(--sans)",fontSize:"0.72rem",letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",color:"#888"}}>
+                {i.sair}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <nav className="nav">
         <a href="/" className="nav-logo">Nora Grei</a>
         <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
@@ -2080,10 +2140,11 @@ export default function Perfil() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </a>
           <NotificationBell lang={lang} />
-          {modoLojista && codigoLoja && (
-            <button onClick={()=>{setTabAtiva("loja");setTabLoja("dashboard");}} style={{fontSize:"0.72rem",letterSpacing:"0.13em",textTransform:"uppercase",background:"none",border:"1.5px solid var(--g2)",padding:"0.3rem 0.65rem",cursor:"pointer",fontFamily:"var(--sans)",color:"var(--g6)",whiteSpace:"nowrap"}}>Loja</button>
-          )}
-          <a href="/" className="nav-back">{i.voltarInicio}</a>
+          <button onClick={() => setMenuAberto(true)} aria-label="Menu" style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",gap:"4px",background:"none",border:"none",cursor:"pointer",padding:"0.3rem",color:"var(--g6)"}}>
+            <span style={{display:"block",width:"18px",height:"1.5px",background:"currentColor",borderRadius:"1px"}}></span>
+            <span style={{display:"block",width:"18px",height:"1.5px",background:"currentColor",borderRadius:"1px"}}></span>
+            <span style={{display:"block",width:"12px",height:"1.5px",background:"currentColor",borderRadius:"1px",alignSelf:"flex-start"}}></span>
+          </button>
         </div>
       </nav>
 
@@ -2894,7 +2955,7 @@ export default function Perfil() {
               </h2>
               {codigoLoja && !editandoUrl && (
                 <div style={{display:"flex",gap:"0.5rem",alignItems:"center",flexWrap:"wrap"}}>
-                  <a href={`/loja/${codigoLoja}`} target="_blank" rel="noreferrer" style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
+                  <a href={`/loja/${codigoLoja}?from=perfil`} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"var(--rosa)",color:"#fff",textDecoration:"none",fontFamily:"var(--sans)",whiteSpace:"nowrap"}}>Ver loja ↗</a>
                   <button onClick={()=>navigator.clipboard.writeText(window.location.origin+`/loja/${codigoLoja}`)} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g6)",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>Copiar link</button>
                   <button onClick={()=>{setNovoUrl(codigoLoja);setEditandoUrl(true);setUrlStatus(null);}} style={{fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",padding:"0.35rem 0.75rem",background:"none",border:"1.5px solid var(--g2)",color:"var(--g4)",fontFamily:"var(--sans)",whiteSpace:"nowrap",cursor:"pointer"}}>✎ URL</button>
                 </div>
