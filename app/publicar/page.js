@@ -2,14 +2,22 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-const CATEGORIAS_VESTUARIO = ["Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans"];
-const CATEGORIAS_ACESSORIOS = ["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"];
-const CATEGORIAS_SEM_TAMANHO = ["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
+const CATEGORIAS_VESTUARIO_PT = ["Vestidos","Saias","Calças","Blusas","Casacos","Fatos","Macacões","Conjuntos","Camisas","Kaftans"];
+const CATEGORIAS_VESTUARIO_FR = ["Robes","Jupes","Pantalons","Hauts","Manteaux","Costumes","Combinaisons","Ensembles","Chemises","Kaftans"];
+const CATEGORIAS_VESTUARIO_LT = ["Suknelės","Sijonai","Kelnės","Palaidinės","Paltai","Kostiumai","Kombinezonai","Komplektai","Marškiniai","Kaftanai"];
+const CATEGORIAS_ACESSORIOS_PT = ["Malas","Anéis","Colares","Pulseiras","Cachecóis","Chapéus","Cintos","Óculos","Luvas","Acessórios"];
+const CATEGORIAS_ACESSORIOS_FR = ["Sacs","Bagues","Colliers","Bracelets","Écharpes","Chapeaux","Ceintures","Lunettes","Gants","Accessoires"];
+const CATEGORIAS_ACESSORIOS_LT = ["Krepšiai","Žiedai","Karoliai","Apyrankės","Skaros","Skrybėlės","Diržai","Akiniai","Pirštinės","Aksesuarai"];
+const CATEGORIAS_SEM_TAMANHO_PT = ["Acessórios","Malas","Anéis","Colares","Pulseiras","Cachecóis","Relógios","Chapéus","Cintos","Óculos"];
+const CATEGORIAS_SEM_TAMANHO_FR = ["Accessoires","Sacs","Bagues","Colliers","Bracelets","Écharpes","Montres","Chapeaux","Ceintures","Lunettes"];
+const CATEGORIAS_SEM_TAMANHO_LT = ["Aksesuarai","Krepšiai","Žiedai","Karoliai","Apyrankės","Skaros","Laikrodžiai","Skrybėlės","Diržai","Akiniai"];
 const TAMANHOS = ["XS","S","M","L","XL","XXL","34","36","38","40","42","44","46","48","Único"];
 const OCASIOES_PT = ["Casamento","Gala","Cocktail","Festa","Jantar","Trabalho","Dia a dia","Praia","Férias","Praia/Férias"];
 const OCASIOES_FR = ["Mariage","Gala","Cocktail","Fête","Dîner","Travail","Quotidien","Plage","Vacances","Plage/Vacances"];
 const OCASIOES_LT = ["Vestuvės","Gala","Kokteiliai","Vakarėlis","Vakarienė","Darbas","Kasdienybė","Paplūdimys","Atostogos","Paplūd./Atost."];
-const CORES = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
+const CORES_PT = ["Preto","Branco","Creme","Bege","Castanho","Azul","Azul marinho","Verde","Verde esmeralda","Vermelho","Rosa","Lilás","Roxo","Laranja","Amarelo","Dourado","Prateado","Multicolor","Estampado","Animal print"];
+const CORES_FR = ["Noir","Blanc","Crème","Beige","Marron","Bleu","Bleu marine","Vert","Vert émeraude","Rouge","Rose","Lilas","Violet","Orange","Jaune","Doré","Argenté","Multicolore","Imprimé","Imprimé animal"];
+const CORES_LT = ["Juoda","Balta","Kreminė","Smėlio","Ruda","Mėlyna","Tamsiai mėlyna","Žalia","Smaragdo žalia","Raudona","Rožinė","Alyvų","Violetinė","Oranžinė","Geltona","Auksinė","Sidabrinė","Spalvota","Su raštu","Gyvūnų raštas"];
 
 // ── Dicionário i18n global da página ────────────────────────────────────────
 const T = {
@@ -683,6 +691,10 @@ export default function PublicarPage() {
   const tl = T[lang] || T.pt;
   const tLoc = TIPOS_I18N[lang] || TIPOS_I18N.pt;
   const OCASIOES = lang === "fr" ? OCASIOES_FR : lang === "lt" ? OCASIOES_LT : OCASIOES_PT;
+  const CATEGORIAS_VESTUARIO = lang === "fr" ? CATEGORIAS_VESTUARIO_FR : lang === "lt" ? CATEGORIAS_VESTUARIO_LT : CATEGORIAS_VESTUARIO_PT;
+  const CATEGORIAS_ACESSORIOS = lang === "fr" ? CATEGORIAS_ACESSORIOS_FR : lang === "lt" ? CATEGORIAS_ACESSORIOS_LT : CATEGORIAS_ACESSORIOS_PT;
+  const CATEGORIAS_SEM_TAMANHO = lang === "fr" ? CATEGORIAS_SEM_TAMANHO_FR : lang === "lt" ? CATEGORIAS_SEM_TAMANHO_LT : CATEGORIAS_SEM_TAMANHO_PT;
+  const CORES = lang === "fr" ? CORES_FR : lang === "lt" ? CORES_LT : CORES_PT;
 
   const validarPasso2 = () => {
     if (!peca.nome.trim()) { setErro(tl.erroNome); return false; }
@@ -1066,7 +1078,7 @@ export default function PublicarPage() {
                     {CATEGORIAS_ACESSORIOS.map(c => <option key={c}>{c}</option>)}
                   </optgroup>
                   <optgroup label={tl.grupoRelogios}>
-                    <option>Relógios</option>
+                    <option>{tl.grupoRelogios}</option>
                   </optgroup>
                   <optgroup label={tl.grupoCalcado}>
                     {tl.calcadoItens.map(c => <option key={c}>{c}</option>)}
