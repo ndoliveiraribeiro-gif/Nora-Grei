@@ -200,6 +200,8 @@ const T = {
 // ── Sistema de marcas com grupos ─────────────────────────────────────────────
 // Listas de detecção de tier (lowercase, para fatorMarca)
 const MARCAS_INVESTIMENTO = [
+  // Marca própria da plataforma
+  "nora grei","nora grey","noragrei","noragrey",
   // Relógios topo
   "rolex","patek philippe","patek","audemars piguet","ap","richard mille","rm",
   "vacheron constantin","jaeger-lecoultre","jaeger lecoultre","a. lange","lange",
@@ -258,6 +260,11 @@ const MARCAS_ALTA = [
 
 // Grupos para o combobox — separados por tipo de produto
 const GRUPOS_MARCA = [
+  // ── NORA GREI ──────────────────────────────────────────────────────────
+  {
+    grupo: { pt: "Nora Grei — Marca Própria", fr: "Nora Grei — Marque Propre", lt: "Nora Grei — Savos prekės ženklas" },
+    marcas: ["Nora Grei"],
+  },
   // ── MALAS ──────────────────────────────────────────────────────────────
   {
     grupo: { pt: "Malas — Ultra Luxo", fr: "Sacs — Ultra Luxe", lt: "Krepšiai — Aukščiausias Luxas" },

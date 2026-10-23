@@ -490,6 +490,8 @@ const PECA_VAZIA = {
 
 // ── Estimativa de valor de mercado ──────────────────────────────────────────
 const MARCAS_PREMIUM = [
+  // Marca própria
+  "nora grei","nora grey","noragrei","noragrey",
   // Malas & roupa luxo topo
   "hermès","hermes","chanel","louis vuitton","lv","delvaux","goyard","bottega veneta",
   "gucci","prada","dior","christian dior","saint laurent","ysl","celine","céline",
