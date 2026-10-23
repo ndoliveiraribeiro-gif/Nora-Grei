@@ -38,7 +38,7 @@ const T = {
     bk4: "Comissão Nora Grei (10%)",
     bk5: "Líquido de alugueres",
     bk6: (m) => `Valor residual da peça após ${m} meses`,
-    bk7: "Venda usada líquida (comissão 20% + envio)",
+    bk7: "Venda usada líquida (comissão 20%)",
     bkTotal: "Total recebido",
     cta: "Publicar a minha peça agora",
     ctaVer: "Ver como outras lojistas fazem →",
@@ -102,7 +102,7 @@ const T = {
     bk4: "Commission Nora Grei (10%)",
     bk5: "Net locations",
     bk6: (m) => `Valeur résiduelle après ${m} mois`,
-    bk7: "Vente d'occasion nette (commission 20% + envoi)",
+    bk7: "Vente d'occasion nette (commission 20%)",
     bkTotal: "Total reçu",
     cta: "Publier ma pièce maintenant",
     ctaVer: "Voir comment d'autres boutiques font →",
@@ -166,7 +166,7 @@ const T = {
     bk4: "Nora Grei komisinis (10%)",
     bk5: "Grynos nuomų pajamos",
     bk6: (m) => `Likutinė vertė po ${m} mėn.`,
-    bk7: "Grynos naudoto pardavimo pajamos (20% + siuntimas)",
+    bk7: "Grynos naudoto pardavimo pajamos (20% komisinis)",
     bkTotal: "Iš viso gauta",
     cta: "Publikuoti savo drabužį dabar",
     ctaVer: "Peržiūrėti kitas parduotuves →",
@@ -608,14 +608,16 @@ export default function Calculadora() {
     const rotacaoMes = cat.rot * est.fator;
     const alugueresTotal = Math.max(1, Math.round(rotacaoMes * meses));
 
-    // Receita aluguer (deduz envio €6×2 por aluguer e comissão 10%)
+    // Receita aluguer — lojista recebe preço × N alugueres, menos comissão de 10%
+    // Envio (€6 ida + €6 volta) é cobrado ao cliente que aluga, não sai do lojista
     const receitaBruta = precoAluguer * alugueresTotal;
-    const liquidoAluguer = receitaBruta * (1 - COMISSAO_ALUGUER) - CUSTO_ENVIO_ALUGUER * alugueresTotal;
+    const liquidoAluguer = receitaBruta * (1 - COMISSAO_ALUGUER);
 
     // Valor residual após alugueres (deprecia suavemente)
     const depreciacaoMes = 0.008;
     const valorFinalPeca = valorMercado * Math.pow(1 - depreciacaoMes, alugueresTotal);
-    const vendaFinalLiquido = Math.max(0, valorFinalPeca * (1 - COMISSAO_VENDA) - CUSTO_ENVIO);
+    // Envio na venda também é pago pelo comprador, não pelo lojista
+    const vendaFinalLiquido = Math.max(0, valorFinalPeca * (1 - COMISSAO_VENDA));
 
     // Total NG
     const totalNG = liquidoAluguer + vendaFinalLiquido;
