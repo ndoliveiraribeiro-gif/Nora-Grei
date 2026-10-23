@@ -610,6 +610,13 @@ export default function PublicarPage() {
   const [pecaCriada, setPecaCriada] = useState(null);
   const inputFotoRef = useRef();
   const inputCameraRef = useRef();
+  const topoRef = useRef();
+
+  const irParaPasso = (n) => {
+    setPasso(n);
+    setErro("");
+    setTimeout(() => { topoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
+  };
 
   useEffect(() => {
     try { const l = localStorage.getItem("ng_lang"); if (l) setLang(l); } catch (_) {}
@@ -765,8 +772,24 @@ export default function PublicarPage() {
       setErro(peca.valor_peca_desconhecido ? tl.erroValorEstimativa2 : tl.erroValorOriginal2);
       return false;
     }
-    if (precisaAluguer && !peca.preco_aluguer_dia) { setErro(tl.erroAluguerDia); return false; }
-    if (precisaVenda && !peca.preco_venda) { setErro(tl.erroPrecoVenda); return false; }
+    // Se preço de aluguer vazio, aplica a sugestão automaticamente (evita erro por não clicar no botão)
+    if (precisaAluguer && !peca.preco_aluguer_dia) {
+      const est = calcEstimativa(peca);
+      if (est) {
+        setPeca(prev => ({ ...prev, preco_aluguer_dia: est.precoAluguerDia.toString() }));
+      } else {
+        setErro(tl.erroAluguerDia); return false;
+      }
+    }
+    // Se preço de venda vazio, aplica a sugestão automaticamente
+    if (precisaVenda && !peca.preco_venda) {
+      const est = calcEstimativa(peca);
+      if (est) {
+        setPeca(prev => ({ ...prev, preco_venda: est.precoVendaUsada.toString() }));
+      } else {
+        setErro(tl.erroPrecoVenda); return false;
+      }
+    }
     setErro(""); return true;
   };
 
@@ -989,7 +1012,7 @@ export default function PublicarPage() {
         <a href="/perfil" className="pub-voltar">{tl.voltar}</a>
       </nav>
 
-      <div className="pub-body">
+      <div className="pub-body" ref={topoRef}>
 
         {/* ── PASSO 1 — FOTOS ── */}
         {passo === 1 && (
@@ -1092,7 +1115,7 @@ export default function PublicarPage() {
                   if (fotos.some(f => f.validando)) { setErro(tl.erroAguardarAnalise); return; }
                   const invalidas = fotos.filter(f => f.valida === false);
                   if (invalidas.length > 0) { setErro(tl.erroFotosRejeitadas); return; }
-                  setErro(""); setPasso(2);
+                  irParaPasso(2);
                 }}
                 disabled={fotos.length === 0 || fotos.some(f => f.validando)}
               >
@@ -1412,10 +1435,10 @@ export default function PublicarPage() {
             {erro && <div className="pub-erro">{erro}</div>}
 
             <div className="pub-actions">
-              <button className="pub-btn pub-btn-outline" onClick={() => { setErro(""); setPasso(1); }}>←</button>
+              <button className="pub-btn pub-btn-outline" onClick={() => irParaPasso(1)}>←</button>
               <button
                 className="pub-btn pub-btn-black"
-                onClick={() => { if (validarPasso2()) setPasso(3); }}
+                onClick={() => { if (validarPasso2()) irParaPasso(3); }}
               >
                 {tl.continuar}
               </button>
@@ -1661,7 +1684,7 @@ export default function PublicarPage() {
             {erro && <div className="pub-erro">{erro}</div>}
 
             <div className="pub-actions">
-              <button className="pub-btn pub-btn-outline" onClick={() => { setErro(""); setPasso(2); }}>←</button>
+              <button className="pub-btn pub-btn-outline" onClick={() => irParaPasso(2)}>←</button>
               <button
                 className="pub-btn pub-btn-black"
                 onClick={publicar}
