@@ -1128,6 +1128,7 @@ export default function Perfil() {
   const [locDetectada, setLocDetectada] = useState(false);
   const [lang, setLang] = useState("pt");
   const [modoLojista, setModoLojista] = useState(false);
+  const [isMarcaPropria, setIsMarcaPropria] = useState(false);
   const [tabAtiva, setTabAtiva] = useState("perfil");
   const [menuAberto, setMenuAberto] = useState(false);
   const [naoLidasMsg, setNaoLidasMsg] = useState(0);
@@ -1256,10 +1257,17 @@ export default function Perfil() {
     const { data: c } = await supabase.from("clientes").select("*").eq("id", user.id).single();
     if (c) {
       setPerfil({ nome: c.nome||"", nome_publico: c.nome_publico||"", telefone: c.telefone||"", morada: c.morada||"", numero_porta: c.numero_porta||"", andar: c.andar||"", foto_perfil: c.foto_perfil||user.user_metadata?.avatar_url||"", nif: c.nif||"", numero_cc: c.numero_cc||"", data_nascimento: c.data_nascimento||"", genero: c.genero||"", profissao: c.profissao||"", cidade: c.cidade||"", pais: c.pais||"Portugal", codigo_postal: c.codigo_postal||"", latitude: c.latitude||null, longitude: c.longitude||null });
-      if (c.modo_lojista) {
+      if (c.modo_lojista && !c.is_marca_propria) {
         setModoLojista(true);
         setLojaEstado(c.lojista_estado||"teste");
         if (c.codigo_cliente) setCodigoLoja(c.codigo_cliente);
+      } else if (c.is_marca_propria) {
+        // Marca própria (ex: Nora Grei) → não carrega tab de loja pesada
+        // Gere a loja via /admin-loja
+        setIsMarcaPropria(true);
+        if (c.codigo_cliente) setCodigoLoja(c.codigo_cliente);
+      }
+      if (c.modo_lojista && !c.is_marca_propria) {
         setLojaIban(c.lojista_iban||"");
         if (c.lojista_cartao_ultimo4) setLojaCartaoGuardadoUltimos4(c.lojista_cartao_ultimo4);
         if (c.lojista_cartao_nome) setLojaCartaoNome(c.lojista_cartao_nome);
@@ -2189,6 +2197,10 @@ export default function Perfil() {
                 {href:"/feed", icon:"◎", label:"Feed"},
                 {href:"/lojas", icon:"◫", label:{pt:"Lojistas",fr:"Boutiques",lt:"Parduotuvės"}[lang]||"Lojistas"},
                 ...(modoLojista && codigoLoja ? [
+                  {href:`/loja/${codigoLoja}?from=perfil`, icon:"◫", label:{pt:"Ver a minha loja",fr:"Voir ma boutique",lt:"Mano parduotuvė"}[lang]||"Ver a minha loja"},
+                  {href:`/admin-loja`, icon:"⚙", label:{pt:"Gerir loja",fr:"Gérer la boutique",lt:"Tvarkyti parduotuvę"}[lang]||"Gerir loja"},
+                ] : []),
+                ...(isMarcaPropria && codigoLoja ? [
                   {href:`/loja/${codigoLoja}?from=perfil`, icon:"◫", label:{pt:"Ver a minha loja",fr:"Voir ma boutique",lt:"Mano parduotuvė"}[lang]||"Ver a minha loja"},
                   {href:`/admin-loja`, icon:"⚙", label:{pt:"Gerir loja",fr:"Gérer la boutique",lt:"Tvarkyti parduotuvę"}[lang]||"Gerir loja"},
                 ] : []),
