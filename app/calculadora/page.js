@@ -402,10 +402,49 @@ const IDADES_DATA = [
 // Peças nunca usadas com etiqueta: a idade quase não penaliza (como vinho em adega)
 const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.98, "4a7": 0.95, "7a15": 0.90, "15mais": 0.85 };
 
-// Taxa de apreciação anual por tier para marcas de investimento em bom estado
-// Rolex/Patek/Hermès: dados reais do mercado secundário de luxo (Chrono24, Watchbox, Vestiaire)
-// Marcas que NÃO são de investimento real: depreciação normal independentemente do tier
-const APREC_ANUAL = { investimento: 0.055, premium: 0.0, alta: 0.0, massmarket: 0.0, semMarca: 0.0 };
+// ── Taxa de apreciação anual por marca (dados mercado secundário: Chrono24, Watchbox, Vestiaire) ──
+// Só marcas com historicamente comprovada valorização têm taxa positiva.
+// Gucci, Prada, etc.: tier premium mas NÃO apreciam — são moda, não investimento.
+// Fonte referência: Knight Frank Luxury Investment Index, WatchCharts, Vestiaire Collective reports.
+const APREC_MARCA = {
+  // Relógios — os que mais apreciam no mercado secundário
+  "rolex":               0.082,  // +8.2%/ano (dados Knight Frank 2024)
+  "patek philippe":      0.095,  // +9.5%/ano (os mais valorizados de sempre)
+  "patek":               0.095,
+  "audemars piguet":     0.071,  // +7.1%/ano (AP Royal Oak em especial)
+  "ap":                  0.071,
+  "richard mille":       0.065,
+  "rm":                  0.065,
+  "vacheron constantin": 0.042,
+  "jaeger-lecoultre":    0.028,
+  "jaeger lecoultre":    0.028,
+  "fp journe":           0.088,  // F.P. Journe: raridade extrema
+  "f.p. journe":         0.088,
+  "greubel forsey":      0.060,
+  "mb&f":                0.045,
+  // Malas — só as icónicas apreciam de verdade
+  "hermès":              0.075,  // Birkin/Kelly: +7.5%/ano média
+  "hermes":              0.075,
+  "chanel":              0.055,  // Classic Flap: +5.5%/ano
+  "louis vuitton":       0.030,  // LV aprecia, mas menos que Hermès/Chanel
+  "lv":                  0.030,
+  "delvaux":             0.025,
+  "goyard":              0.022,
+  // Joalharia — aprecia principalmente pelo metal/pedras
+  "cartier":             0.038,
+  "van cleef":           0.045,
+  "van cleef & arpels":  0.045,
+  "bulgari":             0.022,
+  "bvlgari":             0.022,
+  "tiffany":             0.018,
+  "tiffany & co":        0.018,
+  // Roupa — praticamente nada aprecia (mesmo Chanel roupa deprecia)
+  // Nora Grei — marca própria com valor especial na plataforma
+  "nora grei":           0.040,
+  "nora grey":           0.040,
+  "noragrei":            0.040,
+  "noragrey":            0.040,
+};
 
 // ── Tipos de peça por categoria ──────────────────────────────────────────────
 const TIPOS_DATA = [
@@ -622,7 +661,9 @@ export default function Calculadora() {
     // Taxa de apreciação: ~5.5%/ano composto para investimento tier
     // Estado "usado" ou "com_defeito": FEI aplica-se mesmo nestas marcas
     const anosRef = idObj.anos ?? 1.0;
-    const taxaAprec = APREC_ANUAL[tmemo] ?? 0;
+    // Taxa de apreciação individual por marca (Gucci=0, LV=3%, Rolex=8.2%, Patek=9.5%…)
+    const marcaKey = marca.trim().toLowerCase();
+    const taxaAprec = APREC_MARCA[marcaKey] ?? 0;
     const emBomEstado = estado === "como_novo" || estado === "bom";
     const fatorApreciacao = (taxaAprec > 0 && emBomEstado)
       ? Math.pow(1 + taxaAprec, anosRef)   // Rolex de 10 anos bom estado: ×1.71
