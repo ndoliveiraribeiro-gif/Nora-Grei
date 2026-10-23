@@ -65,8 +65,9 @@ const T = {
     grupoCalcado: "Calçado",
     calcadoItens: ["Saltos","Sandálias","Botas","Sapatilhas","Calçado"],
     identificacaoCard: "Identificação",
-    nomeLabel: "Nome da peça *",
-    nomePlaceholder: "Ex: Vestido midi azul marinho",
+    nomeLabel: "Nome da peça",
+    nomeHint: "Gerado automaticamente a partir da marca e categoria",
+    nomePlaceholder: "Ex: Louis Vuitton · Mala",
     marcaLabel: "Marca / Designer",
     marcaPlaceholder: "Zara, Mango, Gucci...",
     valorNovaBotaoNaoSei: "Não sei o preço original",
@@ -207,8 +208,9 @@ const T = {
     grupoCalcado: "Chaussures",
     calcadoItens: ["Talons","Sandales","Bottes","Baskets","Chaussures"],
     identificacaoCard: "Identification",
-    nomeLabel: "Nom de l'article *",
-    nomePlaceholder: "Ex : Robe midi bleu marine",
+    nomeLabel: "Nom de l'article",
+    nomeHint: "Généré automatiquement à partir de la marque et de la catégorie",
+    nomePlaceholder: "Ex : Louis Vuitton · Sac",
     marcaLabel: "Marque / Créateur",
     marcaPlaceholder: "Zara, Mango, Gucci...",
     valorNovaBotaoNaoSei: "Je ne connais pas le prix d'origine",
@@ -347,8 +349,9 @@ const T = {
     grupoCalcado: "Avalynė",
     calcadoItens: ["Kulniukai","Sandalai","Batai","Sportiniai bateliai","Avalynė"],
     identificacaoCard: "Identifikavimas",
-    nomeLabel: "Drabužio pavadinimas *",
-    nomePlaceholder: "Pvz.: Vidutinio ilgio suknelė tamsiai mėlyna",
+    nomeLabel: "Drabužio pavadinimas",
+    nomeHint: "Sugeneruojama automatiškai iš prekės ženklo ir kategorijos",
+    nomePlaceholder: "Pvz.: Louis Vuitton · Krepšys",
     marcaLabel: "Prekės ženklas / Dizaineris",
     marcaPlaceholder: "Zara, Mango, Gucci...",
     valorNovaBotaoNaoSei: "Nežinau pradinės kainos",
@@ -612,6 +615,16 @@ export default function PublicarPage() {
   const inputCameraRef = useRef();
   const topoRef = useRef();
 
+  // Auto-gerar nome da peça a partir de marca + categoria
+  useEffect(() => {
+    const marca = peca.marca?.trim();
+    const cat = peca.categoria?.trim();
+    if (!marca && !cat) return;
+    const partes = [marca, cat].filter(Boolean);
+    const nomeAuto = partes.join(" · ");
+    setPeca(prev => ({ ...prev, nome: nomeAuto }));
+  }, [peca.marca, peca.categoria]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const irParaPasso = (n) => {
     setPasso(n);
     setErro("");
@@ -755,7 +768,6 @@ export default function PublicarPage() {
   const CORES = lang === "fr" ? CORES_FR : lang === "lt" ? CORES_LT : CORES_PT;
 
   const validarPasso2 = () => {
-    if (!peca.nome.trim()) { setErro(tl.erroNome); return false; }
     if (!peca.valor_peca || parseFloat(peca.valor_peca) <= 0) {
       setErro(peca.valor_peca_desconhecido ? tl.erroValorEstimativa : tl.erroValorOriginal);
       return false;
@@ -1166,10 +1178,6 @@ export default function PublicarPage() {
             <div className="pub-card">
               <p className="pub-card-t">{tl.identificacaoCard}</p>
               <div className="pub-grid2">
-                <div className="pub-fg">
-                  <label className="pub-label">{tl.nomeLabel}</label>
-                  <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder={tl.nomePlaceholder} />
-                </div>
                 <div className="pub-fg" style={{position:"relative"}}>
                   <label className="pub-label">{tl.marcaLabel}</label>
                   <input
@@ -1181,19 +1189,26 @@ export default function PublicarPage() {
                     autoComplete="off"
                   />
                   {marcaSugestoes.length > 0 && (
-                    <div style={{position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1px solid #e2dfda",zIndex:50,boxShadow:"0 4px 16px rgba(0,0,0,0.08)"}}>
+                    <div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1816",border:"1px solid rgba(196,168,130,0.3)",zIndex:50,boxShadow:"0 4px 16px rgba(0,0,0,0.5)",borderRadius:"0 0 6px 6px"}}>
                       {marcaSugestoes.map(m => (
                         <div
                           key={m}
                           onMouseDown={() => { setP("marca", m); setMarcaSugestoes([]); }}
-                          style={{padding:"0.65rem 1rem",fontSize:"0.88rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",borderBottom:"1px solid #f0eeeb",textTransform:"capitalize"}}
-                          onMouseEnter={e => e.currentTarget.style.background="#f8f7f5"}
-                          onMouseLeave={e => e.currentTarget.style.background="#fff"}
+                          style={{padding:"0.65rem 1rem",fontSize:"0.88rem",cursor:"pointer",fontFamily:"'Jost',sans-serif",borderBottom:"1px solid rgba(255,255,255,0.06)",textTransform:"capitalize",color:"#e8e4dc"}}
+                          onMouseEnter={e => { e.currentTarget.style.background="#2a2520"; e.currentTarget.style.color="#c4a882"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.color="#e8e4dc"; }}
                         >{m}</div>
                       ))}
                     </div>
                   )}
                 </div>
+                {peca.nome && (
+                  <div className="pub-fg pub-full">
+                    <label className="pub-label" style={{color:"rgba(196,168,130,0.7)",fontSize:"0.68rem",letterSpacing:"0.04em"}}>{tl.nomeLabel}</label>
+                    <input className="pub-input" value={peca.nome} onChange={e => setP("nome", e.target.value)} placeholder={tl.nomePlaceholder} style={{color:"rgba(255,255,255,0.55)",fontSize:"0.82rem",fontStyle:"italic"}} />
+                    <span className="pub-hint" style={{fontSize:"0.62rem",opacity:0.5}}>{tl.nomeHint}</span>
+                  </div>
+                )}
                 <div className="pub-fg">
                   <label className="pub-label" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <span>{tl.valorNovaLabel} {!peca.valor_peca_desconhecido && <span style={{color:"#c4748a"}}>{tl.valorNovaObrigatorio}</span>}</span>
