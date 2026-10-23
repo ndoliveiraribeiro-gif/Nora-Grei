@@ -96,6 +96,9 @@ const T = {
     higienizacaoCard: "Higienização",
     higienizacaoLabel: "Esta peça requer higienização profissional",
     higienizacaoSem: "Sem taxa de higienização — a limpeza é tratada internamente.",
+    artesanalCard: "Peça artesanal / feita à mão",
+    artesanalLabel: "Esta peça é feita à mão ou é peça única",
+    artesanalHint: "Aplica um factor de valorização de 1.8× ao valor de mercado — peças únicas têm maior valor independentemente da marca.",
     higienizacaoCustoLabel: "Custo de higienização (€)",
     higienizacaoCustoPlaceholder: "ex: 6.00",
     higienizacaoCustoHint: "Valor cobrado ao cliente no checkout. Define de acordo com a tua lavandaria parceira.",
@@ -232,6 +235,9 @@ const T = {
     higienizacaoCard: "Nettoyage",
     higienizacaoLabel: "Cet article nécessite un nettoyage professionnel",
     higienizacaoSem: "Pas de frais de nettoyage — le nettoyage est géré en interne.",
+    artesanalCard: "Pièce artisanale / faite main",
+    artesanalLabel: "Cette pièce est faite main ou est une pièce unique",
+    artesanalHint: "Applique un facteur de valorisation de 1,8× à la valeur marchande — les pièces uniques ont plus de valeur indépendamment de la marque.",
     higienizacaoCustoLabel: "Coût de nettoyage (€)",
     higienizacaoCustoPlaceholder: "ex : 6.00",
     higienizacaoCustoHint: "Montant facturé à la cliente au checkout. Définis-le selon ton pressing partenaire.",
@@ -366,6 +372,9 @@ const T = {
     higienizacaoCard: "Valymas",
     higienizacaoLabel: "Šiam drabužiui reikalingas profesionalus valymas",
     higienizacaoSem: "Nėra valymo mokesčio — valymas atliekamas viduje.",
+    artesanalCard: "Rankų darbo / unikali vienetinė",
+    artesanalLabel: "Šis drabužis yra rankų darbo arba vienetinis",
+    artesanalHint: "Taikomas 1,8× vertės koeficientas — vienetiniai drabužiai turi didesnę vertę, nepriklausomai nuo prekės ženklo.",
     higienizacaoCustoLabel: "Valymo kaina (€)",
     higienizacaoCustoPlaceholder: "pvz.: 6.00",
     higienizacaoCustoHint: "Suma, skaičiuojama klientei checkout metu. Nustatyk pagal savo partnerio skalavyklą.",
@@ -462,6 +471,7 @@ const PECA_VAZIA = {
   preco_aluguer_dia: "", preco_venda: "", valor_peca: "",
   tem_defeito: false, descricao_defeito: "",
   higienizacao_ativa: false, higienizacao_valor: "",
+  peca_artesanal: false,
   ocasioes: [], tamanhos: [{ tamanho: "M", quantidade: 1 }],
   link_compra_externa: "", idade_peca: "1a2", valor_peca_desconhecido: false,
 };
@@ -496,8 +506,10 @@ function fatorMarca(marca = "") {
   return { fator: 0.32, tier: "massmarket" };
 }
 
-const FATOR_ESTADO = { como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
+const FATOR_ESTADO = { novo: 1.0, como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
 const FATOR_IDADE  = { novo: 1.0, "1a2": 0.85, "2a4": 0.70, "4mais": 0.52 };
+// Peça nova/como nova nunca usada: a idade física importa pouco — o estado prevalece
+const FATOR_IDADE_NOVO = { novo: 1.0, "1a2": 1.0, "2a4": 0.97, "4mais": 0.92 };
 
 const ROTACAO_CAT = {
   Vestidos:   { rot: 1.8, dias: 3.5, fp: 0.10 },
@@ -522,19 +534,23 @@ const ROTACAO_CAT = {
 
 function fatorEstadoIdade(condicao, idade_peca) {
   const fe = FATOR_ESTADO[condicao] ?? 0.68;
-  const fi = FATOR_IDADE[idade_peca] ?? 0.85;
+  // Peças nunca usadas (novo/como_novo): a idade física é quase irrelevante
+  const tabelaIdade = (condicao === "novo" || condicao === "como_novo") ? FATOR_IDADE_NOVO : FATOR_IDADE;
+  const fi = tabelaIdade[idade_peca] ?? 0.85;
   const combinado = fe * fi;
   if (combinado < 0.30) return combinado * 0.85;
   if (combinado > 0.85) return combinado * 1.05;
   return combinado;
 }
 
-function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria }) {
+function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria, peca_artesanal }) {
   const p = parseFloat(valor_peca) || 0;
   if (!p) return null;
   const { fator: fm, tier } = fatorMarca(marca);
   const fei = fatorEstadoIdade(condicao, idade_peca);
-  const valorMercado = Math.round(p * fm * fei);
+  // Peças artesanais/feitas à mão: fator de unicidade sobre o valor base
+  const fatorArtesanal = peca_artesanal ? 1.80 : 1.0;
+  const valorMercado = Math.round(p * fm * fei * fatorArtesanal);
   const cat = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
   const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
   const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
@@ -746,6 +762,7 @@ export default function PublicarPage() {
         descricao_defeito: peca.tem_defeito ? (peca.descricao_defeito || null) : null,
         higienizacao_ativa: peca.higienizacao_ativa || false,
         higienizacao_valor: peca.higienizacao_ativa ? (parseFloat(peca.higienizacao_valor) || null) : null,
+        peca_artesanal: peca.peca_artesanal || false,
         ocasioes: peca.ocasioes,
         link_compra_externa: peca.link_compra_externa.trim() || null,
         link_externo_ativo: false,
@@ -1241,6 +1258,27 @@ export default function PublicarPage() {
                 ) : (
                   <p style={{ fontSize: "0.68rem", color: "#9c9894", marginTop: "0.5rem" }}>
                     {tl.higienizacaoSem}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Peça artesanal / feita à mão */}
+            <div className="pub-card">
+              <p className="pub-card-t">{tl.artesanalCard}</p>
+              <div className={`defeito-box${peca.peca_artesanal ? " ativo" : ""}`} style={peca.peca_artesanal ? { borderColor: "#c4a882", background: "#fdf9f3" } : {}}>
+                <label className="defeito-label" style={peca.peca_artesanal ? { color: "#8a6a30" } : {}}>
+                  <input
+                    type="checkbox"
+                    checked={peca.peca_artesanal}
+                    onChange={e => setP("peca_artesanal", e.target.checked)}
+                    style={{ width: "1rem", height: "1rem", cursor: "pointer", accentColor: "#c4a882" }}
+                  />
+                  {tl.artesanalLabel}
+                </label>
+                {peca.peca_artesanal && (
+                  <p style={{ fontSize: "0.68rem", color: "#8a6a30", marginTop: "0.5rem", lineHeight: 1.5 }}>
+                    ✦ {tl.artesanalHint}
                   </p>
                 )}
               </div>
