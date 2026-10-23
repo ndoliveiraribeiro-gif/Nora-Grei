@@ -378,27 +378,27 @@ const CUSTO_ENVIO = 6;           // envio simples (venda)
 const CUSTO_ENVIO_ALUGUER = 12; // €6 ida + €6 volta por aluguer
 
 const ESTADOS_DATA = [
-  { id: "como_novo",  fator: 0.92, label: { pt: "Com etiqueta",   fr: "Avec étiquette",  lt: "Su etikete" } },
-  { id: "bom",        fator: 0.68, label: { pt: "Bom estado",     fr: "Bon état",        lt: "Gera būklė" } },
-  { id: "usado",      fator: 0.45, label: { pt: "Desgaste visível",fr: "Usure visible",   lt: "Matomas nusidėvėjimas" } },
-  { id: "com_defeito",fator: 0.25, label: { pt: "Com defeito",    fr: "Avec défaut",     lt: "Su defektu" } },
+  { id: "como_novo",  fator: 0.95, label: { pt: "Com etiqueta",     fr: "Avec étiquette",  lt: "Su etikete" } },
+  { id: "bom",        fator: 0.75, label: { pt: "Bom estado",       fr: "Bon état",        lt: "Gera būklė" } },
+  { id: "usado",      fator: 0.52, label: { pt: "Desgaste visível", fr: "Usure visible",   lt: "Matomas nusidėvėjimas" } },
+  { id: "com_defeito",fator: 0.28, label: { pt: "Com defeito",      fr: "Avec défaut",     lt: "Su defektu" } },
 ];
 
 const USOS_DATA = [
-  { id: "nunca",    fator: 1.00, label: { pt: "Nunca usada",         fr: "Jamais portée",        lt: "Niekada nenešiota" } },
-  { id: "pouco",    fator: 0.88, label: { pt: "Raramente usada",     fr: "Rarement portée",      lt: "Retai nešiota" } },
-  { id: "moderado", fator: 0.72, label: { pt: "Pouco frequente",     fr: "Peu fréquent",         lt: "Retai" } },
-  { id: "frequente",fator: 0.52, label: { pt: "Uso frequente",       fr: "Usage fréquent",       lt: "Dažnai nešiota" } },
+  { id: "nunca",    fator: 1.00, label: { pt: "Nunca usada",     fr: "Jamais portée",    lt: "Niekada nenešiota" } },
+  { id: "pouco",    fator: 0.90, label: { pt: "Raramente usada", fr: "Rarement portée",  lt: "Retai nešiota" } },
+  { id: "moderado", fator: 0.78, label: { pt: "Pouco frequente", fr: "Peu fréquent",     lt: "Retai" } },
+  { id: "frequente",fator: 0.62, label: { pt: "Uso frequente",   fr: "Usage fréquent",   lt: "Dažnai nešiota" } },
 ];
 
 const IDADES_DATA = [
-  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano",  fr: "Moins d'un an",  lt: "Mažiau nei 1 metai" } },
-  { id: "1a2",   fator: 0.85, label: { pt: "1 a 2 anos",      fr: "1 à 2 ans",       lt: "1–2 metai" } },
-  { id: "2a4",   fator: 0.70, label: { pt: "2 a 4 anos",      fr: "2 à 4 ans",       lt: "2–4 metai" } },
-  { id: "4mais", fator: 0.52, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",   lt: "Daugiau nei 4 metai" } },
+  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano", fr: "Moins d'un an", lt: "Mažiau nei 1 metai" } },
+  { id: "1a2",   fator: 0.90, label: { pt: "1 a 2 anos",     fr: "1 à 2 ans",     lt: "1–2 metai" } },
+  { id: "2a4",   fator: 0.78, label: { pt: "2 a 4 anos",     fr: "2 à 4 ans",     lt: "2–4 metai" } },
+  { id: "4mais", fator: 0.65, label: { pt: "Mais de 4 anos", fr: "Plus de 4 ans", lt: "Daugiau nei 4 metai" } },
 ];
-// Tabela de idade para peças nunca usadas/com etiqueta — a idade importa muito menos
-const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.97, "4mais": 0.92 };
+// Peças nunca usadas com etiqueta: a idade quase não penaliza (como vinho em adega)
+const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.98, "4mais": 0.95 };
 
 // ── Tipos de peça por categoria ──────────────────────────────────────────────
 const TIPOS_DATA = [
@@ -592,21 +592,29 @@ export default function Calculadora() {
     const idObj  = IDADES_DATA.find(i => i.id === idade);
     const cat = TIPOS_DATA.find(tp => tp.id === tipo) ?? TIPOS_DATA.find(tp => tp.id === "_default");
 
-    // Fator de estado de conservação — média ponderada (não multiplicação em cascata)
-    // Pesos: estado=50%, uso=30%, idade=20% — reflecte como o mercado valoriza peças usadas
+    // ── Fator de Conservação (FEI) — média ponderada, não cascata ──────────────
+    // Filosofia: estado físico pesa mais (50%), uso reflecte desgaste real (30%),
+    // idade é o fator mais fraco (20%) — uma peça bem guardada não perde valor por ter anos
     const isNuncaUsada = (uso === "nunca" && (estado === "como_novo" || estado === "bom"));
     const fatorIdade = isNuncaUsada ? (IDADES_NOVO_FATOR[idade] ?? 1.0) : idObj.fator;
     const feiPonderado = est.fator * 0.50 + usoObj.fator * 0.30 + fatorIdade * 0.20;
-    // Floor mínimo por categoria: relógios/joalharia/malas retêm valor melhor
-    const isHardGood = ["Relogio","Joalharia","MalaLuxo","MalaOmbro","Clutch","Mochila","Cinto","Lenco","Oculos","Chapeu"].includes(tipo);
-    const feiFloor = isHardGood ? 0.30 : 0.22;
-    const feiClamp = Math.max(feiFloor, feiPonderado > 0.85 ? feiPonderado * 1.05 : feiPonderado);
+
+    // Floors mínimos por categoria — reflectem retenção de valor real no mercado
+    // Relógios/joalharia/malas de luxo: nunca valem menos que 30% do original mesmo gastos
+    // Roupa massmarket (Zara, Mango): deprecia muito depressa — floor baixo
+    const isHardGood  = ["Relogio","Joalharia","MalaLuxo","MalaOmbro","Clutch","Mochila"].includes(tipo);
+    const isMassFloor = tmemo === "massmarket";
+    const feiFloor = isHardGood ? 0.35 : isMassFloor ? 0.12 : 0.22;
+    const feiClamp = Math.max(feiFloor, feiPonderado > 0.88 ? feiPonderado * 1.05 : feiPonderado);
 
     // Multiplicador artesanal (peça única feita à mão)
     const fatorArtesanal = artesanal ? 1.80 : 1.0;
 
-    // Valor de mercado (marcas investimento podem superar preço original)
-    const valorMercado = tmemo === "investimento"
+    // ── Valor de mercado justo ──────────────────────────────────────────────────
+    // Marcas de investimento (Rolex, Hermès, Chanel): podem apreciar — o FEI só entra
+    // se a peça estiver em mau estado (estado "usado" ou "com_defeito")
+    const investimentoSemDepreciacao = tmemo === "investimento" && (estado === "como_novo" || estado === "bom");
+    const valorMercado = investimentoSemDepreciacao
       ? Math.round(p * fmemo * fatorArtesanal)
       : Math.round(p * fmemo * feiClamp * fatorArtesanal);
 
@@ -632,11 +640,13 @@ export default function Calculadora() {
     // Total NG
     const totalNG = liquidoAluguer + vendaFinalLiquido;
 
-    // Vinted — preço de ocasião imediato (preço original × condição × desconto plataforma)
-    // Na Vinted o vendedor tende a pedir ~60-70% do valor de mercado justo
-    // Comissão Vinted: ~8% comprador + 5% vendedor = vendedor recebe ~95% do listing
-    const VINTED_FATOR_TIER = { investimento: 0.58, premium: 0.48, alta: 0.35, massmarket: 0.22, semMarca: 0.30 };
-    const vintedBase = Math.round(p * feiClamp * (VINTED_FATOR_TIER[tmemo] ?? 0.28));
+    // ── Estimativa Vinted ──────────────────────────────────────────────────────
+    // A Vinted tende a desvalorizar sistematicamente: o algoritmo da plataforma
+    // incentiva preços baixos e a referência de mercado são outros vendedores (também baixos).
+    // Estimativa: lojista recebe ~55-65% do valor justo de mercado após comissões Vinted.
+    // Marcas investimento retêm mais mesmo na Vinted; massmarket colapsa.
+    const VINTED_RETENCAO = { investimento: 0.62, premium: 0.52, alta: 0.40, massmarket: 0.18, semMarca: 0.32 };
+    const vintedBase = Math.round(valorMercado * (VINTED_RETENCAO[tmemo] ?? 0.35));
     const vendaVinted = Math.max(5, vintedBase);
 
     const ganhoExtra = totalNG - vendaVinted;
