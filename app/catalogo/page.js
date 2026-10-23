@@ -404,17 +404,16 @@ export default function Catalogo() {
         .cat-nav {
           position:fixed; top:0; left:0; right:0; z-index:100;
           display:flex; align-items:center; gap:0.75rem;
-          padding:0.75rem 1rem;
+          padding:max(0.75rem, env(safe-area-inset-top, 0px)) 1rem 0.75rem;
           background:rgba(248,247,245,0.97); backdrop-filter:blur(20px);
           border-bottom:1px solid var(--grey-200);
-          height:52px;
         }
         .cat-nav-logo { font-family:var(--serif); font-size:1rem; font-weight:300; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; color:var(--black); flex:1; }
         .cat-nav-icon { display:flex; align-items:center; justify-content:center; padding:0.35rem; color:var(--black); position:relative; text-decoration:none; }
 
         /* ── FILTROS TOPO — sticky abaixo da nav ── */
         .filtros-sticky {
-          position:sticky; top:52px; z-index:90;
+          position:sticky; top:calc(52px + env(safe-area-inset-top, 0px)); z-index:90;
           background:rgba(248,247,245,0.98); backdrop-filter:blur(12px);
           border-bottom:1px solid var(--grey-200);
         }

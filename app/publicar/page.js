@@ -964,7 +964,7 @@ export default function PublicarPage() {
         :root { --black: #080808; --white: #f8f7f5; --g1: #f0eeeb; --g2: #e2dfda; --g3: #c8c4bc; --g4: #7a776f; --rosa: #c4748a; --ouro: #c4a882; --sans: 'Jost', Arial, sans-serif; --serif: 'Cormorant', Georgia, serif; }
         body { background: var(--g1); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
 
-        .pub-nav { background: #fff; border-bottom: 1px solid var(--g2); padding: 0.9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .pub-nav { background: #fff; border-bottom: 1px solid var(--g2); padding: max(0.9rem, env(safe-area-inset-top, 0px)) 1.5rem 0.9rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
         .pub-logo { font-family: var(--serif); font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; color: var(--black); }
         .pub-voltar { font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--g4); text-decoration: none; }
         .pub-steps { display: flex; align-items: center; gap: 0.3rem; }

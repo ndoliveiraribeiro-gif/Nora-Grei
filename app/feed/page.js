@@ -126,7 +126,7 @@ export default function FeedPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
-        .feed-header{background:#fff;border-bottom:1px solid #e8e4df;position:sticky;top:0;z-index:100;padding:0.75rem 1rem}
+        .feed-header{background:#fff;border-bottom:1px solid #e8e4df;position:sticky;top:0;z-index:100;padding:max(0.75rem, env(safe-area-inset-top, 0px)) 1rem 0.75rem}
         .feed-header-top{display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto 0.6rem}
         .feed-logo{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:0.05em;color:#1a1a1a;text-decoration:none}
         .feed-pub-btn{background:#1a1a1a;color:#fff;border:none;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;cursor:pointer;letter-spacing:0.05em;font-family:'Jost',sans-serif}

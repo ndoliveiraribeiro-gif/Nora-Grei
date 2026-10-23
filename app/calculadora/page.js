@@ -796,7 +796,7 @@ export default function Calculadora() {
           min-height: 100svh;
           max-width: 480px;
           margin: 0 auto;
-          padding: 0 1rem calc(5rem + env(safe-area-inset-bottom, 0px));
+          padding: env(safe-area-inset-top, 0px) 1rem calc(5rem + env(safe-area-inset-bottom, 0px));
         }
 
         /* ── Header ─────────────────────────── */
