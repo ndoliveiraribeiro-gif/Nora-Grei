@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 
 const T = {
@@ -500,6 +500,15 @@ export default function Calculadora() {
   const [meses, setMeses] = useState(12);
   const [artesanal, setArtesanal] = useState(false);
 
+  // Taxas de apreciação por marca — carregadas do Supabase, fallback para APREC_MARCA
+  const [aprecRates, setAprecRates] = useState(APREC_MARCA);
+  useEffect(() => {
+    fetch("/api/marcas-rates")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && typeof data === "object") setAprecRates(prev => ({ ...prev, ...data })); })
+      .catch(() => {}); // fallback silencioso para os valores hardcoded
+  }, []);
+
   // Gate de email
   const [gateAberto, setGateAberto] = useState(false);
   const [gateEmail, setGateEmail] = useState("");
@@ -661,9 +670,10 @@ export default function Calculadora() {
     // Taxa de apreciação: ~5.5%/ano composto para investimento tier
     // Estado "usado" ou "com_defeito": FEI aplica-se mesmo nestas marcas
     const anosRef = idObj.anos ?? 1.0;
-    // Taxa de apreciação individual por marca (Gucci=0, LV=3%, Rolex=8.2%, Patek=9.5%…)
+    // Taxa de apreciação individual por marca — lida do Supabase em runtime,
+    // fallback para APREC_MARCA hardcoded se o fetch ainda não terminou
     const marcaKey = marca.trim().toLowerCase();
-    const taxaAprec = APREC_MARCA[marcaKey] ?? 0;
+    const taxaAprec = aprecRates[marcaKey] ?? 0;
     const emBomEstado = estado === "como_novo" || estado === "bom";
     const fatorApreciacao = (taxaAprec > 0 && emBomEstado)
       ? Math.pow(1 + taxaAprec, anosRef)   // Rolex de 10 anos bom estado: ×1.71
@@ -711,7 +721,7 @@ export default function Calculadora() {
       receitaBruta, liquidoAluguer, valorFinalPeca,
       vendaFinalLiquido, totalNG, vendaVinted, ganhoExtra, multiplicador, tier: tmemo,
     };
-  }, [p, marca, tipo, estado, uso, idade, meses]);
+  }, [p, marca, tipo, estado, uso, idade, meses, aprecRates]);
 
   // Lógica do gate: quando o resultado aparece, verificar se precisa gate
   useEffect(() => {
