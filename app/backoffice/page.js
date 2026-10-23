@@ -1311,7 +1311,7 @@ export default function Backoffice() {
       // lojistas aprovados para painel de avaliações
       const { data: lojs } = await supabase
         .from("clientes")
-        .select("id, nome, email, codigo_cliente, lojista_estado")
+        .select("id, nome, email, codigo_cliente, lojista_estado, loja_verificada, is_marca_propria")
         .eq("modo_lojista", true)
         .order("nome");
       if (lojs) setLojistasAprovados(lojs);
@@ -3072,6 +3072,12 @@ export default function Backoffice() {
             setCandidaturasLojista(prev => prev.filter(c => c.id !== cliente.id));
           };
 
+          const toggleLojaVerificada = async (lj) => {
+            const novoEstado = !lj.loja_verificada;
+            await supabase.from("clientes").update({ loja_verificada: novoEstado }).eq("id", lj.id);
+            setLojistasAprovados(prev => prev.map(l => l.id === lj.id ? {...l, loja_verificada: novoEstado} : l));
+          };
+
           const depositos = alugueresLojista.filter(a => a.deposito_estado === "a_devolver");
           const pagamentos = alugueresLojista.filter(a => a.estado === "devolvido" && !a.liquidado_em);
           const disputas = alugueresLojista.filter(a => a.deposito_estado === "em_disputa");
@@ -3284,8 +3290,19 @@ export default function Backoffice() {
                           <div key={lj.id} style={{ background:"#fff",border:"1px solid #f0eeeb",padding:"1rem 1.25rem",borderLeft:`3px solid ${corMedia}` }}>
                             <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:"0.75rem" }}>
                               <div>
-                                <div style={{ fontWeight:500,fontSize:"0.9rem",fontFamily:"'Jost',sans-serif" }}>{lj.nome}</div>
-                                <div style={{ fontSize:"0.72rem",color:"#888",fontFamily:"'Jost',sans-serif" }}>{lj.email} · @{lj.codigo_cliente||"—"}</div>
+                                <div style={{ display:"flex",alignItems:"center",gap:"0.5rem" }}>
+                                  <span style={{ fontWeight:500,fontSize:"0.9rem",fontFamily:"'Jost',sans-serif" }}>{lj.nome}</span>
+                                  {lj.is_marca_propria && <span style={{ fontSize:"0.52rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4748a",border:"1px solid rgba(196,116,138,0.4)",padding:"0.1rem 0.4rem" }}>Marca Oficial</span>}
+                                  {!lj.is_marca_propria && lj.loja_verificada && <span style={{ fontSize:"0.52rem",letterSpacing:"0.15em",textTransform:"uppercase",color:"#c4a882",border:"1px solid rgba(196,168,130,0.4)",padding:"0.1rem 0.4rem" }}>✦ Verificada</span>}
+                                </div>
+                                <div style={{ display:"flex",alignItems:"center",gap:"0.5rem" }}>
+                                  <span style={{ fontSize:"0.72rem",color:"#888",fontFamily:"'Jost',sans-serif" }}>{lj.email} · @{lj.codigo_cliente||"—"}</span>
+                                  {!lj.is_marca_propria && (
+                                    <button onClick={() => toggleLojaVerificada(lj)} style={{ fontSize:"0.62rem",padding:"0.15rem 0.5rem",border:`1px solid ${lj.loja_verificada?"#c4a882":"#ddd"}`,background:lj.loja_verificada?"rgba(196,168,130,0.12)":"transparent",color:lj.loja_verificada?"#c4a882":"#888",cursor:"pointer",letterSpacing:"0.08em",textTransform:"uppercase",fontFamily:"'Jost',sans-serif" }}>
+                                      {lj.loja_verificada ? "✦ Remover verificação" : "Marcar verificada"}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                               <div style={{ display:"flex",alignItems:"center",gap:"0.75rem" }}>
                                 {media ? (

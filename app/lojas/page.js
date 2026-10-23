@@ -50,7 +50,7 @@ export default function Lojas() {
   const carregar = async () => {
     const { data } = await supabase
       .from("clientes")
-      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao, is_marca_propria")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao, is_marca_propria, loja_verificada")
       .eq("modo_lojista", true)
       .order("is_marca_propria", { ascending: false })
       .order("nome");
@@ -149,6 +149,7 @@ export default function Lojas() {
                   }
                 </div>
                 {loja.is_marca_propria && <span className="loja-badge-marca">Marca Oficial</span>}
+                {!loja.is_marca_propria && loja.loja_verificada && <span className="loja-badge-marca" style={{color:"#c4a882",borderColor:"rgba(196,168,130,0.5)"}}>✦ Verificada</span>}
                 <div className="loja-nome">{nomeVis}</div>
                 {(loja.cidade || loja.pais) && (
                   <div className="loja-local">{[loja.cidade, loja.pais].filter(Boolean).join(", ")}</div>

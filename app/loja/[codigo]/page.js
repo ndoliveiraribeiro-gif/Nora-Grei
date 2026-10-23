@@ -24,7 +24,7 @@ async function getLoja(codigo) {
   return withRetry(async () => {
     const { data, error } = await sbServer()
       .from("clientes")
-      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at")
+      .select("id, nome, nome_publico, codigo_cliente, cidade, pais, foto_perfil, descricao, created_at, is_marca_propria, loja_verificada")
       .eq("codigo_cliente", codigo)
       .maybeSingle();
     return data || null;

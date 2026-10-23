@@ -177,6 +177,7 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
         .loja-avatar-lg-initials{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.8rem;font-weight:300;color:var(--rosa)}
         .loja-header-info{flex:1;min-width:0}
         .loja-header-membro{font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rosa);font-family:var(--sans);margin-bottom:0.4rem}
+        .loja-badge-oficial{display:inline-flex;align-items:center;gap:0.35rem;font-size:0.52rem;letter-spacing:0.22em;text-transform:uppercase;font-family:var(--sans);color:#c4a882;border:1px solid rgba(196,168,130,0.5);padding:0.2rem 0.6rem;margin-bottom:0.5rem;background:rgba(196,168,130,0.08)}
         .loja-header-nome{font-family:var(--serif);font-size:clamp(1.8rem,6vw,3rem);font-weight:300;color:#fff;line-height:1.1;margin-bottom:0.5rem}
         .loja-header-local{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:var(--sans)}
         .loja-header-desc{font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.6;margin-top:1rem;max-width:520px}
@@ -235,6 +236,11 @@ export default function LojaCliente({ lojaInicial, pecasIniciais }) {
             }
           </div>
           <div className="loja-header-info">
+            {(loja.is_marca_propria || loja.loja_verificada) && (
+              <div className="loja-badge-oficial">
+                ✦ {loja.is_marca_propria ? "Marca Oficial" : "Loja Verificada"}
+              </div>
+            )}
             <p className="loja-header-membro">{t.membro}</p>
             <h1 className="loja-header-nome">{nomeVis}</h1>
             {(loja.cidade || loja.pais) && (

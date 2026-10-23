@@ -1188,6 +1188,9 @@ export default function Perfil() {
   const [candidaturaLojista, setCandidaturaLojista] = useState(null); // null | "pendente" | "recusada"
   const [showFormLojista, setShowFormLojista] = useState(false);
   const [formLojista, setFormLojista] = useState({ tipo_entidade: "", nome_loja: "", nome_empresa: "", nif_empresa: "", descricao: "", iban: "", tipo_pagamento: "transferencia", nif: "", telefone_loja: "", morada: "", tipo_pecas: "", aceita_termos: false, aceita_responsabilidades: false, cartao_numero: "", cartao_validade: "", cartao_cvv: "" });
+  const [nomeLojaTaken, setNomeLojaTaken] = useState(false);
+  const [nomeLojasChecking, setNomeLojaChecking] = useState(false);
+  const [nomeLojaCheckTimer, setNomeLojaCheckTimer] = useState(null);
   const [formLojistaMsg, setFormLojistaMsg] = useState("");
   const [formLojistaLoading, setFormLojistaLoading] = useState(false);
   const [stripeDisponivel, setStripeDisponivel] = useState(false);
@@ -1493,6 +1496,36 @@ export default function Perfil() {
     }
   };
 
+  // ── VERIFICAÇÃO NOME LOJA ÚNICO ────────────────────────────────────────
+  const verificarNomeLoja = async (nome) => {
+    if (!nome || nome.trim().length < 2) { setNomeLojaTaken(false); setNomeLojaChecking(false); return; }
+    setNomeLojaChecking(true);
+    const nomeLower = nome.trim().toLowerCase();
+    // Verificar nome_publico e nome_loja em candidaturas pendentes/aprovadas
+    const { data: porNomePublico } = await supabase.from("clientes").select("id").ilike("nome_publico", nomeLower).neq("id", user.id).maybeSingle();
+    let tomado = !!porNomePublico;
+    if (!tomado) {
+      // Verificar candidaturas com o mesmo nome de loja
+      const { data: todos } = await supabase.from("clientes").select("id, lojista_candidatura_dados").neq("id", user.id).not("candidatura_lojista", "is", null);
+      if (todos) {
+        tomado = todos.some(c => {
+          const n = c.lojista_candidatura_dados?.nome_loja?.trim().toLowerCase();
+          return n && n === nomeLower;
+        });
+      }
+    }
+    setNomeLojaTaken(tomado);
+    setNomeLojaChecking(false);
+  };
+
+  const onNomeLojaChange = (val) => {
+    setFormLojista(f => ({...f, nome_loja: val}));
+    setNomeLojaTaken(false);
+    if (nomeLojaCheckTimer) clearTimeout(nomeLojaCheckTimer);
+    const t = setTimeout(() => verificarNomeLoja(val), 700);
+    setNomeLojaCheckTimer(t);
+  };
+
   // ── URL PERSONALIZADO DA LOJA ──────────────────────────────────────────
   const slugify = (str) => str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"").slice(0,30);
 
@@ -1735,6 +1768,8 @@ export default function Perfil() {
   const submeterCandidaturaLojista = async () => {
     if (!formLojista.tipo_entidade) { setFormLojistaMsg("Indica se és pessoa singular ou empresa."); return; }
     if (!formLojista.nome_loja.trim()) { setFormLojistaMsg("Indica o nome da tua loja."); return; }
+    if (nomeLojaTaken) { setFormLojistaMsg("Já existe uma loja com esse nome. Escolhe outro nome para a tua loja."); return; }
+    if (nomeLojasChecking) { setFormLojistaMsg("A verificar disponibilidade do nome..."); return; }
     if (formLojista.tipo_entidade === "empresa" && !formLojista.nome_empresa.trim()) { setFormLojistaMsg("Indica o nome da empresa."); return; }
     if (formLojista.tipo_entidade === "empresa" && !formLojista.nif.trim()) { setFormLojistaMsg("Indica o NIF da empresa para faturação."); return; }
     if (!formLojista.telefone_loja.trim()) { setFormLojistaMsg("Indica um número de telefone de contacto."); return; }
@@ -3184,7 +3219,10 @@ export default function Perfil() {
                   <div style={{fontSize:"0.72rem",letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--g4)",fontWeight:600,marginBottom:"1rem",paddingBottom:"0.5rem",borderBottom:"1px solid #e2dfda"}}>1 · Sobre a tua loja</div>
                   <div style={{marginBottom:"0.75rem"}}>
                     <label style={{display:"block",fontSize:"0.68rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"var(--g6)",marginBottom:"0.35rem",fontWeight:500}}>Nome da loja *</label>
-                    <input style={{width:"100%",padding:"0.75rem",border:"1.5px solid #e2dfda",background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => setFormLojista(f => ({...f, nome_loja: e.target.value}))} placeholder="ex: Atelier da Maria" />
+                    <input style={{width:"100%",padding:"0.75rem",border:`1.5px solid ${nomeLojaTaken?"#c0392b":nomeLojasChecking?"#c4a882":"#e2dfda"}`,background:"#fff",fontSize:"0.9rem",fontFamily:"var(--sans)",color:"var(--black)",outline:"none",boxSizing:"border-box"}} value={formLojista.nome_loja} onChange={e => onNomeLojaChange(e.target.value)} placeholder="ex: Atelier da Maria" />
+                    {nomeLojasChecking && <div style={{fontSize:"0.7rem",color:"#c4a882",marginTop:"0.3rem",fontFamily:"var(--sans)"}}>A verificar disponibilidade...</div>}
+                    {nomeLojaTaken && <div style={{fontSize:"0.7rem",color:"#c0392b",marginTop:"0.3rem",fontFamily:"var(--sans)"}}>Este nome já está em uso. Escolhe outro.</div>}
+                    {!nomeLojaTaken && !nomeLojasChecking && formLojista.nome_loja.trim().length >= 2 && <div style={{fontSize:"0.7rem",color:"#27ae60",marginTop:"0.3rem",fontFamily:"var(--sans)"}}>Nome disponível ✓</div>}
                   </div>
                   {formLojista.tipo_entidade === "empresa" && (<>
                     <div style={{marginBottom:"0.75rem"}}>
