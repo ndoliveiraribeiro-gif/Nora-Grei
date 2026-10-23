@@ -200,53 +200,125 @@ const T = {
 // ── Sistema de marcas com grupos ─────────────────────────────────────────────
 // Listas de detecção de tier (lowercase, para fatorMarca)
 const MARCAS_INVESTIMENTO = [
-  "rolex","patek philippe","patek","audemars piguet","ap","richard mille",
+  // Relógios topo
+  "rolex","patek philippe","patek","audemars piguet","ap","richard mille","rm",
   "vacheron constantin","jaeger-lecoultre","jaeger lecoultre","a. lange","lange",
-  "cartier","hermès","hermes","chanel","louis vuitton","lv","birkin","kelly",
-  "delvaux","goyard",
+  "a. lange & söhne","fp journe","f.p. journe","greubel forsey","mb&f",
+  // Malas & Joalharia Topo
+  "hermès","hermes","chanel","louis vuitton","lv","birkin","kelly",
+  "delvaux","goyard","bulgari","bvlgari","van cleef","van cleef & arpels",
+  "cartier","chopard","harry winston","graff","tiffany","tiffany & co",
 ];
 const MARCAS_PREMIUM = [
+  // Luxo roupa & acessórios
   "gucci","prada","bottega veneta","dior","christian dior","saint laurent","ysl",
   "celine","céline","givenchy","valentino","versace","balenciaga","jacquemus",
   "loewe","loro piana","brunello cucinelli","max mara","tod's","tods","ferragamo",
-  "burberry","mulberry","ralph lauren","michael kors","coach","kate spade",
-  "longchamp","furla","tory burch","liu jo","pinko","self-portrait",
-  "omega","tag heuer","breitling","iwc","tudor","longines","tissot",
+  "salvatore ferragamo","burberry","mulberry","ralph lauren","polo ralph lauren",
+  "alexander mcqueen","mcqueen","alexander wang","wang","off-white","off white",
+  "balmain","lanvin","rochas","nina ricci","vivienne westwood","stella mccartney",
+  "isabel marant","marni","fendi","miu miu","dsquared2","dsquared","moschino",
+  "roberto cavalli","cavalli","dolce & gabbana","d&g","dolce gabbana","armani",
+  "giorgio armani","emporio armani","ea7","hugo boss","boss","escada","etro",
+  "missoni","emilio pucci","pucci","alberta ferretti","philosophy","oscar de la renta",
+  // Malas premium
+  "michael kors","coach","kate spade","longchamp","furla","tory burch","liu jo",
+  "pinko","self-portrait","mansur gavriel","staud","jacquemus","by far",
+  "polene","polène","wandler","a.p.c.","apc","strathberry","yuzefi","elleme",
+  // Relógios premium
+  "omega","tag heuer","breitling","iwc","tudor","longines","tissot","hublot",
+  "panerai","zenith","glashutte","glashutte original","blancpain","frederique constant",
+  "bell & ross","rado","baume & mercier","raymond weil","oris","nomos","nomos glashutte",
+  // Calçado luxo
+  "christian louboutin","louboutin","jimmy choo","manolo blahnik","gianvito rossi",
+  "aquazzura","sergio rossi","rene caovilla","stuart weitzman","giuseppe zanotti",
+  "valentino garavani","giambattista valli","roger vivier",
 ];
 const MARCAS_ALTA = [
-  "zara","mango","&other stories","other stories","cos","arket","massimo dutti",
-  "pedro del hierro","hugo boss","boss","calvin klein","ck","tommy hilfiger","tommy",
-  "lacoste","levis","levi's","gant","scotch soda","weekday","monki","stradivarius",
-  "bershka","pull&bear","sfera","phase eight","whistles","reiss","allsaints",
-  "ba&sh","bash","sandro","maje","claudie pierlot","rouje","apc","a.p.c.",
-  "isabel marant etoile","ba&sh","iro","american vintage","sessun","soeur",
+  // Contemporary
+  "sandro","maje","ba&sh","bash","claudie pierlot","rouje","iro","american vintage",
+  "sessun","soeur","isabel marant etoile","ba&sh","a.p.c.","apc",
+  "rouje","antik batik","ba&sh","vanessa bruno","paul & joe","gerard darel",
+  "cop copine","naf naf","caroll","morgan","les petites","bel air","berenice",
+  "pepe jeans","scotch & soda","scotch soda","reiss","warehouse","oasis","coast",
+  "karen millen","whistles","hobbs","phase eight","ghost","joanna hope",
+  // High street qualidade
+  "zara","mango","cos","arket","massimo dutti","& other stories","other stories",
+  "calvin klein","ck","tommy hilfiger","tommy","lacoste","levi's","levis",
+  "gant","allsaints","all saints","weekday","monki","stradivarius","bershka",
+  "pull&bear","pull & bear","selected","selected femme","vila","object","pieces",
+  "vero moda","only","jack & jones","name it","noisy may","envii",
+  "pedro del hierro","pedro","pedro del hierro","pedro del hierro","moda dom",
+  // Calçado mid-range
+  "steve madden","nine west","aerosoles","naturalizer","clarks","ecco",
+  "ugg","ugg australia","sorel","hunter","sam edelman","vince camuto",
+  "geox","camper","superga","converse","vans","new balance","asics","nike",
+  "adidas","puma","reebok","fila","ellesse","champion",
 ];
 
 // Grupos para o combobox — separados por tipo de produto
 const GRUPOS_MARCA = [
+  // ── MALAS ──────────────────────────────────────────────────────────────
   {
-    grupo: { pt: "Relógios de Luxo", fr: "Montres de Luxe", lt: "Prabangūs laikrodžiai" },
-    marcas: ["Rolex","Patek Philippe","Audemars Piguet","Richard Mille","Vacheron Constantin","Jaeger-LeCoultre","A. Lange & Söhne","Cartier","Omega","TAG Heuer","Breitling","IWC","Tudor","Longines","Tissot"],
+    grupo: { pt: "Malas — Ultra Luxo", fr: "Sacs — Ultra Luxe", lt: "Krepšiai — Aukščiausias Luxas" },
+    marcas: ["Hermès","Louis Vuitton","Chanel","Delvaux","Goyard","Bottega Veneta"],
   },
   {
-    grupo: { pt: "Haute Couture & Joalharia", fr: "Haute Couture & Joaillerie", lt: "Haute couture ir papuošalai" },
-    marcas: ["Chanel","Hermès","Louis Vuitton","Delvaux","Goyard"],
+    grupo: { pt: "Malas — Luxo", fr: "Sacs — Luxe", lt: "Krepšiai — Prabanga" },
+    marcas: ["Gucci","Prada","Dior","Saint Laurent","Celine","Givenchy","Valentino","Balenciaga","Loewe","Fendi","Burberry","Mulberry","Tod's","Ferragamo","Balmain","Giambattista Valli","Miu Miu","Vivienne Westwood","Alexander McQueen","Stella McCartney","Marni","Moschino","Dolce & Gabbana","Giorgio Armani","Emporio Armani","Etro","Missoni","Roberto Cavalli","Oscar de la Renta","Ralph Lauren"],
   },
   {
-    grupo: { pt: "Luxo — Roupa & Acessórios", fr: "Luxe — Vêtements & Accessoires", lt: "Prabanga — drabužiai ir aksesuarai" },
-    marcas: ["Gucci","Prada","Bottega Veneta","Dior","Saint Laurent","Celine","Givenchy","Valentino","Versace","Balenciaga","Jacquemus","Loewe","Loro Piana","Brunello Cucinelli","Max Mara","Tod's","Ferragamo","Burberry","Mulberry","Ralph Lauren"],
+    grupo: { pt: "Malas — Premium", fr: "Sacs — Premium", lt: "Krepšiai — Premium" },
+    marcas: ["Michael Kors","Coach","Kate Spade","Longchamp","Furla","Tory Burch","Liu Jo","Pinko","Self-Portrait","Mansur Gavriel","Staud","Polène","Wandler","Strathberry","Yuzefi","Elleme","By Far","A.P.C.","Jacquemus","Hugo Boss"],
   },
   {
-    grupo: { pt: "Premium — Malas & Acessórios", fr: "Premium — Sacs & Accessoires", lt: "Premium — rankinės ir aksesuarai" },
-    marcas: ["Michael Kors","Coach","Kate Spade","Longchamp","Furla","Tory Burch","Liu Jo","Pinko","Self-Portrait"],
+    grupo: { pt: "Malas — Contemporary", fr: "Sacs — Contemporary", lt: "Krepšiai — Contemporary" },
+    marcas: ["Sandro","Maje","Ba&sh","Claudie Pierlot","Isabel Marant","Zara","Mango","COS","& Other Stories","Arket","Massimo Dutti","Reiss","Whistles","Karen Millen"],
+  },
+  // ── ROUPA ──────────────────────────────────────────────────────────────
+  {
+    grupo: { pt: "Roupa — Haute Couture & Luxo", fr: "Vêtements — Haute Couture & Luxe", lt: "Drabužiai — Haute Couture" },
+    marcas: ["Chanel","Dior","Valentino","Givenchy","Balenciaga","Saint Laurent","Celine","Gucci","Prada","Bottega Veneta","Versace","Fendi","Loewe","Jacquemus","Balmain","Lanvin","Rochas","Nina Ricci","Vivienne Westwood","Stella McCartney","Alexander McQueen","Off-White","Marni","Moschino","Dolce & Gabbana","Giorgio Armani","Emporio Armani","Etro","Missoni","Roberto Cavalli","Giambattista Valli","Oscar de la Renta","Emilio Pucci","Alberta Ferretti","Escada","Loro Piana","Brunello Cucinelli","Max Mara","Ralph Lauren"],
   },
   {
-    grupo: { pt: "Contemporary / High Street", fr: "Contemporary / High Street", lt: "Contemporary / High Street" },
-    marcas: ["Sandro","Maje","Ba&sh","Claudie Pierlot","Isabel Marant Étoile","IRO","A.P.C.","American Vintage","Rouje","Sessun","Soeur"],
+    grupo: { pt: "Roupa — Premium & Designer", fr: "Vêtements — Premium & Designer", lt: "Drabužiai — Premium" },
+    marcas: ["Isabel Marant","Alexander Wang","Self-Portrait","Nanushka","Cult Gaia","Reformation","Sandro","Maje","Ba&sh","Claudie Pierlot","IRO","A.P.C.","American Vintage","Rouje","Soeur","Sessun","Antik Batik","Vanessa Bruno","Paul & Joe","Gérard Darel","Karen Millen","Phase Eight","Hobbs","Reiss","Whistles","Hugo Boss","Calvin Klein","Tommy Hilfiger","Ralph Lauren","Lacoste","Gant"],
   },
   {
-    grupo: { pt: "High Street", fr: "High Street", lt: "High Street" },
-    marcas: ["Zara","Mango","COS","Arket","Massimo Dutti","Hugo Boss","Calvin Klein","Tommy Hilfiger","Lacoste","Levi's","Gant","& Other Stories","Phase Eight","Reiss","Whistles","AllSaints","Pull&Bear","Bershka","Stradivarius"],
+    grupo: { pt: "Roupa — High Street", fr: "Vêtements — High Street", lt: "Drabužiai — High Street" },
+    marcas: ["Zara","Mango","COS","Arket","& Other Stories","Massimo Dutti","Pull&Bear","Bershka","Stradivarius","H&M","Weekday","Monki","AllSaints","Levi's","Calvin Klein Jeans","Tommy Jeans","Pepe Jeans","Scotch & Soda","Selected Femme","Vero Moda","Only","Vila","Object","Pieces","Noisy May","Envii"],
+  },
+  // ── CALÇADO ────────────────────────────────────────────────────────────
+  {
+    grupo: { pt: "Calçado — Luxo", fr: "Chaussures — Luxe", lt: "Avalynė — Prabanga" },
+    marcas: ["Christian Louboutin","Jimmy Choo","Manolo Blahnik","Gianvito Rossi","Aquazzura","Sergio Rossi","René Caovilla","Stuart Weitzman","Giuseppe Zanotti","Roger Vivier","Valentino Garavani","Giambattista Valli","Gucci","Prada","Dior","Saint Laurent","Bottega Veneta","Balenciaga","Versace","Dolce & Gabbana","Ferragamo","Tod's","Chanel"],
+  },
+  {
+    grupo: { pt: "Calçado — Premium & Lifestyle", fr: "Chaussures — Premium & Lifestyle", lt: "Avalynė — Premium" },
+    marcas: ["Michael Kors","Tory Burch","Liu Jo","Steve Madden","Nine West","Sam Edelman","Vince Camuto","Clarks","Ecco","Geox","Camper","Superga","UGG","Sorel","Hunter","Converse","Vans","New Balance","Nike","Adidas","Puma","Reebok","Fila","Asics"],
+  },
+  // ── RELÓGIOS ───────────────────────────────────────────────────────────
+  {
+    grupo: { pt: "Relógios — Ultra Luxo", fr: "Montres — Ultra Luxe", lt: "Laikrodžiai — Ultra Prabanga" },
+    marcas: ["Rolex","Patek Philippe","Audemars Piguet","Richard Mille","Vacheron Constantin","Jaeger-LeCoultre","A. Lange & Söhne","F.P. Journe","Greubel Forsey","MB&F","Breguet","Blancpain","Glashutte Original"],
+  },
+  {
+    grupo: { pt: "Relógios — Luxo & Premium", fr: "Montres — Luxe & Premium", lt: "Laikrodžiai — Prabanga" },
+    marcas: ["Cartier","Omega","TAG Heuer","Breitling","IWC","Tudor","Hublot","Panerai","Zenith","Longines","Tissot","Bell & Ross","Rado","Baume & Mercier","Raymond Weil","Oris","Nomos","Frederique Constant","Chopard"],
+  },
+  // ── JOALHARIA & ACESSÓRIOS ─────────────────────────────────────────────
+  {
+    grupo: { pt: "Joalharia — Alta Joalharia", fr: "Bijoux — Haute Joaillerie", lt: "Papuošalai — Aukščiausia Klasė" },
+    marcas: ["Cartier","Bulgari","Van Cleef & Arpels","Chopard","Harry Winston","Tiffany & Co","Graff","Boucheron","Pomellato","Chaumet","Piaget","De Beers","Chanel Joaillerie","Dior Joaillerie"],
+  },
+  {
+    grupo: { pt: "Joalharia & Acessórios — Premium", fr: "Bijoux & Accessoires — Premium", lt: "Papuošalai ir aksesuarai — Premium" },
+    marcas: ["Pandora","Swarovski","Monica Vinader","Thomas Sabo","Tous","Agatha","Majorica","Uno de 50","Camille Enrico","Artizan Joyeria","Vidal & Vidal","Aristocrazy","Unode50"],
+  },
+  // ── SPORTSWEAR & ATHLEISURE ────────────────────────────────────────────
+  {
+    grupo: { pt: "Sportswear & Athleisure", fr: "Sportswear & Athleisure", lt: "Sportinė apranga" },
+    marcas: ["Nike","Adidas","Puma","Reebok","New Balance","Asics","Under Armour","Lululemon","Gymshark","Sweaty Betty","Varley","Vuori","Girlfriend Collective","Fila","Ellesse","Champion","Calvin Klein Sport","Tommy Hilfiger Sport","EA7","Lacoste Sport","Superdry","Napapijri","The North Face","Patagonia","Arc'teryx"],
   },
 ];
 

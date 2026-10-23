@@ -490,25 +490,59 @@ const PECA_VAZIA = {
 
 // ── Estimativa de valor de mercado ──────────────────────────────────────────
 const MARCAS_PREMIUM = [
-  "hermès","hermes","chanel","louis vuitton","lv","gucci","prada","bottega veneta",
-  "dior","christian dior","saint laurent","ysl","celine","céline","givenchy",
-  "valentino","versace","balenciaga","jacquemus","loewe","loro piana","brunello cucinelli",
-  "max mara","tod's","tods","ferragamo","burberry","mulberry","ralph lauren",
-  // relógios & jóias
-  "rolex","patek philippe","audemars piguet","richard mille","ap","cartier","bulgari","bvlgari",
-  "tiffany","tiffany & co","van cleef","van cleef & arpels","chopard","piaget","iwc",
-  "jaeger-lecoultre","jaeger lecoultre","jlc","omega","tag heuer","breitling","longines",
-  "swarovski","pandora","dior joaillerie","chanel joaillerie",
+  // Malas & roupa luxo topo
+  "hermès","hermes","chanel","louis vuitton","lv","delvaux","goyard","bottega veneta",
+  "gucci","prada","dior","christian dior","saint laurent","ysl","celine","céline",
+  "givenchy","valentino","versace","balenciaga","jacquemus","loewe","fendi","miu miu",
+  "loro piana","brunello cucinelli","max mara","tod's","tods","ferragamo","salvatore ferragamo",
+  "burberry","mulberry","ralph lauren","polo ralph lauren","alexander mcqueen","mcqueen",
+  "alexander wang","off-white","off white","balmain","lanvin","rochas","nina ricci",
+  "vivienne westwood","stella mccartney","isabel marant","marni","moschino","roberto cavalli",
+  "cavalli","dolce & gabbana","d&g","dolce gabbana","armani","giorgio armani","emporio armani",
+  "ea7","escada","etro","missoni","emilio pucci","pucci","alberta ferretti","oscar de la renta",
+  // Calçado luxo
+  "christian louboutin","louboutin","jimmy choo","manolo blahnik","gianvito rossi",
+  "aquazzura","sergio rossi","rene caovilla","stuart weitzman","giuseppe zanotti",
+  "valentino garavani","giambattista valli","roger vivier",
+  // Malas premium
+  "mansur gavriel","staud","polene","polène","wandler","strathberry","yuzefi","elleme","by far",
+  // Relógios ultra luxo & premium
+  "rolex","patek philippe","audemars piguet","richard mille","vacheron constantin",
+  "jaeger-lecoultre","jaeger lecoultre","a. lange & söhne","fp journe","f.p. journe",
+  "greubel forsey","mb&f","breguet","blancpain","glashutte original","glashutte",
+  "cartier","omega","tag heuer","breitling","iwc","tudor","hublot","panerai","zenith",
+  "longines","tissot","bell & ross","rado","baume & mercier","raymond weil","oris","nomos",
+  "frederique constant","chopard",
+  // Alta joalharia
+  "bulgari","bvlgari","van cleef","van cleef & arpels","harry winston","graff",
+  "tiffany","tiffany & co","boucheron","pomellato","chaumet","piaget","de beers",
+  "chanel joaillerie","dior joaillerie",
 ];
 const MARCAS_ALTA = [
-  "zara","mango","&other stories","other stories","cos","arket","massimo dutti",
-  "pedro del hierro","escorpion","escorpión","hugo boss","boss","calvin klein","ck",
-  "tommy hilfiger","tommy","lacoste","levis","levi's","gant","scotch soda",
-  "weekday","monki","stradivarius","bershka","pull&bear","sfera","phase eight",
-  "whistles","reiss","allsaints","all saints","ba&sh","bash","sandro","maje",
-  // relógios & jóias acessíveis
-  "fossil","michael kors","marc jacobs","kate spade","coach","dkny","tommy hilfiger watches",
-  "cluse","daniel wellington","mvmt","aldo","mango accessories",
+  // Contemporary premium
+  "sandro","maje","ba&sh","bash","claudie pierlot","iro","american vintage","rouje",
+  "sessun","soeur","antik batik","vanessa bruno","paul & joe","gerard darel",
+  "karen millen","phase eight","hobbs","whistles","reiss","ghost","self-portrait",
+  "nanushka","cult gaia","reformation",
+  // Joalharia acessível
+  "pandora","swarovski","monica vinader","thomas sabo","tous","agatha","majorica","unode50",
+  // Relógios mid
+  "fossil","michael kors","marc jacobs","kate spade","coach","dkny",
+  "cluse","daniel wellington","mvmt","hugo boss watches","tommy hilfiger watches",
+  // High street qualidade
+  "zara","mango","cos","arket","& other stories","other stories","massimo dutti",
+  "hugo boss","boss","calvin klein","ck","tommy hilfiger","tommy","lacoste",
+  "levis","levi's","gant","scotch soda","scotch & soda","weekday","monki",
+  "stradivarius","bershka","pull&bear","pull & bear","phase eight",
+  "allsaints","all saints","selected femme","vero moda","only","vila","object",
+  "pieces","noisy may","envii","pepe jeans",
+  // Calçado mid
+  "steve madden","nine west","sam edelman","vince camuto","clarks","ecco","geox","camper",
+  "ugg","sorel","hunter","superga","converse","vans","new balance","nike","adidas",
+  "puma","reebok","fila","asics","under armour",
+  // Sportswear premium
+  "lululemon","gymshark","sweaty betty","varley","vuori","girlfriend collective",
+  "ellesse","champion","napapijri","the north face","patagonia","arc'teryx","superdry",
 ];
 
 function fatorMarca(marca = "") {
