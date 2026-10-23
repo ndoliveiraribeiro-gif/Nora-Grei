@@ -15,6 +15,8 @@ const T = {
     estadoLabel: "Estado actual da peça",
     usoLabel: "Frequência de uso",
     idadeLabel: "Idade da peça",
+    artesanalLabel: "Peça artesanal / feita à mão",
+    artesanalHint: "Peça única feita à mão — aplica valorização de 1.8×",
     mesesLabel: "Durante quantos meses queres alugar?",
     mesesPeriodo: "Período de aluguer",
     mesesUnidade: (n) => `${n} meses`,
@@ -77,6 +79,8 @@ const T = {
     estadoLabel: "État actuel de la pièce",
     usoLabel: "Fréquence d'utilisation",
     idadeLabel: "Âge de la pièce",
+    artesanalLabel: "Pièce artisanale / faite à la main",
+    artesanalHint: "Pièce unique faite main — valorisation ×1.8 appliquée",
     mesesLabel: "Pendant combien de mois veux-tu louer ?",
     mesesPeriodo: "Période de location",
     mesesUnidade: (n) => `${n} mois`,
@@ -139,6 +143,8 @@ const T = {
     estadoLabel: "Dabartinė drabužio būklė",
     usoLabel: "Nešiojimo dažnis",
     idadeLabel: "Drabužio amžius",
+    artesanalLabel: "Rankų darbo / unikalus drabužis",
+    artesanalHint: "Vienintelis rankų darbo gaminys — taikomas 1.8× koeficientas",
     mesesLabel: "Kiek mėnesių nori nuomoti?",
     mesesPeriodo: "Nuomos laikotarpis",
     mesesUnidade: (n) => `${n} mėn.`,
@@ -263,6 +269,8 @@ const FATORES_MARCA = {
   premium:      { roupa: 0.48, malas: 0.72, relogio: 0.65, calcado: 0.52, joias: 0.60, acess: 0.55 },
   alta:         { roupa: 0.28, malas: 0.45, relogio: 0.40, calcado: 0.35, joias: 0.38, acess: 0.32 },
   massmarket:   { roupa: 0.12, malas: 0.22, relogio: 0.18, calcado: 0.15, joias: 0.15, acess: 0.14 },
+  // Sem marca declarada: valor neutro (artesanal/sem etiqueta não deve ser penalizado como massmarket)
+  semMarca:     { roupa: 0.55, malas: 0.55, relogio: 0.55, calcado: 0.55, joias: 0.55, acess: 0.55 },
 };
 
 function categoriaTipo(tipo) {
@@ -277,17 +285,18 @@ function categoriaTipo(tipo) {
 function fatorMarca(marca = "", tipo = "_default") {
   const m = marca.toLowerCase().trim();
   const cat = categoriaTipo(tipo);
-  if (!m) return { fator: FATORES_MARCA.massmarket[cat], tier: "massmarket" };
+  if (!m) return { fator: FATORES_MARCA.semMarca[cat], tier: "semMarca" }; // sem marca: neutro, não penaliza artesanal
   if (MARCAS_INVESTIMENTO.some(b => m.includes(b))) return { fator: FATORES_MARCA.investimento[cat], tier: "investimento" };
   if (MARCAS_PREMIUM.some(b => m.includes(b)))      return { fator: FATORES_MARCA.premium[cat],      tier: "premium" };
   if (MARCAS_ALTA.some(b => m.includes(b)))         return { fator: FATORES_MARCA.alta[cat],         tier: "alta" };
-  return { fator: FATORES_MARCA.massmarket[cat], tier: "massmarket" };
+  return { fator: FATORES_MARCA.massmarket[cat], tier: "massmarket" }; // marca declarada mas desconhecida
 }
 
 // Comissões reais da plataforma
 const COMISSAO_ALUGUER = 0.10;
 const COMISSAO_VENDA = 0.20;
-const CUSTO_ENVIO = 6;
+const CUSTO_ENVIO = 6;           // envio simples (venda)
+const CUSTO_ENVIO_ALUGUER = 12; // €6 ida + €6 volta por aluguer
 
 const ESTADOS_DATA = [
   { id: "como_novo",  fator: 0.92, label: { pt: "Com etiqueta",   fr: "Avec étiquette",  lt: "Su etikete" } },
@@ -309,6 +318,8 @@ const IDADES_DATA = [
   { id: "2a4",   fator: 0.70, label: { pt: "2 a 4 anos",      fr: "2 à 4 ans",       lt: "2–4 metai" } },
   { id: "4mais", fator: 0.52, label: { pt: "Mais de 4 anos",  fr: "Plus de 4 ans",   lt: "Daugiau nei 4 metai" } },
 ];
+// Tabela de idade para peças nunca usadas/com etiqueta — a idade importa muito menos
+const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.97, "4mais": 0.92 };
 
 // ── Tipos de peça por categoria ──────────────────────────────────────────────
 const TIPOS_DATA = [
@@ -362,6 +373,7 @@ export default function Calculadora() {
   const [uso, setUso] = useState("pouco");
   const [idade, setIdade] = useState("1a2");
   const [meses, setMeses] = useState(12);
+  const [artesanal, setArtesanal] = useState(false);
 
   // Gate de email
   const [gateAberto, setGateAberto] = useState(false);
@@ -502,13 +514,19 @@ export default function Calculadora() {
     const cat = TIPOS_DATA.find(tp => tp.id === tipo) ?? TIPOS_DATA.find(tp => tp.id === "_default");
 
     // Fator estado × uso × idade combinado
-    const fei = est.fator * usoObj.fator * idObj.fator;
+    // Peças nunca usadas ou com etiqueta: a idade quase não penaliza
+    const isNuncaUsada = (uso === "nunca" && (estado === "como_novo" || estado === "bom"));
+    const fatorIdade = isNuncaUsada ? (IDADES_NOVO_FATOR[idade] ?? 1.0) : idObj.fator;
+    const fei = est.fator * usoObj.fator * fatorIdade;
     const feiClamp = fei < 0.30 ? fei * 0.85 : fei > 0.85 ? fei * 1.05 : fei;
+
+    // Multiplicador artesanal (peça única feita à mão)
+    const fatorArtesanal = artesanal ? 1.80 : 1.0;
 
     // Valor de mercado (marcas investimento podem superar preço original)
     const valorMercado = tmemo === "investimento"
-      ? Math.round(p * fmemo)
-      : Math.round(p * fmemo * feiClamp);
+      ? Math.round(p * fmemo * fatorArtesanal)
+      : Math.round(p * fmemo * feiClamp * fatorArtesanal);
 
     // Tier bonus para preço de aluguer
     const tierBonus = tmemo === "investimento" ? 1.35 : tmemo === "premium" ? 1.20 : tmemo === "alta" ? 1.05 : 1.0;
@@ -518,9 +536,9 @@ export default function Calculadora() {
     const rotacaoMes = cat.rot * est.fator;
     const alugueresTotal = Math.max(1, Math.round(rotacaoMes * meses));
 
-    // Receita aluguer
+    // Receita aluguer (deduz envio €6×2 por aluguer e comissão 10%)
     const receitaBruta = precoAluguer * alugueresTotal;
-    const liquidoAluguer = receitaBruta * (1 - COMISSAO_ALUGUER);
+    const liquidoAluguer = receitaBruta * (1 - COMISSAO_ALUGUER) - CUSTO_ENVIO_ALUGUER * alugueresTotal;
 
     // Valor residual após alugueres (deprecia suavemente)
     const depreciacaoMes = 0.008;
@@ -531,7 +549,7 @@ export default function Calculadora() {
     const totalNG = liquidoAluguer + vendaFinalLiquido;
 
     // Vinted — preço de ocasião imediato
-    const VINTED_FATOR_TIER = { investimento: 0.50, premium: 0.35, alta: 0.20, massmarket: 0.12 };
+    const VINTED_FATOR_TIER = { investimento: 0.50, premium: 0.35, alta: 0.20, massmarket: 0.12, semMarca: 0.25 };
     const vendaVinted = Math.round(p * (VINTED_FATOR_TIER[tmemo] ?? 0.18));
 
     const ganhoExtra = totalNG - vendaVinted;
@@ -773,6 +791,7 @@ export default function Calculadora() {
         .tier-investimento { background: #1a3a2a; color: #a8d8a8; }
         .tier-premium      { background: #1a1a2e; color: #c4b0e8; }
         .tier-alta         { background: #2a2018; color: #e8c97a; }
+        .tier-semMarca     { background: #2a2020; color: #d4a89a; }
 
         /* ── Pills em grid (4 colunas, nunca quebra) ── */
         .pills-grid {
@@ -1203,11 +1222,13 @@ export default function Calculadora() {
               </div>
             )}
           </div>
-          {tier && tier !== "massmarket" && marca && (
+          {tier && tier !== "massmarket" && (
             <span className={`marca-badge tier-${tier}`}>
               {tier==="investimento" ? (lang==="fr"?"Investissement ↑":lang==="lt"?"Investicinė ↑":"Investimento ↑")
               : tier==="premium" ? (lang==="fr"?"Marque premium":lang==="lt"?"Premium":"Premium")
-              : (lang==="fr"?"Haute marque":lang==="lt"?"Aukšta klasė":"Alta gama")}
+              : tier==="alta" ? (lang==="fr"?"Haute marque":lang==="lt"?"Aukšta klasė":"Alta gama")
+              : tier==="semMarca" ? (lang==="fr"?"Sans marque / artisanale":lang==="lt"?"Be prekės ženklo":"Sem marca / artesanal")
+              : null}
             </span>
           )}
         </div>
@@ -1278,6 +1299,23 @@ export default function Calculadora() {
                 {i.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* ── 6b. ARTESANAL toggle ── */}
+        <div className="card" style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", cursor: "pointer" }}
+          onClick={() => setArtesanal(a => !a)}>
+          <div style={{
+            width: "20px", height: "20px", minWidth: "20px", borderRadius: "4px", marginTop: "2px",
+            border: `2px solid ${artesanal ? "var(--rosa,#c4748a)" : "var(--sub,#999)"}`,
+            background: artesanal ? "var(--rosa,#c4748a)" : "transparent",
+            display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.18s"
+          }}>
+            {artesanal && <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          </div>
+          <div>
+            <div style={{ fontSize: "0.78rem", fontWeight: 500, color: "var(--fg)" }}>{t.artesanalLabel}</div>
+            <div style={{ fontSize: "0.68rem", color: "var(--sub)", marginTop: "0.2rem" }}>{t.artesanalHint}</div>
           </div>
         </div>
 
