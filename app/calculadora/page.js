@@ -385,10 +385,10 @@ const ESTADOS_DATA = [
 ];
 
 const USOS_DATA = [
-  { id: "nunca",    fator: 1.00, label: { pt: "Raramente usada",     fr: "Rarement portée",      lt: "Retai nešiota" } },
-  { id: "pouco",    fator: 0.88, label: { pt: "Pouco frequente",     fr: "Peu fréquent",         lt: "Retai" } },
-  { id: "moderado", fator: 0.72, label: { pt: "Frequência moderada", fr: "Fréquence modérée",    lt: "Vidutiniškai" } },
-  { id: "frequente",fator: 0.52, label: { pt: "Muito frequente",     fr: "Très fréquent",        lt: "Labai dažnai" } },
+  { id: "nunca",    fator: 1.00, label: { pt: "Nunca usada",         fr: "Jamais portée",        lt: "Niekada nenešiota" } },
+  { id: "pouco",    fator: 0.88, label: { pt: "Raramente usada",     fr: "Rarement portée",      lt: "Retai nešiota" } },
+  { id: "moderado", fator: 0.72, label: { pt: "Pouco frequente",     fr: "Peu fréquent",         lt: "Retai" } },
+  { id: "frequente",fator: 0.52, label: { pt: "Uso frequente",       fr: "Usage fréquent",       lt: "Dažnai nešiota" } },
 ];
 
 const IDADES_DATA = [
@@ -1350,7 +1350,11 @@ export default function Calculadora() {
           <div className="pills-grid">
             {ESTADOS.map(e => (
               <button key={e.id} className={`pill${estado === e.id ? " sel" : ""}`}
-                onClick={() => setEstado(e.id)}>
+                onClick={() => {
+                  setEstado(e.id);
+                  // Se escolher "com etiqueta", muda uso para "nunca usada" automaticamente
+                  if (e.id === "novo") setUso("nunca");
+                }}>
                 {e.label}
               </button>
             ))}
