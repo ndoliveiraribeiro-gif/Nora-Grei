@@ -392,13 +392,20 @@ const USOS_DATA = [
 ];
 
 const IDADES_DATA = [
-  { id: "novo",  fator: 1.00, label: { pt: "Menos de 1 ano", fr: "Moins d'un an", lt: "Mažiau nei 1 metai" } },
-  { id: "1a2",   fator: 0.90, label: { pt: "1 a 2 anos",     fr: "1 à 2 ans",     lt: "1–2 metai" } },
-  { id: "2a4",   fator: 0.78, label: { pt: "2 a 4 anos",     fr: "2 à 4 ans",     lt: "2–4 metai" } },
-  { id: "4mais", fator: 0.65, label: { pt: "Mais de 4 anos", fr: "Plus de 4 ans", lt: "Daugiau nei 4 metai" } },
+  { id: "novo",   anos: 0.5,  fator: 1.00, label: { pt: "Menos de 1 ano", fr: "Moins d'un an",  lt: "Mažiau nei 1 metai" } },
+  { id: "1a2",    anos: 1.5,  fator: 0.90, label: { pt: "1 a 2 anos",     fr: "1 à 2 ans",      lt: "1–2 metai" } },
+  { id: "2a4",    anos: 3.0,  fator: 0.78, label: { pt: "2 a 4 anos",     fr: "2 à 4 ans",      lt: "2–4 metai" } },
+  { id: "4a7",    anos: 5.5,  fator: 0.62, label: { pt: "4 a 7 anos",     fr: "4 à 7 ans",      lt: "4–7 metai" } },
+  { id: "7a15",   anos: 10.0, fator: 0.48, label: { pt: "7 a 15 anos",    fr: "7 à 15 ans",     lt: "7–15 metų" } },
+  { id: "15mais", anos: 18.0, fator: 0.35, label: { pt: "Mais de 15 anos",fr: "Plus de 15 ans", lt: "Daugiau nei 15 metų" } },
 ];
 // Peças nunca usadas com etiqueta: a idade quase não penaliza (como vinho em adega)
-const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.98, "4mais": 0.95 };
+const IDADES_NOVO_FATOR = { novo: 1.0, "1a2": 1.0, "2a4": 0.98, "4a7": 0.95, "7a15": 0.90, "15mais": 0.85 };
+
+// Taxa de apreciação anual por tier para marcas de investimento em bom estado
+// Rolex/Patek/Hermès: dados reais do mercado secundário de luxo (Chrono24, Watchbox, Vestiaire)
+// Marcas que NÃO são de investimento real: depreciação normal independentemente do tier
+const APREC_ANUAL = { investimento: 0.055, premium: 0.0, alta: 0.0, massmarket: 0.0, semMarca: 0.0 };
 
 // ── Tipos de peça por categoria ──────────────────────────────────────────────
 const TIPOS_DATA = [
@@ -611,11 +618,17 @@ export default function Calculadora() {
     const fatorArtesanal = artesanal ? 1.80 : 1.0;
 
     // ── Valor de mercado justo ──────────────────────────────────────────────────
-    // Marcas de investimento (Rolex, Hermès, Chanel): podem apreciar — o FEI só entra
-    // se a peça estiver em mau estado (estado "usado" ou "com_defeito")
-    const investimentoSemDepreciacao = tmemo === "investimento" && (estado === "como_novo" || estado === "bom");
-    const valorMercado = investimentoSemDepreciacao
-      ? Math.round(p * fmemo * fatorArtesanal)
+    // Marcas de investimento (Rolex, Hermès, Patek) em bom estado: apreciam com o tempo
+    // Taxa de apreciação: ~5.5%/ano composto para investimento tier
+    // Estado "usado" ou "com_defeito": FEI aplica-se mesmo nestas marcas
+    const anosRef = idObj.anos ?? 1.0;
+    const taxaAprec = APREC_ANUAL[tmemo] ?? 0;
+    const emBomEstado = estado === "como_novo" || estado === "bom";
+    const fatorApreciacao = (taxaAprec > 0 && emBomEstado)
+      ? Math.pow(1 + taxaAprec, anosRef)   // Rolex de 10 anos bom estado: ×1.71
+      : 1.0;
+    const valorMercado = (taxaAprec > 0 && emBomEstado)
+      ? Math.round(p * fmemo * fatorApreciacao * fatorArtesanal)
       : Math.round(p * fmemo * feiClamp * fatorArtesanal);
 
     // Tier bonus para preço de aluguer
