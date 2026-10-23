@@ -121,10 +121,13 @@ const T = {
     tierPremium: "✦ Marca premium",
     tierAlta: "Marca alta",
     tierMassmarket: "Marca standard",
+    tierSemMarca: "Sem marca / artesanal",
     rotacoesMes: "rotações/mês",
     diasAluguer: "dias/aluguer",
     potencial: "potencial",
     em12Meses: "em 12 meses",
+    recebeLiquidoVenda: "Recebes líquido (venda)",
+    recebeLiquidoAluguer: "Média líquida/mês",
     usarSugestao: "Usar sugestão",
     ajustarManualmente: "Ou ajusta manualmente abaixo",
     idadePecaCard: "Idade da peça",
@@ -259,10 +262,13 @@ const T = {
     tierPremium: "✦ Marque premium",
     tierAlta: "Marque haut de gamme",
     tierMassmarket: "Marque standard",
+    tierSemMarca: "Sans marque / artisanale",
     rotacoesMes: "rotations/mois",
     diasAluguer: "jours/location",
     potencial: "potentiel",
     em12Meses: "en 12 mois",
+    recebeLiquidoVenda: "Tu reçois net (vente)",
+    recebeLiquidoAluguer: "Moy. nette/mois",
     usarSugestao: "Utiliser la suggestion",
     ajustarManualmente: "Ou ajuste manuellement ci-dessous",
     idadePecaCard: "Âge de l'article",
@@ -396,10 +402,13 @@ const T = {
     tierPremium: "✦ Premium prekės ženklas",
     tierAlta: "Aukštos klasės prekės ženklas",
     tierMassmarket: "Standartinis prekės ženklas",
+    tierSemMarca: "Be prekės ženklo / rankų darbo",
     rotacoesMes: "rotacijos/mėn.",
     diasAluguer: "dienos/nuoma",
     potencial: "potencialas",
     em12Meses: "per 12 mėn.",
+    recebeLiquidoVenda: "Gauni grynai (pardavimas)",
+    recebeLiquidoAluguer: "Vid. grynai/mėn.",
     usarSugestao: "Naudoti pasiūlymą",
     ajustarManualmente: "Arba nustatyk rankiniu būdu žemiau",
     idadePecaCard: "Drabužio amžius",
@@ -501,9 +510,10 @@ const MARCAS_ALTA = [
 
 function fatorMarca(marca = "") {
   const m = marca.toLowerCase().trim();
+  if (!m) return { fator: 0.55, tier: "semMarca" }; // sem marca declarada: valor neutro (não é massmarket)
   if (MARCAS_PREMIUM.some(b => m.includes(b))) return { fator: 0.82, tier: "premium" };
   if (MARCAS_ALTA.some(b => m.includes(b))) return { fator: 0.50, tier: "alta" };
-  return { fator: 0.32, tier: "massmarket" };
+  return { fator: 0.40, tier: "massmarket" }; // marca desconhecida declarada: ligeiramente acima do mínimo
 }
 
 const FATOR_ESTADO = { novo: 1.0, como_novo: 0.92, bom: 0.68, usado: 0.45, com_defeito: 0.25 };
@@ -543,6 +553,11 @@ function fatorEstadoIdade(condicao, idade_peca) {
   return combinado;
 }
 
+// Custos fixos por aluguer (ida + volta do envio)
+const CUSTO_ENVIO_ALUGUER = 12; // €6 cada sentido
+const COMISSAO_ALUGUER = 0.10;
+const COMISSAO_VENDA = 0.20;
+
 function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria, peca_artesanal }) {
   const p = parseFloat(valor_peca) || 0;
   if (!p) return null;
@@ -553,11 +568,31 @@ function calcEstimativa({ valor_peca, marca, condicao, idade_peca, categoria, pe
   const valorMercado = Math.round(p * fm * fei * fatorArtesanal);
   const cat = ROTACAO_CAT[categoria] ?? ROTACAO_CAT._default;
   const tierBonus = tier === "premium" ? 1.20 : tier === "alta" ? 1.05 : 1.0;
-  const precoAluguerDia = Math.max(5, Math.round(valorMercado * cat.fp * tierBonus / 5) * 5);
-  const precoVendaUsada = Math.max(5, Math.round(valorMercado * 0.75));
-  const caucao = Math.round(valorMercado * 0.30 / 10) * 10;
-  const ganho12m = Math.round(precoAluguerDia * cat.dias * cat.rot * 12 * 0.90 * 0.90);
-  return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, tier };
+
+  // Preço aluguer/dia: mínimo que cobre envios + comissão para um aluguer típico
+  // receita bruta por aluguer = precoAluguerDia × diasTipicos
+  // receita líquida = bruta × (1 - comissão) - custoEnvio  ≥ 0
+  // → precoAluguerDia_min = custoEnvio / (diasTipicos × (1 - comissão))
+  const diasTipicos = cat.dias;
+  const precoMinRentavel = Math.ceil(CUSTO_ENVIO_ALUGUER / (diasTipicos * (1 - COMISSAO_ALUGUER)));
+  const precoSugeridoBruto = Math.round(valorMercado * cat.fp * tierBonus / 5) * 5;
+  const precoAluguerDia = Math.max(precoMinRentavel, precoSugeridoBruto, 5);
+
+  // Venda usada: sobre o preço original (não sobre valorMercado já penalizado)
+  // lojista recebe: precoVenda × (1 - comissãoVenda)
+  const precoVendaUsada = Math.max(10, Math.round(p * fm * fei * fatorArtesanal * 0.80 / 5) * 5);
+
+  const caucao = Math.round(Math.max(valorMercado * 0.30, 20) / 10) * 10;
+
+  // Ganho anual realista: receita líquida por aluguer × rotações anuais
+  const receitaBrutaAluguer = precoAluguerDia * diasTipicos;
+  const receitaLiquidaAluguer = receitaBrutaAluguer * (1 - COMISSAO_ALUGUER) - CUSTO_ENVIO_ALUGUER;
+  const ganho12m = Math.max(0, Math.round(receitaLiquidaAluguer * cat.rot * 12));
+
+  // Receita líquida de venda (para comparação)
+  const receitaLiquidaVenda = Math.round(precoVendaUsada * (1 - COMISSAO_VENDA));
+
+  return { valorMercado, precoAluguerDia, precoVendaUsada, caucao, rotMes: cat.rot.toFixed(1), diasAlug: cat.dias, ganho12m, receitaLiquidaVenda, tier };
 }
 
 export default function PublicarPage() {
@@ -1398,7 +1433,7 @@ export default function PublicarPage() {
             {(() => {
               const est = calcEstimativa(peca);
               if (!est) return null;
-              const tierLabel = { premium: tl.tierPremium, alta: tl.tierAlta, massmarket: tl.tierMassmarket }[est.tier];
+              const tierLabel = { premium: tl.tierPremium, alta: tl.tierAlta, massmarket: tl.tierMassmarket, semMarca: tl.tierSemMarca }[est.tier];
               return (
                 <div style={{
                   background: "linear-gradient(135deg,#1a1816 0%,#2d2926 100%)",
@@ -1426,8 +1461,11 @@ export default function PublicarPage() {
                       <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)", marginTop: "0.2rem" }}>{tl.caucao}</div>
                     </div>
                   </div>
-                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: "0.75rem", lineHeight: 1.4 }}>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: "0.5rem", lineHeight: 1.4 }}>
                     ~{est.rotMes}× {tl.rotacoesMes} · ~{est.diasAlug} {tl.diasAluguer} · {tl.potencial} <strong style={{ color: "#fff" }}>€{est.ganho12m}</strong> {tl.em12Meses}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.45)", marginBottom: "0.75rem", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "0.4rem" }}>
+                    {tl.recebeLiquidoVenda}: <strong style={{ color: "#a8d8a8" }}>€{est.receitaLiquidaVenda}</strong> · {tl.recebeLiquidoAluguer}: <strong style={{ color: "#e8a0b0" }}>€{Math.round(est.ganho12m / 12)}/{lang === "fr" ? "mois" : lang === "lt" ? "mėn." : "mês"}</strong>
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <button
