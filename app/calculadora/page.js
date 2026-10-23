@@ -592,12 +592,15 @@ export default function Calculadora() {
     const idObj  = IDADES_DATA.find(i => i.id === idade);
     const cat = TIPOS_DATA.find(tp => tp.id === tipo) ?? TIPOS_DATA.find(tp => tp.id === "_default");
 
-    // Fator estado × uso × idade combinado
-    // Peças nunca usadas ou com etiqueta: a idade quase não penaliza
+    // Fator de estado de conservação — média ponderada (não multiplicação em cascata)
+    // Pesos: estado=50%, uso=30%, idade=20% — reflecte como o mercado valoriza peças usadas
     const isNuncaUsada = (uso === "nunca" && (estado === "como_novo" || estado === "bom"));
     const fatorIdade = isNuncaUsada ? (IDADES_NOVO_FATOR[idade] ?? 1.0) : idObj.fator;
-    const fei = est.fator * usoObj.fator * fatorIdade;
-    const feiClamp = fei < 0.30 ? fei * 0.85 : fei > 0.85 ? fei * 1.05 : fei;
+    const feiPonderado = est.fator * 0.50 + usoObj.fator * 0.30 + fatorIdade * 0.20;
+    // Floor mínimo por categoria: relógios/joalharia/malas retêm valor melhor
+    const isHardGood = ["Relogio","Joalharia","MalaLuxo","MalaOmbro","Clutch","Mochila","Cinto","Lenco","Oculos","Chapeu"].includes(tipo);
+    const feiFloor = isHardGood ? 0.30 : 0.22;
+    const feiClamp = Math.max(feiFloor, feiPonderado > 0.85 ? feiPonderado * 1.05 : feiPonderado);
 
     // Multiplicador artesanal (peça única feita à mão)
     const fatorArtesanal = artesanal ? 1.80 : 1.0;
@@ -629,9 +632,12 @@ export default function Calculadora() {
     // Total NG
     const totalNG = liquidoAluguer + vendaFinalLiquido;
 
-    // Vinted — preço de ocasião imediato
-    const VINTED_FATOR_TIER = { investimento: 0.50, premium: 0.35, alta: 0.20, massmarket: 0.12, semMarca: 0.25 };
-    const vendaVinted = Math.round(p * (VINTED_FATOR_TIER[tmemo] ?? 0.18));
+    // Vinted — preço de ocasião imediato (preço original × condição × desconto plataforma)
+    // Na Vinted o vendedor tende a pedir ~60-70% do valor de mercado justo
+    // Comissão Vinted: ~8% comprador + 5% vendedor = vendedor recebe ~95% do listing
+    const VINTED_FATOR_TIER = { investimento: 0.58, premium: 0.48, alta: 0.35, massmarket: 0.22, semMarca: 0.30 };
+    const vintedBase = Math.round(p * feiClamp * (VINTED_FATOR_TIER[tmemo] ?? 0.28));
+    const vendaVinted = Math.max(5, vintedBase);
 
     const ganhoExtra = totalNG - vendaVinted;
     const multiplicador = vendaVinted > 0 ? (totalNG / vendaVinted) : 0;
