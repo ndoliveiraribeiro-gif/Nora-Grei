@@ -2237,7 +2237,7 @@ export default function Perfil() {
 
       <div className="page">
 
-        {/* ATALHO ADMIN — só visível para o admin */}
+        {/* ATALHO ADMIN — só visível para o admin Nuno Ribeiro */}
         {user?.id === "2f6afc17-8e46-41a7-9b9f-4f407c76919f" && (
           <a href="/backoffice" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.85rem 1.25rem",background:"#080808",color:"#f8f7f5",textDecoration:"none",borderBottom:"1px solid #2a2420"}}>
             <div style={{display:"flex",alignItems:"center",gap:"0.6rem"}}>
